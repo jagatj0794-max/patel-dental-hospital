@@ -12,7 +12,9 @@ export type PageId =
   | 'gallery'
   | 'doctors'
   | 'contact'
-  | 'admin';
+  | 'admin'
+  | 'admin/login'
+  | 'supabase-test';
 
 export interface Treatment {
   id: string;

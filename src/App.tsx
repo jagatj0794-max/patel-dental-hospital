@@ -26,11 +26,29 @@ import SmileGallery from './pages/SmileGallery';
 import Doctors from './pages/Doctors';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
+import SupabaseTest from './pages/SupabaseTest';
+import { supabase } from './utils/supabase';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<PageId>('home');
+  const [currentPage, setCurrentPage] = useState<PageId>(() => {
+    let hash = window.location.hash.replace('#', '');
+    if (hash.startsWith('/')) {
+      hash = hash.substring(1);
+    }
+    if (hash === 'admin-login') {
+      hash = 'admin/login';
+    }
+    const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test'];
+    if (hash && validPages.includes(hash as PageId)) {
+      return hash as PageId;
+    }
+    return 'home';
+  });
+  const [session, setSession] = useState<any>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
   const [appointmentTreatment, setAppointmentTreatment] = useState('General Consultation');
   
@@ -178,6 +196,46 @@ export default function App() {
     safeStorage.setItem('pdh_contact_info', JSON.stringify(contactInfo));
   }, [contactInfo]);
 
+  // Load and listen to Supabase authentication changes
+  useEffect(() => {
+    let subscription: any = null;
+
+    async function initAuth() {
+      try {
+        const client = supabase.client;
+        // Fetch existing session safely
+        const { data: { session: initialSession } } = await client.auth.getSession();
+        setSession(initialSession);
+
+        // Listen for realtime auth changes
+        const { data: { subscription: authSubscription } } = client.auth.onAuthStateChange((_event, currentSession) => {
+          setSession(currentSession);
+        });
+        subscription = authSubscription;
+      } catch (err) {
+        console.warn('Supabase auth initialization skipped or failed:', err);
+      } finally {
+        setIsAuthLoading(false);
+      }
+    }
+
+    initAuth();
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, []);
+
+  // Enforce authenticated administrator routing
+  useEffect(() => {
+    if (!isAuthLoading && currentPage === 'admin' && !session) {
+      setCurrentPage('admin/login');
+      window.location.hash = 'admin/login';
+    }
+  }, [currentPage, session, isAuthLoading]);
+
   // Map mediaImages dynamically to GalleryItem[] format for SmileGallery page and Lightbox
   const mappedGalleryItems: GalleryItem[] = (mediaImages || [])
     .filter(img => img && typeof img === 'object' && img.id && img.url)
@@ -213,10 +271,16 @@ export default function App() {
   // Synchronize dynamic routing hashes (supports deep-linking & browser backward/forward steps)
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '') as PageId;
-      const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin'];
-      if (hash && validPages.includes(hash)) {
-        setCurrentPage(hash);
+      let hash = window.location.hash.replace('#', '');
+      if (hash.startsWith('/')) {
+        hash = hash.substring(1);
+      }
+      if (hash === 'admin-login') {
+        hash = 'admin/login';
+      }
+      const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test'];
+      if (hash && validPages.includes(hash as PageId)) {
+        setCurrentPage(hash as PageId);
         window.scrollTo({ top: 0 });
       }
     };
@@ -338,7 +402,19 @@ export default function App() {
             contactInfo={contactInfo}
           />
         );
+      case 'admin/login':
+        return <AdminLogin setCurrentPage={setCurrentPage} session={session} />;
+      case 'supabase-test':
+        return <SupabaseTest setCurrentPage={setCurrentPage} />;
       case 'admin':
+        if (isAuthLoading) {
+          return (
+            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-slate-50">
+              <span className="animate-spin text-brand-navy rounded-full h-8 w-8 border-b-2 border-slate-900"></span>
+              <p className="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Verifying Admin Session...</p>
+            </div>
+          );
+        }
         return (
           <Admin 
             setCurrentPage={setCurrentPage} 
@@ -385,7 +461,7 @@ export default function App() {
     <div id="react-main-frame" className="min-h-screen flex flex-col justify-between relative bg-white selection:bg-brand-cyan/20 selection:text-brand-navy">
       
       {/* Sticky Premium Navbar */}
-      {currentPage !== 'admin' && (
+      {currentPage !== 'admin' && currentPage !== 'admin/login' && currentPage !== 'supabase-test' && (
         <Navbar
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
@@ -410,7 +486,7 @@ export default function App() {
       </main>
 
       {/* Floating interactive My Appointments Indicator drawer */}
-      {appointments.length > 0 && currentPage !== 'contact' && (
+      {appointments.length > 0 && currentPage !== 'contact' && currentPage !== 'admin' && currentPage !== 'admin/login' && currentPage !== 'supabase-test' && (
         <div id="appointments-status-badge" className="hidden lg:block fixed bottom-6 left-6 z-40 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 max-w-sm">
           <div className="flex justify-between items-center pb-2 border-b border-gray-150 mb-2">
             <span className="text-xs font-extrabold text-brand-navy flex items-center">
@@ -451,7 +527,7 @@ export default function App() {
       )}
 
       {/* Elegant Footer area */}
-      {currentPage !== 'admin' && (
+      {currentPage !== 'admin' && currentPage !== 'admin/login' && currentPage !== 'supabase-test' && (
         <Footer
           setCurrentPage={setCurrentPage}
           openAppointmentModal={() => openAppointmentModal()}
@@ -460,7 +536,7 @@ export default function App() {
       )}
 
       {/* Floating active emergency action and booking widget */}
-      {currentPage !== 'admin' && (
+      {currentPage !== 'admin' && currentPage !== 'admin/login' && currentPage !== 'supabase-test' && (
         <FloatingActionPanel 
           openAppointmentModal={openAppointmentModal} 
           contactInfo={contactInfo}

@@ -34,6 +34,7 @@ import {
 import { PageId, Doctor, PatientMoment, ContactInfo } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
+import { supabase } from '../utils/supabase';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -184,7 +185,12 @@ export default function Admin({
     { id: 'contact', label: 'Contact', icon: Phone },
   ] as const;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await supabase.client.auth.signOut();
+    } catch (err) {
+      console.warn('Error signing out:', err);
+    }
     // Return to public homepage view
     setCurrentPage('home');
     window.location.hash = 'home';
