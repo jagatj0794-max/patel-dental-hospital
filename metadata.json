@@ -1,0 +1,6 @@
+{
+  "name": "Patel Dental Hospital",
+  "description": "A modern, premium, minimalist website for Patel Dental Hospital in Rajkot, Gujarat. Specialists in Dental Implants, Same Day Fix Teeth, Aligners, and Full Mouth Rehabilitation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
