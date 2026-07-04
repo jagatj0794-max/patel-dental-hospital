@@ -300,16 +300,14 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               <p>Designed under clean sanitization protocols in Rajkot.</p>
               <p>Chief Dental Surgeon: <span className="text-brand-cyan font-bold">Dr. Kinjal Patel BDS</span></p>
             </div>
-            {isDev && (
-              <button
-                type="button"
-                onClick={() => handleLinkClick('admin')}
-                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white transition duration-200 cursor-pointer text-[10px] font-bold shadow-xs"
-                id="admin-demo-access-btn"
-              >
-                <span>🔐 Admin Demo</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => handleLinkClick('admin')}
+              className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700"
+              id="admin-demo-access-btn"
+            >
+              <span>🔐 Admin Demo</span>
+            </button>
           </div>
         </div>
 
