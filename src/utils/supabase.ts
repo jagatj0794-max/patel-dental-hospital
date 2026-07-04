@@ -84,10 +84,12 @@ export function getSupabaseConfigError(): string | null {
     return `The Supabase Anon Key contains whitespace characters (spaces or newlines). Please check and clean your environment variables in the Settings menu.`;
   }
 
-  // Check if Anon Key is a valid JWT (Segment check)
-  const keyParts = key.split('.');
-  if (keyParts.length < 3) {
-    return `The Supabase Anon Key format is invalid. A valid Supabase Anon Key must be a JSON Web Token (JWT) containing three dot-separated segments. Please make sure you copied the correct "anon" "public" key from your Supabase Dashboard API Settings.`;
+  // Check if Anon Key is a valid legacy JWT or new publishable key
+  const isLegacyJwt = key.startsWith('eyJ') && key.split('.').length >= 3;
+  const isPublishableKey = key.startsWith('sb_publishable_');
+
+  if (!isLegacyJwt && !isPublishableKey) {
+    return `The Supabase Anon Key format is invalid. A valid Supabase Anon Key must be either a legacy JSON Web Token (JWT) or a new Supabase Publishable Key (starting with "sb_publishable_"). Please make sure you copied the correct "anon" "public" key from your Supabase Dashboard API Settings.`;
   }
 
   return null;
