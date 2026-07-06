@@ -10,7 +10,9 @@ import { Calendar, PhoneCall, Plus, Table, Trash2, X, Sparkles, Check, CheckSqua
 import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo } from './types';
 import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
+import { supabase } from './utils/supabase';
 import { PATIENT_MOMENTS } from './data/patientMoments';
+import { appointmentService } from './utils/appointmentData';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingActionPanel from './components/FloatingActionPanel';
@@ -28,7 +30,6 @@ import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import SupabaseTest from './pages/SupabaseTest';
-import { supabase } from './utils/supabase';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
@@ -52,15 +53,47 @@ export default function App() {
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
   const [appointmentTreatment, setAppointmentTreatment] = useState('General Consultation');
   
-  // My Saved Appointments local-storage persistence
-  const [appointments, setAppointments] = useState<Appointment[]>(() => {
-    try {
-      const saved = safeStorage.getItem('pdh_appointments');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  // My Saved Appointments state (loaded dynamically from Supabase based on session IDs)
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  useEffect(() => {
+    const loadMyAppointments = async () => {
+      try {
+        const bookedIds = JSON.parse(sessionStorage.getItem('my_booked_ids') || '[]');
+        if (bookedIds.length === 0) return;
+
+        const { data, error } = await supabase.client
+          .from('appointments')
+          .select('*')
+          .in('id', bookedIds);
+
+        if (error) {
+          console.error('Error fetching my appointments:', error);
+          return;
+        }
+
+        if (data) {
+          const mapped: Appointment[] = data.map((row: any) => ({
+            id: row.id,
+            name: row.patient_name,
+            phone: row.mobile_number,
+            email: row.email,
+            treatment: row.service,
+            branch: row.branch,
+            date: row.appointment_date,
+            timeSlot: row.appointment_time,
+            message: row.symptoms,
+            createdAt: row.created_at,
+            status: row.status === 'Pending' ? 'Pending' : 'Confirmed'
+          }));
+          setAppointments(mapped);
+        }
+      } catch (e) {
+        console.error('Exception loading my appointments from Supabase:', e);
+      }
+    };
+    loadMyAppointments();
+  }, []);
 
   // Lightbox selection state mapping
   const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
@@ -213,7 +246,8 @@ export default function App() {
         });
         subscription = authSubscription;
       } catch (err) {
-        console.warn('Supabase auth initialization skipped or failed:', err);
+        console.warn('Supabase auth initialization failed:', err);
+        setSession(null);
       } finally {
         setIsAuthLoading(false);
       }
@@ -301,7 +335,7 @@ export default function App() {
     setIsAppointmentOpen(true);
   };
 
-  const handleBookAppointment = (data: {
+  const handleBookAppointment = async (data: {
     name: string;
     phone: string;
     treatment: string;
@@ -309,44 +343,142 @@ export default function App() {
     date: string;
     timeSlot: string;
     message?: string;
-  }) => {
-    const newAppointment: Appointment = {
-      id: `apt-${Date.now()}`,
-      status: 'Confirmed', // Fast automatic confirmation for clinical prototype feel
-      createdAt: new Date().toISOString(),
-      ...data,
-    } as any;
+  }): Promise<boolean> => {
+    // 1. Double check availability before inserting to prevent race conditions
+    const isAvailable = await appointmentService.isSlotAvailable(data.date, data.timeSlot, data.branch);
+    if (!isAvailable) {
+      return false;
+    }
 
-    const updatedList = [newAppointment, ...appointments];
-    setAppointments(updatedList);
-    safeStorage.setItem('pdh_appointments', JSON.stringify(updatedList));
+    const newId = `apt-${Date.now()}`;
+    const newApt = {
+      id: newId,
+      patient_name: data.name,
+      mobile_number: data.phone,
+      email: '',
+      age: 0,
+      gender: 'Male',
+      doctor: 'To Be Assigned',
+      branch: data.branch,
+      service: data.treatment,
+      appointment_date: data.date,
+      appointment_time: data.timeSlot,
+      booking_date: new Date().toISOString().split('T')[0],
+      status: 'Pending',
+      symptoms: data.message || '',
+      notes: ''
+    };
+
+    try {
+      const { error } = await supabase.client
+        .from('appointments')
+        .insert(newApt);
+
+      if (error) {
+        console.error('Error booking appointment on Supabase:', error);
+        return false;
+      } else {
+        const patientFormat: Appointment = {
+          id: newId,
+          name: data.name,
+          phone: data.phone,
+          treatment: data.treatment,
+          branch: data.branch as any,
+          date: data.date,
+          timeSlot: data.timeSlot,
+          message: data.message,
+          createdAt: new Date().toISOString(),
+          status: 'Pending'
+        };
+        setAppointments(prev => [patientFormat, ...prev]);
+        
+        const existingSessionIds = JSON.parse(sessionStorage.getItem('my_booked_ids') || '[]');
+        sessionStorage.setItem('my_booked_ids', JSON.stringify([newId, ...existingSessionIds]));
+        return true;
+      }
+    } catch (e) {
+      console.error('Exception booking appointment:', e);
+      return false;
+    }
   };
 
-  const handleCancelAppointment = (id: string) => {
-    const filtered = appointments.filter((apt) => apt.id !== id);
-    setAppointments(filtered);
-    safeStorage.setItem('pdh_appointments', JSON.stringify(filtered));
+  const handleCancelAppointment = async (id: string) => {
+    try {
+      const { error } = await supabase.client
+        .from('appointments')
+        .update({ status: 'Cancelled' })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error cancelling appointment on Supabase:', error);
+      } else {
+        setAppointments(prev => prev.filter((apt) => apt.id !== id));
+        const bookedIds = JSON.parse(sessionStorage.getItem('my_booked_ids') || '[]');
+        const updatedIds = bookedIds.filter((bid: string) => bid !== id);
+        sessionStorage.setItem('my_booked_ids', JSON.stringify(updatedIds));
+      }
+    } catch (e) {
+      console.error('Exception cancelling appointment:', e);
+    }
   };
+
+  const ALL_MODAL_TIME_SLOTS = [
+    '09:00 AM - 10:00 AM',
+    '11:00 AM - 12:00 PM',
+    '12:00 PM - 01:00 PM',
+    '04:00 PM - 05:00 PM',
+    '06:00 PM - 07:00 PM',
+    '07:00 PM - 08:00 PM',
+  ];
 
   // Appointment Modal Inner setup with form controls (fully integrated!)
   const [modalForm, setModalForm] = useState({
     name: '',
     phone: '',
     date: '',
-    branch: 'Gayatrinagar Road (Jalaram Chowk)',
+    branch: 'Gayatrinagar Branch',
     timeSlot: '09:00 AM - 10:00 AM',
     message: '',
   });
 
   const [modalFormSubmitted, setModalFormSubmitted] = useState(false);
+  const [modalBookedSlots, setModalBookedSlots] = useState<string[]>([]);
+  const [bookingError, setBookingError] = useState('');
 
-  const handleModalSubmit = (e: React.FormEvent) => {
+  // Dynamic slot lookup for popup modal
+  useEffect(() => {
+    let active = true;
+    const loadSlots = async () => {
+      if (!modalForm.date || !modalForm.branch) return;
+      try {
+        const booked = await appointmentService.getBookedSlots(modalForm.date, modalForm.branch);
+        if (active) {
+          setModalBookedSlots(booked);
+          
+          // Auto select first available if currently selected slot is booked
+          const available = ALL_MODAL_TIME_SLOTS.filter(s => !booked.includes(s));
+          if (available.length > 0 && !available.includes(modalForm.timeSlot)) {
+            setModalForm(prev => ({ ...prev, timeSlot: available[0] }));
+          }
+        }
+      } catch (err) {
+        console.error('Error loading booked slots for modal:', err);
+      }
+    };
+    loadSlots();
+    return () => {
+      active = false;
+    };
+  }, [modalForm.date, modalForm.branch]);
+
+  const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBookingError('');
     if (!modalForm.name.trim() || !modalForm.phone.trim() || !modalForm.date) {
       return;
     }
 
-    handleBookAppointment({
+    const success = await handleBookAppointment({
       name: modalForm.name,
       phone: modalForm.phone,
       treatment: appointmentTreatment,
@@ -356,7 +488,11 @@ export default function App() {
       message: modalForm.message,
     });
 
-    setModalFormSubmitted(true);
+    if (success) {
+      setModalFormSubmitted(true);
+    } else {
+      setBookingError('This appointment slot has already been booked. Please select another available time.');
+    }
   };
 
   // Switch rendered pages dynamically (state & hash controller)
@@ -574,21 +710,22 @@ export default function App() {
               <div className="bg-brand-navy p-6 text-white flex justify-between items-center relative">
                 <div className="space-y-1">
                   <h3 className="font-display font-extrabold text-lg leading-none">
-                    Clinic Appointment Slot
+                    Book Dental Appointment
                   </h3>
                   <span className="text-[11px] text-brand-cyan font-semibold block uppercase tracking-wider">
-                    Assigned: {appointmentTreatment}
+                    Dental Consultation
                   </span>
                 </div>
                 <button
                   onClick={() => {
                     setIsAppointmentOpen(false);
                     setModalFormSubmitted(false);
+                    setBookingError('');
                     setModalForm({
                       name: '',
                       phone: '',
                       date: '',
-                      branch: 'Gayatrinagar Road (Jalaram Chowk)',
+                      branch: 'Gayatrinagar Branch',
                       timeSlot: '09:00 AM - 10:00 AM',
                       message: '',
                     });
@@ -611,16 +748,21 @@ export default function App() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                     >
+                      {bookingError && (
+                        <div className="p-3 bg-red-50 border border-red-150 rounded-xl text-red-600 text-xs font-semibold">
+                          {bookingError}
+                        </div>
+                      )}
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                          Patients Full Name *
+                          Patient's Full Name *
                         </label>
                         <input
                           type="text"
                           required
                           value={modalForm.name}
                           onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
-                          placeholder="e.g. Ramesh Savaliya"
+                          placeholder="Enter patient's full name"
                           className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         />
                       </div>
@@ -634,7 +776,7 @@ export default function App() {
                           required
                           value={modalForm.phone}
                           onChange={(e) => setModalForm({ ...modalForm, phone: e.target.value })}
-                          placeholder="e.g. +91 79900 62009"
+                          placeholder="Enter WhatsApp mobile number"
                           className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         />
                       </div>
@@ -649,6 +791,7 @@ export default function App() {
                             required
                             value={modalForm.date}
                             onChange={(e) => setModalForm({ ...modalForm, date: e.target.value })}
+                            placeholder="DD-MM-YYYY"
                             className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                           />
                         </div>
@@ -660,14 +803,17 @@ export default function App() {
                           <select
                             value={modalForm.timeSlot}
                             onChange={(e) => setModalForm({ ...modalForm, timeSlot: e.target.value })}
-                            className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
+                            disabled={ALL_MODAL_TIME_SLOTS.filter(s => !modalBookedSlots.includes(s)).length === 0}
+                            className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none disabled:opacity-60"
                           >
-                            <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
-                            <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
-                            <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
-                            <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
-                            <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
-                            <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+                            {ALL_MODAL_TIME_SLOTS.filter(s => !modalBookedSlots.includes(s)).map((slot) => (
+                              <option key={slot} value={slot}>
+                                {slot}
+                              </option>
+                            ))}
+                            {ALL_MODAL_TIME_SLOTS.filter(s => !modalBookedSlots.includes(s)).length === 0 && (
+                              <option value="">No slots available</option>
+                            )}
                           </select>
                         </div>
                       </div>
@@ -681,20 +827,20 @@ export default function App() {
                           onChange={(e) => setModalForm({ ...modalForm, branch: e.target.value })}
                           className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         >
-                          <option value="Gayatrinagar Road (Jalaram Chowk)">Branch 1: Gayatrinagar Road</option>
-                          <option value="Mavdi Main Road (Business Centrum)">Branch 2: Mavdi Main Road</option>
+                          <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
+                          <option value="Mavdi Branch">Mavdi Branch</option>
                         </select>
                       </div>
 
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                          Brief Symptoms / Remarks (Optional)
+                          Symptoms (Optional)
                         </label>
                         <textarea
                           rows={2}
                           value={modalForm.message}
                           onChange={(e) => setModalForm({ ...modalForm, message: e.target.value })}
-                          placeholder="Please note down any symptoms..."
+                          placeholder="Describe symptoms or additional notes..."
                           className="w-full px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan"
                         />
                       </div>
@@ -704,7 +850,7 @@ export default function App() {
                           type="submit"
                           className="w-full py-3.5 bg-brand-cyan hover:bg-brand-navy text-white text-xs font-bold rounded-xl shadow-lg transition"
                         >
-                          Confirm & Secure Ticket
+                          Book Appointment
                         </button>
                       </div>
                     </motion.form>
@@ -744,11 +890,12 @@ export default function App() {
                           onClick={() => {
                             setIsAppointmentOpen(false);
                             setModalFormSubmitted(false);
+                            setBookingError('');
                             setModalForm({
                               name: '',
                               phone: '',
                               date: '',
-                              branch: 'Gayatrinagar Road (Jalaram Chowk)',
+                              branch: 'Gayatrinagar Branch',
                               timeSlot: '09:00 AM - 10:00 AM',
                               message: '',
                             });

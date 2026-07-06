@@ -62,7 +62,7 @@ export interface Appointment {
   phone: string;
   email?: string;
   treatment: string;
-  branch: 'Gayatrinagar Road (Jalaram Chowk)' | 'Mavdi Main Road (Business Centrum)';
+  branch: 'Gayatrinagar Branch' | 'Mavdi Branch';
   date: string;
   timeSlot: string;
   message?: string;

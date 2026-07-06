@@ -114,7 +114,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
 
       console.log("=== LOGIN DEBUG START ===");
       console.log("typeof supabase =", typeof supabase);
-      console.log("supabase =", supabase);
+      console.log("is supabase client initialized =", !!supabase.client);
 
       const { data, error } = await client.auth.signInWithPassword({
         email,
@@ -136,7 +136,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
         }, 1200);
       }
     } catch (err: any) {
-      console.group('%c❌ Supabase Sign In Failed ❌', 'background: #f43f5e; color: white; font-weight: bold; padding: 4px;');
+      console.group('%c❌ Supabase Auth Operation Failed ❌', 'background: #f43f5e; color: white; font-weight: bold; padding: 4px;');
       console.error('Error Object:', err);
       console.error('Error Message:', err.message);
       console.error('Error Status:', err.status);
@@ -204,10 +204,20 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-5 p-3.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs flex items-start space-x-2.5"
+              className="mb-5 p-3.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs flex flex-col space-y-2"
+              id="auth-error"
             >
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-rose-500" />
-              <span>{errorMsg}</span>
+              <div className="flex items-start space-x-2.5">
+                <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-rose-500" />
+                <span>{errorMsg}</span>
+              </div>
+              {errorMsg.toLowerCase().includes('invalid login credentials') && (
+                <div className="pl-6.5 pt-2 border-t border-rose-100 mt-2 space-y-1.5" id="auth-error-suggestions">
+                  <p className="text-[11px] text-rose-600 font-medium leading-relaxed">
+                    Tip: Please verify that you have entered the correct administrator credentials. Administrator accounts must be configured via the database.
+                  </p>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -216,13 +226,14 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="mb-5 p-3.5 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs flex items-start space-x-2.5"
+              id="auth-success"
             >
               <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-emerald-600" />
               <span>{successMsg}</span>
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" id="auth-form">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 Admin Email Address
@@ -239,6 +250,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-brand-cyan focus:bg-white text-sm rounded-xl outline-none transition-all duration-200"
+                  id="auth-email-input"
                 />
               </div>
             </div>
@@ -259,11 +271,13 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-brand-cyan focus:bg-white text-sm rounded-xl outline-none transition-all duration-200"
+                  id="auth-password-input"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                  id="toggle-password-visibility-btn"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -274,6 +288,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
               type="submit"
               disabled={loading}
               className="w-full mt-6 bg-brand-navy hover:bg-brand-slate text-white text-xs font-bold uppercase tracking-wider py-3 px-4 rounded-xl shadow-md transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              id="auth-submit-btn"
             >
               {loading ? (
                 <>
@@ -289,7 +304,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
           {/* Quick Notice about newly provisioned Supabase DB */}
           <div className="mt-8 pt-6 border-t border-slate-100 text-center">
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              🔑 Secure clinical administration panel. Only registered administrator credentials are authorized to log in.
+              🔑 Secure clinical administration panel. Please log in using your administrator credentials.
             </p>
           </div>
         </div>

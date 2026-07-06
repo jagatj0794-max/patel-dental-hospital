@@ -42,6 +42,9 @@ export default defineConfig(() => {
   envUrl = cleanEnvValue(envUrl);
   envKey = cleanEnvValue(envKey);
 
+  process.env.VITE_SUPABASE_URL = envUrl;
+  process.env.VITE_SUPABASE_ANON_KEY = envKey;
+
   return {
     plugins: [react(), tailwindcss()],
     resolve: {

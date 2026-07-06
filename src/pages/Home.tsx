@@ -2114,7 +2114,7 @@ export default function Home({
                       : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  Branch 1: Gayatrinagar Road
+                  Gayatrinagar Branch
                 </button>
                 <button
                   type="button"
@@ -2125,7 +2125,7 @@ export default function Home({
                       : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  Branch 2: Mavdi Main Road
+                  Mavdi Branch
                 </button>
               </div>
 

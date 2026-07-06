@@ -29,12 +29,16 @@ import {
   Clock,
   Play,
   GripVertical,
-  ExternalLink
+  ExternalLink,
+  Building2,
+  Mail
 } from 'lucide-react';
 import { PageId, Doctor, PatientMoment, ContactInfo } from '../types';
-import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft } from 'lucide-react';
+import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
+import { uploadImage } from '../utils/supabaseStorage';
+import Appointments from './Appointments';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -56,7 +60,7 @@ interface AdminProps {
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>;
 }
 
-type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'contact';
+type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact';
 
 export default function Admin({ 
   setCurrentPage, 
@@ -182,6 +186,7 @@ export default function Admin({
     { id: 'hero', label: 'Hero', icon: Sparkles },
     { id: 'doctors', label: 'Doctors', icon: Users },
     { id: 'media', label: 'Media', icon: ImageIcon },
+    { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
   ] as const;
 
@@ -221,18 +226,43 @@ export default function Admin({
     }
   };
 
-  const handleFile = (file: File) => {
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('Please upload a valid image file.');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setDraftBgImage(reader.result);
+
+    // Inform user if the file is quite large
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Warning: This image file is quite large (' + (file.size / (1024 * 1024)).toFixed(1) + 'MB). For optimal rendering performance, please consider using an image under 2MB.');
+    }
+
+    try {
+      const imageUrl = await uploadImage(file);
+      setDraftBgImage(imageUrl);
+      setSaveMessage('Hero background image uploaded successfully!');
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (err: any) {
+      console.warn('Supabase storage upload failed, falling back to local Base64 storage:', err);
+      try {
+        const localDataUrl = await readFileAsDataURL(file);
+        setDraftBgImage(localDataUrl);
+        setSaveMessage('Notice: The image was loaded locally because the Supabase storage connection is restricted or offline. Your background will still render and persist correctly on this device.');
+        setTimeout(() => setSaveMessage(null), 5000);
+      } catch (fallbackErr: any) {
+        console.error('Local fallback failed:', fallbackErr);
+        alert('Failed to upload to Supabase and failed to read file locally: ' + (fallbackErr.message || fallbackErr));
       }
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleResetImage = () => {
@@ -264,12 +294,29 @@ export default function Admin({
   };
 
   const renderTabContent = () => {
+    // Dynamically calculate clinical counts for statistics
+    const totalDoctors = doctorsList?.length || 0;
+    const totalImages = mediaImages?.length || 0;
+    const totalVideos = videosList?.length || 0;
+    
+    // Dynamically calculate unique branches
+    const uniqueBranchesList = Array.from(
+      new Set(
+        [
+          ...(doctorsList || []).map((d) => d.branch),
+          ...(mediaImages || []).map((m) => m.branch)
+        ]
+          .filter((b): b is string => typeof b === 'string' && b.trim() !== '' && b !== 'All Branches' && b !== 'Select Branch')
+      )
+    );
+    const totalBranches = uniqueBranchesList.length > 0 ? uniqueBranchesList.length : 2;
+
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-6" id="admin-dashboard-view">
             {/* Upper Info Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-150 shadow-3xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08)]">
               <div>
                 <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900" id="admin-tab-title">
                   Dashboard Overview
@@ -289,73 +336,131 @@ export default function Admin({
             {/* Summary Cards Grid (Responsive 1 -> 2 -> 4 Columns) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="admin-summary-cards">
               {/* Card 1: Doctors */}
-              <div className="bg-white border border-slate-150 p-6 rounded-2xl shadow-3xs flex items-center justify-between hover:shadow-sm hover:border-blue-200 transition-all duration-300 group">
-                <div className="space-y-1.5">
+              <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08),0_2px_4px_-1px_rgba(148,163,184,0.04)] hover:shadow-[0_12px_24px_-8px_rgba(148,163,184,0.15)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-teal-500 transition-all duration-300 group-hover:h-full group-hover:w-1.5" />
+                <div className="space-y-2 pl-2">
                   <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Doctors</span>
-                  <span className="text-2xl font-black text-slate-900 block leading-none">6 Specialists</span>
-                  <span className="text-[11px] text-[#0D9488] font-bold flex items-center gap-1 mt-1">
-                    <UserCheck className="h-3.5 w-3.5 text-[#0D9488]" />
-                    <span>Clinic Rosters active</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{totalDoctors}</span>
+                    <span className="text-xs text-slate-500 font-medium">Specialists</span>
+                  </div>
+                  <span className="text-[11px] text-teal-600 font-semibold flex items-center gap-1.5 mt-1">
+                    <UserCheck className="h-3.5 w-3.5 text-teal-500" />
+                    <span>Clinic rosters active</span>
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-blue-50 text-blue-600 transition-transform duration-300 group-hover:scale-105 shrink-0">
+                <div className="p-4 rounded-xl bg-teal-50 text-teal-600 transition-all duration-300 group-hover:bg-teal-100 group-hover:scale-110 shrink-0 shadow-3xs">
                   <Stethoscope className="h-6 w-6" />
                 </div>
               </div>
 
               {/* Card 2: Images */}
-              <div className="bg-white border border-slate-150 p-6 rounded-2xl shadow-3xs flex items-center justify-between hover:shadow-sm hover:border-emerald-200 transition-all duration-300 group">
-                <div className="space-y-1.5">
+              <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08),0_2px_4px_-1px_rgba(148,163,184,0.04)] hover:shadow-[0_12px_24px_-8px_rgba(148,163,184,0.15)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 transition-all duration-300 group-hover:h-full group-hover:w-1.5" />
+                <div className="space-y-2 pl-2">
                   <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Images</span>
-                  <span className="text-2xl font-black text-slate-900 block leading-none">142 Items</span>
-                  <span className="text-[11px] text-slate-500 font-medium block mt-1">
-                    Dental gallery uploads
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{totalImages}</span>
+                    <span className="text-xs text-slate-500 font-medium">Assets</span>
+                  </div>
+                  <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1.5 mt-1">
+                    <ImageIcon className="h-3.5 w-3.5 text-emerald-500" />
+                    <span>Gallery uploads</span>
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-105 shrink-0">
+                <div className="p-4 rounded-xl bg-emerald-50 text-emerald-600 transition-all duration-300 group-hover:bg-emerald-100 group-hover:scale-110 shrink-0 shadow-3xs">
                   <ImageIcon className="h-6 w-6" />
                 </div>
               </div>
 
               {/* Card 3: Videos */}
-              <div className="bg-white border border-slate-150 p-6 rounded-2xl shadow-3xs flex items-center justify-between hover:shadow-sm hover:border-sky-200 transition-all duration-300 group">
-                <div className="space-y-1.5">
+              <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08),0_2px_4px_-1px_rgba(148,163,184,0.04)] hover:shadow-[0_12px_24px_-8px_rgba(148,163,184,0.15)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-sky-500 transition-all duration-300 group-hover:h-full group-hover:w-1.5" />
+                <div className="space-y-2 pl-2">
                   <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Videos</span>
-                  <span className="text-2xl font-black text-slate-900 block leading-none">8 Features</span>
-                  <span className="text-[11px] text-sky-600 font-semibold block mt-1">
-                    Patient Testimonials
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{totalVideos}</span>
+                    <span className="text-xs text-slate-500 font-medium">Features</span>
+                  </div>
+                  <span className="text-[11px] text-sky-600 font-semibold flex items-center gap-1.5 mt-1">
+                    <Video className="h-3.5 w-3.5 text-sky-500" />
+                    <span>Patient testimonials</span>
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-sky-50 text-sky-600 transition-transform duration-300 group-hover:scale-105 shrink-0">
+                <div className="p-4 rounded-xl bg-sky-50 text-sky-600 transition-all duration-300 group-hover:bg-sky-100 group-hover:scale-110 shrink-0 shadow-3xs">
                   <Video className="h-6 w-6" />
                 </div>
               </div>
 
-              {/* Card 4: Contact Details */}
-              <div className="bg-white border border-slate-150 p-6 rounded-2xl shadow-3xs flex items-center justify-between hover:shadow-sm hover:border-violet-200 transition-all duration-300 group">
-                <div className="space-y-1.5">
-                  <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Contact Details</span>
-                  <span className="text-2xl font-black text-slate-900 block leading-none">2 Branches</span>
-                  <span className="text-[11px] text-slate-500 font-medium block mt-1">
-                    Gayatrinagar & Mavdi HQ
+              {/* Card 4: Branches */}
+              <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08),0_2px_4px_-1px_rgba(148,163,184,0.04)] hover:shadow-[0_12px_24px_-8px_rgba(148,163,184,0.15)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-violet-500 transition-all duration-300 group-hover:h-full group-hover:w-1.5" />
+                <div className="space-y-2 pl-2">
+                  <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Branches</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{totalBranches}</span>
+                    <span className="text-xs text-slate-500 font-medium">Branches</span>
+                  </div>
+                  <span className="text-[11px] text-violet-600 font-semibold flex items-center gap-1.5 mt-1">
+                    <MapPin className="h-3.5 w-3.5 text-violet-500" />
+                    <span>Gayatrinagar & Mavdi HQ</span>
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-violet-50 text-violet-600 transition-transform duration-300 group-hover:scale-105 shrink-0">
+                <div className="p-4 rounded-xl bg-violet-50 text-violet-600 transition-all duration-300 group-hover:bg-violet-100 group-hover:scale-110 shrink-0 shadow-3xs">
                   <MapPin className="h-6 w-6" />
                 </div>
               </div>
             </div>
 
-            {/* Quick Action visual guide layout block */}
-            <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center space-y-3 min-h-[220px]">
-              <div className="h-12 w-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
-                <LayoutDashboard className="h-6 w-6" />
+            {/* Premium Full-Width Information Panel */}
+            <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+                <div className="space-y-1">
+                  <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Clinical Entity</span>
+                  <h3 className="text-base md:text-lg font-bold font-display text-slate-800 flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-teal-600" />
+                    <span>Patel Dental Hospital</span>
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-3 items-center">
+                  <div className="flex items-center gap-2 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100 text-emerald-700 text-xs font-semibold">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span>Website Status: Online</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-1.5 rounded-full border border-slate-100 text-slate-500 text-xs font-medium">
+                    <Clock className="h-3.5 w-3.5 text-slate-400" />
+                    <span>Last Updated: Today</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1 max-w-sm">
-                <h3 className="font-display font-bold text-slate-800 text-sm">Operational Website Configuration</h3>
-                <p className="text-slate-400 text-xs leading-relaxed">
-                  Select options inside the sidebar menu to view empty configurations, layout statistics, and live asset endpoints instantly.
-                </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 md:pt-8">
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h4 className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Contact & Inquiry</h4>
+                  <div className="space-y-3.5 text-sm text-slate-600">
+                    <div className="flex items-center gap-2.5">
+                      <Phone className="h-4 w-4 text-slate-400 shrink-0" />
+                      <span className="font-medium">{contactInfo.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <Mail className="h-4 w-4 text-slate-400 shrink-0" />
+                      <span className="font-medium">{contactInfo.email}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary Address */}
+                <div className="space-y-4 md:col-span-2">
+                  <h4 className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Hospital Headquarters</h4>
+                  <div className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <MapPin className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+                    <span className="font-medium leading-relaxed">{contactInfo.address}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -458,15 +563,16 @@ export default function Admin({
                     <div className="space-y-1">
                       <p className="text-xs font-bold text-slate-700">
                         Drag and drop your background image here, or{' '}
-                        <label className="text-blue-600 hover:underline cursor-pointer">
+                        <label htmlFor="hero-bg-file-input" className="text-blue-600 hover:underline cursor-pointer">
                           browse file
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleFileInput}
-                          />
                         </label>
+                        <input 
+                          type="file" 
+                          id="hero-bg-file-input"
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleFileInput}
+                        />
                       </p>
                       <p className="text-[10px] text-slate-400">
                         PNG, JPG, JPEG or WEBP formats. High resolution recommended.
@@ -2298,6 +2404,8 @@ export default function Admin({
             </div>
           </div>
         );
+      case 'appointments':
+        return <Appointments />;
     }
   };
 

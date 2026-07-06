@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Phone, MapPin, Clock, MessageSquare, Check, Sparkles, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TREATMENTS } from '../data/treatments';
+import { appointmentService } from '../utils/appointmentData';
 
 import { ContactInfo } from '../types';
 
@@ -20,7 +21,7 @@ interface ContactProps {
     date: string;
     timeSlot: string;
     message?: string;
-  }) => void;
+  }) => Promise<boolean>;
   contactInfo?: ContactInfo;
 }
 
@@ -33,7 +34,7 @@ export default function Contact({
     name: '',
     phone: '',
     treatment: preselectedTreatment,
-    branch: 'Gayatrinagar Road (Jalaram Chowk)',
+    branch: 'Gayatrinagar Branch',
     date: '',
     timeSlot: '09:00 AM - 10:00 AM',
     message: '',
@@ -41,6 +42,7 @@ export default function Contact({
 
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   const timeSlots = [
     '09:00 AM - 10:00 AM',
@@ -53,7 +55,33 @@ export default function Contact({
     '07:00 PM - 08:00 PM',
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Dynamic slot lookup
+  useEffect(() => {
+    let active = true;
+    const loadBookedSlots = async () => {
+      if (!formData.date || !formData.branch) return;
+      try {
+        const booked = await appointmentService.getBookedSlots(formData.date, formData.branch);
+        if (active) {
+          setBookedSlots(booked);
+          
+          // Auto select first available if currently selected slot is booked
+          const available = timeSlots.filter(s => !booked.includes(s));
+          if (available.length > 0 && !available.includes(formData.timeSlot)) {
+            setFormData(prev => ({ ...prev, timeSlot: available[0] }));
+          }
+        }
+      } catch (err) {
+        console.error('Error loading booked slots for Contact page:', err);
+      }
+    };
+    loadBookedSlots();
+    return () => {
+      active = false;
+    };
+  }, [formData.date, formData.branch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
 
@@ -75,18 +103,25 @@ export default function Contact({
       return;
     }
 
-    // Trigger local state synchronization
-    onBookAppointment({
-      name: formData.name,
-      phone: formData.phone,
-      treatment: formData.treatment,
-      branch: formData.branch,
-      date: formData.date,
-      timeSlot: formData.timeSlot,
-      message: formData.message,
-    });
+    try {
+      const success = await onBookAppointment({
+        name: formData.name,
+        phone: formData.phone,
+        treatment: formData.treatment,
+        branch: formData.branch,
+        date: formData.date,
+        timeSlot: formData.timeSlot,
+        message: formData.message,
+      });
 
-    setFormSubmitted(true);
+      if (success) {
+        setFormSubmitted(true);
+      } else {
+        setValidationError('This appointment slot has already been booked. Please select another available time.');
+      }
+    } catch (err) {
+      setValidationError('This appointment slot has already been booked. Please select another available time.');
+    }
   };
 
   return (
@@ -202,8 +237,8 @@ export default function Contact({
                           onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
                           className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         >
-                          <option value="Gayatrinagar Road (Jalaram Chowk)">Branch 1: Gayatrinagar Road</option>
-                          <option value="Mavdi Main Road (Business Centrum)">Branch 2: Mavdi Main Road</option>
+                          <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
+                          <option value="Mavdi Branch">Mavdi Branch</option>
                         </select>
                       </div>
                     </div>
@@ -231,13 +266,17 @@ export default function Contact({
                         <select
                           value={formData.timeSlot}
                           onChange={(e) => setFormData({ ...formData, timeSlot: e.target.value })}
-                          className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
+                          disabled={timeSlots.filter(slot => !bookedSlots.includes(slot)).length === 0}
+                          className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none disabled:opacity-60"
                         >
-                          {timeSlots.map((slot, i) => (
+                          {timeSlots.filter(slot => !bookedSlots.includes(slot)).map((slot, i) => (
                             <option key={i} value={slot}>
                               {slot}
                             </option>
                           ))}
+                          {timeSlots.filter(slot => !bookedSlots.includes(slot)).length === 0 && (
+                            <option value="">No slots available</option>
+                          )}
                         </select>
                       </div>
                     </div>
@@ -305,7 +344,7 @@ export default function Contact({
                             name: '',
                             phone: '',
                             treatment: preselectedTreatment,
-                            branch: 'Gayatrinagar Road (Jalaram Chowk)',
+                            branch: 'Gayatrinagar Branch',
                             date: '',
                             timeSlot: '09:00 AM - 10:00 AM',
                             message: '',
@@ -352,7 +391,7 @@ export default function Contact({
                   MAIN SPECIALTY BRANCH
                 </span>
                 <h3 className="font-display font-bold text-brand-navy text-lg mb-2">
-                  Branch 1: Gayatrinagar Road
+                  Gayatrinagar Branch
                 </h3>
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
@@ -376,7 +415,7 @@ export default function Contact({
                   RECOVERY & IMPLANT CENTER
                 </span>
                 <h3 className="font-display font-bold text-brand-navy text-lg mb-2">
-                  Branch 2: Mavdi Main Road
+                  Mavdi Branch
                 </h3>
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
