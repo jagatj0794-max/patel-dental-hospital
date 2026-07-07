@@ -7,13 +7,15 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, PhoneCall, Plus, Table, Trash2, X, Sparkles, Check, CheckSquare } from 'lucide-react';
 
-import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo } from './types';
+import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo } from './types';
 import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
 import { supabase } from './utils/supabase';
 import { heroService } from './utils/heroData';
 import { doctorService } from './utils/doctorData';
 import { galleryService, DEFAULT_MEDIA_IMAGES } from './utils/galleryData';
+import { videoService, DEFAULT_VIDEOS } from './utils/videoData';
+import { contactService, DEFAULT_CONTACT_INFO } from './utils/contactData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
 import { appointmentService } from './utils/appointmentData';
 import Navbar from './components/Navbar';
@@ -175,60 +177,49 @@ export default function App() {
   // Happy Smiles / Patient Moments state initialized with default values; updated from Supabase on mount
   const [patientMoments, setPatientMoments] = useState<PatientMoment[]>(PATIENT_MOMENTS);
 
-  // Video management state with localStorage persistence
-  const [videosList, setVideosList] = useState<Array<{ id: string; title: string; treatment: string }>>(() => {
-    try {
-      const saved = safeStorage.getItem('pdh_videos_list');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(item => item && typeof item === 'object' && item.id && item.title);
-        }
-      }
-    } catch {
-      // Quiet fallback
-    }
-    return [
-      { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants' },
-      { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab' },
-      { id: '2okui6RFf_k', title: 'Life-changing Clear Aligners Transformation', treatment: 'Clear Aligners' },
-      { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care' },
-      { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover' },
-      { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry' }
-    ];
-  });
-
+  // Load Videos from Supabase on mount
   useEffect(() => {
-    safeStorage.setItem('pdh_videos_list', JSON.stringify(videosList));
-  }, [videosList]);
-
-  // Contact management state with localStorage persistence
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(() => {
-    try {
-      const saved = safeStorage.getItem('pdh_contact_info');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object' && parsed.phone) {
-          return parsed;
+    let active = true;
+    const fetchVideos = async () => {
+      try {
+        const data = await videoService.getVideos();
+        if (active) {
+          setVideosList(data);
         }
+      } catch (e) {
+        console.warn("Failed to load videos from Supabase on mount:", e);
       }
-    } catch {
-      // Quiet fallback
-    }
-    return {
-      phone: '+91 79900 62009',
-      phoneRaw: '+917990062009',
-      whatsapp: '+91 79900 62009',
-      whatsappRaw: '917990062009',
-      email: 'info@pateldentalrajkot.com',
-      address: 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot, Gujarat 360002',
-      mapsLink: 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot'
     };
-  });
+    fetchVideos();
+    return () => {
+      active = false;
+    };
+  }, []);
 
+  // Video management state initialized with default values; updated from Supabase on mount
+  const [videosList, setVideosList] = useState<DentalVideo[]>(DEFAULT_VIDEOS);
+
+  // Load Contact Info from Supabase on mount
   useEffect(() => {
-    safeStorage.setItem('pdh_contact_info', JSON.stringify(contactInfo));
-  }, [contactInfo]);
+    let active = true;
+    const fetchContact = async () => {
+      try {
+        const data = await contactService.getContactInfo();
+        if (active) {
+          setContactInfo(data);
+        }
+      } catch (e) {
+        console.warn("Failed to load contact info from Supabase on mount:", e);
+      }
+    };
+    fetchContact();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Contact management state initialized with default values; updated from Supabase on mount
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
 
   // Load and listen to Supabase authentication changes
   useEffect(() => {

@@ -21,6 +21,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   // Helper to safely mask and format values for logging
   const getMaskedValue = (val: string | undefined, isUrl = false) => {
@@ -109,31 +110,57 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
 
     try {
       const client = supabase.client;
-      console.log('[Supabase Auth] Attempting sign in with email:', email);
-      console.log('[Supabase Auth] Executing auth.signInWithPassword with client at URL:', (client as any).supabaseUrl);
+      if (isSignUp) {
+        console.log('[Supabase Auth] Attempting sign up with email:', email);
+        const { data, error } = await client.auth.signUp({
+          email,
+          password,
+        });
 
-      console.log("=== LOGIN DEBUG START ===");
-      console.log("typeof supabase =", typeof supabase);
-      console.log("is supabase client initialized =", !!supabase.client);
+        if (error) {
+          console.error('[Supabase Auth] Sign up returned an error:', error);
+          throw error;
+        }
 
-      const { data, error } = await client.auth.signInWithPassword({
-        email,
-        password,
-      });
+        console.log('[Supabase Auth] Sign up succeeded!', data);
+        
+        if (data.session) {
+          setSuccessMsg('Admin account created and logged in successfully!');
+          setTimeout(() => {
+            setCurrentPage('admin');
+            window.location.hash = 'admin';
+          }, 1200);
+        } else {
+          setSuccessMsg('Account created successfully! Please try to log in now.');
+          setIsSignUp(false); // Switch back to sign in mode
+        }
+      } else {
+        console.log('[Supabase Auth] Attempting sign in with email:', email);
+        console.log('[Supabase Auth] Executing auth.signInWithPassword with client at URL:', (client as any).supabaseUrl);
 
-      if (error) {
-        console.error('[Supabase Auth] Authentication service returned an error:', error);
-        throw error;
-      }
+        console.log("=== LOGIN DEBUG START ===");
+        console.log("typeof supabase =", typeof supabase);
+        console.log("is supabase client initialized =", !!supabase.client);
 
-      console.log('[Supabase Auth] Authentication succeeded! Session acquired:', !!data.session);
+        const { data, error } = await client.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (data.session) {
-        setSuccessMsg('Login successful! Loading administrator workspace...');
-        setTimeout(() => {
-          setCurrentPage('admin');
-          window.location.hash = 'admin';
-        }, 1200);
+        if (error) {
+          console.error('[Supabase Auth] Authentication service returned an error:', error);
+          throw error;
+        }
+
+        console.log('[Supabase Auth] Authentication succeeded! Session acquired:', !!data.session);
+
+        if (data.session) {
+          setSuccessMsg('Login successful! Loading administrator workspace...');
+          setTimeout(() => {
+            setCurrentPage('admin');
+            window.location.hash = 'admin';
+          }, 1200);
+        }
       }
     } catch (err: any) {
       console.group('%c❌ Supabase Auth Operation Failed ❌', 'background: #f43f5e; color: white; font-weight: bold; padding: 4px;');
@@ -296,15 +323,31 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
                   <span>Processing...</span>
                 </>
               ) : (
-                <span>Authenticate Security Access</span>
+                <span>{isSignUp ? 'Create Admin Account' : 'Authenticate Security Access'}</span>
               )}
             </button>
           </form>
 
+          {/* Sign Up / Sign In Toggle */}
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setErrorMsg(null);
+                setSuccessMsg(null);
+              }}
+              className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer font-medium"
+              id="toggle-signup-mode-btn"
+            >
+              {isSignUp ? 'Already have an admin account? Sign In' : 'First time? Create an Admin Account'}
+            </button>
+          </div>
+
           {/* Quick Notice about newly provisioned Supabase DB */}
           <div className="mt-8 pt-6 border-t border-slate-100 text-center">
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              🔑 Secure clinical administration panel. Please log in using your administrator credentials.
+              🔑 Secure clinical administration panel. Please {isSignUp ? 'register a new' : 'log in using your'} administrator account.
             </p>
           </div>
         </div>

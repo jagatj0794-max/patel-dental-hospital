@@ -85,6 +85,12 @@ export interface ContactInfo {
   mapsLink: string;
 }
 
+export interface DentalVideo {
+  id: string; // YouTube Video ID
+  title: string;
+  treatment: string;
+}
+
 
 
 

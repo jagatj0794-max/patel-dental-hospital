@@ -33,7 +33,7 @@ import {
   Building2,
   Mail
 } from 'lucide-react';
-import { PageId, Doctor, PatientMoment, ContactInfo } from '../types';
+import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
@@ -41,6 +41,8 @@ import { uploadImage } from '../utils/supabaseStorage';
 import { heroService } from '../utils/heroData';
 import { doctorService } from '../utils/doctorData';
 import { galleryService } from '../utils/galleryData';
+import { videoService } from '../utils/videoData';
+import { contactService } from '../utils/contactData';
 import Appointments from './Appointments';
 
 interface AdminProps {
@@ -57,8 +59,8 @@ interface AdminProps {
   setMediaImages: React.Dispatch<React.SetStateAction<Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>>>;
   patientMoments: PatientMoment[];
   setPatientMoments: React.Dispatch<React.SetStateAction<PatientMoment[]>>;
-  videosList: Array<{ id: string; title: string; treatment: string }>;
-  setVideosList: React.Dispatch<React.SetStateAction<Array<{ id: string; title: string; treatment: string }>>>;
+  videosList: DentalVideo[];
+  setVideosList: React.Dispatch<React.SetStateAction<DentalVideo[]>>;
   contactInfo: ContactInfo;
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>;
 }
@@ -1322,7 +1324,7 @@ export default function Admin({
           }
         };
 
-        const handleSaveVideo = () => {
+        const handleSaveVideo = async () => {
           const ytId = getYouTubeId(videoUrlInput);
           if (!ytId) {
             alert('Please enter a valid YouTube video URL.');
@@ -1330,23 +1332,40 @@ export default function Admin({
           }
           const generatedTitle = getAutoTitle(videoUrlInput);
 
+          let updated: DentalVideo[];
           if (editingVideo) {
             // Edit mode: replace the old video with the new ytId and title
-            setVideosList(prev => (prev || []).map(v => v.id === editingVideo.id ? {
+            updated = (videosList || []).map(v => v.id === editingVideo.id ? {
               id: ytId,
               title: generatedTitle,
               treatment: 'Patient Testimonial'
-            } : v));
+            } : v);
           } else {
             // Add mode: append a new video object to videosList
-            setVideosList(prev => [
-              ...(prev || []),
+            updated = [
+              ...(videosList || []),
               {
                 id: ytId,
                 title: generatedTitle,
                 treatment: 'Patient Testimonial'
               }
-            ]);
+            ];
+          }
+
+          setVideosList(updated);
+          setSaveMessage('Saving video list changes to Supabase...');
+          try {
+            const success = await videoService.saveVideos(updated);
+            if (success) {
+              setSaveMessage('Video list saved to Supabase successfully!');
+            } else {
+              setSaveMessage('Failed to save videos to Supabase database.');
+            }
+          } catch (err: any) {
+            console.error('Error saving video changes:', err);
+            setSaveMessage('Error saving: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 3000);
           }
 
           // Reset and close
@@ -1355,8 +1374,24 @@ export default function Admin({
           setVideoUrlInput('');
         };
 
-        const handleDeleteVideo = (id: string) => {
-          setVideosList(prev => (prev || []).filter(v => v.id !== id));
+        const handleDeleteVideo = async (id: string) => {
+          const updated = (videosList || []).filter(v => v.id !== id);
+          setVideosList(updated);
+
+          setSaveMessage('Deleting video and syncing with Supabase...');
+          try {
+            const success = await videoService.saveVideos(updated);
+            if (success) {
+              setSaveMessage('Video deleted from Supabase successfully!');
+            } else {
+              setSaveMessage('Failed to sync deletion with Supabase.');
+            }
+          } catch (err: any) {
+            console.error('Error saving video deletion:', err);
+            setSaveMessage('Error syncing deletion: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 3000);
+          }
         };
 
         const handleSaveImageDetails = async () => {
@@ -2474,8 +2509,8 @@ export default function Admin({
               {/* Save Button */}
               <button
                 type="button"
-                onClick={() => {
-                  setContactInfo({
+                onClick={async () => {
+                  const newContact = {
                     phone: draftPhone,
                     phoneRaw: draftPhoneRaw,
                     whatsapp: draftWhatsapp,
@@ -2483,9 +2518,21 @@ export default function Admin({
                     email: draftEmail,
                     address: draftAddress,
                     mapsLink: draftMapsLink
-                  });
-                  setContactSaved(true);
-                  setTimeout(() => setContactSaved(false), 3500);
+                  };
+                  setContactInfo(newContact);
+                  
+                  try {
+                    const success = await contactService.saveContactInfo(newContact);
+                    if (success) {
+                      setContactSaved(true);
+                      setTimeout(() => setContactSaved(false), 3500);
+                    } else {
+                      alert('Failed to save contact changes to Supabase.');
+                    }
+                  } catch (err) {
+                    console.error('Error saving contact info to Supabase:', err);
+                    alert('An error occurred while saving contact details.');
+                  }
                 }}
                 className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition duration-150 flex items-center justify-center gap-2 cursor-pointer shrink-0"
               >
