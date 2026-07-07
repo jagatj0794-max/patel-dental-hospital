@@ -38,6 +38,7 @@ import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays } from 'luc
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
 import { uploadImage } from '../utils/supabaseStorage';
+import { heroService } from '../utils/heroData';
 import Appointments from './Appointments';
 
 interface AdminProps {
@@ -88,6 +89,13 @@ export default function Admin({
   const [draftHeading, setDraftHeading] = useState(heroHeading);
   const [draftDescription, setDraftDescription] = useState(heroDescription);
   const [draftBgImage, setDraftBgImage] = useState(heroBgImage);
+
+  // Synchronize draft states when parent props change (e.g. once loaded from Supabase)
+  useEffect(() => {
+    setDraftHeading(heroHeading);
+    setDraftDescription(heroDescription);
+    setDraftBgImage(heroBgImage);
+  }, [heroHeading, heroDescription, heroBgImage]);
 
   // Contact details draft state
   const [draftPhone, setDraftPhone] = useState(contactInfo?.phone || '');
@@ -270,18 +278,29 @@ export default function Admin({
   };
 
   // Save changes
-  const handleSave = () => {
-    setHeroHeading(draftHeading);
-    setHeroDescription(draftDescription);
-    setHeroBgImage(draftBgImage);
+  const handleSave = async () => {
+    setSaveMessage('Saving Hero content to Supabase...');
+    try {
+      const success = await heroService.saveHeroContent({
+        heading: draftHeading,
+        description: draftDescription,
+        bg_image: draftBgImage
+      });
 
-    // Save to localStorage
-    safeStorage.setItem('pdh_hero_heading', draftHeading);
-    safeStorage.setItem('pdh_hero_description', draftDescription);
-    safeStorage.setItem('pdh_hero_bg_image', draftBgImage);
-
-    setSaveMessage('Hero section saved successfully! Your website is updated.');
-    setTimeout(() => setSaveMessage(null), 3500);
+      if (success) {
+        setHeroHeading(draftHeading);
+        setHeroDescription(draftDescription);
+        setHeroBgImage(draftBgImage);
+        setSaveMessage('Hero section saved to Supabase successfully! Your website is updated.');
+      } else {
+        setSaveMessage('Failed to save Hero content to Supabase. Check your connection or table setup.');
+      }
+    } catch (err: any) {
+      console.error('Error saving Hero content to Supabase:', err);
+      setSaveMessage('Error saving Hero content: ' + (err.message || err));
+    } finally {
+      setTimeout(() => setSaveMessage(null), 4000);
+    }
   };
 
   // Discard changes

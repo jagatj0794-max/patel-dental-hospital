@@ -11,6 +11,7 @@ import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo } 
 import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
 import { supabase } from './utils/supabase';
+import { heroService } from './utils/heroData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
 import { appointmentService } from './utils/appointmentData';
 import Navbar from './components/Navbar';
@@ -99,15 +100,30 @@ export default function App() {
   const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
 
   // Hero customisable states
-  const [heroHeading, setHeroHeading] = useState(() => {
-    return safeStorage.getItem('pdh_hero_heading') || "Dental Implant, Aligner &\nFMR Specialists\nin Rajkot";
-  });
-  const [heroDescription, setHeroDescription] = useState(() => {
-    return safeStorage.getItem('pdh_hero_description') || "Trusted smiles. Advanced care. Exceptional results.";
-  });
-  const [heroBgImage, setHeroBgImage] = useState(() => {
-    return safeStorage.getItem('pdh_hero_bg_image') || "";
-  });
+  const [heroHeading, setHeroHeading] = useState("Dental Implant, Aligner &\nFMR Specialists\nin Rajkot");
+  const [heroDescription, setHeroDescription] = useState("Trusted smiles. Advanced care. Exceptional results.");
+  const [heroBgImage, setHeroBgImage] = useState("");
+
+  // Load Hero section from Supabase on mount
+  useEffect(() => {
+    let active = true;
+    const fetchHero = async () => {
+      try {
+        const data = await heroService.getHeroContent();
+        if (active) {
+          setHeroHeading(data.heading);
+          setHeroDescription(data.description);
+          setHeroBgImage(data.bg_image);
+        }
+      } catch (e) {
+        console.warn("Failed to load hero from Supabase on mount (using local/default values):", e);
+      }
+    };
+    fetchHero();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Doctors list state with localStorage persistence
   const [doctorsList, setDoctorsList] = useState<Doctor[]>(() => {
