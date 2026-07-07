@@ -39,6 +39,8 @@ import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
 import { uploadImage } from '../utils/supabaseStorage';
 import { heroService } from '../utils/heroData';
+import { doctorService } from '../utils/doctorData';
+import { galleryService } from '../utils/galleryData';
 import Appointments from './Appointments';
 
 interface AdminProps {
@@ -756,11 +758,22 @@ export default function Admin({
           setEditingDoctor(null);
         };
 
-        const handleSaveDoctors = () => {
-          setDoctorsList(draftDoctors);
-          safeStorage.setItem('pdh_doctors_list', JSON.stringify(draftDoctors));
-          setSaveMessage('Doctors directory saved successfully! Public website updated.');
-          setTimeout(() => setSaveMessage(null), 3500);
+        const handleSaveDoctors = async () => {
+          setSaveMessage('Saving doctors directory to Supabase...');
+          try {
+            const success = await doctorService.saveDoctors(draftDoctors);
+            if (success) {
+              setDoctorsList(draftDoctors);
+              setSaveMessage('Doctors directory saved to Supabase successfully! Public website updated.');
+            } else {
+              setSaveMessage('Failed to save doctors to Supabase. Check your connection or table setup.');
+            }
+          } catch (err: any) {
+            console.error('Error saving doctors to Supabase:', err);
+            setSaveMessage('Error saving doctors: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 4000);
+          }
         };
 
         const handleCancelDoctors = () => {
@@ -1179,12 +1192,25 @@ export default function Admin({
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
                         const updated = draftDoctors.filter(d => d.id !== doctorToDelete);
                         setDraftDoctors(updated);
                         setDoctorsList(updated);
-                        safeStorage.setItem('pdh_doctors_list', JSON.stringify(updated));
                         setDoctorToDelete(null);
+                        setSaveMessage('Deleting doctor and syncing with Supabase...');
+                        try {
+                          const success = await doctorService.saveDoctors(updated);
+                          if (success) {
+                            setSaveMessage('Doctor deleted successfully!');
+                          } else {
+                            setSaveMessage('Failed to delete doctor on Supabase.');
+                          }
+                        } catch (err: any) {
+                          console.error('Error deleting doctor on Supabase:', err);
+                          setSaveMessage('Error deleting doctor: ' + (err.message || err));
+                        } finally {
+                          setTimeout(() => setSaveMessage(null), 3500);
+                        }
                       }}
                       className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
                     >
@@ -1228,27 +1254,71 @@ export default function Admin({
           return titles[index];
         };
 
-        const handleReplaceImage = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+        const handleReplaceImage = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
           if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = () => {
-              if (typeof reader.result === 'string') {
-                const dataUrl = reader.result;
-                setMediaImages(prev => prev.map(img => img.id === id ? { ...img, url: dataUrl } : img));
+            setSaveMessage('Uploading replacement image to Supabase...');
+            try {
+              const imageUrl = await uploadImage(file);
+              const updated = mediaImages.map(img => img.id === id ? { ...img, url: imageUrl } : img);
+              
+              setMediaImages(updated);
+              if (previewImage && previewImage.id === id) {
+                setPreviewImage(prev => prev ? { ...prev, url: imageUrl } : null);
+              }
+
+              setSaveMessage('Saving gallery changes to Supabase...');
+              const success = await galleryService.saveGalleryData(updated, patientMoments);
+              if (success) {
+                setSaveMessage('Image replaced and saved to Supabase successfully!');
+              } else {
+                setSaveMessage('Failed to save replacement to Supabase database.');
+              }
+            } catch (err: any) {
+              console.warn('Supabase upload failed, falling back to local Base64:', err);
+              try {
+                const dataUrl = await new Promise<string>((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onload = () => resolve(reader.result as string);
+                  reader.onerror = reject;
+                  reader.readAsDataURL(file);
+                });
+                const updated = mediaImages.map(img => img.id === id ? { ...img, url: dataUrl } : img);
+                setMediaImages(updated);
                 if (previewImage && previewImage.id === id) {
                   setPreviewImage(prev => prev ? { ...prev, url: dataUrl } : null);
                 }
+                setSaveMessage('Notice: Saved locally (Supabase offline/restricted).');
+                await galleryService.saveGalleryData(updated, patientMoments);
+              } catch (fallbackErr) {
+                console.error(fallbackErr);
+                alert('Failed to read file.');
               }
-            };
-            reader.readAsDataURL(file);
+            } finally {
+              setTimeout(() => setSaveMessage(null), 3000);
+            }
           }
         };
 
-        const handleDeleteImage = (id: string) => {
-          setMediaImages(prev => prev.filter(img => img.id !== id));
+        const handleDeleteImage = async (id: string) => {
+          const updated = mediaImages.filter(img => img.id !== id);
+          setMediaImages(updated);
           if (previewImage && previewImage.id === id) {
             setPreviewImage(null);
+          }
+          setSaveMessage('Deleting image and syncing with Supabase...');
+          try {
+            const success = await galleryService.saveGalleryData(updated, patientMoments);
+            if (success) {
+              setSaveMessage('Image deleted from Supabase successfully!');
+            } else {
+              setSaveMessage('Failed to sync deletion with Supabase.');
+            }
+          } catch (err: any) {
+            console.error('Error saving gallery deletion:', err);
+            setSaveMessage('Error syncing deletion: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 3000);
           }
         };
 
@@ -1289,26 +1359,27 @@ export default function Admin({
           setVideosList(prev => (prev || []).filter(v => v.id !== id));
         };
 
-        const handleSaveImageDetails = () => {
+        const handleSaveImageDetails = async () => {
           if (!drawerImageUrl) {
             alert('Please select or upload an image file first.');
             return;
           }
 
+          let updated: any[];
           if (editingImage) {
             // Edit existing image
-            setMediaImages(prev => (prev || []).map(img => (img && img.id === editingImage.id) ? {
+            updated = (mediaImages || []).map(img => (img && img.id === editingImage.id) ? {
               ...img,
               url: drawerImageUrl,
               title: drawerImageTitle || img.title || 'Uploaded Image',
               category: drawerImageCategory || 'Homepage Gallery',
               branch: drawerImageBranch || 'All Branches',
               altText: drawerImageAltText || ''
-            } : img));
+            } : img);
           } else {
             // Create/add new image
-            setMediaImages(prev => [
-              ...(prev || []),
+            updated = [
+              ...(mediaImages || []),
               {
                 id: 'img-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
                 url: drawerImageUrl,
@@ -1317,7 +1388,23 @@ export default function Admin({
                 branch: drawerImageBranch || 'All Branches',
                 altText: drawerImageAltText || ''
               }
-            ]);
+            ];
+          }
+
+          setMediaImages(updated);
+          setSaveMessage('Saving gallery properties to Supabase...');
+          try {
+            const success = await galleryService.saveGalleryData(updated, patientMoments);
+            if (success) {
+              setSaveMessage('Gallery properties saved to Supabase successfully!');
+            } else {
+              setSaveMessage('Failed to save gallery properties to Supabase database.');
+            }
+          } catch (err: any) {
+            console.error('Error saving gallery properties:', err);
+            setSaveMessage('Error saving: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 3000);
           }
 
           // Reset drawer states
@@ -1410,22 +1497,43 @@ export default function Admin({
                       id="gallery-upload-file-trigger"
                       className="hidden"
                       accept="image/*"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         if (e.target.files && e.target.files[0]) {
                           const file = e.target.files[0];
-                          const reader = new FileReader();
-                          reader.onload = () => {
-                            if (typeof reader.result === 'string') {
+                          setSaveMessage('Uploading image to Supabase...');
+                          try {
+                            const imageUrl = await uploadImage(file);
+                            setEditingImage(null);
+                            setDrawerImageUrl(imageUrl);
+                            setDrawerImageTitle(file.name.replace(/\.[^/.]+$/, ""));
+                            setDrawerImageCategory('Homepage Gallery');
+                            setDrawerImageBranch('All Branches');
+                            setDrawerImageAltText('');
+                            setImageDrawerOpen(true);
+                            setSaveMessage('Uploaded to storage! Set options & save.');
+                          } catch (err: any) {
+                            console.warn('Upload failed, using local fallback:', err);
+                            try {
+                              const dataUrl = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              });
                               setEditingImage(null);
-                              setDrawerImageUrl(reader.result);
+                              setDrawerImageUrl(dataUrl);
                               setDrawerImageTitle(file.name.replace(/\.[^/.]+$/, ""));
                               setDrawerImageCategory('Homepage Gallery');
                               setDrawerImageBranch('All Branches');
                               setDrawerImageAltText('');
                               setImageDrawerOpen(true);
+                              setSaveMessage('Using local image fallback.');
+                            } catch (fallbackErr) {
+                              console.error(fallbackErr);
                             }
-                          };
-                          reader.readAsDataURL(file);
+                          } finally {
+                            setTimeout(() => setSaveMessage(null), 3500);
+                          }
                         }
                       }}
                     />
@@ -1523,22 +1631,52 @@ export default function Admin({
                       id="smile-upload-file-trigger"
                       className="hidden"
                       accept="image/*"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         if (e.target.files && e.target.files[0]) {
                           const file = e.target.files[0];
-                          const reader = new FileReader();
-                          reader.onload = () => {
-                            if (typeof reader.result === 'string') {
-                              setPatientMoments(prev => [
+                          setSaveMessage('Uploading smile moment to Supabase...');
+                          try {
+                            const imageUrl = await uploadImage(file);
+                            const updated = [
+                              {
+                                id: 'smile-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                                image: imageUrl
+                              },
+                              ...(patientMoments || [])
+                            ];
+                            setPatientMoments(updated);
+                            setSaveMessage('Saving smile moment to Supabase...');
+                            const success = await galleryService.saveGalleryData(mediaImages, updated);
+                            if (success) {
+                              setSaveMessage('Smile moment uploaded and saved to Supabase successfully!');
+                            } else {
+                              setSaveMessage('Failed to save smile moment to database.');
+                            }
+                          } catch (err: any) {
+                            console.warn('Upload failed, falling back to local Base64:', err);
+                            try {
+                              const dataUrl = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              });
+                              const updated = [
                                 {
                                   id: 'smile-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
-                                  image: reader.result
+                                  image: dataUrl
                                 },
-                                ...(prev || [])
-                              ]);
+                                ...(patientMoments || [])
+                              ];
+                              setPatientMoments(updated);
+                              await galleryService.saveGalleryData(mediaImages, updated);
+                              setSaveMessage('Smile moment loaded locally and saved.');
+                            } catch (fallbackErr) {
+                              console.error(fallbackErr);
                             }
-                          };
-                          reader.readAsDataURL(file);
+                          } finally {
+                            setTimeout(() => setSaveMessage(null), 3500);
+                          }
                         }
                       }}
                     />
@@ -1581,16 +1719,40 @@ export default function Admin({
                             id={`smile-replace-trigger-${item.id}`}
                             className="hidden"
                             accept="image/*"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               if (e.target.files && e.target.files[0]) {
                                 const file = e.target.files[0];
-                                const reader = new FileReader();
-                                reader.onload = () => {
-                                  if (typeof reader.result === 'string') {
-                                    setPatientMoments(prev => (prev || []).map(moment => moment.id === item.id ? { ...moment, image: reader.result } : moment));
+                                setSaveMessage('Replacing smile moment on Supabase...');
+                                try {
+                                  const imageUrl = await uploadImage(file);
+                                  const updated = (patientMoments || []).map(moment => moment.id === item.id ? { ...moment, image: imageUrl } : moment);
+                                  setPatientMoments(updated);
+                                  setSaveMessage('Saving updated smile moment to Supabase...');
+                                  const success = await galleryService.saveGalleryData(mediaImages, updated);
+                                  if (success) {
+                                    setSaveMessage('Smile moment replaced and saved successfully!');
+                                  } else {
+                                    setSaveMessage('Failed to save replacement to database.');
                                   }
-                                };
-                                reader.readAsDataURL(file);
+                                } catch (err: any) {
+                                  console.warn('Upload failed, falling back to local Base64:', err);
+                                  try {
+                                    const dataUrl = await new Promise<string>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve(reader.result as string);
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    });
+                                    const updated = (patientMoments || []).map(moment => moment.id === item.id ? { ...moment, image: dataUrl } : moment);
+                                    setPatientMoments(updated);
+                                    await galleryService.saveGalleryData(mediaImages, updated);
+                                    setSaveMessage('Smile moment replaced locally.');
+                                  } catch (fallbackErr) {
+                                    console.error(fallbackErr);
+                                  }
+                                } finally {
+                                  setTimeout(() => setSaveMessage(null), 3500);
+                                }
                               }
                             }}
                           />
@@ -1633,9 +1795,24 @@ export default function Admin({
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
-                            setPatientMoments(prev => (prev || []).filter(moment => moment.id !== smileToDelete));
+                          onClick={async () => {
+                            const updated = (patientMoments || []).filter(moment => moment.id !== smileToDelete);
+                            setPatientMoments(updated);
                             setSmileToDelete(null);
+                            setSaveMessage('Deleting smile moment and syncing with Supabase...');
+                            try {
+                              const success = await galleryService.saveGalleryData(mediaImages, updated);
+                              if (success) {
+                                setSaveMessage('Smile moment deleted successfully!');
+                              } else {
+                                setSaveMessage('Failed to delete smile moment on Supabase database.');
+                              }
+                            } catch (err: any) {
+                              console.error('Error deleting smile moment:', err);
+                              setSaveMessage('Error: ' + (err.message || err));
+                            } finally {
+                              setTimeout(() => setSaveMessage(null), 3500);
+                            }
                           }}
                           className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
                         >
@@ -2082,19 +2259,37 @@ export default function Admin({
                             id="drawer-replace-file-input"
                             className="hidden"
                             accept="image/*"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               if (e.target.files && e.target.files[0]) {
                                 const file = e.target.files[0];
-                                const reader = new FileReader();
-                                reader.onload = () => {
-                                  if (typeof reader.result === 'string') {
-                                    setDrawerImageUrl(reader.result);
+                                setSaveMessage('Uploading image to Supabase storage...');
+                                try {
+                                  const imageUrl = await uploadImage(file);
+                                  setDrawerImageUrl(imageUrl);
+                                  if (!drawerImageTitle) {
+                                    setDrawerImageTitle(file.name.replace(/\.[^/.]+$/, ""));
+                                  }
+                                  setSaveMessage('Image uploaded successfully! Press Save below to apply.');
+                                } catch (err: any) {
+                                  console.warn('Storage upload failed, falling back to local preview:', err);
+                                  try {
+                                    const dataUrl = await new Promise<string>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve(reader.result as string);
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    });
+                                    setDrawerImageUrl(dataUrl);
                                     if (!drawerImageTitle) {
                                       setDrawerImageTitle(file.name.replace(/\.[^/.]+$/, ""));
                                     }
+                                    setSaveMessage('Notice: Image loaded locally. Press Save below to apply.');
+                                  } catch (fallbackErr) {
+                                    console.error(fallbackErr);
                                   }
-                                };
-                                reader.readAsDataURL(file);
+                                } finally {
+                                  setTimeout(() => setSaveMessage(null), 3000);
+                                }
                               }
                             }}
                           />

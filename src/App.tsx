@@ -12,6 +12,8 @@ import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
 import { supabase } from './utils/supabase';
 import { heroService } from './utils/heroData';
+import { doctorService } from './utils/doctorData';
+import { galleryService, DEFAULT_MEDIA_IMAGES } from './utils/galleryData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
 import { appointmentService } from './utils/appointmentData';
 import Navbar from './components/Navbar';
@@ -125,70 +127,53 @@ export default function App() {
     };
   }, []);
 
-  // Doctors list state with localStorage persistence
-  const [doctorsList, setDoctorsList] = useState<Doctor[]>(() => {
-    try {
-      const saved = safeStorage.getItem('pdh_doctors_list');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(item => item && typeof item === 'object' && item.name);
-        }
-      }
-    } catch {
-      // Quiet fallback
-    }
-    return DEFAULT_DOCTORS;
-  });
-
-  // Media / Gallery images state with localStorage persistence
-  const [mediaImages, setMediaImages] = useState<Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>>(() => {
-    try {
-      const saved = safeStorage.getItem('pdh_media_images');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(item => item && typeof item === 'object' && item.id && item.url);
-        }
-      }
-    } catch {
-      // Quiet fallback
-    }
-    // Default initial images
-    return [
-      { id: 'img-1', url: '/6.jpeg', title: 'Before & After Smile Transformation', category: 'Before / After', branch: 'All Branches', altText: 'Complete smile reconstruction case' },
-      { id: 'img-2', url: '/Dr kinjal patel 2.png', title: 'Microscopic Dental Diagnostics', category: 'Clinic Interior', branch: 'Mavdi Branch', altText: 'Our high-tech microscopic dental operatory' },
-      { id: 'img-3', url: '/patel dental doctors.jpeg', title: 'High-Tech Dental Operatory', category: 'Dental Implants', branch: 'Gayatrinagar Branch', altText: 'Dental implant surgery room setup' },
-      { id: 'img-4', url: '/patel dental hospital doctors.png', title: 'Clinical Medical Faculty', category: 'Doctors', branch: 'All Branches', altText: 'Team of experienced doctors at Patel Dental Hospital' },
-      { id: 'img-5', url: '/patel mobile hero.jpeg', title: 'Premium Patient Care Ward', category: 'Homepage Slider', branch: 'All Branches', altText: 'Our premium recovery ward for patients' },
-      { id: 'img-6', url: '/Dr. kinjal patel.png', title: 'Expert Consultation Panel', category: 'Homepage Gallery', branch: 'Mavdi Branch', altText: 'Expert consult meeting room' },
-    ];
-  });
-
-  // Synchronize mediaImages to localStorage when it changes
+  // Load Doctors from Supabase on mount
   useEffect(() => {
-    safeStorage.setItem('pdh_media_images', JSON.stringify(mediaImages));
-  }, [mediaImages]);
-
-  // Happy Smiles / Patient Moments state with localStorage persistence
-  const [patientMoments, setPatientMoments] = useState<PatientMoment[]>(() => {
-    try {
-      const saved = safeStorage.getItem('pdh_patient_moments');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(item => item && typeof item === 'object' && item.id && item.image);
+    let active = true;
+    const fetchDoctors = async () => {
+      try {
+        const data = await doctorService.getDoctors();
+        if (active) {
+          setDoctorsList(data);
         }
+      } catch (e) {
+        console.warn("Failed to load doctors from Supabase on mount:", e);
       }
-    } catch {
-      // Quiet fallback
-    }
-    return PATIENT_MOMENTS;
-  });
+    };
+    fetchDoctors();
+    return () => {
+      active = false;
+    };
+  }, []);
 
+  // Doctors list state initialized with default values; updated from Supabase on mount
+  const [doctorsList, setDoctorsList] = useState<Doctor[]>(DEFAULT_DOCTORS);
+
+  // Load Gallery from Supabase on mount
   useEffect(() => {
-    safeStorage.setItem('pdh_patient_moments', JSON.stringify(patientMoments));
-  }, [patientMoments]);
+    let active = true;
+    const fetchGallery = async () => {
+      try {
+        const data = await galleryService.getGalleryData();
+        if (active) {
+          setMediaImages(data.mediaImages);
+          setPatientMoments(data.patientMoments);
+        }
+      } catch (e) {
+        console.warn("Failed to load gallery data from Supabase on mount:", e);
+      }
+    };
+    fetchGallery();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Media / Gallery images state initialized with default values; updated from Supabase on mount
+  const [mediaImages, setMediaImages] = useState<Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>>(DEFAULT_MEDIA_IMAGES);
+
+  // Happy Smiles / Patient Moments state initialized with default values; updated from Supabase on mount
+  const [patientMoments, setPatientMoments] = useState<PatientMoment[]>(PATIENT_MOMENTS);
 
   // Video management state with localStorage persistence
   const [videosList, setVideosList] = useState<Array<{ id: string; title: string; treatment: string }>>(() => {
