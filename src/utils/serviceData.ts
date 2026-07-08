@@ -1,0 +1,841 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Service, ServiceGalleryItem, ServiceFaq } from '../types';
+import { supabase, isSupabaseConfigured } from './supabase';
+import { TREATMENTS } from '../data/treatments';
+
+export const DEFAULT_SERVICES: Service[] = [
+  {
+    id: 'implants-srv',
+    slug: 'dental-implants',
+    title: 'Dental Implants',
+    short_description: TREATMENTS.find(t => t.id === 'implants')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'implants')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'implants')?.image || '',
+    icon: 'Shield',
+    display_order: 1,
+    is_active: true
+  },
+  {
+    id: 'fmr-srv',
+    slug: 'full-mouth-rehabilitation',
+    title: 'Full Mouth Rehabilitation',
+    short_description: TREATMENTS.find(t => t.id === 'fullmouth')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'fullmouth')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'fullmouth')?.image || '',
+    icon: 'Sparkles',
+    display_order: 2,
+    is_active: true
+  },
+  {
+    id: 'aligners-srv',
+    slug: 'clear-aligners',
+    title: 'Clear Aligners',
+    short_description: TREATMENTS.find(t => t.id === 'aligners')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'aligners')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'aligners')?.image || '',
+    icon: 'EyeOff',
+    display_order: 3,
+    is_active: true
+  },
+  {
+    id: 'rct',
+    slug: 'root-canal-treatment',
+    title: 'Root Canal Treatment',
+    short_description: TREATMENTS.find(t => t.id === 'rct')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'rct')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'rct')?.image || '',
+    icon: 'Activity',
+    display_order: 4,
+    is_active: true
+  },
+  {
+    id: 'smile-srv',
+    slug: 'smile-makeover',
+    title: 'Smile Makeover',
+    short_description: TREATMENTS.find(t => t.id === 'smilemakeover')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'smilemakeover')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'smilemakeover')?.image || '',
+    icon: 'Heart',
+    display_order: 5,
+    is_active: true
+  },
+  {
+    id: 'crowns',
+    slug: 'crowns-bridges',
+    title: 'Crowns & Bridges',
+    short_description: TREATMENTS.find(t => t.id === 'crowns')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'crowns')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'crowns')?.image || '',
+    icon: 'Layers',
+    display_order: 6,
+    is_active: true
+  },
+  {
+    id: 'kids',
+    slug: 'kids-dentistry',
+    title: 'Kids Dentistry',
+    short_description: TREATMENTS.find(t => t.id === 'kids')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'kids')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'kids')?.image || '',
+    icon: 'Baby',
+    display_order: 7,
+    is_active: true
+  }
+];
+
+export const serviceService = {
+  /**
+   * Fetch all services ordered by display_order ascending.
+   */
+  getServices: async (): Promise<Service[]> => {
+    if (!isSupabaseConfigured()) {
+      return DEFAULT_SERVICES;
+    }
+
+    try {
+      const { data, error } = await supabase.client
+        .from('services')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching services from Supabase:', error);
+        return DEFAULT_SERVICES;
+      }
+
+      if (!data || data.length === 0) {
+        // Table is empty, seed default services
+        const seedRows = DEFAULT_SERVICES.map(s => ({
+          id: s.id,
+          slug: s.slug,
+          title: s.title,
+          short_description: s.short_description,
+          description: s.description,
+          hero_image: s.hero_image,
+          icon: s.icon || null,
+          display_order: s.display_order,
+          is_active: s.is_active,
+          seo_title: s.seo_title || null,
+          seo_description: s.seo_description || null,
+          updated_at: new Date().toISOString()
+        }));
+
+        const { error: insertError } = await supabase.client
+          .from('services')
+          .insert(seedRows);
+
+        if (insertError) {
+          console.warn('Error seeding default services:', insertError);
+        }
+
+        // Fetch immediately from database after seeding
+        const { data: refetchedData, error: refetchError } = await supabase.client
+          .from('services')
+          .select('*')
+          .order('display_order', { ascending: true });
+
+        if (refetchError) {
+          console.error('Error re-fetching services after seeding:', refetchError);
+          return DEFAULT_SERVICES;
+        }
+
+        return refetchedData || DEFAULT_SERVICES;
+      }
+
+      return data || [];
+    } catch (e) {
+      console.error('Exception in getServices:', e);
+      return DEFAULT_SERVICES;
+    }
+  },
+
+  /**
+   * Fetch a service by its slug.
+   */
+  getServiceBySlug: async (slug: string): Promise<Service | null> => {
+    if (!isSupabaseConfigured()) {
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase.client
+        .from('services')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching service by slug:', error);
+        return null;
+      }
+
+      return data;
+    } catch (e) {
+      console.error('Exception in getServiceBySlug:', e);
+      return null;
+    }
+  },
+
+  /**
+   * Save (Insert/Update) a service record.
+   */
+  saveService: async (service: Service): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Supabase is not configured.' };
+    }
+
+    console.log('Saving Service...');
+    try {
+      const { error } = await supabase.client
+        .from('services')
+        .upsert({
+          id: service.id,
+          slug: service.slug,
+          title: service.title,
+          short_description: service.short_description,
+          description: service.description,
+          hero_image: service.hero_image,
+          icon: service.icon || null,
+          display_order: service.display_order,
+          is_active: service.is_active,
+          seo_title: service.seo_title || null,
+          seo_description: service.seo_description || null,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.log(`Supabase Error: ${error.message}`);
+        console.error('Error upserting service:', error);
+        return { success: false, error: error.message || JSON.stringify(error) };
+      }
+
+      console.log('Service Saved');
+      return { success: true };
+    } catch (e: any) {
+      console.log(`Supabase Error: ${e.message || String(e)}`);
+      console.error('Exception in saveService:', e);
+      return { success: false, error: e.message || String(e) };
+    }
+  },
+
+  /**
+   * Delete a service by its ID.
+   * Cascade delete will automatically clean up referencing gallery and faq entries.
+   */
+  deleteService: async (id: string): Promise<boolean> => {
+    if (!isSupabaseConfigured()) {
+      return false;
+    }
+
+    try {
+      const { error } = await supabase.client
+        .from('services')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting service:', error);
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      console.error('Exception in deleteService:', e);
+      return false;
+    }
+  },
+
+  /**
+   * Fetch all gallery items associated with a service, ordered by display_order.
+   */
+  getGallery: async (serviceId: string): Promise<ServiceGalleryItem[]> => {
+    if (!isSupabaseConfigured()) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase.client
+        .from('service_gallery')
+        .select('*')
+        .eq('service_id', serviceId)
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching service gallery:', error);
+        return [];
+      }
+
+      // Check if the service_gallery table is empty across all services
+      const { count } = await supabase.client
+        .from('service_gallery')
+        .select('*', { count: 'exact', head: true });
+
+      if (count === 0) {
+        console.log('service_gallery table is empty, seeding default service gallery...');
+        const { error: insertError } = await supabase.client
+          .from('service_gallery')
+          .insert(DEFAULT_SERVICE_GALLERY);
+
+        if (insertError) {
+          console.warn('Error seeding default service gallery:', insertError);
+        } else {
+          // Re-fetch immediate data for the requested service
+          const { data: refetchedData, error: refetchError } = await supabase.client
+            .from('service_gallery')
+            .select('*')
+            .eq('service_id', serviceId)
+            .order('display_order', { ascending: true });
+
+          if (!refetchError && refetchedData) {
+            return refetchedData;
+          }
+        }
+      }
+
+      return data || [];
+    } catch (e) {
+      console.error('Exception in getGallery:', e);
+      return [];
+    }
+  },
+
+  /**
+   * Sync/save the entire gallery array for a specific service.
+   * Deletes those not present in the current set, and upserts current set.
+   */
+  saveGallery: async (serviceId: string, items: ServiceGalleryItem[]): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Supabase is not configured.' };
+    }
+
+    console.log('Saving Gallery...');
+    try {
+      // Rule 3: Never attempt to insert into service_gallery or service_faqs unless the parent service already exists.
+      const { data: serviceExists, error: serviceCheckError } = await supabase.client
+        .from('services')
+        .select('id')
+        .eq('id', serviceId)
+        .maybeSingle();
+
+      if (serviceCheckError || !serviceExists) {
+        const checkErrorMsg = serviceCheckError 
+          ? serviceCheckError.message 
+          : `Parent service with ID "${serviceId}" does not exist in the database. Please save the service first.`;
+        console.log(`Supabase Error: ${checkErrorMsg}`);
+        return { success: false, error: checkErrorMsg };
+      }
+
+      const itemIds = items.map(item => item.id);
+
+      // 1. Delete old items that are no longer in the list
+      if (itemIds.length > 0) {
+        const { error: deleteError } = await supabase.client
+          .from('service_gallery')
+          .delete()
+          .eq('service_id', serviceId)
+          .not('id', 'in', `(${itemIds.map(id => `'${id}'`).join(',')})`);
+
+        if (deleteError) {
+          console.log(`Supabase Error: ${deleteError.message}`);
+          console.error('Error deleting obsolete gallery items:', deleteError);
+          return { success: false, error: deleteError.message || JSON.stringify(deleteError) };
+        }
+      } else {
+        const { error: deleteError } = await supabase.client
+          .from('service_gallery')
+          .delete()
+          .eq('service_id', serviceId);
+
+        if (deleteError) {
+          console.log(`Supabase Error: ${deleteError.message}`);
+          console.error('Error clearing gallery:', deleteError);
+          return { success: false, error: deleteError.message || JSON.stringify(deleteError) };
+        }
+      }
+
+      // 2. Upsert current list items
+      if (items.length > 0) {
+        const rowsToUpsert = items.map((item, idx) => ({
+          id: item.id,
+          service_id: serviceId,
+          image_url: item.image_url,
+          caption: item.caption || null,
+          alt_text: item.alt_text || null,
+          display_order: item.display_order !== undefined ? item.display_order : idx
+        }));
+
+        const { error: upsertError } = await supabase.client
+          .from('service_gallery')
+          .upsert(rowsToUpsert);
+
+        if (upsertError) {
+          console.log(`Supabase Error: ${upsertError.message}`);
+          console.error('Error upserting gallery items:', upsertError);
+          return { success: false, error: upsertError.message || JSON.stringify(upsertError) };
+        }
+      }
+
+      console.log('Gallery Saved');
+      return { success: true };
+    } catch (e: any) {
+      console.log(`Supabase Error: ${e.message || String(e)}`);
+      console.error('Exception in saveGallery:', e);
+      return { success: false, error: e.message || String(e) };
+    }
+  },
+
+  /**
+   * Delete a single gallery image by its unique ID.
+   */
+  deleteGalleryImage: async (id: string): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Supabase is not configured.' };
+    }
+
+    try {
+      const { error } = await supabase.client
+        .from('service_gallery')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.log(`Supabase Error: ${error.message}`);
+        console.error('Error deleting gallery image:', error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (e: any) {
+      console.log(`Supabase Error: ${e.message || String(e)}`);
+      console.error('Exception in deleteGalleryImage:', e);
+      return { success: false, error: e.message || String(e) };
+    }
+  },
+
+  /**
+   * Fetch all FAQs associated with a service, ordered by display_order.
+   */
+  getFaqs: async (serviceId: string): Promise<ServiceFaq[]> => {
+    if (!isSupabaseConfigured()) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase.client
+        .from('service_faqs')
+        .select('*')
+        .eq('service_id', serviceId)
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching service FAQs:', error);
+        return [];
+      }
+
+      // Check if service_faqs is empty
+      const { count } = await supabase.client
+        .from('service_faqs')
+        .select('*', { count: 'exact', head: true });
+
+      if (count === 0) {
+        console.log('service_faqs table is empty, seeding default service FAQs...');
+        const { error: insertError } = await supabase.client
+          .from('service_faqs')
+          .insert(DEFAULT_SERVICE_FAQS);
+
+        if (insertError) {
+          console.warn('Error seeding default service FAQs:', insertError);
+        } else {
+          // Re-fetch immediate data for the requested service
+          const { data: refetchedData, error: refetchError } = await supabase.client
+            .from('service_faqs')
+            .select('*')
+            .eq('service_id', serviceId)
+            .order('display_order', { ascending: true });
+
+          if (!refetchError && refetchedData) {
+            return refetchedData;
+          }
+        }
+      }
+
+      return data || [];
+    } catch (e) {
+      console.error('Exception in getFaqs:', e);
+      return [];
+    }
+  },
+
+  /**
+   * Sync/save the entire FAQs array for a specific service.
+   * Deletes those not present in the current set, and upserts current set.
+   */
+  saveFaqs: async (serviceId: string, faqs: ServiceFaq[]): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Supabase is not configured.' };
+    }
+
+    console.log('Saving FAQ...');
+    try {
+      // Rule 3: Never attempt to insert into service_gallery or service_faqs unless the parent service already exists.
+      const { data: serviceExists, error: serviceCheckError } = await supabase.client
+        .from('services')
+        .select('id')
+        .eq('id', serviceId)
+        .maybeSingle();
+
+      if (serviceCheckError || !serviceExists) {
+        const checkErrorMsg = serviceCheckError 
+          ? serviceCheckError.message 
+          : `Parent service with ID "${serviceId}" does not exist in the database. Please save the service first.`;
+        console.log(`Supabase Error: ${checkErrorMsg}`);
+        return { success: false, error: checkErrorMsg };
+      }
+
+      const faqIds = faqs.map(faq => faq.id);
+
+      // 1. Delete old FAQs that are no longer in the list
+      if (faqIds.length > 0) {
+        const { error: deleteError } = await supabase.client
+          .from('service_faqs')
+          .delete()
+          .eq('service_id', serviceId)
+          .not('id', 'in', `(${faqIds.map(id => `'${id}'`).join(',')})`);
+
+        if (deleteError) {
+          console.log(`Supabase Error: ${deleteError.message}`);
+          console.error('Error deleting obsolete FAQs:', deleteError);
+          return { success: false, error: deleteError.message || JSON.stringify(deleteError) };
+        }
+      } else {
+        const { error: deleteError } = await supabase.client
+          .from('service_faqs')
+          .delete()
+          .eq('service_id', serviceId);
+
+        if (deleteError) {
+          console.log(`Supabase Error: ${deleteError.message}`);
+          console.error('Error clearing FAQs:', deleteError);
+          return { success: false, error: deleteError.message || JSON.stringify(deleteError) };
+        }
+      }
+
+      // 2. Upsert current FAQs
+      if (faqs.length > 0) {
+        const rowsToUpsert = faqs.map((faq, idx) => ({
+          id: faq.id,
+          service_id: serviceId,
+          question: faq.question,
+          answer: faq.answer,
+          display_order: faq.display_order !== undefined ? faq.display_order : idx
+        }));
+
+        const { error: upsertError } = await supabase.client
+          .from('service_faqs')
+          .upsert(rowsToUpsert);
+
+        if (upsertError) {
+          console.log(`Supabase Error: ${upsertError.message}`);
+          console.error('Error upserting FAQs:', upsertError);
+          return { success: false, error: upsertError.message || JSON.stringify(upsertError) };
+        }
+      }
+
+      console.log('FAQ Saved');
+      return { success: true };
+    } catch (e: any) {
+      console.log(`Supabase Error: ${e.message || String(e)}`);
+      console.error('Exception in saveFaqs:', e);
+      return { success: false, error: e.message || String(e) };
+    }
+  },
+
+  /**
+   * Delete a single FAQ by its unique ID.
+   */
+  deleteFaq: async (id: string): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: 'Supabase is not configured.' };
+    }
+
+    try {
+      const { error } = await supabase.client
+        .from('service_faqs')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.log(`Supabase Error: ${error.message}`);
+        console.error('Error deleting FAQ:', error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (e: any) {
+      console.log(`Supabase Error: ${e.message || String(e)}`);
+      console.error('Exception in deleteFaq:', e);
+      return { success: false, error: e.message || String(e) };
+    }
+  }
+};
+
+export const DEFAULT_SERVICE_GALLERY: ServiceGalleryItem[] = [
+  // Dental Implants
+  {
+    id: 'gal-implants-1',
+    service_id: 'implants-srv',
+    image_url: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=600',
+    caption: 'State-of-the-art titanium dental implant procedure setup',
+    alt_text: 'Dental implant procedure',
+    display_order: 1
+  },
+  {
+    id: 'gal-implants-2',
+    service_id: 'implants-srv',
+    image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?q=80&w=600',
+    caption: 'Precisely fitted ceramic crown on custom titanium implant anchor',
+    alt_text: 'Fitted ceramic crown on titanium implant',
+    display_order: 2
+  },
+  {
+    id: 'gal-implants-3',
+    service_id: 'implants-srv',
+    image_url: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?q=80&w=600',
+    caption: 'Advanced digital CBCT diagnostics for implant planning',
+    alt_text: 'Advanced dental diagnostics planning',
+    display_order: 3
+  },
+
+  // Full Mouth Rehabilitation
+  {
+    id: 'gal-fmr-1',
+    service_id: 'fmr-srv',
+    image_url: 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?q=80&w=600',
+    caption: 'Comprehensive full arch smile rehabilitation mapping',
+    alt_text: 'Comprehensive full mouth rehabilitation',
+    display_order: 1
+  },
+  {
+    id: 'gal-fmr-2',
+    service_id: 'fmr-srv',
+    image_url: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?q=80&w=600',
+    caption: 'Restored occlusion and vertical dimension with premium zirconia prosthetics',
+    alt_text: 'Full mouth restoration results',
+    display_order: 2
+  },
+
+  // Clear Aligners
+  {
+    id: 'gal-aligners-1',
+    service_id: 'aligners-srv',
+    image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=600',
+    caption: 'Premium custom orthodontic clear aligner trays',
+    alt_text: 'Clear aligner trays',
+    display_order: 1
+  },
+  {
+    id: 'gal-aligners-2',
+    service_id: 'aligners-srv',
+    image_url: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?q=80&w=600',
+    caption: 'Invisible orthodontic alignment session for adult patients',
+    alt_text: 'Invisible orthodontic session',
+    display_order: 2
+  },
+
+  // Root Canal Treatment
+  {
+    id: 'gal-rct-1',
+    service_id: 'rct',
+    image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=600',
+    caption: 'Precision endodontic procedure with digital rotary apex locator',
+    alt_text: 'Endodontic procedure',
+    display_order: 1
+  },
+  {
+    id: 'gal-rct-2',
+    service_id: 'rct',
+    image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?q=80&w=600',
+    caption: 'Laser sterilization of root canal pathways',
+    alt_text: 'Laser root canal sterilization',
+    display_order: 2
+  },
+
+  // Smile Makeover
+  {
+    id: 'gal-smile-1',
+    service_id: 'smile-srv',
+    image_url: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=600',
+    caption: 'Post-treatment smile transformation using porcelain veneers',
+    alt_text: 'Smile makeover porcelain veneers',
+    display_order: 1
+  },
+  {
+    id: 'gal-smile-2',
+    service_id: 'smile-srv',
+    image_url: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600',
+    caption: 'Perfected alignment, symmetry, and shade match results',
+    alt_text: 'Perfect smile shade match',
+    display_order: 2
+  },
+
+  // Crowns & Bridges
+  {
+    id: 'gal-crowns-1',
+    service_id: 'crowns',
+    image_url: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=600',
+    caption: 'Prepped structure for customized zirconia crown placement',
+    alt_text: 'Zirconia crown placement',
+    display_order: 1
+  },
+  {
+    id: 'gal-crowns-2',
+    service_id: 'crowns',
+    image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?q=80&w=600',
+    caption: 'Precision 3D CAD/CAM scan of dental bridge model',
+    alt_text: 'Dental bridge scan',
+    display_order: 2
+  },
+
+  // Kids Dentistry
+  {
+    id: 'gal-kids-1',
+    service_id: 'kids',
+    image_url: 'https://images.unsplash.com/photo-1484981138541-3d074aa97716?q=80&w=600',
+    caption: 'Friendly pediatric dental checkup and dental health education',
+    alt_text: 'Pediatric dental checkup',
+    display_order: 1
+  },
+  {
+    id: 'gal-kids-2',
+    service_id: 'kids',
+    image_url: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600',
+    caption: 'Fluoride varnish treatment in a comfortable, anxiety-free setting',
+    alt_text: 'Kids fluoride treatment',
+    display_order: 2
+  }
+];
+
+export const DEFAULT_SERVICE_FAQS: ServiceFaq[] = [
+  // Dental Implants
+  {
+    id: 'faq-implants-1',
+    service_id: 'implants-srv',
+    question: 'How long do dental implants last?',
+    answer: 'With proper oral hygiene and regular professional dental checkups, titanium dental implants can last a lifetime. The ceramic crown attached to the implant typically lasts 10 to 15 years before natural wear may require replacement.',
+    display_order: 1
+  },
+  {
+    id: 'faq-implants-2',
+    service_id: 'implants-srv',
+    question: 'Is the dental implant procedure painful?',
+    answer: 'The procedure is performed under local anesthesia, meaning you will feel absolutely no pain during the surgery. After the anesthesia wears off, there may be mild discomfort which can be easily managed with standard prescribed painkillers.',
+    display_order: 2
+  },
+  {
+    id: 'faq-implants-3',
+    service_id: 'implants-srv',
+    question: 'Am I a candidate for dental implants?',
+    answer: 'Generally, anyone with missing teeth who has adequate jawbone density and healthy gums is an excellent candidate for dental implants. We perform a full 3D CBCT scan during your consultation to verify your bone structure.',
+    display_order: 3
+  },
+
+  // Full Mouth Rehabilitation
+  {
+    id: 'faq-fmr-1',
+    service_id: 'fmr-srv',
+    question: 'What is Full Mouth Rehabilitation?',
+    answer: 'It is a comprehensive clinical treatment plan that combines multiple procedures—such as crowns, bridges, dental implants, and veneers—to restore the function, health, and aesthetics of a patient’s entire bite and oral structure.',
+    display_order: 1
+  },
+  {
+    id: 'faq-fmr-2',
+    service_id: 'fmr-srv',
+    question: 'How long does a Full Mouth Rehabilitation take?',
+    answer: 'Because of its highly customized nature, the timeline can vary. Simple reconstructions take about 2 to 3 weeks, while complex cases involving bone grafts or implant healing can be phased over several months.',
+    display_order: 2
+  },
+
+  // Clear Aligners
+  {
+    id: 'faq-aligners-1',
+    service_id: 'aligners-srv',
+    question: 'How many hours a day must I wear my clear aligners?',
+    answer: 'For optimal results, you must wear your clear aligners for 20 to 22 hours every day. You should only remove them when eating, drinking anything other than water, brushing, and flossing.',
+    display_order: 1
+  },
+  {
+    id: 'faq-aligners-2',
+    service_id: 'aligners-srv',
+    question: 'Are clear aligners really invisible?',
+    answer: 'Yes! They are made of medical-grade transparent polyurethane plastic. Once they are fitted over your teeth, they are virtually unnoticeable to others, making them an excellent choice for professionals.',
+    display_order: 2
+  },
+
+  // Root Canal Treatment
+  {
+    id: 'faq-rct-1',
+    service_id: 'rct',
+    question: 'Is a root canal painful?',
+    answer: 'With modern micro-endodontic rotary files and advanced local anesthetics, a root canal is as painless and comfortable as getting a standard dental filling. The procedure actually relieves the intense pain caused by the tooth infection.',
+    display_order: 1
+  },
+  {
+    id: 'faq-rct-2',
+    service_id: 'rct',
+    question: 'Why do I need a crown after a root canal?',
+    answer: 'After a root canal, the tooth loses its internal blood and nerve supply, which can make it brittle and susceptible to fracture under chewing pressure. A customized crown covers and strengthens the tooth structure completely.',
+    display_order: 2
+  },
+
+  // Smile Makeover
+  {
+    id: 'faq-smile-1',
+    service_id: 'smile-srv',
+    question: 'What treatments are included in a Smile Makeover?',
+    answer: 'A smile makeover is tailored to your unique goals. It can include teeth whitening, porcelain veneers, cosmetic bonding, clear aligners, and laser gum contouring to achieve the perfect balance and symmetry.',
+    display_order: 1
+  },
+  {
+    id: 'faq-smile-2',
+    service_id: 'smile-srv',
+    question: 'How long does a Smile Makeover take?',
+    answer: 'Porcelain veneer treatments can be completed in just 2 to 3 sessions over a week. If orthodontic alignment or implants are needed first, the process will be planned in coordinated phases.',
+    display_order: 2
+  },
+
+  // Crowns & Bridges
+  {
+    id: 'faq-crowns-1',
+    service_id: 'crowns',
+    question: 'What is the difference between a crown and a bridge?',
+    answer: 'A crown is a custom cap that fits over a single damaged or decayed tooth to restore its shape and strength. A bridge is used to replace one or more missing teeth by anchoring prosthetic teeth to the healthy teeth on either side.',
+    display_order: 1
+  },
+  {
+    id: 'faq-crowns-2',
+    service_id: 'crowns',
+    question: 'How should I care for my dental bridge?',
+    answer: 'You should brush twice daily and floss under the bridge using a specialized threader or dental water flosser. Maintaining healthy anchor teeth is crucial to the long-term success of your dental bridge.',
+    display_order: 2
+  },
+
+  // Kids Dentistry
+  {
+    id: 'faq-kids-1',
+    service_id: 'kids',
+    question: 'When should a child have their first dental visit?',
+    answer: 'The American Academy of Pediatric Dentistry recommends that a child should visit the dentist by their first birthday or within six months of their first baby tooth erupting.',
+    display_order: 1
+  },
+  {
+    id: 'faq-kids-2',
+    service_id: 'kids',
+    question: 'What are dental sealants and are they safe?',
+    answer: 'Yes, sealants are 100% safe. They are thin, protective plastic coatings applied to the chewing surfaces of the back molars. They act as a barrier to prevent food debris and bacteria from causing cavities.',
+    display_order: 2
+  }
+];

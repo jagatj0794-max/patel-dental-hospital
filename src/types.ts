@@ -14,7 +14,8 @@ export type PageId =
   | 'contact'
   | 'admin'
   | 'admin/login'
-  | 'supabase-test';
+  | 'supabase-test'
+  | string;
 
 export interface Treatment {
   id: string;
@@ -90,6 +91,41 @@ export interface DentalVideo {
   title: string;
   treatment: string;
 }
+
+export interface Service {
+  id: string;
+  slug: string;
+  title: string;
+  short_description: string;
+  description: string;
+  hero_image: string;
+  icon?: string | null;
+  display_order: number;
+  is_active: boolean;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ServiceGalleryItem {
+  id: string;
+  service_id: string;
+  image_url: string;
+  caption?: string | null;
+  alt_text?: string | null;
+  display_order: number;
+  created_at?: string;
+}
+
+export interface ServiceFaq {
+  id: string;
+  service_id: string;
+  question: string;
+  answer: string;
+  display_order: number;
+}
+
 
 
 

@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Phone, Calendar, MapPin, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, ContactInfo } from '../types';
+import { serviceService } from '../utils/serviceData';
 
 interface NavbarProps {
   currentPage: PageId;
@@ -49,15 +50,7 @@ const navHierarchy = [
   {
     label: 'Services',
     id: 'treatments',
-    dropdown: [
-      { label: 'Dental Implants', id: 'implants-srv' },
-      { label: 'Full Mouth Rehabilitation', id: 'fmr-srv' },
-      { label: 'Clear Aligners', id: 'aligners-srv' },
-      { label: 'Root Canal Treatment', id: 'rct' },
-      { label: 'Smile Makeover', id: 'smile-srv' },
-      { label: 'Crowns & Bridges', id: 'crowns' },
-      { label: 'Kids Dentistry', id: 'kids' },
-    ]
+    dropdown: []
   },
   {
     label: 'Academy',
@@ -84,6 +77,32 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [dynamicServices, setDynamicServices] = useState<{ label: string; id: string }[]>([]);
+
+  // Fetch active services dynamically
+  useEffect(() => {
+    let active = true;
+    const fetchServices = async () => {
+      try {
+        const services = await serviceService.getServices();
+        if (active) {
+          const activeServices = services
+            .filter(s => s.is_active)
+            .map(s => ({
+              label: s.title,
+              id: `services/${s.slug}`
+            }));
+          setDynamicServices(activeServices);
+        }
+      } catch (err) {
+        console.error('Failed to load active services for navbar dropdown:', err);
+      }
+    };
+    fetchServices();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Monitor scroll height to apply sticky blur and premium border
   useEffect(() => {
@@ -95,6 +114,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
   }, []);
 
   const handleNavigate = (id: string) => {
+    if (id === 'no-services') return;
     // Basic navigation handling - cast as PageId since some routes are mock
     setCurrentPage(id as PageId);
     setIsOpen(false);
@@ -109,6 +129,25 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
     } else {
       setMobileExpanded(id);
     }
+  };
+
+  // Replace default services dropdown with dynamically loaded ones
+  const menuItems = navHierarchy.map(item => {
+    if (item.id === 'treatments') {
+      return {
+        ...item,
+        dropdown: dynamicServices.length > 0
+          ? dynamicServices
+          : [{ label: 'No Services Available', id: 'no-services' }]
+      };
+    }
+    return item;
+  });
+
+  const isItemActive = (item: typeof navHierarchy[0] | typeof menuItems[0]) => {
+    if (currentPage === item.id) return true;
+    if (item.id === 'treatments' && currentPage.startsWith('services/')) return true;
+    return false;
   };
 
   return (
@@ -163,7 +202,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
 
             {/* Center Desktop Navigation */}
             <div className="hidden lg:flex flex-nowrap items-center justify-center flex-grow mx-4 z-50 relative">
-              {navHierarchy.map((item) => (
+              {menuItems.map((item) => (
                 <div 
                   key={item.id}
                   className="relative group px-1.5 xl:px-3 2xl:px-3.5 h-full shrink-0"
@@ -175,7 +214,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                         if (!item.dropdown) handleNavigate(item.id);
                     }}
                     className={`flex items-center text-[13px] xl:text-[14px] 2xl:text-[15px] font-semibold py-2 transition-colors whitespace-nowrap ${
-                      currentPage === item.id || activeDropdown === item.id ? 'text-[#0D9488]' : 'text-[#12355B] hover:text-[#0D9488]'
+                      isItemActive(item) || activeDropdown === item.id ? 'text-[#0D9488]' : 'text-[#12355B] hover:text-[#0D9488]'
                     }`}
                   >
                     {item.label}
@@ -258,7 +297,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             }}
           >
             <div className="px-4 py-4 pb-24 space-y-1">
-              {navHierarchy.map((item) => (
+              {menuItems.map((item) => (
                 <div key={item.id} className="border-b border-gray-50 last:border-0">
                   <div className="flex items-center justify-between px-2 py-3 rounded-xl transition-all">
                     <button
@@ -267,7 +306,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                         else toggleMobileDropdown(item.id);
                       }}
                       className={`flex-grow text-left text-[15px] font-bold ${
-                        currentPage === item.id ? 'text-[#0D9488]' : 'text-[#12355B]'
+                        isItemActive(item) ? 'text-[#0D9488]' : 'text-[#12355B]'
                       }`}
                     >
                       {item.label}

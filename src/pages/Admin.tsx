@@ -33,8 +33,8 @@ import {
   Building2,
   Mail
 } from 'lucide-react';
-import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo } from '../types';
-import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays } from 'lucide-react';
+import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq } from '../types';
+import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
 import { uploadImage } from '../utils/supabaseStorage';
@@ -43,6 +43,7 @@ import { doctorService } from '../utils/doctorData';
 import { galleryService } from '../utils/galleryData';
 import { videoService } from '../utils/videoData';
 import { contactService } from '../utils/contactData';
+import { serviceService } from '../utils/serviceData';
 import Appointments from './Appointments';
 
 interface AdminProps {
@@ -65,7 +66,7 @@ interface AdminProps {
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>;
 }
 
-type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact';
+type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services';
 
 export default function Admin({ 
   setCurrentPage, 
@@ -128,6 +129,640 @@ export default function Admin({
   const [docPhotoDragging, setDocPhotoDragging] = useState(false);
   const [doctorToDelete, setDoctorToDelete] = useState<string | null>(null);
   const [smileToDelete, setSmileToDelete] = useState<string | null>(null);
+
+  // Services Tab states
+  const [servicesList, setServicesList] = useState<Service[]>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+  const [servicesError, setServicesError] = useState<string | null>(null);
+  const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [serviceImgUploading, setServiceImgUploading] = useState(false);
+  const [serviceFormError, setServiceFormError] = useState<string | null>(null);
+  const [isSlugTouched, setIsSlugTouched] = useState(false);
+
+  const isSlugUnique = (slug: string, id: string) => {
+    return !servicesList.some(s => s.slug.trim().toLowerCase() === slug.trim().toLowerCase() && s.id !== id);
+  };
+
+  const handleAddService = () => {
+    setIsSlugTouched(false);
+    setServiceFormError(null);
+    setActiveServiceEditorTab('details');
+    setEditingService({
+      id: `svc-${Date.now()}`,
+      slug: '',
+      title: '',
+      short_description: '',
+      description: '',
+      hero_image: '',
+      icon: 'Stethoscope',
+      display_order: servicesList.length > 0 ? Math.max(...servicesList.map(s => s.display_order)) + 10 : 10,
+      is_active: true,
+      seo_title: '',
+      seo_description: '',
+    });
+  };
+
+  const handleSaveService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingService) return;
+
+    setServiceFormError(null);
+
+    // Validate fields
+    if (!editingService.title.trim()) {
+      setServiceFormError('Service title is required.');
+      return;
+    }
+    if (!editingService.slug.trim()) {
+      setServiceFormError('Service slug is required.');
+      return;
+    }
+    // Validate slug uniqueness
+    if (!isSlugUnique(editingService.slug, editingService.id)) {
+      setServiceFormError('Service slug must be unique. This slug is already in use.');
+      return;
+    }
+    if (!editingService.short_description.trim()) {
+      setServiceFormError('Short description is required.');
+      return;
+    }
+    if (!editingService.description.trim()) {
+      setServiceFormError('Full description is required.');
+      return;
+    }
+    if (!editingService.hero_image.trim()) {
+      setServiceFormError('Hero image is required. Please upload or specify an image URL.');
+      return;
+    }
+    if (isNaN(Number(editingService.display_order))) {
+      setServiceFormError('Display order must be a valid numeric value.');
+      return;
+    }
+
+    setSaveMessage('Saving service to Supabase...');
+    try {
+      const isNew = !servicesList.some(s => s.id === editingService.id);
+      const serviceToSave: Service = {
+        ...editingService,
+        title: editingService.title.trim(),
+        slug: editingService.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+        short_description: editingService.short_description.trim(),
+        description: editingService.description.trim(),
+        display_order: Number(editingService.display_order),
+        seo_title: editingService.seo_title?.trim() || null,
+        seo_description: editingService.seo_description?.trim() || null,
+      };
+
+      const result = await serviceService.saveService(serviceToSave);
+      if (result.success) {
+        if (isNew) {
+          setSaveMessage('Service created successfully. You can now add Gallery images and FAQs.');
+        } else {
+          setSaveMessage('Service saved successfully!');
+        }
+        await loadServicesList();
+        // Keep drawer open & update local state with saved service so that it converts to Edit Mode
+        setEditingService(serviceToSave);
+      } else {
+        setServiceFormError(result.error || 'Failed to save service on Supabase.');
+        setSaveMessage(null);
+      }
+    } catch (err: any) {
+      console.error('Error saving service:', err);
+      setServiceFormError('Error saving service: ' + (err.message || err));
+      setSaveMessage(null);
+    } finally {
+      setTimeout(() => setSaveMessage(null), 3000);
+    }
+  };
+
+  const handleServiceHeroImageUpload = async (file: File) => {
+    setServiceImgUploading(true);
+    setServiceFormError(null);
+    try {
+      const publicUrl = await uploadImage(file);
+      if (editingService) {
+        setEditingService({ ...editingService, hero_image: publicUrl });
+      }
+    } catch (err: any) {
+      console.error('Error uploading service image:', err);
+      setServiceFormError('Image upload failed: ' + (err.message || err));
+    } finally {
+      setServiceImgUploading(false);
+    }
+  };
+
+  const loadServicesList = async () => {
+    setLoadingServices(true);
+    setServicesError(null);
+    try {
+      const data = await serviceService.getServices();
+      setServicesList(data || []);
+    } catch (err: any) {
+      console.error('[Services] Failed to fetch services:', err);
+      setServicesError('Failed to fetch services. Please try again.');
+    } finally {
+      setLoadingServices(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'services') {
+      loadServicesList();
+    }
+  }, [activeTab]);
+
+  const handleDeleteService = async () => {
+    if (!serviceToDelete) return;
+    setSaveMessage('Deleting service from Supabase...');
+    try {
+      const success = await serviceService.deleteService(serviceToDelete);
+      if (success) {
+        setSaveMessage('Service deleted successfully!');
+        setServicesList(prev => prev.filter(s => s.id !== serviceToDelete));
+      } else {
+        setSaveMessage('Failed to delete service on Supabase.');
+      }
+    } catch (err: any) {
+      console.error('Error deleting service:', err);
+      setSaveMessage('Error deleting service: ' + (err.message || err));
+    } finally {
+      setServiceToDelete(null);
+      setTimeout(() => setSaveMessage(null), 3000);
+    }
+  };
+
+  // Service Gallery Tab states
+  const [activeServiceEditorTab, setActiveServiceEditorTab] = useState<'details' | 'gallery' | 'faqs'>('details');
+  const [serviceGalleryList, setServiceGalleryList] = useState<ServiceGalleryItem[]>([]);
+  const [loadingGallery, setLoadingGallery] = useState(false);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [gallerySaving, setGallerySaving] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // Add by URL states
+  const [isAddByUrlOpen, setIsAddByUrlOpen] = useState(false);
+  const [addByUrlInput, setAddByUrlInput] = useState('');
+  const [addByUrlCaption, setAddByUrlCaption] = useState('');
+  const [addByUrlAltText, setAddByUrlAltText] = useState('');
+  const [addByUrlError, setAddByUrlError] = useState<string | null>(null);
+
+  // Replace & Delete states
+  const [replacingGalleryItemIndex, setReplacingGalleryItemIndex] = useState<number | null>(null);
+  const [replaceUrlInput, setReplaceUrlInput] = useState('');
+  const [replaceError, setReplaceError] = useState<string | null>(null);
+  const [galleryImageToDelete, setGalleryImageToDelete] = useState<string | null>(null);
+
+  // Service FAQs Tab states
+  const [serviceFaqsList, setServiceFaqsList] = useState<ServiceFaq[]>([]);
+  const [loadingFaqs, setLoadingFaqs] = useState(false);
+  const [faqsError, setFaqsError] = useState<string | null>(null);
+  const [faqsSaving, setFaqsSaving] = useState(false);
+  const [draggedFaqIndex, setDraggedFaqIndex] = useState<number | null>(null);
+  const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
+  const [faqEditQuestion, setFaqEditQuestion] = useState('');
+  const [faqEditAnswer, setFaqEditAnswer] = useState('');
+
+  useEffect(() => {
+    if (editingService?.id) {
+      const loadGallery = async () => {
+        setLoadingGallery(true);
+        setGalleryError(null);
+        try {
+          const items = await serviceService.getGallery(editingService.id);
+          setServiceGalleryList(items || []);
+        } catch (err: any) {
+          console.error('Error fetching service gallery:', err);
+          setGalleryError('Failed to fetch gallery images.');
+        } finally {
+          setLoadingGallery(false);
+        }
+      };
+
+      const loadFaqs = async () => {
+        setLoadingFaqs(true);
+        setFaqsError(null);
+        try {
+          const items = await serviceService.getFaqs(editingService.id);
+          setServiceFaqsList(items || []);
+        } catch (err: any) {
+          console.error('Error fetching service FAQs:', err);
+          setFaqsError('Failed to fetch FAQs.');
+        } finally {
+          setLoadingFaqs(false);
+        }
+      };
+
+      loadGallery();
+      loadFaqs();
+    } else {
+      setServiceGalleryList([]);
+      setServiceFaqsList([]);
+      setEditingFaqId(null);
+    }
+  }, [editingService?.id]);
+
+  const handleAddGalleryImages = async (files: FileList) => {
+    if (!editingService) return;
+    setGalleryUploading(true);
+    setGalleryError(null);
+    try {
+      const newItems: ServiceGalleryItem[] = [];
+      let startOrder = serviceGalleryList.length > 0
+        ? Math.max(...serviceGalleryList.map(item => item.display_order)) + 10
+        : 10;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const publicUrl = await uploadImage(file);
+        if (publicUrl) {
+          newItems.push({
+            id: `img-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+            service_id: editingService.id,
+            image_url: publicUrl,
+            caption: file.name.split('.')[0] || '',
+            alt_text: file.name.split('.')[0] || '',
+            display_order: startOrder,
+          });
+          startOrder += 10;
+        }
+      }
+
+      if (newItems.length > 0) {
+        const updatedList = [...serviceGalleryList, ...newItems];
+        setServiceGalleryList(updatedList);
+        const result = await serviceService.saveGallery(editingService.id, updatedList);
+        if (result.success) {
+          const items = await serviceService.getGallery(editingService.id);
+          setServiceGalleryList(items || []);
+        } else {
+          setGalleryError(result.error || 'Failed to save gallery item to database.');
+        }
+      }
+    } catch (err: any) {
+      console.error('Error uploading gallery images:', err);
+      setGalleryError('Failed to upload some gallery images: ' + (err.message || err));
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
+  const handleAddGalleryByUrl = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingService) return;
+    setAddByUrlError(null);
+
+    const url = addByUrlInput.trim();
+    if (!url) {
+      setAddByUrlError('Image URL is required.');
+      return;
+    }
+
+    // Validate that the URL is a valid http/https image URL.
+    if (!/^https?:\/\/.+/i.test(url)) {
+      setAddByUrlError('Please enter a valid HTTP or HTTPS image URL.');
+      return;
+    }
+
+    setGallerySaving(true);
+    try {
+      let startOrder = serviceGalleryList.length > 0
+        ? Math.max(...serviceGalleryList.map(item => item.display_order)) + 10
+        : 10;
+
+      const newItem: ServiceGalleryItem = {
+        id: `img-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        service_id: editingService.id,
+        image_url: url,
+        caption: addByUrlCaption.trim() || null,
+        alt_text: addByUrlAltText.trim() || null,
+        display_order: startOrder,
+      };
+
+      const updatedList = [...serviceGalleryList, newItem];
+      setServiceGalleryList(updatedList);
+      const result = await serviceService.saveGallery(editingService.id, updatedList);
+      if (result.success) {
+        const items = await serviceService.getGallery(editingService.id);
+        setServiceGalleryList(items || []);
+        // Reset states and close modal
+        setAddByUrlInput('');
+        setAddByUrlCaption('');
+        setAddByUrlAltText('');
+        setIsAddByUrlOpen(false);
+      } else {
+        setAddByUrlError(result.error || 'Failed to save gallery item to database.');
+      }
+    } catch (err: any) {
+      console.error('Error adding gallery image by URL:', err);
+      setAddByUrlError('Error: ' + (err.message || err));
+    } finally {
+      setGallerySaving(false);
+    }
+  };
+
+  const handleReplaceUploadedFile = async (index: number, file: File) => {
+    if (!editingService) return;
+    setGalleryUploading(true);
+    setReplaceError(null);
+    setGalleryError(null);
+    try {
+      const publicUrl = await uploadImage(file);
+      if (publicUrl) {
+        const updatedList = [...serviceGalleryList];
+        updatedList[index] = {
+          ...updatedList[index],
+          image_url: publicUrl
+        };
+        setServiceGalleryList(updatedList);
+        const result = await serviceService.saveGallery(editingService.id, updatedList);
+        if (result.success) {
+          const items = await serviceService.getGallery(editingService.id);
+          setServiceGalleryList(items || []);
+          setReplacingGalleryItemIndex(null);
+          setReplaceUrlInput('');
+        } else {
+          setReplaceError(result.error || 'Failed to save replaced gallery image.');
+          setGalleryError(result.error || 'Failed to save replaced gallery image.');
+        }
+      }
+    } catch (err: any) {
+      console.error('Error replacing gallery image:', err);
+      setReplaceError(err.message || 'Failed to replace image.');
+      setGalleryError(err.message || 'Failed to replace image.');
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
+  const handleReplaceByUrl = async (index: number) => {
+    if (!editingService) return;
+    const url = replaceUrlInput.trim();
+    if (!url) {
+      setReplaceError('Image URL is required.');
+      return;
+    }
+    if (!/^https?:\/\/.+/i.test(url)) {
+      setReplaceError('Please enter a valid HTTP or HTTPS image URL.');
+      return;
+    }
+
+    setGallerySaving(true);
+    setReplaceError(null);
+    setGalleryError(null);
+    try {
+      const updatedList = [...serviceGalleryList];
+      updatedList[index] = {
+        ...updatedList[index],
+        image_url: url
+      };
+      setServiceGalleryList(updatedList);
+      const result = await serviceService.saveGallery(editingService.id, updatedList);
+      if (result.success) {
+        const items = await serviceService.getGallery(editingService.id);
+        setServiceGalleryList(items || []);
+        setReplacingGalleryItemIndex(null);
+        setReplaceUrlInput('');
+      } else {
+        setReplaceError(result.error || 'Failed to save replaced gallery image.');
+        setGalleryError(result.error || 'Failed to save replaced gallery image.');
+      }
+    } catch (err: any) {
+      console.error('Error replacing gallery image by URL:', err);
+      setReplaceError(err.message || 'Failed to replace image.');
+      setGalleryError(err.message || 'Failed to replace image.');
+    } finally {
+      setGallerySaving(false);
+    }
+  };
+
+  const handleDeleteGalleryImage = (itemId: string) => {
+    setGalleryImageToDelete(itemId);
+  };
+
+  const handleConfirmDeleteGalleryImage = async () => {
+    if (!galleryImageToDelete || !editingService) return;
+    setGallerySaving(true);
+    setGalleryError(null);
+    try {
+      const result = await serviceService.deleteGalleryImage(galleryImageToDelete);
+      if (result.success) {
+        const items = await serviceService.getGallery(editingService.id);
+        setServiceGalleryList(items || []);
+        setGalleryImageToDelete(null);
+      } else {
+        setGalleryError(result.error || 'Failed to delete gallery image.');
+      }
+    } catch (err: any) {
+      console.error('Error deleting gallery image:', err);
+      setGalleryError(err.message || 'Failed to delete gallery image.');
+    } finally {
+      setGallerySaving(false);
+    }
+  };
+
+  const handleUpdateGalleryItem = async (index: number, updatedFields: Partial<ServiceGalleryItem>) => {
+    const updatedList = [...serviceGalleryList];
+    updatedList[index] = { ...updatedList[index], ...updatedFields };
+    setServiceGalleryList(updatedList);
+
+    if (editingService) {
+      setGallerySaving(true);
+      try {
+        const result = await serviceService.saveGallery(editingService.id, updatedList);
+        if (result.success) {
+          const items = await serviceService.getGallery(editingService.id);
+          setServiceGalleryList(items || []);
+        } else {
+          setGalleryError(result.error || 'Failed to save gallery item.');
+        }
+      } catch (err: any) {
+        console.error('Error updating gallery item metadata:', err);
+        setGalleryError('Error: ' + (err.message || err));
+      } finally {
+        setGallerySaving(false);
+      }
+    }
+  };
+
+  const handleGalleryDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleGalleryDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const items = [...serviceGalleryList];
+    const draggedItem = items[draggedIndex];
+    items.splice(draggedIndex, 1);
+    items.splice(index, 0, draggedItem);
+
+    const updatedItems = items.map((item, idx) => ({
+      ...item,
+      display_order: (idx + 1) * 10
+    }));
+
+    setServiceGalleryList(updatedItems);
+    setDraggedIndex(index);
+  };
+
+  const handleGalleryDragEnd = async () => {
+    setDraggedIndex(null);
+    if (editingService) {
+      setGallerySaving(true);
+      try {
+        const result = await serviceService.saveGallery(editingService.id, serviceGalleryList);
+        if (result.success) {
+          const items = await serviceService.getGallery(editingService.id);
+          setServiceGalleryList(items || []);
+        } else {
+          setGalleryError(result.error || 'Failed to save gallery item.');
+        }
+      } catch (err: any) {
+        console.error('Error saving reordered gallery:', err);
+        setGalleryError('Error: ' + (err.message || err));
+      } finally {
+        setGallerySaving(false);
+      }
+    }
+  };
+
+  // Service FAQ Helper Handlers
+  const handleAddFaq = () => {
+    if (!editingService) return;
+    const newFaqId = `new-faq-${Date.now()}`;
+    const newFaq: ServiceFaq = {
+      id: newFaqId,
+      service_id: editingService.id,
+      question: '',
+      answer: '',
+      display_order: serviceFaqsList.length > 0
+        ? Math.max(...serviceFaqsList.map(f => f.display_order)) + 10
+        : 10
+    };
+    setServiceFaqsList(prev => [...prev, newFaq]);
+    setEditingFaqId(newFaqId);
+    setFaqEditQuestion('');
+    setFaqEditAnswer('');
+  };
+
+  const handleEditFaq = (faq: ServiceFaq) => {
+    setEditingFaqId(faq.id);
+    setFaqEditQuestion(faq.question);
+    setFaqEditAnswer(faq.answer);
+  };
+
+  const handleSaveFaq = async (faqId: string) => {
+    if (!editingService) return;
+    if (!faqEditQuestion.trim() || !faqEditAnswer.trim()) {
+      setFaqsError('Question and Answer cannot be empty.');
+      return;
+    }
+    setFaqsSaving(true);
+    setFaqsError(null);
+    try {
+      const updatedList = serviceFaqsList.map(faq => {
+        if (faq.id === faqId) {
+          return { ...faq, question: faqEditQuestion, answer: faqEditAnswer };
+        }
+        return faq;
+      });
+      setServiceFaqsList(updatedList);
+      const result = await serviceService.saveFaqs(editingService.id, updatedList);
+      if (result.success) {
+        const items = await serviceService.getFaqs(editingService.id);
+        setServiceFaqsList(items || []);
+        setEditingFaqId(null);
+      } else {
+        setFaqsError(result.error || 'Failed to save FAQs to database.');
+      }
+    } catch (err: any) {
+      console.error('Error saving FAQ:', err);
+      setFaqsError('Failed to save FAQ: ' + (err.message || err));
+    } finally {
+      setFaqsSaving(false);
+    }
+  };
+
+  const handleCancelFaqEdit = (faqId: string) => {
+    setEditingFaqId(null);
+    setFaqsError(null);
+    // If it was a newly added FAQ and was left completely blank, discard it
+    const faq = serviceFaqsList.find(f => f.id === faqId);
+    if (faq && faq.id.startsWith('new-faq-') && !faq.question && !faq.answer) {
+      setServiceFaqsList(prev => prev.filter(f => f.id !== faqId));
+    }
+  };
+
+  const handleDeleteFaq = async (faqId: string) => {
+    if (!confirm('Are you sure you want to delete this FAQ?')) return;
+    setFaqsSaving(true);
+    setFaqsError(null);
+    try {
+      if (!faqId.startsWith('new-faq-')) {
+        const result = await serviceService.deleteFaq(faqId);
+        if (!result.success) {
+          setFaqsError(result.error || 'Failed to delete FAQ record from database.');
+          setFaqsSaving(false);
+          return;
+        }
+      }
+      // Reload FAQs from database to ensure state sync
+      const items = await serviceService.getFaqs(editingService.id);
+      setServiceFaqsList(items || []);
+    } catch (err: any) {
+      console.error('Error deleting FAQ:', err);
+      setFaqsError('Failed to delete FAQ: ' + (err.message || err));
+    } finally {
+      setFaqsSaving(false);
+    }
+  };
+
+  const handleFaqDragStart = (index: number) => {
+    setDraggedFaqIndex(index);
+  };
+
+  const handleFaqDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedFaqIndex === null || draggedFaqIndex === index) return;
+
+    const items = [...serviceFaqsList];
+    const draggedItem = items[draggedFaqIndex];
+    items.splice(draggedFaqIndex, 1);
+    items.splice(index, 0, draggedItem);
+
+    const updatedItems = items.map((item, idx) => ({
+      ...item,
+      display_order: (idx + 1) * 10
+    }));
+
+    setServiceFaqsList(updatedItems);
+    setDraggedFaqIndex(index);
+  };
+
+  const handleFaqDragEnd = async () => {
+    setDraggedFaqIndex(null);
+    if (editingService) {
+      setFaqsSaving(true);
+      try {
+        const result = await serviceService.saveFaqs(editingService.id, serviceFaqsList);
+        if (result.success) {
+          const items = await serviceService.getFaqs(editingService.id);
+          setServiceFaqsList(items || []);
+        } else {
+          setFaqsError(result.error || 'Failed to save FAQs.');
+        }
+      } catch (err: any) {
+        console.error('Error saving reordered FAQs:', err);
+        setFaqsError('Error: ' + (err.message || err));
+      } finally {
+        setFaqsSaving(false);
+      }
+    }
+  };
 
   // Media local interactive states
   const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'smiles' | 'videos'>('gallery');
@@ -200,6 +835,7 @@ export default function Admin({
     { id: 'media', label: 'Media', icon: ImageIcon },
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
+    { id: 'services', label: 'Services', icon: Stethoscope },
   ] as const;
 
   const handleLogout = async () => {
@@ -2667,6 +3303,210 @@ export default function Admin({
         );
       case 'appointments':
         return <Appointments />;
+      case 'services':
+        return (
+          <div className="space-y-6" id="admin-services-view">
+            {/* Header Banner */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-150 shadow-3xs flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900 flex items-center gap-2" id="admin-tab-title">
+                  <span className="p-2 rounded-xl bg-[#F0FDFA] text-[#0D9488]"><Stethoscope className="h-5 w-5" /></span>
+                  Services Management
+                </h1>
+                <p className="text-slate-500 text-xs md:text-sm mt-1">
+                  Manage hospital treatment services, service-specific gallery images, and FAQs.
+                </p>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={handleAddService}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs md:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer"
+                  id="add-service-btn"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Service
+                </button>
+              </div>
+            </div>
+
+            {loadingServices ? (
+              <div className="bg-white border border-slate-100 p-12 rounded-2xl text-center shadow-3xs flex flex-col items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0D9488] mb-3"></div>
+                <p className="text-slate-500 text-xs font-medium">Loading clinical services...</p>
+              </div>
+            ) : servicesError ? (
+              <div className="bg-red-50 border border-red-200 text-red-800 p-6 rounded-2xl text-sm">
+                <p className="font-bold">Error loading services</p>
+                <p className="text-xs mt-1 text-red-600">{servicesError}</p>
+                <button
+                  onClick={loadServicesList}
+                  className="mt-3 px-4 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-bold rounded-lg transition animate-pulse"
+                >
+                  Retry Loading
+                </button>
+              </div>
+            ) : servicesList.length === 0 ? (
+              <div className="bg-white border border-slate-100 p-12 rounded-2xl text-center shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08)]">
+                <div className="max-w-md mx-auto py-12 flex flex-col items-center justify-center">
+                  <div className="p-4 rounded-full bg-slate-50 text-slate-400 mb-4">
+                    <Stethoscope className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800">No services found.</h3>
+                  <p className="text-slate-500 text-xs mt-2 leading-relaxed">
+                    There are currently no active treatment services in the database. Set up your first service to showcase clinical procedures, FAQs, and a photo gallery.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAddService}
+                    className="mt-6 flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs md:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add First Service
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-150 shadow-3xs overflow-hidden" id="services-table-container">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left border-collapse" id="services-data-table">
+                    <thead>
+                      <tr className="bg-slate-50/50 border-b border-slate-150">
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-24">Display Order</th>
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-28">Hero Image</th>
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Title</th>
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Slug</th>
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-28">Status</th>
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right pr-6 w-72">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {servicesList.map((svc) => (
+                        <tr 
+                          key={svc.id} 
+                          className="hover:bg-slate-50/30 transition-all duration-150"
+                          id={`service-row-${svc.id}`}
+                        >
+                          {/* Display Order */}
+                          <td className="px-4 py-4 text-xs font-mono text-slate-600 font-medium">
+                            <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md">
+                              {svc.display_order}
+                            </span>
+                          </td>
+
+                          {/* Hero Image Thumbnail */}
+                          <td className="px-4 py-4">
+                            <img
+                              src={svc.hero_image || 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?q=80&w=200'}
+                              alt={svc.title}
+                              className="w-16 h-10 object-cover rounded-lg border border-slate-100 shadow-3xs"
+                              referrerPolicy="no-referrer"
+                            />
+                          </td>
+                          
+                          {/* Title */}
+                          <td className="px-4 py-4 text-xs">
+                            <div className="font-semibold text-slate-800 text-sm">{svc.title}</div>
+                            {svc.short_description && (
+                              <div className="text-slate-400 mt-0.5 line-clamp-1 max-w-sm">{svc.short_description}</div>
+                            )}
+                          </td>
+
+                          {/* Slug */}
+                          <td className="px-4 py-4 text-xs font-mono text-slate-500">
+                            {svc.slug}
+                          </td>
+
+                          {/* Active/Inactive Status */}
+                          <td className="px-4 py-4 text-xs">
+                            {svc.is_active ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                Active
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-500">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                                Inactive
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="px-4 py-4 text-xs text-right pr-6 whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {/* Edit Action */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveServiceEditorTab('details');
+                                  setEditingService(svc);
+                                  setIsSlugTouched(true);
+                                  setServiceFormError(null);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#0D9488] bg-[#F0FDFA] hover:bg-[#CCFBF1] rounded-lg transition cursor-pointer"
+                                title="Edit Service details"
+                              >
+                                <Pencil className="h-3 w-3" />
+                                Edit
+                              </button>
+
+                              {/* Gallery Action */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveServiceEditorTab('gallery');
+                                  setEditingService(svc);
+                                  setIsSlugTouched(true);
+                                  setServiceFormError(null);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition cursor-pointer"
+                                title="Manage service gallery images"
+                              >
+                                <ImageIcon className="h-3 w-3" />
+                                Gallery
+                              </button>
+
+                              {/* FAQs Action */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveServiceEditorTab('faqs');
+                                  setEditingService(svc);
+                                  setIsSlugTouched(true);
+                                  setServiceFormError(null);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition cursor-pointer"
+                                title="Manage service FAQs"
+                              >
+                                <MessageCircle className="h-3 w-3" />
+                                FAQs
+                              </button>
+
+                              {/* Delete Action */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setServiceToDelete(svc.id);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer"
+                                title="Delete service"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        );
     }
   };
 
@@ -2950,6 +3790,991 @@ export default function Admin({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Services Delete Confirmation Dialog Modal */}
+      {serviceToDelete && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          {/* Backdrop click to close */}
+          <div className="absolute inset-0" onClick={() => setServiceToDelete(null)} />
+          
+          {/* Card container */}
+          <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
+            <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Treatment Service</h3>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Are you sure you want to delete this service? This action is permanent and will delete all associated gallery images and FAQs.
+            </p>
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setServiceToDelete(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteService}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add by URL Modal */}
+      {isAddByUrlOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          {/* Backdrop click to close */}
+          <div className="absolute inset-0" onClick={() => setIsAddByUrlOpen(false)} />
+          
+          {/* Card container */}
+          <div className="relative bg-white rounded-2xl border border-slate-150 shadow-2xl max-w-md w-full p-6 text-slate-800 z-10 animate-fade-in">
+            <h3 className="text-base font-extrabold text-[#081C3A] mb-1">Add Image by URL</h3>
+            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+              Paste a direct image URL from Unsplash, Pexels, or other clinical image hosting sites.
+            </p>
+
+            {addByUrlError && (
+              <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs font-semibold leading-relaxed mb-4">
+                ⚠️ {addByUrlError}
+              </div>
+            )}
+
+            <form onSubmit={handleAddGalleryByUrl} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Image URL *</label>
+                <input
+                  type="text"
+                  required
+                  value={addByUrlInput}
+                  onChange={(e) => setAddByUrlInput(e.target.value)}
+                  placeholder="https://images.unsplash.com/photo-..."
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Caption (Optional)</label>
+                <input
+                  type="text"
+                  value={addByUrlCaption}
+                  onChange={(e) => setAddByUrlCaption(e.target.value)}
+                  placeholder="e.g. Clinical implant outcome"
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Alt Text (Optional, SEO)</label>
+                <input
+                  type="text"
+                  value={addByUrlAltText}
+                  onChange={(e) => setAddByUrlAltText(e.target.value)}
+                  placeholder="e.g. titanium dental implant procedure setup"
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddByUrlInput('');
+                    setAddByUrlCaption('');
+                    setAddByUrlAltText('');
+                    setAddByUrlError(null);
+                    setIsAddByUrlOpen(false);
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl transition cursor-pointer shadow-sm shadow-teal-600/10"
+                >
+                  Save Image
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Replace Gallery Image Modal */}
+      {replacingGalleryItemIndex !== null && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
+          {/* Backdrop click to close */}
+          <div className="absolute inset-0" onClick={() => {
+            setReplacingGalleryItemIndex(null);
+            setReplaceUrlInput('');
+            setReplaceError(null);
+          }} />
+          
+          {/* Card container */}
+          <div className="relative bg-white rounded-2xl border border-slate-150 shadow-2xl max-w-md w-full p-6 text-slate-800 z-10">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-extrabold text-[#081C3A]">Replace Gallery Image</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setReplacingGalleryItemIndex(null);
+                  setReplaceUrlInput('');
+                  setReplaceError(null);
+                }}
+                className="text-slate-400 hover:text-slate-600 transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Choose one of the two options below to replace the image. The current caption, alt text, and display order will be preserved.
+            </p>
+
+            {replaceError && (
+              <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs font-semibold leading-relaxed mb-4 font-medium">
+                ⚠️ {replaceError}
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {/* Option 1: Upload File */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Option 1: Upload New Image</span>
+                <div 
+                  className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/30 transition duration-150 relative cursor-pointer"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                      await handleReplaceUploadedFile(replacingGalleryItemIndex, e.dataTransfer.files[0]);
+                    }
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    onChange={async (e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        await handleReplaceUploadedFile(replacingGalleryItemIndex, e.target.files[0]);
+                      }
+                    }}
+                  />
+                  <div className="p-2.5 bg-white border border-slate-100 rounded-full shadow-3xs text-slate-400 mb-2">
+                    {galleryUploading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600" />
+                    ) : (
+                      <Upload className="h-4 w-4 text-[#0D9488]" />
+                    )}
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-700">
+                    {galleryUploading ? 'Uploading to Supabase...' : 'Drag & Drop or Click to Upload'}
+                  </span>
+                  <span className="text-[9px] text-slate-400 mt-0.5">PNG, JPG or WEBP up to 5MB</span>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-slate-150"></div>
+                <span className="flex-shrink mx-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">OR</span>
+                <div className="flex-grow border-t border-slate-150"></div>
+              </div>
+
+              {/* Option 2: Replace by URL */}
+              <form 
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleReplaceByUrl(replacingGalleryItemIndex);
+                }} 
+                className="space-y-3"
+              >
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Option 2: Replace by URL</label>
+                  <input
+                    type="text"
+                    required
+                    value={replaceUrlInput}
+                    onChange={(e) => setReplaceUrlInput(e.target.value)}
+                    placeholder="https://images.unsplash.com/photo-..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={gallerySaving || galleryUploading}
+                    className="px-4 py-2 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl transition cursor-pointer shadow-sm shadow-teal-600/10 flex items-center gap-1.5"
+                  >
+                    {gallerySaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
+                        Replacing...
+                      </>
+                    ) : (
+                      'Replace Image URL'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Gallery Image Confirmation Modal */}
+      {galleryImageToDelete !== null && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
+          {/* Backdrop click to close */}
+          <div className="absolute inset-0" onClick={() => setGalleryImageToDelete(null)} />
+          
+          {/* Card container */}
+          <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10">
+            <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Gallery Image</h3>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed font-medium">
+              Are you sure you want to delete this gallery image from the database? This action is permanent, and the website will immediately stop displaying it. The physical file will not be deleted from storage.
+            </p>
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setGalleryImageToDelete(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteGalleryImage}
+                disabled={gallerySaving}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10 flex items-center gap-1.5 animate-pulse-once"
+              >
+                {gallerySaving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Service Edit Right Side Slide Drawer */}
+      {editingService && (
+        <div className="fixed inset-0 z-[150] flex justify-end" id="service-drawer-overlay">
+          {/* Backdrop overlay with fade */}
+          <div
+            className="fixed inset-0 bg-[#0B1B33]/55 backdrop-blur-xs transition-opacity duration-300"
+            onClick={() => setEditingService(null)}
+          />
+
+          {/* Right Drawer Box */}
+          <div className="relative w-full md:w-[750px] bg-white h-full shadow-2xl flex flex-col z-110 border-l border-slate-100 animate-slide-in">
+            {/* Drawer Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+              <div className="flex items-center gap-3">
+                {/* ← Back Button */}
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                  <span>← Back</span>
+                </button>
+                
+                <div className="min-w-0">
+                  <h3 className="font-display font-extrabold text-[#081C3A] text-base md:text-lg leading-tight">
+                    {servicesList.some(s => s.id === editingService.id) 
+                      ? `Edit Treatment Service (ID: ${editingService.id})` 
+                      : 'Add New Service'}
+                  </h3>
+                  <p className="text-slate-500 text-[11px] font-medium mt-0.5 truncate flex items-center gap-1">
+                    <span className="font-bold text-[#0D9488]">ID:</span>
+                    <span className="font-mono text-slate-700">{editingService.id}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingService(null)}
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Tab Bar */}
+            <div className="flex border-b border-slate-100 bg-slate-50/20 px-6 shrink-0">
+              <button
+                type="button"
+                onClick={() => setActiveServiceEditorTab('details')}
+                className={`py-3 px-4 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeServiceEditorTab === 'details'
+                    ? 'border-[#0D9488] text-[#0D9488]'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Stethoscope className="h-4 w-4" />
+                Service Details
+              </button>
+              <button
+                type="button"
+                disabled={!editingService || !servicesList.some(s => s.id === editingService.id)}
+                onClick={() => editingService && servicesList.some(s => s.id === editingService.id) && setActiveServiceEditorTab('gallery')}
+                className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
+                  !(editingService && servicesList.some(s => s.id === editingService.id))
+                    ? 'opacity-40 cursor-not-allowed text-slate-400 border-transparent'
+                    : activeServiceEditorTab === 'gallery'
+                    ? 'border-[#0D9488] text-[#0D9488] cursor-pointer'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 cursor-pointer'
+                }`}
+                title={!(editingService && servicesList.some(s => s.id === editingService.id)) ? "Please save service details first to enable gallery." : "Manage service gallery images"}
+              >
+                <ImageIcon className="h-4 w-4" />
+                Gallery
+              </button>
+              <button
+                type="button"
+                disabled={!editingService || !servicesList.some(s => s.id === editingService.id)}
+                onClick={() => editingService && servicesList.some(s => s.id === editingService.id) && setActiveServiceEditorTab('faqs')}
+                className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
+                  !(editingService && servicesList.some(s => s.id === editingService.id))
+                    ? 'opacity-40 cursor-not-allowed text-slate-400 border-transparent'
+                    : activeServiceEditorTab === 'faqs'
+                    ? 'border-[#0D9488] text-[#0D9488] cursor-pointer'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 cursor-pointer'
+                }`}
+                title={!(editingService && servicesList.some(s => s.id === editingService.id)) ? "Please save service details first to enable FAQs." : "Manage service FAQs"}
+              >
+                <MessageCircle className="h-4 w-4" />
+                FAQs
+              </button>
+            </div>
+
+            {/* Scrollable Form */}
+            {activeServiceEditorTab === 'details' ? (
+              <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-6 space-y-6">
+                {saveMessage && (
+                  <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 border animate-fade-in ${
+                    saveMessage.includes('successfully') 
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                      : 'bg-teal-50 border-teal-200 text-teal-800'
+                  }`}>
+                    <Check className="h-4 w-4 text-teal-600 shrink-0" />
+                    <span>{saveMessage}</span>
+                  </div>
+                )}
+                {serviceFormError && (
+                  <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs font-semibold leading-relaxed">
+                    ⚠️ {serviceFormError}
+                  </div>
+                )}
+
+                {/* Service Title */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Service Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingService.title}
+                    onChange={(e) => {
+                      const newTitle = e.target.value;
+                      let nextSlug = editingService.slug;
+                      if (!isSlugTouched) {
+                        nextSlug = newTitle
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, '-')
+                          .replace(/(^-|-$)/g, '');
+                      }
+                      setEditingService({
+                        ...editingService,
+                        title: newTitle,
+                        slug: nextSlug
+                      });
+                    }}
+                    placeholder="e.g. Oral & Maxillofacial Surgery"
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+
+                {/* Slug */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Web Slug *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingService.slug}
+                    onChange={(e) => {
+                      setIsSlugTouched(true);
+                      setEditingService({
+                        ...editingService,
+                        slug: e.target.value.toLowerCase().replace(/\s+/g, '-')
+                      });
+                    }}
+                    placeholder="e.g. maxillofacial-surgery"
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                  />
+                  <p className="text-[10px] text-slate-400 font-medium">
+                    The unique path segment for the service URL. Only letters, numbers, and hyphens.
+                  </p>
+                </div>
+
+                {/* Short Description */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Short Description *</label>
+                  <textarea
+                    rows={2}
+                    required
+                    value={editingService.short_description}
+                    onChange={(e) => setEditingService({ ...editingService, short_description: e.target.value })}
+                    placeholder="A brief summary of the service displayed in search results and card lists..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                  />
+                </div>
+
+                {/* Full Description */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Full Service Description *</label>
+                  <textarea
+                    rows={6}
+                    required
+                    value={editingService.description}
+                    onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                    placeholder="Detailed explanation of clinical procedures, medical methodologies, recovery time, etc..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+
+                {/* Hero Image Box & Upload Zone */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Hero Image *</label>
+                  
+                  {editingService.hero_image && (
+                    <div className="relative group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 h-44 flex items-center justify-center">
+                      <img
+                        src={editingService.hero_image}
+                        alt="Service Hero Preview"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingService({ ...editingService, hero_image: '' })}
+                          className="p-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-md cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span>Remove Hero</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* File Drag and Drop */}
+                    <div 
+                      className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/30 transition duration-150 relative cursor-pointer"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                          await handleServiceHeroImageUpload(e.dataTransfer.files[0]);
+                        }
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="service-hero-file-input"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            await handleServiceHeroImageUpload(e.target.files[0]);
+                          }
+                        }}
+                      />
+                      <div className="p-3 bg-white border border-slate-100 rounded-full shadow-3xs text-slate-400 mb-2">
+                        {serviceImgUploading ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-600" />
+                        ) : (
+                          <Upload className="h-5 w-5 text-[#0D9488]" />
+                        )}
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-700">
+                        {serviceImgUploading ? 'Uploading to Supabase...' : 'Drag & Drop to Upload'}
+                      </span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">PNG, JPG or WEBP up to 5MB</span>
+                    </div>
+
+                    {/* Manual URL Input */}
+                    <div className="p-4 border border-slate-150 rounded-2xl bg-white space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Or Specify Direct URL</span>
+                      <input
+                        type="text"
+                        placeholder="https://images.unsplash.com/photo-..."
+                        value={editingService.hero_image}
+                        onChange={(e) => setEditingService({ ...editingService, hero_image: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                      />
+                      <p className="text-[9px] text-slate-400 leading-relaxed">
+                        You can paste a stock photo link directly from Unsplash, Pexels or other clinical galleries.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Display Order & Active Toggle Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Display Order */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Display Order *</label>
+                    <input
+                      type="number"
+                      required
+                      value={editingService.display_order}
+                      onChange={(e) => setEditingService({ ...editingService, display_order: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                    />
+                    <p className="text-[10px] text-slate-400 font-medium">Used for custom sorting. Lower numbers sort first.</p>
+                  </div>
+
+                  {/* Active/Inactive Status Toggle */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Availability Status</label>
+                    <div className="flex items-center gap-3 h-10 px-3 border border-slate-200 rounded-xl bg-slate-50/50">
+                      <input
+                        type="checkbox"
+                        id="service-is-active-chk"
+                        checked={editingService.is_active}
+                        onChange={(e) => setEditingService({ ...editingService, is_active: e.target.checked })}
+                        className="w-4 h-4 text-[#0D9488] border-slate-300 rounded-sm focus:ring-[#0D9488] cursor-pointer"
+                      />
+                      <label htmlFor="service-is-active-chk" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
+                        Active (Display publicly on website)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SEO Configurations */}
+                <div className="border-t border-slate-100 pt-6 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-4 w-4 text-[#0D9488]" />
+                    <h4 className="text-xs font-extrabold text-[#081C3A] uppercase tracking-wider">Search Engine Optimization (SEO)</h4>
+                  </div>
+
+                  {/* SEO Title */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">SEO Meta Title</label>
+                    <input
+                      type="text"
+                      value={editingService.seo_title || ''}
+                      onChange={(e) => setEditingService({ ...editingService, seo_title: e.target.value })}
+                      placeholder="Custom meta title for Google, fallback is Service Title"
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                    />
+                  </div>
+
+                  {/* SEO Description */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">SEO Meta Description</label>
+                    <textarea
+                      rows={2}
+                      value={editingService.seo_description || ''}
+                      onChange={(e) => setEditingService({ ...editingService, seo_description: e.target.value })}
+                      placeholder="Custom meta snippet for search results, fallback is Short Description"
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Sticky Action Buttons */}
+                <div className="border-t border-slate-100 pt-6 flex items-center justify-end gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Check className="h-4 w-4" />
+                    {servicesList.some(s => s.id === editingService.id) ? 'Update Service' : 'Save Service'}
+                  </button>
+                </div>
+              </form>
+            ) : activeServiceEditorTab === 'gallery' ? (
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col space-y-6" id="service-gallery-tab">
+                {/* Status / Errors */}
+                {galleryError && (
+                  <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs font-semibold leading-relaxed">
+                    ⚠️ {galleryError}
+                  </div>
+                )}
+
+                {/* Progress / Saving indicator */}
+                {(galleryUploading || gallerySaving) && (
+                  <div className="p-3 bg-teal-50 border border-teal-100 rounded-xl flex items-center justify-between text-teal-800 text-xs font-bold animate-pulse">
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600" />
+                      {galleryUploading ? 'Uploading & saving clinical images...' : 'Saving database records...'}
+                    </span>
+                    <span className="text-[10px] bg-teal-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold animate-bounce">
+                      Syncing
+                    </span>
+                  </div>
+                )}
+
+                {/* Top Control Panel */}
+                <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100 shrink-0">
+                  <div className="min-w-0 pr-4">
+                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Service Gallery</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                      Upload clinical before/after results, high-res procedure imagery, or equipment photos. Drag items to custom sort.
+                    </p>
+                  </div>
+                  <div className="shrink-0 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('service-gallery-multi-input')?.click()}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Images
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddByUrlError(null);
+                        setIsAddByUrlOpen(true);
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-white border border-[#0D9488] hover:bg-teal-50/50 text-[#0D9488] text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                    >
+                      <Link className="h-4 w-4" />
+                      Add by URL
+                    </button>
+                    <input
+                      type="file"
+                      id="service-gallery-multi-input"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          await handleAddGalleryImages(e.target.files);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Gallery List */}
+                {loadingGallery ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-16">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mb-3" />
+                    <span className="text-xs text-slate-500 font-medium">Fetching gallery list from Supabase...</span>
+                  </div>
+                ) : serviceGalleryList.length === 0 ? (
+                  <div 
+                    className="flex-1 border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-2xl p-12 flex flex-col items-center justify-center text-center bg-slate-50/10 cursor-pointer relative"
+                    onClick={() => document.getElementById('service-gallery-multi-input')?.click()}
+                  >
+                    <div className="p-4 bg-white border border-slate-100 rounded-full shadow-3xs text-slate-400 mb-4">
+                      <ImageIcon className="h-8 w-8 text-[#0D9488]" />
+                    </div>
+                    <h5 className="font-bold text-slate-700 text-sm">No clinical images uploaded</h5>
+                    <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
+                      Showcase visual procedures. Drag and drop multiple images here or click to browse.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4" id="gallery-items-list">
+                    {serviceGalleryList.map((item, index) => (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={() => handleGalleryDragStart(index)}
+                        onDragOver={(e) => handleGalleryDragOver(e, index)}
+                        onDragEnd={handleGalleryDragEnd}
+                        className={`flex flex-col sm:flex-row gap-4 p-4 bg-white border rounded-2xl transition-all duration-200 ${
+                          draggedIndex === index
+                            ? 'border-teal-500 bg-teal-50/20 scale-[0.98] shadow-inner opacity-60'
+                            : 'border-slate-150 hover:border-slate-250 shadow-3xs'
+                        }`}
+                        id={`gallery-item-card-${item.id}`}
+                      >
+                        {/* Drag Handle & Preview Box */}
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div 
+                            className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-slate-50 rounded-md text-slate-400 hover:text-slate-600 transition shrink-0"
+                            title="Drag to reorder"
+                          >
+                            <GripVertical className="h-4 w-4" />
+                          </div>
+                          
+                          <div className="relative group w-28 h-20 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden shrink-0 shadow-3xs">
+                            <img
+                              src={item.image_url}
+                              alt={item.alt_text || 'Gallery item'}
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                            
+                            {/* Replace button overlay */}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setReplacingGalleryItemIndex(index);
+                                  setReplaceUrlInput(item.image_url || '');
+                                  setReplaceError(null);
+                                }}
+                                className="px-2 py-1 bg-white hover:bg-slate-100 text-[#0D9488] rounded-md text-[10px] font-bold transition shadow-xs cursor-pointer"
+                              >
+                                Replace
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Metadata Inputs */}
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+                          {/* Caption */}
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Caption</label>
+                            <input
+                              type="text"
+                              value={item.caption || ''}
+                              onChange={(e) => {
+                                const updated = [...serviceGalleryList];
+                                updated[index] = { ...updated[index], caption: e.target.value };
+                                setServiceGalleryList(updated);
+                              }}
+                              onBlur={(e) => handleUpdateGalleryItem(index, { caption: e.target.value })}
+                              placeholder="e.g. Pre-op panoramic view"
+                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white font-medium text-slate-800"
+                            />
+                          </div>
+
+                          {/* Alt Text */}
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Alt Text (SEO)</label>
+                            <input
+                              type="text"
+                              value={item.alt_text || ''}
+                              onChange={(e) => {
+                                const updated = [...serviceGalleryList];
+                                updated[index] = { ...updated[index], alt_text: e.target.value };
+                                setServiceGalleryList(updated);
+                              }}
+                              onBlur={(e) => handleUpdateGalleryItem(index, { alt_text: e.target.value })}
+                              placeholder="e.g. dentist performing implant procedure"
+                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white font-medium text-slate-800"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Delete */}
+                        <div className="flex sm:flex-col items-center sm:items-end justify-center gap-3 border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0 shrink-0">
+                          {/* Delete Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteGalleryImage(item.id)}
+                            className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                            title="Delete clinical image"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col space-y-6" id="service-faqs-tab">
+                {/* Status / Errors */}
+                {faqsError && (
+                  <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs font-semibold leading-relaxed">
+                    ⚠️ {faqsError}
+                  </div>
+                )}
+
+                {/* Progress / Saving indicator */}
+                {(loadingFaqs || faqsSaving) && (
+                  <div className="p-3 bg-teal-50 border border-teal-100 rounded-xl flex items-center justify-between text-teal-800 text-xs font-bold animate-pulse">
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600" />
+                      {loadingFaqs ? 'Fetching FAQs from Supabase...' : 'Saving FAQ records...'}
+                    </span>
+                    <span className="text-[10px] bg-teal-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold">
+                      Syncing
+                    </span>
+                  </div>
+                )}
+
+                {/* Top Control Panel */}
+                <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100 shrink-0">
+                  <div className="min-w-0 pr-4">
+                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Service FAQs</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                      Manage frequently asked questions for this service. Drag cards to reorder.
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleAddFaq}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add FAQ
+                    </button>
+                  </div>
+                </div>
+
+                {/* FAQs List */}
+                {loadingFaqs ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-16">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mb-3" />
+                    <span className="text-xs text-slate-500 font-medium">Fetching FAQs from Supabase...</span>
+                  </div>
+                ) : serviceFaqsList.length === 0 ? (
+                  <div 
+                    className="flex-1 border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-2xl p-12 flex flex-col items-center justify-center text-center bg-slate-50/10 cursor-pointer"
+                    onClick={handleAddFaq}
+                  >
+                    <div className="p-4 bg-white border border-slate-100 rounded-full shadow-3xs text-slate-400 mb-4">
+                      <MessageCircle className="h-8 w-8 text-[#0D9488]" />
+                    </div>
+                    <h5 className="font-bold text-slate-700 text-sm">No FAQs created yet</h5>
+                    <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
+                      Help patients find answers about this treatment. Click here or use the "+ Add FAQ" button to add your first FAQ.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4" id="faqs-items-list">
+                    {serviceFaqsList.map((item, index) => {
+                      const isEditing = editingFaqId === item.id;
+                      return (
+                        <div
+                          key={item.id}
+                          draggable={!isEditing}
+                          onDragStart={() => handleFaqDragStart(index)}
+                          onDragOver={(e) => handleFaqDragOver(e, index)}
+                          onDragEnd={handleFaqDragEnd}
+                          className={`p-4 bg-white border rounded-2xl transition-all duration-200 ${
+                            draggedFaqIndex === index
+                              ? 'border-teal-500 bg-teal-50/20 scale-[0.98] shadow-inner opacity-60'
+                              : 'border-slate-150 hover:border-slate-250 shadow-3xs'
+                          }`}
+                          id={`faq-item-card-${item.id}`}
+                        >
+                          {isEditing ? (
+                            /* EDIT MODE FOR FAQ CARD */
+                            <div className="space-y-4">
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Question</label>
+                                <input
+                                  type="text"
+                                  value={faqEditQuestion}
+                                  onChange={(e) => setFaqEditQuestion(e.target.value)}
+                                  placeholder="e.g. Is dental implant surgery painful?"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white font-medium text-slate-800"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Answer</label>
+                                <textarea
+                                  rows={4}
+                                  value={faqEditAnswer}
+                                  onChange={(e) => setFaqEditAnswer(e.target.value)}
+                                  placeholder="Explain the procedure details, pain management, recovery expectations..."
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white font-medium text-slate-800"
+                                />
+                              </div>
+                              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => handleCancelFaqEdit(item.id)}
+                                  className="px-4 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSaveFaq(item.id)}
+                                  className="px-4 py-1.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition cursor-pointer"
+                                >
+                                  Save FAQ
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            /* VIEW MODE FOR FAQ CARD */
+                            <div className="flex gap-4">
+                              {/* Grab Handle */}
+                              <div 
+                                className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-slate-50 rounded-md text-slate-400 hover:text-slate-600 transition shrink-0 self-start mt-1"
+                                title="Drag to reorder"
+                              >
+                                <GripVertical className="h-4 w-4" />
+                              </div>
+                              
+                              {/* FAQ Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-4">
+                                  <h5 className="text-xs font-bold text-[#081C3A] leading-relaxed">
+                                    Q: {item.question || <span className="italic text-slate-400 font-normal">(No question set)</span>}
+                                  </h5>
+                                  
+                                  {/* Actions */}
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEditFaq(item)}
+                                      className="p-1.5 text-slate-500 hover:text-[#0D9488] hover:bg-slate-50 rounded-lg transition cursor-pointer"
+                                      title="Edit FAQ"
+                                    >
+                                      <Pencil className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteFaq(item.id)}
+                                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                                      title="Delete FAQ"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-slate-600 mt-2 whitespace-pre-wrap leading-relaxed">
+                                  {item.answer || <span className="italic text-slate-400 font-normal">(No answer set)</span>}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

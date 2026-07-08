@@ -35,6 +35,7 @@ import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import SupabaseTest from './pages/SupabaseTest';
+import ServiceDetail from './pages/ServiceDetail';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
@@ -48,7 +49,7 @@ export default function App() {
       hash = 'admin/login';
     }
     const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test'];
-    if (hash && validPages.includes(hash as PageId)) {
+    if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
       return hash as PageId;
     }
     return 'home';
@@ -305,7 +306,7 @@ export default function App() {
         hash = 'admin/login';
       }
       const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test'];
-      if (hash && validPages.includes(hash as PageId)) {
+      if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
         setCurrentPage(hash as PageId);
         window.scrollTo({ top: 0 });
       }
@@ -489,6 +490,17 @@ export default function App() {
 
   // Switch rendered pages dynamically (state & hash controller)
   const renderPage = () => {
+    if (currentPage.startsWith('services/')) {
+      const slug = currentPage.substring('services/'.length);
+      return (
+        <ServiceDetail
+          slug={slug}
+          openAppointmentModal={openAppointmentModal}
+          setCurrentPage={setCurrentPage}
+        />
+      );
+    }
+
     switch (currentPage) {
       case 'home':
         return (
