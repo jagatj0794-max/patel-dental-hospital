@@ -214,22 +214,44 @@ export default function Admin({
         seo_description: editingService.seo_description?.trim() || null,
       };
 
-      const result = await serviceService.saveService(serviceToSave);
-      if (result.success) {
-        if (isNew) {
-          setSaveMessage('Service created successfully. You can now add Gallery images and FAQs.');
+      // Store a backup of the current list for rollback on error
+      const oldServicesList = [...servicesList];
+
+      // Optimistically update the local services list immediately
+      setServicesList(prev => {
+        const exists = prev.some(s => s.id === serviceToSave.id);
+        if (exists) {
+          return prev.map(s => s.id === serviceToSave.id ? serviceToSave : s);
         } else {
-          setSaveMessage('Service saved successfully!');
+          return [...prev, serviceToSave];
         }
-        await loadServicesList();
-        // Keep drawer open & update local state with saved service so that it converts to Edit Mode
-        setEditingService(serviceToSave);
-      } else {
-        setServiceFormError(result.error || 'Failed to save service on Supabase.');
+      });
+
+      // Keep the editor open in edit mode instantly with the new data
+      setEditingService(serviceToSave);
+
+      // Perform background database synchronization
+      serviceService.saveService(serviceToSave).then((result) => {
+        if (result.success) {
+          if (isNew) {
+            setSaveMessage('Service created successfully. You can now add Gallery images and FAQs.');
+          } else {
+            setSaveMessage('Service saved successfully!');
+          }
+        } else {
+          // Revert local state if save fails
+          setServicesList(oldServicesList);
+          setServiceFormError(result.error || 'Failed to save service on Supabase.');
+          setSaveMessage(null);
+        }
+      }).catch((err: any) => {
+        setServicesList(oldServicesList);
+        setServiceFormError('Error saving service: ' + (err.message || err));
         setSaveMessage(null);
-      }
+      });
+
     } catch (err: any) {
-      console.error('Error saving service:', err);
+      console.error('Error in save service setup:', err);
       setServiceFormError('Error saving service: ' + (err.message || err));
       setSaveMessage(null);
     } finally {
@@ -276,19 +298,27 @@ export default function Admin({
   const handleDeleteService = async () => {
     if (!serviceToDelete) return;
     setSaveMessage('Deleting service from Supabase...');
+    const targetId = serviceToDelete;
+    const oldServicesList = [...servicesList];
+
+    // Optimistically update the services list local state immediately
+    setServicesList(prev => prev.filter(s => s.id !== targetId));
+    setServiceToDelete(null);
+
     try {
-      const success = await serviceService.deleteService(serviceToDelete);
+      const success = await serviceService.deleteService(targetId);
       if (success) {
         setSaveMessage('Service deleted successfully!');
-        setServicesList(prev => prev.filter(s => s.id !== serviceToDelete));
       } else {
+        // Rollback on failure
+        setServicesList(oldServicesList);
         setSaveMessage('Failed to delete service on Supabase.');
       }
     } catch (err: any) {
       console.error('Error deleting service:', err);
+      setServicesList(oldServicesList);
       setSaveMessage('Error deleting service: ' + (err.message || err));
     } finally {
-      setServiceToDelete(null);
       setTimeout(() => setSaveMessage(null), 3000);
     }
   };
@@ -546,17 +576,23 @@ export default function Admin({
     if (!galleryImageToDelete || !editingService) return;
     setGallerySaving(true);
     setGalleryError(null);
+    const targetId = galleryImageToDelete;
+    const oldGalleryList = [...serviceGalleryList];
+
+    // Optimistically update local state immediately
+    setServiceGalleryList(prev => prev.filter(img => img.id !== targetId));
+    setGalleryImageToDelete(null);
+
     try {
-      const result = await serviceService.deleteGalleryImage(galleryImageToDelete);
-      if (result.success) {
-        const items = await serviceService.getGallery(editingService.id);
-        setServiceGalleryList(items || []);
-        setGalleryImageToDelete(null);
-      } else {
+      const result = await serviceService.deleteGalleryImage(targetId);
+      if (!result.success) {
+        // Rollback on failure
+        setServiceGalleryList(oldGalleryList);
         setGalleryError(result.error || 'Failed to delete gallery image.');
       }
     } catch (err: any) {
       console.error('Error deleting gallery image:', err);
+      setServiceGalleryList(oldGalleryList);
       setGalleryError(err.message || 'Failed to delete gallery image.');
     } finally {
       setGallerySaving(false);
@@ -572,10 +608,7 @@ export default function Admin({
       setGallerySaving(true);
       try {
         const result = await serviceService.saveGallery(editingService.id, updatedList);
-        if (result.success) {
-          const items = await serviceService.getGallery(editingService.id);
-          setServiceGalleryList(items || []);
-        } else {
+        if (!result.success) {
           setGalleryError(result.error || 'Failed to save gallery item.');
         }
       } catch (err: any) {
@@ -615,10 +648,7 @@ export default function Admin({
       setGallerySaving(true);
       try {
         const result = await serviceService.saveGallery(editingService.id, serviceGalleryList);
-        if (result.success) {
-          const items = await serviceService.getGallery(editingService.id);
-          setServiceGalleryList(items || []);
-        } else {
+        if (!result.success) {
           setGalleryError(result.error || 'Failed to save gallery item.');
         }
       } catch (err: any) {
@@ -671,12 +701,10 @@ export default function Admin({
         return faq;
       });
       setServiceFaqsList(updatedList);
+      setEditingFaqId(null); // Close the form instantly
+
       const result = await serviceService.saveFaqs(editingService.id, updatedList);
-      if (result.success) {
-        const items = await serviceService.getFaqs(editingService.id);
-        setServiceFaqsList(items || []);
-        setEditingFaqId(null);
-      } else {
+      if (!result.success) {
         setFaqsError(result.error || 'Failed to save FAQs to database.');
       }
     } catch (err: any) {
@@ -701,20 +729,22 @@ export default function Admin({
     if (!confirm('Are you sure you want to delete this FAQ?')) return;
     setFaqsSaving(true);
     setFaqsError(null);
+    const oldFaqsList = [...serviceFaqsList];
+
+    // Optimistically update the UI instantly
+    setServiceFaqsList(prev => prev.filter(f => f.id !== faqId));
+
     try {
       if (!faqId.startsWith('new-faq-')) {
         const result = await serviceService.deleteFaq(faqId);
         if (!result.success) {
+          setServiceFaqsList(oldFaqsList);
           setFaqsError(result.error || 'Failed to delete FAQ record from database.');
-          setFaqsSaving(false);
-          return;
         }
       }
-      // Reload FAQs from database to ensure state sync
-      const items = await serviceService.getFaqs(editingService.id);
-      setServiceFaqsList(items || []);
     } catch (err: any) {
       console.error('Error deleting FAQ:', err);
+      setServiceFaqsList(oldFaqsList);
       setFaqsError('Failed to delete FAQ: ' + (err.message || err));
     } finally {
       setFaqsSaving(false);
@@ -749,10 +779,7 @@ export default function Admin({
       setFaqsSaving(true);
       try {
         const result = await serviceService.saveFaqs(editingService.id, serviceFaqsList);
-        if (result.success) {
-          const items = await serviceService.getFaqs(editingService.id);
-          setServiceFaqsList(items || []);
-        } else {
+        if (!result.success) {
           setFaqsError(result.error || 'Failed to save FAQs.');
         }
       } catch (err: any) {
@@ -919,7 +946,16 @@ export default function Admin({
 
   // Save changes
   const handleSave = async () => {
-    setSaveMessage('Saving Hero content to Supabase...');
+    setSaveMessage('Saving Hero content...');
+    const oldHeading = heroHeading;
+    const oldDescription = heroDescription;
+    const oldBgImage = heroBgImage;
+
+    // Optimistically update parent-level states immediately
+    setHeroHeading(draftHeading);
+    setHeroDescription(draftDescription);
+    setHeroBgImage(draftBgImage);
+
     try {
       const success = await heroService.saveHeroContent({
         heading: draftHeading,
@@ -928,15 +964,19 @@ export default function Admin({
       });
 
       if (success) {
-        setHeroHeading(draftHeading);
-        setHeroDescription(draftDescription);
-        setHeroBgImage(draftBgImage);
         setSaveMessage('Hero section saved to Supabase successfully! Your website is updated.');
       } else {
+        // Rollback on failure
+        setHeroHeading(oldHeading);
+        setHeroDescription(oldDescription);
+        setHeroBgImage(oldBgImage);
         setSaveMessage('Failed to save Hero content to Supabase. Check your connection or table setup.');
       }
     } catch (err: any) {
       console.error('Error saving Hero content to Supabase:', err);
+      setHeroHeading(oldHeading);
+      setHeroDescription(oldDescription);
+      setHeroBgImage(oldBgImage);
       setSaveMessage('Error saving Hero content: ' + (err.message || err));
     } finally {
       setTimeout(() => setSaveMessage(null), 4000);
@@ -1062,7 +1102,7 @@ export default function Admin({
                   </div>
                   <span className="text-[11px] text-violet-600 font-semibold flex items-center gap-1.5 mt-1">
                     <MapPin className="h-3.5 w-3.5 text-violet-500" />
-                    <span>Gayatrinagar & Mavdi HQ</span>
+                    <span>Gayatrinagar & Amin Marg HQ</span>
                   </span>
                 </div>
                 <div className="p-4 rounded-xl bg-violet-50 text-violet-600 transition-all duration-300 group-hover:bg-violet-100 group-hover:scale-110 shrink-0 shadow-3xs">
@@ -1333,7 +1373,7 @@ export default function Admin({
             bdsInstitution: 'Dental College Graduate',
             stats: [],
             expertises: [],
-            branch: 'Mavdi Branch',
+            branch: 'Amin Marg Branch',
             experience: '5'
           });
         };
@@ -1398,16 +1438,23 @@ export default function Admin({
 
         const handleSaveDoctors = async () => {
           setSaveMessage('Saving doctors directory to Supabase...');
+          const oldDoctorsList = [...doctorsList];
+          
+          // Optimistically update the primary doctorsList immediately
+          setDoctorsList(draftDoctors);
+
           try {
             const success = await doctorService.saveDoctors(draftDoctors);
             if (success) {
-              setDoctorsList(draftDoctors);
               setSaveMessage('Doctors directory saved to Supabase successfully! Public website updated.');
             } else {
+              // Rollback on failure
+              setDoctorsList(oldDoctorsList);
               setSaveMessage('Failed to save doctors to Supabase. Check your connection or table setup.');
             }
           } catch (err: any) {
             console.error('Error saving doctors to Supabase:', err);
+            setDoctorsList(oldDoctorsList);
             setSaveMessage('Error saving doctors: ' + (err.message || err));
           } finally {
             setTimeout(() => setSaveMessage(null), 4000);
@@ -1767,7 +1814,7 @@ export default function Admin({
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-white font-semibold cursor-pointer"
                         >
                           <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                          <option value="Mavdi Branch">Mavdi Branch</option>
+                          <option value="Amin Marg Branch">Amin Marg Branch</option>
                         </select>
                       </div>
 
@@ -3067,7 +3114,7 @@ export default function Admin({
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-semibold bg-white cursor-pointer"
                         >
                           <option value="All Branches">All Branches</option>
-                          <option value="Mavdi Branch">Mavdi Branch</option>
+                          <option value="Amin Marg Branch">Amin Marg Branch</option>
                           <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
                         </select>
                       </div>

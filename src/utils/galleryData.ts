@@ -18,11 +18,11 @@ export interface MediaImage {
 
 export const DEFAULT_MEDIA_IMAGES: MediaImage[] = [
   { id: 'img-1', url: '/6.jpeg', title: 'Before & After Smile Transformation', category: 'Before / After', branch: 'All Branches', altText: 'Complete smile reconstruction case' },
-  { id: 'img-2', url: '/Dr kinjal patel 2.png', title: 'Microscopic Dental Diagnostics', category: 'Clinic Interior', branch: 'Mavdi Branch', altText: 'Our high-tech microscopic dental operatory' },
+  { id: 'img-2', url: '/Dr kinjal patel 2.png', title: 'Microscopic Dental Diagnostics', category: 'Clinic Interior', branch: 'Amin Marg Branch', altText: 'Our high-tech microscopic dental operatory' },
   { id: 'img-3', url: '/patel dental doctors.jpeg', title: 'High-Tech Dental Operatory', category: 'Dental Implants', branch: 'Gayatrinagar Branch', altText: 'Dental implant surgery room setup' },
   { id: 'img-4', url: '/patel dental hospital doctors.png', title: 'Clinical Medical Faculty', category: 'Doctors', branch: 'All Branches', altText: 'Team of experienced doctors at Patel Dental Hospital' },
   { id: 'img-5', url: '/patel mobile hero.jpeg', title: 'Premium Patient Care Ward', category: 'Homepage Slider', branch: 'All Branches', altText: 'Our premium recovery ward for patients' },
-  { id: 'img-6', url: '/Dr. kinjal patel.png', title: 'Expert Consultation Panel', category: 'Homepage Gallery', branch: 'Mavdi Branch', altText: 'Expert consult meeting room' },
+  { id: 'img-6', url: '/Dr. kinjal patel.png', title: 'Expert Consultation Panel', category: 'Homepage Gallery', branch: 'Amin Marg Branch', altText: 'Expert consult meeting room' },
 ];
 
 export interface GalleryData {

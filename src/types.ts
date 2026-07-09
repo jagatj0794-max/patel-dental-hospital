@@ -53,7 +53,7 @@ export interface Doctor {
   bdsInstitution: string;
   stats: { value: string; label: string }[];
   expertises: { title: string; desc: string }[];
-  branch: 'Mavdi Branch' | 'Gayatrinagar Branch';
+  branch: 'Amin Marg Branch' | 'Gayatrinagar Branch';
   experience?: string; // Experience in years
 }
 
@@ -63,7 +63,7 @@ export interface Appointment {
   phone: string;
   email?: string;
   treatment: string;
-  branch: 'Gayatrinagar Branch' | 'Mavdi Branch';
+  branch: 'Gayatrinagar Branch' | 'Amin Marg Branch';
   date: string;
   timeSlot: string;
   message?: string;

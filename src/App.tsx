@@ -832,7 +832,7 @@ export default function App() {
                           className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         >
                           <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                          <option value="Mavdi Branch">Mavdi Branch</option>
+                          <option value="Amin Marg Branch">Amin Marg Branch</option>
                         </select>
                       </div>
 

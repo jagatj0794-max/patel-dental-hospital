@@ -238,7 +238,7 @@ export default function Contact({
                           className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         >
                           <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                          <option value="Mavdi Branch">Mavdi Branch</option>
+                          <option value="Amin Marg Branch">Amin Marg Branch</option>
                         </select>
                       </div>
                     </div>
@@ -415,7 +415,7 @@ export default function Contact({
                   RECOVERY & IMPLANT CENTER
                 </span>
                 <h3 className="font-display font-bold text-brand-navy text-lg mb-2">
-                  Mavdi Branch
+                  Amin Marg Branch
                 </h3>
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
@@ -470,7 +470,7 @@ export default function Contact({
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow"
                 >
-                  Mavdi Road Branch Map
+                  Amin Marg Branch Map
                 </a>
               </div>
             </div>

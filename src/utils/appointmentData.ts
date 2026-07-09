@@ -13,7 +13,7 @@ export interface AdminAppointment {
   age: number;
   gender: 'Male' | 'Female' | 'Other';
   doctor: string;       // Dr. Kinjal Patel, Dr. Vipul Patel
-  branch: 'Gayatrinagar Branch' | 'Mavdi Branch';
+  branch: 'Gayatrinagar Branch' | 'Amin Marg Branch';
   service: string;      // e.g. Root Canal, Wisdom Tooth Extraction, Dental Implant, Aligners, Braces
   appointmentDate: string; // YYYY-MM-DD
   appointmentTime: string; // e.g. 10:30 AM, 04:30 PM

@@ -2125,7 +2125,7 @@ export default function Home({
                       : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  Mavdi Branch
+                  Amin Marg Branch
                 </button>
               </div>
 
@@ -2138,7 +2138,7 @@ export default function Home({
                       HOSPITAL NAME
                     </span>
                     <h3 className="font-display font-[900] text-[#081C3A] text-lg sm:text-xl">
-                      Patel Dental Hospital {activeMapBranch === 'gayatrinagar' ? '(Gayatrinagar Main Branch)' : '(Mavdi Branch)'}
+                      Patel Dental Hospital {activeMapBranch === 'gayatrinagar' ? '(Gayatrinagar Main Branch)' : '(Amin Marg Branch)'}
                     </h3>
                   </div>
 

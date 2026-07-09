@@ -170,7 +170,7 @@ const handlePrintSlip = (apt: AdminAppointment) => {
 
         <div class="footer">
           Thank you for choosing Patel Dental Hospital. Please arrive 10 minutes prior to your scheduled time.<br>
-          Gayatrinagar Branch: Gayatrinagar Main Road, Rajkot | Mavdi Branch: Mavdi Main Road, Rajkot
+          Gayatrinagar Branch: Gayatrinagar Main Road, Rajkot | Amin Marg Branch: Amin Marg Road, Rajkot
         </div>
 
         <script>
@@ -686,7 +686,7 @@ export default function Appointments() {
                 >
                   <option value="All">All Branches</option>
                   <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                  <option value="Mavdi Branch">Mavdi Branch</option>
+                  <option value="Amin Marg Branch">Amin Marg Branch</option>
                 </select>
               </div>
 
@@ -1520,12 +1520,12 @@ export default function Appointments() {
                     <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Branch</label>
                     <select
                       value={editingAppointment.branch}
-                      onChange={(e) => setEditingAppointment(prev => prev ? { ...prev, branch: e.target.value as 'Gayatrinagar Branch' | 'Mavdi Branch' } : null)}
+                      onChange={(e) => setEditingAppointment(prev => prev ? { ...prev, branch: e.target.value as 'Gayatrinagar Branch' | 'Amin Marg Branch' } : null)}
                       className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-semibold text-slate-800 bg-white"
                       id="edit-branch-select"
                     >
                       <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                      <option value="Mavdi Branch">Mavdi Branch</option>
+                      <option value="Amin Marg Branch">Amin Marg Branch</option>
                     </select>
                   </div>
                 </div>

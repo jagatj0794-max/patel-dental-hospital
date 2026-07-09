@@ -254,7 +254,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-white font-extrabold text-sm uppercase tracking-wide group-hover:text-brand-cyan transition-colors">
-                    Mavdi Branch
+                    Amin Marg Branch
                   </span>
                   <span className="text-[9px] bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
                     Regional Center

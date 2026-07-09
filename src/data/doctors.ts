@@ -72,7 +72,7 @@ export const DEFAULT_DOCTORS: Doctor[] = [
         desc: 'Highly structured single-sitting root canal treatments, utilizing high-torque precision rotary equipment and deep sterile sealing protocols for supreme tooth saving.'
       }
     ],
-    branch: 'Mavdi Branch',
+    branch: 'Amin Marg Branch',
     experience: '18+'
   }
 ];
