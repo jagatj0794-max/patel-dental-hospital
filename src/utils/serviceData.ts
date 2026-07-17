@@ -270,21 +270,51 @@ export const serviceService = {
    * Fetch a service by its slug.
    */
   getServiceBySlug: async (slug: string): Promise<Service | null> => {
+    let resolvedSlug = slug;
+    if (slug === 'laser-teeth-whitening') {
+      resolvedSlug = 'teeth-whitening';
+    } else if (slug === 'clear-aligners') {
+      resolvedSlug = 'invisible-aligners';
+    }
+
     if (!isSupabaseConfigured()) {
       const services = await serviceService.getServices();
-      return services.find(s => s.slug === slug) || null;
+      let found = services.find(s => s.slug === resolvedSlug);
+      if (!found && resolvedSlug === 'teeth-whitening') {
+        found = services.find(s => s.slug === 'laser-teeth-whitening');
+      }
+      if (!found && resolvedSlug === 'invisible-aligners') {
+        found = services.find(s => s.slug === 'clear-aligners');
+      }
+      return found || null;
     }
 
     try {
       const { data, error } = await supabase.client
         .from('services')
         .select('*')
-        .eq('slug', slug)
+        .eq('slug', resolvedSlug)
         .maybeSingle();
 
       if (error) {
         console.error('Error fetching service by slug:', error);
         return null;
+      }
+
+      if (!data) {
+        // Fallback check if the other slug name was saved instead
+        const fallbackSlug = resolvedSlug === 'teeth-whitening' ? 'laser-teeth-whitening' : 
+                             resolvedSlug === 'invisible-aligners' ? 'clear-aligners' : null;
+        if (fallbackSlug) {
+          const { data: fbData, error: fbError } = await supabase.client
+            .from('services')
+            .select('*')
+            .eq('slug', fallbackSlug)
+            .maybeSingle();
+          if (!fbError && fbData) {
+            return fbData;
+          }
+        }
       }
 
       return data;

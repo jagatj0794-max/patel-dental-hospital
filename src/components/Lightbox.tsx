@@ -17,9 +17,9 @@ interface LightboxProps {
 }
 
 export default function Lightbox({ item, onClose, items, setCurrentIndex }: LightboxProps) {
-  if (!item) return null;
-
   const [compareMode, setCompareMode] = useState<'slider' | 'side-by-side'>('slider');
+
+  if (!item) return null;
 
   const itemIndex = items.findIndex((i) => i.id === item.id);
 

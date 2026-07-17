@@ -18,10 +18,8 @@ import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import Implants from './Implants';
 import RootCanal from './RootCanal';
 import FullMouthRehab from './FullMouthRehab';
-import InvisibleAligners from './InvisibleAligners';
 import SmileMakeover from './SmileMakeover';
 import CrownsBridges from './CrownsBridges';
-import TeethWhitening from './TeethWhitening';
 import PediatricDentistry from './PediatricDentistry';
 import Braces from './Braces';
 import WisdomToothSurgery from './WisdomToothSurgery';
@@ -51,6 +49,63 @@ function getFallbackMedia(slug: string, title: string) {
   let videoTitle = `${title || 'Dental'} Procedure Guide`;
   let videoDesc = `Watch this comprehensive walkthrough video to understand the step-by-step procedure and clinical process of ${title || 'our'} treatment.`;
   
+  let steps: any[] = [];
+  let features: any[] = [];
+  let faqs: any[] = [];
+
+  const alignerSteps = [
+    { display_order: 10, title: 'Clinical Examination', description: 'A thorough dental check by Dr. Kinjal Patel to verify your suitability for clear aligners.' },
+    { display_order: 20, title: 'CBCT Scan', description: 'Ultra-low radiation bone scanning to inspect dental roots, bone volumes, and skeletal symmetry.' },
+    { display_order: 30, title: 'Intraoral Scan', description: 'Direct 3D optical scanning to map your entire bite in full color without messy impression paste.' },
+    { display_order: 40, title: 'DSLR Face & Smile Pics', description: 'Capturing aesthetic studio photos of your face, lips, and smile angles to guide the software design.' },
+    { display_order: 50, title: '3D Digital Planning', description: 'Creating a highly personalized virtual simulation of each step of your teeth transition.' },
+    { display_order: 60, title: 'Custom Fabrication', description: 'US FDA-approved medical clear plastics are laser-cut and molded into your custom aligner tray sets.' },
+    { display_order: 70, title: 'Bi-Weekly Aligner Swap', description: 'Progress to the next set of clear trays approximately every 14 days until your smile is beautifully straight.' }
+  ];
+
+  const alignerFeatures = [
+    { display_order: 10, title: 'Virtually Invisible', description: 'So completely clear and transparent that nobody will ever notice you are undergoing orthodontic care.' },
+    { display_order: 20, title: 'Ultimate Comfort', description: 'Sleek, rounded edges that do not cut or irritate sensitive inner lips, gums, or oral tissues.' },
+    { display_order: 30, title: 'No Metal Or Wires', description: 'Enjoy absolute dental peace with zero risk of metal brackets snapping or wires injuring cheeks.' },
+    { display_order: 40, title: 'Customized 3D Treatment', description: 'Every single micromovement is mathematically mapped to achieve highly stable clinical outcomes.' },
+    { display_order: 50, title: 'Improved Confidence', description: 'Smile proudly in photographs and speak seamlessly during business presentations with confidence.' },
+    { display_order: 60, title: 'Excellent Smile Aesthetics', description: 'Combines beautiful vertical tooth alignment with facial harmony for stunning life-long results.' }
+  ];
+
+  const alignerFaqs = [
+    { question: "How do Invisible Aligners straighten teeth?", answer: "Invisible Aligners use a series of custom-made, clear, medical-grade plastic trays. Each set of trays applies a slight, calibrated force to specific teeth, gradually and gently moving them into their correct positions as planned by our advanced 3D digital software.", display_order: 10 },
+    { question: "How many hours a day must I wear my clear aligners?", answer: "For optimal, predictable clinical results, aligners must be worn for 20 to 22 hours every day. You should only remove them when eating, drinking hot liquids, brushing, or flossing.", display_order: 20 },
+    { question: "Is the Invisible Aligner treatment painful?", answer: "No, aligners are much more comfortable than traditional metal braces. You may feel a mild sensation of pressure for the first day or two after switching to a new set of trays, which is a healthy sign that your teeth are moving successfully.", display_order: 30 },
+    { question: "How do I clean my clear aligners?", answer: "Simply rinse them with cold or lukewarm water and brush them gently with a soft-bristled toothbrush. Never use hot water, as it can warp and ruin the custom medical plastic.", display_order: 40 },
+    { question: "How much does Invisible Aligner treatment cost?", answer: "At Patel Dental Hospital, we offer world-class digital aligners at highly affordable packages, saving you up to 50% compared to typical international clinics. We provide complete transparency with flexible payment options.", display_order: 50 }
+  ];
+
+  const whiteningSteps = [
+    { display_order: 10, title: 'Shade Assessment', description: 'Analyzing your current natural tooth shade to map out a personalized brightening path.' },
+    { display_order: 20, title: 'Professional Scaling', description: 'Ultrasonic cleaning to completely eliminate outer tartar, plaque, and stubborn extrinsic stains.' },
+    { display_order: 30, title: 'Gum Protection Layer', description: 'Applying a specialized medical-grade barrier resin to safely shield and protect soft gum tissue.' },
+    { display_order: 40, title: 'Bleaching Agent Application', description: 'Carefully applying high-performance sensitivity-free whitening gel to tooth surfaces.' },
+    { display_order: 50, title: 'Ultraviolet Light Activation', description: 'Using specialized UV dental lamps to accelerate stain breakdown for dynamic rapid whitening.' },
+    { display_order: 60, title: 'Fluoride Polish Finish', description: 'A final soothing polish to strengthen enamel, prevent post-procedure sensitivity, and boost shine.' }
+  ];
+
+  const whiteningFeatures = [
+    { display_order: 10, title: 'Rapid Instant Transformation', description: 'Achieve spectacular, clinically proven shade improvements in just a single 30-minute session.' },
+    { display_order: 20, title: 'Sensitivity-Free Technology', description: 'Advanced cooling agents and precise buffer compounds prevent any post-whitening discomfort.' },
+    { display_order: 30, title: 'Enamel Safe Formulation', description: 'Non-acidic chemical composition that acts only on stain pigments without eroding precious enamel.' },
+    { display_order: 40, title: 'Deep Extrinsic Stain Eraser', description: 'Powerfully targets and removes deep yellowing from tobacco, tea, coffee, and spices.' },
+    { display_order: 50, title: 'Long-Lasting Results', description: 'Whitened smile easily persists for years with simple home care and routine oral hygiene.' },
+    { display_order: 60, title: 'Doctor-Supervised Precision', description: 'Performed entirely by specialized clinical experts for ultimate comfort, control, and peace of mind.' }
+  ];
+
+  const whiteningFaqs = [
+    { question: "What is professional Teeth Whitening and how does it work?", answer: "Professional teeth whitening at Patel Dental Hospital is a cosmetic dental treatment that uses high-performance, safe whitening agents combined with professional scaling, polishing, and specialized ultraviolet light therapy. This advanced process breaks down organic stain molecules deep within the tooth enamel to restore your natural, bright white tooth shade safely and comfortably.", display_order: 10 },
+    { question: "What is the difference between Hospital-Based and Home-Based whitening?", answer: "Hospital-Based Whitening is an in-office treatment utilizing professional-strength whitening agents and ultraviolet light activation for instant, dramatic results in about 30 minutes. Home-Based Whitening involves custom-fit trays and a milder gel applied at home, offering a safe, convenient, and gradual whitening option under complete clinical guidance.", display_order: 20 },
+    { question: "Will teeth whitening cause tooth sensitivity?", answer: "Our ultra-modern professional whitening procedures are designed to be completely sensitivity-free. While some individuals may experience minor, temporary cooling sensations or mild sensitivity for a few hours after the procedure, it is completely reversible and subsides quickly, with zero risk of enamel damage.", display_order: 30 },
+    { question: "How long do the teeth whitening results typically last?", answer: "With proper oral hygiene and routine maintenance, professional whitening results can easily last from 1 to 3 years. To maximize longevity, we recommend minimizing the consumption of heavily staining substances like coffee, tea, red wine, turmeric, or tobacco products.", display_order: 40 },
+    { question: "Can teeth whitening remove deep fluorosis or tetracycline stains?", answer: "Yes, teeth whitening is highly effective for severe stains. For deep fluorosis or severe intrinsic tetracycline discoloration, Dr. Vipul Patel may recommend a combination of multiple hospital sittings or coordinate a custom plan linking our professional in-office bleaching sessions with a specialized home-based whitening regimen.", display_order: 50 }
+  ];
+
   if (norm.includes('filling') || norm.includes('composite')) {
     heroImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=1200';
     heroCap = 'Natural Looking Tooth Coloured Fillings for a Healthy & Beautiful Smile.';
@@ -67,6 +122,9 @@ function getFallbackMedia(slug: string, title: string) {
     heroImg = 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=1200';
     heroCap = 'Advanced laser smile bleaching and whitening.';
     youtubeVideo = 'cbVcmy53KBs';
+    steps = whiteningSteps;
+    features = whiteningFeatures;
+    faqs = whiteningFaqs;
   } else if (norm.includes('canal') || norm.includes('rct')) {
     heroImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901a?auto=format&fit=crop&q=80&w=1200';
     heroCap = 'Pain-free root canal treatment with modern rotary systems.';
@@ -87,6 +145,9 @@ function getFallbackMedia(slug: string, title: string) {
     heroImg = 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=1200';
     heroCap = 'Completely clear invisible custom-made tooth aligner trays.';
     youtubeVideo = 'cbVcmy53KBs';
+    steps = alignerSteps;
+    features = alignerFeatures;
+    faqs = alignerFaqs;
   } else if (norm.includes('makeover') || norm.includes('smile')) {
     heroImg = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=1200';
     heroCap = 'Complete cosmetic smile designing and dental veneers.';
@@ -113,7 +174,10 @@ function getFallbackMedia(slug: string, title: string) {
     ],
     hospital_team_photos: [
       { image_url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800', title: 'DR. VIPUL PATEL & PANEL EXPERTS', caption: 'State-of-the-art dental care since generations with advanced USA standards.', display_order: 10 }
-    ]
+    ],
+    process_steps: steps,
+    features: features,
+    faqs: faqs
   };
 }
 
@@ -264,7 +328,10 @@ export default function ServiceDetail({
           setGallery(sortedGallery);
 
           // Sort FAQs by display order
-          const sortedFaqs = [...fetchedFaqs].sort((a, b) => a.display_order - b.display_order);
+          const fb = getFallbackMedia(slug, fetchedService.title || '');
+          const sortedFaqs = fetchedFaqs.length > 0
+            ? [...fetchedFaqs].sort((a, b) => a.display_order - b.display_order)
+            : (fb.faqs || []);
           setFaqs(sortedFaqs);
 
           // Update contact info
@@ -393,10 +460,130 @@ export default function ServiceDetail({
     return hasHeroTitle || hasHeroDesc || hasHeroImgCap || hasIntroTitle || hasIntroDesc || hasSteps || hasFeats || hasMedia;
   }, [service]);
 
+  // Update page title & meta description for SEO
+  useEffect(() => {
+    if (service) {
+      const originalTitle = document.title;
+      let metaDescription = document.querySelector('meta[name="description"]');
+      const originalDescription = metaDescription ? metaDescription.getAttribute('content') : '';
+
+      // Set new Title
+      const newTitle = service.seo_title || `${service.title} | Patel Dental Hospital`;
+      document.title = newTitle;
+
+      // Set new Description
+      const newDescription = service.seo_description || service.short_description;
+      if (newDescription) {
+        if (!metaDescription) {
+          metaDescription = document.createElement('meta');
+          metaDescription.setAttribute('name', 'description');
+          document.head.appendChild(metaDescription);
+        }
+        metaDescription.setAttribute('content', newDescription);
+      }
+
+      return () => {
+        document.title = originalTitle;
+        if (metaDescription) {
+          if (originalDescription) {
+            metaDescription.setAttribute('content', originalDescription);
+          } else {
+            metaDescription.remove();
+          }
+        }
+      };
+    }
+  }, [service]);
+
+  const mConfig = React.useMemo(() => {
+    if (!service || !service.marketing_config) return {};
+    if (typeof service.marketing_config === 'string') {
+      try {
+        return JSON.parse(service.marketing_config);
+      } catch (e) {
+        return {};
+      }
+    }
+    return service.marketing_config || {};
+  }, [service]);
+
+  const displaySteps: any[] = React.useMemo(() => {
+    if (!service) return [];
+    let rawSteps: any[] = [];
+    if (Array.isArray(service.process_steps)) {
+      rawSteps = service.process_steps;
+    } else if (typeof service.process_steps === 'string') {
+      try {
+        rawSteps = JSON.parse(service.process_steps);
+      } catch (e) {
+        rawSteps = [];
+      }
+    }
+    if (rawSteps.length === 0 && fallback.process_steps) {
+      return fallback.process_steps;
+    }
+    return Array.isArray(rawSteps)
+      ? [...rawSteps].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+      : [];
+  }, [service, fallback]);
+
+  const displayFeatures: any[] = React.useMemo(() => {
+    if (!service) return [];
+    let rawFeatures: any[] = [];
+    if (Array.isArray(service.features)) {
+      rawFeatures = service.features;
+    } else if (typeof service.features === 'string') {
+      try {
+        rawFeatures = JSON.parse(service.features);
+      } catch (e) {
+        rawFeatures = [];
+      }
+    }
+    if (rawFeatures.length === 0 && fallback.features) {
+      return fallback.features;
+    }
+    return Array.isArray(rawFeatures)
+      ? [...rawFeatures].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+      : [];
+  }, [service, fallback]);
+
   // If loading, display the skeleton state first
   if (isLoading) {
-    // We will render skeleton below
-  } else if (!hasCustomContent) {
+    return (
+      <div className="min-h-[80vh] bg-slate-50 flex items-center justify-center py-20 px-4">
+        <div className="w-full max-w-4xl space-y-8 animate-pulse">
+          {/* Back Button Skeleton */}
+          <div className="h-6 w-32 bg-slate-200 rounded-lg" />
+          
+          {/* Hero Section Skeleton */}
+          <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-xs">
+            <div className="h-64 sm:h-80 md:h-96 bg-slate-200" />
+            <div className="p-6 sm:p-10 space-y-4">
+              <div className="h-8 w-2/3 bg-slate-200 rounded-lg" />
+              <div className="h-4 w-full bg-slate-200 rounded-lg" />
+              <div className="h-4 w-5/6 bg-slate-200 rounded-lg" />
+            </div>
+          </div>
+
+          {/* Double Column content skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="h-40 bg-white border border-slate-100 rounded-3xl p-6 space-y-4 shadow-3xs">
+                <div className="h-6 w-1/3 bg-slate-200 rounded-lg" />
+                <div className="h-4 w-full bg-slate-200 rounded-lg" />
+                <div className="h-4 w-5/6 bg-slate-200 rounded-lg" />
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="h-64 bg-white border border-slate-100 rounded-3xl p-6 shadow-3xs" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasCustomContent) {
     // If no custom text has been configured by the doctor, fall back to the existing static page design
     if (slug === 'tooth-coloured-filling' || slug === 'composite-filling') {
       return (
@@ -428,15 +615,6 @@ export default function ServiceDetail({
     if (slug === 'pediatric-dentistry' || slug === 'kids-dentistry') {
       return (
         <PediatricDentistry
-          setCurrentPage={(page) => setCurrentPage?.(page)}
-          openAppointmentModal={openAppointmentModal}
-        />
-      );
-    }
-
-    if (slug === 'teeth-whitening') {
-      return (
-        <TeethWhitening
           setCurrentPage={(page) => setCurrentPage?.(page)}
           openAppointmentModal={openAppointmentModal}
         />
@@ -479,15 +657,6 @@ export default function ServiceDetail({
       );
     }
 
-    if (slug === 'invisible-aligners') {
-      return (
-        <InvisibleAligners
-          setCurrentPage={(page) => setCurrentPage?.(page)}
-          openAppointmentModal={openAppointmentModal}
-        />
-      );
-    }
-
     if (slug === 'smile-makeover') {
       return (
         <SmileMakeover
@@ -497,41 +666,6 @@ export default function ServiceDetail({
       );
     }
   }
-
-  // Update page title & meta description for SEO
-  useEffect(() => {
-    if (service) {
-      const originalTitle = document.title;
-      let metaDescription = document.querySelector('meta[name="description"]');
-      const originalDescription = metaDescription ? metaDescription.getAttribute('content') : '';
-
-      // Set new Title
-      const newTitle = service.seo_title || `${service.title} | Patel Dental Hospital`;
-      document.title = newTitle;
-
-      // Set new Description
-      const newDescription = service.seo_description || service.short_description;
-      if (newDescription) {
-        if (!metaDescription) {
-          metaDescription = document.createElement('meta');
-          metaDescription.setAttribute('name', 'description');
-          document.head.appendChild(metaDescription);
-        }
-        metaDescription.setAttribute('content', newDescription);
-      }
-
-      return () => {
-        document.title = originalTitle;
-        if (metaDescription) {
-          if (originalDescription) {
-            metaDescription.setAttribute('content', originalDescription);
-          } else {
-            metaDescription.remove();
-          }
-        }
-      };
-    }
-  }, [service]);
 
   // Handle navigating to back / treatment page
   const handleBackToServices = () => {
@@ -577,17 +711,7 @@ export default function ServiceDetail({
     }
   };
 
-  const mConfig = React.useMemo(() => {
-    if (!service || !service.marketing_config) return {};
-    if (typeof service.marketing_config === 'string') {
-      try {
-        return JSON.parse(service.marketing_config);
-      } catch (e) {
-        return {};
-      }
-    }
-    return service.marketing_config || {};
-  }, [service]);
+
 
   // Formulate WhatsApp API direct URL
   const getWhatsAppUrl = () => {
@@ -657,75 +781,7 @@ export default function ServiceDetail({
     );
   };
 
-  const displaySteps: any[] = React.useMemo(() => {
-    if (!service) return [];
-    let rawSteps: any[] = [];
-    if (Array.isArray(service.process_steps)) {
-      rawSteps = service.process_steps;
-    } else if (typeof service.process_steps === 'string') {
-      try {
-        rawSteps = JSON.parse(service.process_steps);
-      } catch (e) {
-        rawSteps = [];
-      }
-    }
-    return Array.isArray(rawSteps)
-      ? [...rawSteps].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
-      : [];
-  }, [service]);
 
-  const displayFeatures: any[] = React.useMemo(() => {
-    if (!service) return [];
-    let rawFeatures: any[] = [];
-    if (Array.isArray(service.features)) {
-      rawFeatures = service.features;
-    } else if (typeof service.features === 'string') {
-      try {
-        rawFeatures = JSON.parse(service.features);
-      } catch (e) {
-        rawFeatures = [];
-      }
-    }
-    return Array.isArray(rawFeatures)
-      ? [...rawFeatures].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
-      : [];
-  }, [service]);
-
-  // Loading Skeleton State
-  if (isLoading) {
-    return (
-      <div className="min-h-[80vh] bg-slate-50 flex items-center justify-center py-20 px-4">
-        <div className="w-full max-w-4xl space-y-8 animate-pulse">
-          {/* Back Button Skeleton */}
-          <div className="h-6 w-32 bg-slate-200 rounded-lg" />
-          
-          {/* Hero Section Skeleton */}
-          <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-xs">
-            <div className="h-64 sm:h-80 md:h-96 bg-slate-200" />
-            <div className="p-6 sm:p-10 space-y-4">
-              <div className="h-8 w-2/3 bg-slate-200 rounded-lg" />
-              <div className="h-4 w-full bg-slate-200 rounded-lg" />
-              <div className="h-4 w-5/6 bg-slate-200 rounded-lg" />
-            </div>
-          </div>
-
-          {/* Double Column content skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="h-40 bg-white border border-slate-100 rounded-3xl p-6 space-y-4 shadow-3xs">
-                <div className="h-6 w-1/3 bg-slate-200 rounded-lg" />
-                <div className="h-4 w-full bg-slate-200 rounded-lg" />
-                <div className="h-4 w-5/6 bg-slate-200 rounded-lg" />
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div className="h-64 bg-white border border-slate-100 rounded-3xl p-6 shadow-3xs" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // 404 Service Not Found state
   if (!service) {
