@@ -13,9 +13,23 @@ CREATE TABLE IF NOT EXISTS public.services (
   is_active boolean DEFAULT true NOT NULL,
   seo_title text,
   seo_description text,
+  homepage_card_image text,
+  homepage_short_description text,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Ensure columns exist in case the table was already created
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS homepage_card_image text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS homepage_short_description text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS hero_title text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS hero_description text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS hero_image_caption text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS intro_title text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS intro_description text;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS process_steps jsonb;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS features jsonb;
+ALTER TABLE public.services ADD COLUMN IF NOT EXISTS marketing_config jsonb;
 
 -- 2. Create Service Gallery Table
 CREATE TABLE IF NOT EXISTS public.service_gallery (

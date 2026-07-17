@@ -31,7 +31,14 @@ import {
   GripVertical,
   ExternalLink,
   Building2,
-  Mail
+  Mail,
+  ChevronUp,
+  ChevronDown,
+  Sliders,
+  Settings,
+  Layers,
+  Star,
+  EyeOff
 } from 'lucide-react';
 import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link } from 'lucide-react';
@@ -45,6 +52,7 @@ import { videoService } from '../utils/videoData';
 import { contactService } from '../utils/contactData';
 import { serviceService } from '../utils/serviceData';
 import Appointments from './Appointments';
+import ServiceDetail from './ServiceDetail';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -137,8 +145,246 @@ export default function Admin({
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceImgUploading, setServiceImgUploading] = useState(false);
+  const [homePageImgUploading, setHomePageImgUploading] = useState(false);
   const [serviceFormError, setServiceFormError] = useState<string | null>(null);
   const [isSlugTouched, setIsSlugTouched] = useState(false);
+
+  const steps: any[] = Array.isArray(editingService?.process_steps)
+    ? editingService.process_steps
+    : (typeof editingService?.process_steps === 'string'
+        ? (() => { try { return JSON.parse(editingService.process_steps || '[]') } catch(e) { return [] } })()
+        : []);
+  
+  const feats: any[] = Array.isArray(editingService?.features)
+    ? editingService.features
+    : (typeof editingService?.features === 'string'
+        ? (() => { try { return JSON.parse(editingService.features || '[]') } catch(e) { return [] } })()
+        : []);
+
+  const updateStep = (index: number, key: string, value: any) => {
+    if (!editingService) return;
+    const currentSteps = [...steps];
+    currentSteps[index] = { ...currentSteps[index], [key]: value };
+    if (key === 'display_order') {
+      currentSteps.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    }
+    setEditingService({ ...editingService, process_steps: currentSteps });
+  };
+
+  const deleteStep = (index: number) => {
+    if (!editingService) return;
+    const currentSteps = steps.filter((_, idx) => idx !== index);
+    setEditingService({ ...editingService, process_steps: currentSteps });
+  };
+
+  const addStep = () => {
+    if (!editingService) return;
+    const currentSteps = [...steps];
+    const nextOrder = currentSteps.length > 0 ? Math.max(...currentSteps.map(s => s.display_order || 0)) + 10 : 10;
+    currentSteps.push({ title: '', description: '', display_order: nextOrder });
+    setEditingService({ ...editingService, process_steps: currentSteps });
+  };
+
+  const moveStep = (index: number, direction: 'up' | 'down') => {
+    if (!editingService) return;
+    const currentSteps = [...steps];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= currentSteps.length) return;
+    
+    const temp = currentSteps[index];
+    currentSteps[index] = currentSteps[targetIndex];
+    currentSteps[targetIndex] = temp;
+    
+    const tempOrder = currentSteps[index].display_order;
+    currentSteps[index].display_order = currentSteps[targetIndex].display_order;
+    currentSteps[targetIndex].display_order = tempOrder;
+    
+    setEditingService({ ...editingService, process_steps: currentSteps });
+  };
+
+  const updateFeat = (index: number, key: string, value: any) => {
+    if (!editingService) return;
+    const currentFeats = [...feats];
+    currentFeats[index] = { ...currentFeats[index], [key]: value };
+    if (key === 'display_order') {
+      currentFeats.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    }
+    setEditingService({ ...editingService, features: currentFeats });
+  };
+
+  const deleteFeat = (index: number) => {
+    if (!editingService) return;
+    const currentFeats = feats.filter((_, idx) => idx !== index);
+    setEditingService({ ...editingService, features: currentFeats });
+  };
+
+  const addFeat = () => {
+    if (!editingService) return;
+    const currentFeats = [...feats];
+    const nextOrder = currentFeats.length > 0 ? Math.max(...currentFeats.map(f => f.display_order || 0)) + 10 : 10;
+    currentFeats.push({ title: '', description: '', display_order: nextOrder });
+    setEditingService({ ...editingService, features: currentFeats });
+  };
+
+  const moveFeat = (index: number, direction: 'up' | 'down') => {
+    if (!editingService) return;
+    const currentFeats = [...feats];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= currentFeats.length) return;
+    
+    const temp = currentFeats[index];
+    currentFeats[index] = currentFeats[targetIndex];
+    currentFeats[targetIndex] = temp;
+    
+    const tempOrder = currentFeats[index].display_order;
+    currentFeats[index].display_order = currentFeats[targetIndex].display_order;
+    currentFeats[targetIndex].display_order = tempOrder;
+    
+    setEditingService({ ...editingService, features: currentFeats });
+  };
+
+  const contentImages: any[] = Array.isArray(editingService?.content_images)
+    ? editingService.content_images
+    : (typeof editingService?.content_images === 'string'
+        ? (() => { try { return JSON.parse(editingService.content_images || '[]') } catch(e) { return [] } })()
+        : []);
+
+  const testimonials: any[] = Array.isArray(editingService?.patient_testimonials)
+    ? editingService.patient_testimonials
+    : (typeof editingService?.patient_testimonials === 'string'
+        ? (() => { try { return JSON.parse(editingService.patient_testimonials || '[]') } catch(e) { return [] } })()
+        : []);
+
+  const teamPhotos: any[] = Array.isArray(editingService?.hospital_team_photos)
+    ? editingService.hospital_team_photos
+    : (typeof editingService?.hospital_team_photos === 'string'
+        ? (() => { try { return JSON.parse(editingService.hospital_team_photos || '[]') } catch(e) { return [] } })()
+        : []);
+
+  const updateContentImage = (index: number, key: string, value: any) => {
+    if (!editingService) return;
+    const current = [...contentImages];
+    current[index] = { ...current[index], [key]: value };
+    if (key === 'display_order') {
+      current.sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    }
+    setEditingService({ ...editingService, content_images: current });
+  };
+
+  const deleteContentImage = (index: number) => {
+    if (!editingService) return;
+    const current = contentImages.filter((_, idx) => idx !== index);
+    setEditingService({ ...editingService, content_images: current });
+  };
+
+  const addContentImage = () => {
+    if (!editingService) return;
+    const current = [...contentImages];
+    const nextOrder = current.length > 0 ? Math.max(...current.map(i => Number(i.display_order) || 0)) + 10 : 10;
+    current.push({ image_url: '', caption: '', alt_text: '', display_order: nextOrder });
+    setEditingService({ ...editingService, content_images: current });
+  };
+
+  const updateTestimonial = (index: number, key: string, value: any) => {
+    if (!editingService) return;
+    const current = [...testimonials];
+    current[index] = { ...current[index], [key]: value };
+    if (key === 'display_order') {
+      current.sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    }
+    setEditingService({ ...editingService, patient_testimonials: current });
+  };
+
+  const deleteTestimonial = (index: number) => {
+    if (!editingService) return;
+    const current = testimonials.filter((_, idx) => idx !== index);
+    setEditingService({ ...editingService, patient_testimonials: current });
+  };
+
+  const addTestimonial = () => {
+    if (!editingService) return;
+    const current = [...testimonials];
+    const nextOrder = current.length > 0 ? Math.max(...current.map(t => Number(t.display_order) || 0)) + 10 : 10;
+    current.push({ video_url: '', patient_name: '', treatment_name: '', short_review: '', display_order: nextOrder });
+    setEditingService({ ...editingService, patient_testimonials: current });
+  };
+
+  const updateTeamPhoto = (index: number, key: string, value: any) => {
+    if (!editingService) return;
+    const current = [...teamPhotos];
+    current[index] = { ...current[index], [key]: value };
+    if (key === 'display_order') {
+      current.sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    }
+    setEditingService({ ...editingService, hospital_team_photos: current });
+  };
+
+  const deleteTeamPhoto = (index: number) => {
+    if (!editingService) return;
+    const current = teamPhotos.filter((_, idx) => idx !== index);
+    setEditingService({ ...editingService, hospital_team_photos: current });
+  };
+
+  const addTeamPhoto = () => {
+    if (!editingService) return;
+    const current = [...teamPhotos];
+    const nextOrder = current.length > 0 ? Math.max(...current.map(p => Number(p.display_order) || 0)) + 10 : 10;
+    current.push({ image_url: '', title: '', caption: '', display_order: nextOrder });
+    setEditingService({ ...editingService, hospital_team_photos: current });
+  };
+
+  const updateMarketingConfig = (key: string, value: any) => {
+    if (!editingService) return;
+    const currentConfig = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+    
+    const updatedConfig = { ...currentConfig, [key]: value };
+    
+    // Sync to legacy hospital_team_photos if we updated any of the split fields
+    let updatedHospitalTeamPhotos = editingService.hospital_team_photos;
+    if (['hospital_photos', 'team_photos', 'equipment_photos'].includes(key)) {
+      const merged: any[] = [];
+      const hList = updatedConfig.hospital_photos || [];
+      const tList = updatedConfig.team_photos || [];
+      const eList = updatedConfig.equipment_photos || [];
+      
+      hList.forEach((h: any) => {
+        merged.push({
+          image_url: h.image_url || '',
+          title: h.caption || 'Clinic Infrastructure',
+          caption: 'Hospital Photo',
+          display_order: Number(h.display_order) || 0
+        });
+      });
+      
+      tList.forEach((t: any) => {
+        merged.push({
+          image_url: t.photo_url || '',
+          title: t.name || 'Team Specialist',
+          caption: t.designation ? `${t.designation}${t.caption ? ` - ${t.caption}` : ''}` : (t.caption || 'Team Member'),
+          display_order: Number(t.display_order) || 0
+        });
+      });
+      
+      eList.forEach((e: any) => {
+        merged.push({
+          image_url: e.image_url || '',
+          title: e.name || 'Clinical Equipment',
+          caption: e.caption || 'Advanced Technology',
+          display_order: Number(e.display_order) || 0
+        });
+      });
+      
+      updatedHospitalTeamPhotos = merged;
+    }
+    
+    setEditingService({ 
+      ...editingService, 
+      marketing_config: updatedConfig,
+      hospital_team_photos: updatedHospitalTeamPhotos
+    });
+  };
 
   const isSlugUnique = (slug: string, id: string) => {
     return !servicesList.some(s => s.slug.trim().toLowerCase() === slug.trim().toLowerCase() && s.id !== id);
@@ -160,6 +406,23 @@ export default function Admin({
       is_active: true,
       seo_title: '',
       seo_description: '',
+      homepage_card_image: '',
+      homepage_short_description: '',
+      hero_title: '',
+      hero_description: '',
+      hero_image_caption: '',
+      intro_title: '',
+      intro_description: '',
+      process_steps: [],
+      features: [],
+      content_images: [],
+      procedure_video_url: '',
+      procedure_video_title: '',
+      procedure_video_description: '',
+      procedure_video_thumbnail: '',
+      patient_testimonials: [],
+      hospital_team_photos: [],
+      marketing_config: {},
     });
   };
 
@@ -212,6 +475,22 @@ export default function Admin({
         display_order: Number(editingService.display_order),
         seo_title: editingService.seo_title?.trim() || null,
         seo_description: editingService.seo_description?.trim() || null,
+        homepage_card_image: editingService.homepage_card_image?.trim() || null,
+        homepage_short_description: editingService.homepage_short_description?.trim() || null,
+        hero_title: editingService.hero_title?.trim() || null,
+        hero_description: editingService.hero_description?.trim() || null,
+        hero_image_caption: editingService.hero_image_caption?.trim() || null,
+        intro_title: editingService.intro_title?.trim() || null,
+        intro_description: editingService.intro_description?.trim() || null,
+        process_steps: editingService.process_steps || [],
+        features: editingService.features || [],
+        content_images: editingService.content_images || [],
+        procedure_video_url: editingService.procedure_video_url?.trim() || null,
+        procedure_video_title: editingService.procedure_video_title?.trim() || null,
+        procedure_video_description: editingService.procedure_video_description?.trim() || null,
+        procedure_video_thumbnail: editingService.procedure_video_thumbnail?.trim() || null,
+        patient_testimonials: editingService.patient_testimonials || [],
+        hospital_team_photos: editingService.hospital_team_photos || [],
       };
 
       // Store a backup of the current list for rollback on error
@@ -275,6 +554,22 @@ export default function Admin({
     }
   };
 
+  const handleHomePageCardImageUpload = async (file: File) => {
+    setHomePageImgUploading(true);
+    setServiceFormError(null);
+    try {
+      const publicUrl = await uploadImage(file);
+      if (editingService) {
+        setEditingService({ ...editingService, homepage_card_image: publicUrl });
+      }
+    } catch (err: any) {
+      console.error('Error uploading home page card image:', err);
+      setServiceFormError('Image upload failed: ' + (err.message || err));
+    } finally {
+      setHomePageImgUploading(false);
+    }
+  };
+
   const loadServicesList = async () => {
     setLoadingServices(true);
     setServicesError(null);
@@ -324,7 +619,7 @@ export default function Admin({
   };
 
   // Service Gallery Tab states
-  const [activeServiceEditorTab, setActiveServiceEditorTab] = useState<'details' | 'gallery' | 'faqs'>('details');
+  const [activeServiceEditorTab, setActiveServiceEditorTab] = useState<'details' | 'media' | 'gallery' | 'faqs' | 'marketing'>('details');
   const [serviceGalleryList, setServiceGalleryList] = useState<ServiceGalleryItem[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
@@ -354,6 +649,81 @@ export default function Admin({
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
   const [faqEditQuestion, setFaqEditQuestion] = useState('');
   const [faqEditAnswer, setFaqEditAnswer] = useState('');
+
+  // Written Reviews edit states
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [reviewDraftName, setReviewDraftName] = useState('');
+  const [reviewDraftTreatment, setReviewDraftTreatment] = useState('');
+  const [reviewDraftText, setReviewDraftText] = useState('');
+  const [reviewDraftRating, setReviewDraftRating] = useState<number>(5);
+  const [reviewDraftBeforeImage, setReviewDraftBeforeImage] = useState('');
+  const [reviewDraftAfterImage, setReviewDraftAfterImage] = useState('');
+  const [reviewDraftDisplayOrder, setReviewDraftDisplayOrder] = useState<number>(10);
+
+  // Derived Marketing Media States
+  const mConfig = typeof editingService?.marketing_config === 'string'
+    ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+    : (editingService?.marketing_config || {});
+
+  const triggerUpload = async (accept: string, onUpload: (url: string) => void) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+    input.onchange = async (eEvent: any) => {
+      if (eEvent.target.files && eEvent.target.files[0]) {
+        setSaveMessage('Uploading media file...');
+        try {
+          const url = await uploadImage(eEvent.target.files[0]);
+          if (url) {
+            onUpload(url);
+            setSaveMessage('Uploaded successfully!');
+          }
+        } catch (err: any) {
+          console.error(err);
+          setServiceFormError('Upload failed: ' + (err.message || String(err)));
+        } finally {
+          setTimeout(() => setSaveMessage(null), 2500);
+        }
+      }
+    };
+    input.click();
+  };
+
+  const clinicalVideosList = mConfig.procedure_videos || (editingService?.procedure_video_url ? [{
+    title: editingService.procedure_video_title || 'Procedure Video',
+    video_url: editingService.procedure_video_url || '',
+    thumbnail: editingService.procedure_video_thumbnail || '',
+    description: editingService.procedure_video_description || '',
+    display_order: 10
+  }] : []);
+
+  const hospitalPhotosList = mConfig.hospital_photos || [];
+  const teamPhotosList = mConfig.team_photos || [];
+  const equipmentPhotosList = mConfig.equipment_photos || [];
+
+  const saveProcedureVideos = (videos: any[]) => {
+    if (!editingService) return;
+    const updatedConfig = { ...mConfig, procedure_videos: videos };
+    if (videos.length > 0) {
+      setEditingService({
+        ...editingService,
+        marketing_config: updatedConfig,
+        procedure_video_url: videos[0].video_url,
+        procedure_video_title: videos[0].title,
+        procedure_video_description: videos[0].description,
+        procedure_video_thumbnail: videos[0].thumbnail
+      });
+    } else {
+      setEditingService({
+        ...editingService,
+        marketing_config: updatedConfig,
+        procedure_video_url: null,
+        procedure_video_title: null,
+        procedure_video_description: null,
+        procedure_video_thumbnail: null
+      });
+    }
+  };
 
   useEffect(() => {
     if (editingService?.id) {
@@ -789,6 +1159,104 @@ export default function Admin({
         setFaqsSaving(false);
       }
     }
+  };
+
+  // Service Media Tab state helpers
+  const handleAddContentImage = async (files: FileList | null, url?: string) => {
+    if (!editingService) return;
+    const currentList = Array.isArray(editingService.content_images) ? editingService.content_images : [];
+    const updated = [...currentList];
+    let startOrder = currentList.length > 0 ? Math.max(...currentList.map((c: any) => Number(c.display_order || 0))) + 10 : 10;
+
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const publicUrl = await uploadImage(file);
+        if (publicUrl) {
+          updated.push({
+            image_url: publicUrl,
+            caption: file.name.split('.')[0] || '',
+            alt_text: file.name.split('.')[0] || '',
+            display_order: startOrder,
+          });
+          startOrder += 10;
+        }
+      }
+    } else if (url) {
+      updated.push({
+        image_url: url,
+        caption: 'New Image',
+        alt_text: 'Service content section image',
+        display_order: startOrder,
+      });
+    }
+
+    setEditingService({ ...editingService, content_images: updated });
+  };
+
+  const handleAddTestimonial = () => {
+    if (!editingService) return;
+    const currentList = Array.isArray(editingService.patient_testimonials) ? editingService.patient_testimonials : [];
+    const startOrder = currentList.length > 0 ? Math.max(...currentList.map((t: any) => Number(t.display_order || 0))) + 10 : 10;
+    const updated = [
+      ...currentList,
+      {
+        video_url: '',
+        patient_name: '',
+        treatment_name: '',
+        short_review: '',
+        display_order: startOrder
+      }
+    ];
+    setEditingService({ ...editingService, patient_testimonials: updated });
+  };
+
+  const handleUploadTestimonialVideo = async (index: number, file: File) => {
+    if (!editingService) return;
+    try {
+      const publicUrl = await uploadImage(file);
+      if (publicUrl) {
+        const currentList = Array.isArray(editingService.patient_testimonials) ? editingService.patient_testimonials : [];
+        const updated = [...currentList];
+        updated[index] = { ...updated[index], video_url: publicUrl };
+        setEditingService({ ...editingService, patient_testimonials: updated });
+      }
+    } catch (e: any) {
+      console.error(e);
+      setServiceFormError('Video upload failed: ' + (e.message || String(e)));
+    }
+  };
+
+  const handleAddTeamPhoto = async (files: FileList | null, url?: string) => {
+    if (!editingService) return;
+    const currentList = Array.isArray(editingService.hospital_team_photos) ? editingService.hospital_team_photos : [];
+    const updated = [...currentList];
+    let startOrder = currentList.length > 0 ? Math.max(...currentList.map((t: any) => Number(t.display_order || 0))) + 10 : 10;
+
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const publicUrl = await uploadImage(file);
+        if (publicUrl) {
+          updated.push({
+            image_url: publicUrl,
+            title: file.name.split('.')[0] || '',
+            caption: '',
+            display_order: startOrder,
+          });
+          startOrder += 10;
+        }
+      }
+    } else if (url) {
+      updated.push({
+        image_url: url,
+        title: 'New Photo',
+        caption: '',
+        display_order: startOrder,
+      });
+    }
+
+    setEditingService({ ...editingService, hospital_team_photos: updated });
   };
 
   // Media local interactive states
@@ -3253,7 +3721,7 @@ export default function Admin({
                     type="text"
                     value={draftPhone}
                     onChange={(e) => setDraftPhone(e.target.value)}
-                    placeholder="e.g. +91 79900 62009"
+                    placeholder="e.g. +91 95103 97046"
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white text-slate-800"
                   />
                   <p className="text-[10px] text-slate-400 font-medium">Displayed to patients in the navbar, footer, and contact sections.</p>
@@ -3266,7 +3734,7 @@ export default function Admin({
                     type="text"
                     value={draftPhoneRaw}
                     onChange={(e) => setDraftPhoneRaw(e.target.value)}
-                    placeholder="e.g. +917990062009"
+                    placeholder="e.g. +919510397046"
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white text-slate-800"
                   />
                   <p className="text-[10px] text-slate-400 font-medium">Used for direct click-to-dial links (starts with country code, e.g., +91).</p>
@@ -3279,7 +3747,7 @@ export default function Admin({
                     type="text"
                     value={draftWhatsapp}
                     onChange={(e) => setDraftWhatsapp(e.target.value)}
-                    placeholder="e.g. +91 79900 62009"
+                    placeholder="e.g. +91 95103 97046"
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white text-slate-800"
                   />
                   <p className="text-[10px] text-slate-400 font-medium">Formatted number shown to patients on floating action buttons.</p>
@@ -3292,7 +3760,7 @@ export default function Admin({
                     type="text"
                     value={draftWhatsappRaw}
                     onChange={(e) => setDraftWhatsappRaw(e.target.value)}
-                    placeholder="e.g. 917990062009"
+                    placeholder="e.g. 919510397046"
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white text-slate-800"
                   />
                   <p className="text-[10px] text-slate-400 font-medium">Numbers only (no + or spaces). Formats the WhatsApp click-to-chat API links.</p>
@@ -3564,7 +4032,7 @@ export default function Admin({
       <div className="lg:hidden w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between relative z-30 shrink-0">
         <div className="flex items-center space-x-2">
           <img 
-            src="/patel-logo-vector.svg" 
+            src="/LOGO 3D FULL NAME WHITE (3).png" 
             alt="Patel Logo" 
             className="h-9 w-auto object-contain"
             referrerPolicy="no-referrer"
@@ -3596,7 +4064,7 @@ export default function Admin({
           {/* Logo Brand Header (Desktop only) */}
           <div className="hidden lg:flex flex-col items-center pb-4 border-b border-slate-100">
             <img 
-              src="/patel-logo-vector.svg" 
+              src="/LOGO 3D FULL NAME WHITE (3).png" 
               alt="Patel Dental Hospital Logo" 
               className="h-[52px] w-auto object-contain mb-3"
               referrerPolicy="no-referrer"
@@ -4178,6 +4646,22 @@ export default function Admin({
               <button
                 type="button"
                 disabled={!editingService || !servicesList.some(s => s.id === editingService.id)}
+                onClick={() => editingService && servicesList.some(s => s.id === editingService.id) && setActiveServiceEditorTab('media')}
+                className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
+                  !(editingService && servicesList.some(s => s.id === editingService.id))
+                    ? 'opacity-40 cursor-not-allowed text-slate-400 border-transparent'
+                    : activeServiceEditorTab === 'media'
+                    ? 'border-[#0D9488] text-[#0D9488] cursor-pointer'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 cursor-pointer'
+                }`}
+                title={!(editingService && servicesList.some(s => s.id === editingService.id)) ? "Please save service details first to enable Media." : "Manage service media files"}
+              >
+                <Video className="h-4 w-4" />
+                Media Management
+              </button>
+              <button
+                type="button"
+                disabled={!editingService || !servicesList.some(s => s.id === editingService.id)}
                 onClick={() => editingService && servicesList.some(s => s.id === editingService.id) && setActiveServiceEditorTab('gallery')}
                 className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
                   !(editingService && servicesList.some(s => s.id === editingService.id))
@@ -4206,6 +4690,22 @@ export default function Admin({
               >
                 <MessageCircle className="h-4 w-4" />
                 FAQs
+              </button>
+              <button
+                type="button"
+                disabled={!editingService || !servicesList.some(s => s.id === editingService.id)}
+                onClick={() => editingService && servicesList.some(s => s.id === editingService.id) && setActiveServiceEditorTab('marketing')}
+                className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
+                  !(editingService && servicesList.some(s => s.id === editingService.id))
+                    ? 'opacity-40 cursor-not-allowed text-slate-400 border-transparent'
+                    : activeServiceEditorTab === 'marketing'
+                    ? 'border-[#0D9488] text-[#0D9488] cursor-pointer'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 cursor-pointer'
+                }`}
+                title={!(editingService && servicesList.some(s => s.id === editingService.id)) ? "Please save service details first to enable Marketing." : "Manage service Marketing & CTA configurations"}
+              >
+                <Sparkles className="h-4 w-4" />
+                Marketing & CTA
               </button>
             </div>
 
@@ -4288,6 +4788,24 @@ export default function Admin({
                     placeholder="A brief summary of the service displayed in search results and card lists..."
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
                   />
+                </div>
+
+                {/* Home Page Short Description */}
+                <div className="space-y-1.5 p-3.5 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Home Page Short Description</label>
+                    <span className="text-[9px] text-[#0D9488] font-bold uppercase tracking-widest bg-[#0D9488]/10 px-1.5 py-0.5 rounded">Home Only</span>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={editingService.homepage_short_description || ''}
+                    onChange={(e) => setEditingService({ ...editingService, homepage_short_description: e.target.value })}
+                    placeholder="If empty, automatically falls back to the master Short Description..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                  />
+                  <p className="text-[9px] text-slate-400 font-medium leading-relaxed">
+                    Optional multiline description shown only on the Home Page Service Card.
+                  </p>
                 </div>
 
                 {/* Full Description */}
@@ -4381,6 +4899,374 @@ export default function Admin({
                   </div>
                 </div>
 
+                {/* Home Page Card Image Box & Upload Zone */}
+                <div className="space-y-2 p-3.5 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 font-sans">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Home Page Card Image</label>
+                    <span className="text-[9px] text-[#0D9488] font-bold uppercase tracking-widest bg-[#0D9488]/10 px-1.5 py-0.5 rounded">Home Only</span>
+                  </div>
+                  
+                  {editingService.homepage_card_image && (
+                    <div className="relative group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 h-44 flex items-center justify-center">
+                      <img
+                        src={editingService.homepage_card_image}
+                        alt="Service Home Card Preview"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingService({ ...editingService, homepage_card_image: '' })}
+                          className="p-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-md cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span>Remove Image</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* File Drag and Drop */}
+                    <div 
+                      className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-white transition duration-150 relative cursor-pointer"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                          await handleHomePageCardImageUpload(e.dataTransfer.files[0]);
+                        }
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="service-homepage-file-input"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            await handleHomePageCardImageUpload(e.target.files[0]);
+                          }
+                        }}
+                      />
+                      <div className="p-3 bg-slate-50 border border-slate-100 rounded-full shadow-3xs text-slate-400 mb-2">
+                        {homePageImgUploading ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-600" />
+                        ) : (
+                          <Upload className="h-5 w-5 text-[#0D9488]" />
+                        )}
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-700">
+                        {homePageImgUploading ? 'Uploading to Supabase...' : 'Drag & Drop to Upload'}
+                      </span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">PNG, JPG or WEBP up to 5MB</span>
+                    </div>
+
+                    {/* Manual URL Input */}
+                    <div className="p-4 border border-slate-150 rounded-2xl bg-white space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Or Specify Direct URL</span>
+                      <input
+                        type="text"
+                        placeholder="https://images.unsplash.com/photo-..."
+                        value={editingService.homepage_card_image || ''}
+                        onChange={(e) => setEditingService({ ...editingService, homepage_card_image: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                      />
+                      <p className="text-[9px] text-slate-400 leading-relaxed">
+                        Optional direct URL. If empty, automatically falls back to the master Hero Image.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 1. HERO CONTENT ENHANCEMENT */}
+                <div className="border-t border-slate-100 pt-6 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-4 w-4 text-[#0D9488]" />
+                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Hero Section Content (Phase 1)</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Custom Hero Title</label>
+                      <input
+                        type="text"
+                        placeholder="Fallback to Service Title"
+                        value={editingService.hero_title || ''}
+                        onChange={(e) => setEditingService({ ...editingService, hero_title: e.target.value })}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Hero Image Caption</label>
+                      <input
+                        type="text"
+                        placeholder="Optional photo caption / equipment credit"
+                        value={editingService.hero_image_caption || ''}
+                        onChange={(e) => setEditingService({ ...editingService, hero_image_caption: e.target.value })}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Custom Hero Description</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Fallback to Short Description"
+                      value={editingService.hero_description || ''}
+                      onChange={(e) => setEditingService({ ...editingService, hero_description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. INTRODUCTION SECTION */}
+                <div className="border-t border-slate-100 pt-6 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Stethoscope className="h-4 w-4 text-[#0D9488]" />
+                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Introduction Section (Phase 1)</h4>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Introduction Title</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. What is a Dental Implant? (Fallback is About the Treatment)"
+                      value={editingService.intro_title || ''}
+                      onChange={(e) => setEditingService({ ...editingService, intro_title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Introduction Description</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Detailed clinical overview of this treatment (Fallback to Full Description)"
+                      value={editingService.intro_description || ''}
+                      onChange={(e) => setEditingService({ ...editingService, intro_description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* 3. PROCESS SECTION */}
+                <div className="border-t border-slate-100 pt-6 space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Treatment Process Steps</h4>
+                    </div>
+                    <span className="text-[9px] bg-teal-50 text-[#0D9488] border border-teal-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      {steps.length} Steps
+                    </span>
+                  </div>
+
+                  {steps.length === 0 ? (
+                    <div className="p-6 bg-slate-50/50 border border-slate-150 rounded-2xl text-center space-y-1.5">
+                      <p className="text-xs text-slate-500 font-medium">No process steps added yet.</p>
+                      <p className="text-[10px] text-slate-400">Add steps below to detail the clinical stages of this treatment.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {steps.map((step, index) => (
+                        <div key={index} className="p-4 bg-slate-50/40 border border-slate-150 rounded-2xl space-y-3 relative group">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] bg-white border border-slate-200 px-2.5 py-1 rounded-lg font-black text-[#0D9488]">
+                              STEP {(index + 1).toString().padStart(2, '0')}
+                            </span>
+                            
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => moveStep(index, 'up')}
+                                className="p-1 px-2 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 hover:text-[#0D9488] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-transparent disabled:hover:text-slate-500 transition cursor-pointer text-xs font-bold"
+                                title="Move Step Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === steps.length - 1}
+                                onClick={() => moveStep(index, 'down')}
+                                className="p-1 px-2 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 hover:text-[#0D9488] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-transparent disabled:hover:text-slate-500 transition cursor-pointer text-xs font-bold"
+                                title="Move Step Down"
+                              >
+                                ▼
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteStep(index)}
+                                className="p-1 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-lg text-slate-400 hover:text-rose-600 transition cursor-pointer ml-1"
+                                title="Delete Step"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-9 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Step Title</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. Clinical Diagnostics"
+                                value={step.title || ''}
+                                onChange={(e) => updateStep(index, 'title', e.target.value)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                                required
+                              />
+                            </div>
+                            <div className="sm:col-span-3 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Order</span>
+                              <input
+                                type="number"
+                                placeholder="Order"
+                                value={step.display_order}
+                                onChange={(e) => updateStep(index, 'display_order', parseInt(e.target.value) || 0)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Step Description</span>
+                            <textarea
+                              rows={2}
+                              placeholder="Describe what occurs during this phase of the treatment..."
+                              value={step.description || ''}
+                              onChange={(e) => updateStep(index, 'description', e.target.value)}
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                              required
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={addStep}
+                    className="w-full py-2.5 border border-dashed border-[#0D9488]/30 hover:border-[#0D9488] bg-teal-50/5 hover:bg-teal-50/20 text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Procedure Step
+                  </button>
+                </div>
+
+                {/* 4. FEATURE / BENEFITS SECTION */}
+                <div className="border-t border-slate-100 pt-6 space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Features & Benefits Cards</h4>
+                    </div>
+                    <span className="text-[9px] bg-teal-50 text-[#0D9488] border border-teal-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      {feats.length} Cards
+                    </span>
+                  </div>
+
+                  {feats.length === 0 ? (
+                    <div className="p-6 bg-slate-50/50 border border-slate-150 rounded-2xl text-center space-y-1.5">
+                      <p className="text-xs text-slate-500 font-medium">No feature cards added yet.</p>
+                      <p className="text-[10px] text-slate-400">Add features below to display custom high-trust highlight cards.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {feats.map((feat, index) => (
+                        <div key={index} className="p-4 bg-slate-50/40 border border-slate-150 rounded-2xl space-y-3 relative group">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] bg-white border border-slate-200 px-2.5 py-1 rounded-lg font-black text-[#0D9488]">
+                              CARD {(index + 1).toString().padStart(2, '0')}
+                            </span>
+                            
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => moveFeat(index, 'up')}
+                                className="p-1 px-2 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 hover:text-[#0D9488] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-transparent disabled:hover:text-slate-500 transition cursor-pointer text-xs font-bold"
+                                title="Move Card Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === feats.length - 1}
+                                onClick={() => moveFeat(index, 'down')}
+                                className="p-1 px-2 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 hover:text-[#0D9488] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-transparent disabled:hover:text-slate-500 transition cursor-pointer text-xs font-bold"
+                                title="Move Card Down"
+                              >
+                                ▼
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteFeat(index)}
+                                className="p-1 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-lg text-slate-400 hover:text-rose-600 transition cursor-pointer ml-1"
+                                title="Delete Card"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-9 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Card Title</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. Painless Therapy"
+                                value={feat.title || ''}
+                                onChange={(e) => updateFeat(index, 'title', e.target.value)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                                required
+                              />
+                            </div>
+                            <div className="sm:col-span-3 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Order</span>
+                              <input
+                                type="number"
+                                placeholder="Order"
+                                value={feat.display_order}
+                                onChange={(e) => updateFeat(index, 'display_order', parseInt(e.target.value) || 0)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Card Description</span>
+                            <textarea
+                              rows={2}
+                              placeholder="Enter a brief, compelling description for this benefit card..."
+                              value={feat.description || ''}
+                              onChange={(e) => updateFeat(index, 'description', e.target.value)}
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                              required
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={addFeat}
+                    className="w-full py-2.5 border border-dashed border-[#0D9488]/30 hover:border-[#0D9488] bg-teal-50/5 hover:bg-teal-50/20 text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Feature / Benefit Card
+                  </button>
+                </div>
+
                 {/* Display Order & Active Toggle Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Display Order */}
@@ -4444,6 +5330,1268 @@ export default function Admin({
                       className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
                     />
                   </div>
+                </div>
+
+                {/* Bottom Sticky Action Buttons */}
+                <div className="border-t border-slate-100 pt-6 flex items-center justify-end gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Check className="h-4 w-4" />
+                    {servicesList.some(s => s.id === editingService.id) ? 'Update Service' : 'Save Service'}
+                  </button>
+                </div>
+              </form>
+            ) : activeServiceEditorTab === 'media' ? (
+              <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-6 space-y-6 font-sans" id="service-media-tab">
+                {saveMessage && (
+                  <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 border animate-fade-in ${
+                    saveMessage.includes('successfully') 
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                      : 'bg-teal-50 border-teal-200 text-teal-800'
+                  }`}>
+                    <Check className="h-4 w-4 text-teal-600 shrink-0" />
+                    <span>{saveMessage}</span>
+                  </div>
+                )}
+                {serviceFormError && (
+                  <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs font-semibold leading-relaxed">
+                    ⚠️ {serviceFormError}
+                  </div>
+                )}
+
+                {/* MEDIA GUIDELINES HEADER */}
+                <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 shrink-0 flex items-start gap-3">
+                  <div className="p-2 bg-teal-50 border border-teal-100 rounded-xl text-[#0D9488]">
+                    <Video className="h-5 w-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Clinic Media Management</h4>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                      Provide high-quality clinical, facility, and patient-centered media for the public service pages. 
+                      If any section is left blank, the portal will automatically fallback to default illustrations to maintain visual integrity.
+                    </p>
+                    <div className="pt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[9px] font-bold text-slate-400">
+                      <span>📸 Hero image: 1600×900 px (16:9)</span>
+                      <span>🏥 Clinic photos: 1200×800 px (3:2)</span>
+                      <span>👩‍⚕️ Team photos: 600×600 px (1:1)</span>
+                      <span>🦷 Equipment: 1200×800 px</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 1. HERO MEDIA SECTION */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Hero Section Media</h4>
+                    </div>
+                    <span className="text-[9px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+                      Recommended: 1600 × 900 px (16:9)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2 space-y-3">
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-black text-slate-500 uppercase block">Hero Background Image URL</span>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={editingService.hero_image || ''}
+                            onChange={(e) => setEditingService({ ...editingService, hero_image: e.target.value })}
+                            placeholder="Image URL (e.g., https://images.unsplash.com/...)"
+                            className="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-mono text-slate-800 bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => triggerUpload('image/*', (url) => setEditingService({ ...editingService, hero_image: url }))}
+                            className="px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-[#0D9488] rounded-xl text-xs font-bold border border-teal-200 transition cursor-pointer"
+                          >
+                            Upload Image
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-black text-slate-500 uppercase block">Hero Image Caption</span>
+                          <input
+                            type="text"
+                            placeholder="Optional caption or credit line"
+                            value={editingService.hero_image_caption || ''}
+                            onChange={(e) => setEditingService({ ...editingService, hero_image_caption: e.target.value })}
+                            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 text-slate-800 bg-white font-medium"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-black text-slate-500 uppercase block">Hero Image Alt Text (SEO)</span>
+                          <input
+                            type="text"
+                            placeholder="e.g. clinic surgeon performing laser procedure"
+                            value={mConfig.hero_image_alt || ''}
+                            onChange={(e) => updateMarketingConfig('hero_image_alt', e.target.value)}
+                            className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 text-slate-800 bg-white font-medium"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Real-time Hero Preview */}
+                    <div className="border border-slate-150 rounded-xl p-3 bg-slate-50/40 flex flex-col items-center justify-center text-center relative group overflow-hidden">
+                      {editingService.hero_image ? (
+                        <div className="w-full h-full flex flex-col justify-between">
+                          <div className="aspect-video w-full rounded-lg bg-slate-100 overflow-hidden relative shadow-3xs">
+                            <img
+                              src={editingService.hero_image}
+                              alt={mConfig.hero_image_alt || 'Hero Preview'}
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setEditingService({ ...editingService, hero_image: '' })}
+                              className="absolute top-1.5 right-1.5 p-1 bg-white/90 hover:bg-rose-50 text-rose-500 rounded-lg shadow-sm transition"
+                              title="Clear Image"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <div className="mt-2 text-left space-y-0.5">
+                            <span className="text-[9px] font-black text-[#081C3A] block uppercase tracking-wider truncate">
+                              Caption: {editingService.hero_image_caption || <span className="italic text-slate-400">None</span>}
+                            </span>
+                            <span className="text-[8px] font-semibold text-slate-400 block uppercase tracking-wider truncate">
+                              Alt: {mConfig.hero_image_alt || <span className="italic text-slate-300">None</span>}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="py-6">
+                          <ImageIcon className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">No Hero Image Set</span>
+                          <span className="text-[8px] text-slate-300 mt-0.5 block">Fallback to default illustrative media.</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. CONTENT SECTION IMAGES */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Content Section Images</h4>
+                    </div>
+                    <span className="text-[10px] bg-teal-50 text-[#0D9488] border border-teal-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      {Array.isArray(editingService.content_images) ? editingService.content_images.length : 0} Images
+                    </span>
+                  </div>
+
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    Embed high-resolution images within the full clinical descriptions or procedure process sections. Keep your sections visually engaging.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* File Upload for Content Images */}
+                    <div className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/10 cursor-pointer relative">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            await handleAddContentImage(e.target.files);
+                          }
+                        }}
+                      />
+                      <Upload className="h-5 w-5 text-[#0D9488] mb-1.5" />
+                      <span className="text-[11px] font-bold text-slate-700">Drag & Drop or Click to Upload</span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">JPEG, PNG or WEBP up to 5MB</span>
+                    </div>
+
+                    {/* Manual URL Input */}
+                    <div className="p-4 border border-slate-150 rounded-xl bg-slate-50/5 space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Add by direct URL</span>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          id="new-content-image-url-input"
+                          placeholder="https://images.unsplash.com/..."
+                          className="flex-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono text-slate-800 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const input = document.getElementById('new-content-image-url-input') as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              handleAddContentImage(null, input.value.trim());
+                              input.value = '';
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-lg transition"
+                        >
+                          Add URL
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* List of Content Images */}
+                  {Array.isArray(editingService.content_images) && editingService.content_images.length > 0 && (
+                    <div className="space-y-3 mt-4">
+                      {editingService.content_images.map((imgItem: any, index: number) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border border-slate-150 rounded-xl bg-slate-50/30">
+                          <div className="relative group w-24 h-18 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden shrink-0">
+                            <img src={imgItem.image_url} alt="Content preview" className="w-full h-full object-cover" />
+                          </div>
+
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Caption</span>
+                              <input
+                                type="text"
+                                value={imgItem.caption || ''}
+                                onChange={(e) => {
+                                  const list = [...(editingService.content_images || [])];
+                                  list[index] = { ...list[index], caption: e.target.value };
+                                  setEditingService({ ...editingService, content_images: list });
+                                }}
+                                placeholder="Caption"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Alt Text (SEO)</span>
+                              <input
+                                type="text"
+                                value={imgItem.alt_text || ''}
+                                onChange={(e) => {
+                                  const list = [...(editingService.content_images || [])];
+                                  list[index] = { ...list[index], alt_text: e.target.value };
+                                  setEditingService({ ...editingService, content_images: list });
+                                }}
+                                placeholder="Alt text"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Sort Order</span>
+                              <input
+                                type="number"
+                                value={imgItem.display_order || 0}
+                                onChange={(e) => {
+                                  const list = [...(editingService.content_images || [])];
+                                  list[index] = { ...list[index], display_order: parseInt(e.target.value) || 0 };
+                                  setEditingService({ ...editingService, content_images: list });
+                                }}
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-mono font-medium"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end shrink-0 gap-2 sm:border-l sm:border-slate-100 sm:pl-3">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => {
+                                const list = [...(editingService.content_images || [])];
+                                const temp = list[index];
+                                list[index] = list[index - 1];
+                                list[index - 1] = temp;
+                                setEditingService({ ...editingService, content_images: list });
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Up"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === (editingService.content_images || []).length - 1}
+                              onClick={() => {
+                                const list = [...(editingService.content_images || [])];
+                                const temp = list[index];
+                                list[index] = list[index + 1];
+                                list[index + 1] = temp;
+                                setEditingService({ ...editingService, content_images: list });
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Down"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const list = (editingService.content_images || []).filter((_, i) => i !== index);
+                                setEditingService({ ...editingService, content_images: list });
+                              }}
+                              className="p-1 hover:bg-rose-50 rounded-lg text-rose-500 cursor-pointer"
+                              title="Delete Image"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. PROCEDURE VIDEO SECTION */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Video className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Procedure / Clinical Videos</h4>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = [...clinicalVideosList, {
+                          title: '',
+                          video_url: '',
+                          thumbnail: '',
+                          description: '',
+                          display_order: (clinicalVideosList.length + 1) * 10
+                        }];
+                        saveProcedureVideos(updated);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-black rounded-lg transition cursor-pointer border border-teal-200"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Clinical Video
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    Provide detailed virtual consultation videos, procedure simulations, or patient-educational walkthroughs. 
+                    The first video in this list will automatically sync as the service's primary clinical video.
+                  </p>
+
+                  {clinicalVideosList.length === 0 ? (
+                    <div className="p-6 bg-slate-50/50 border border-slate-150 rounded-2xl text-center">
+                      <p className="text-xs text-slate-400 font-semibold">No clinical or procedure videos added yet.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {clinicalVideosList.map((vid: any, index: number) => (
+                        <div key={index} className="p-4 bg-slate-50/40 border border-slate-150 rounded-xl space-y-3 relative group">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] bg-white border border-slate-200 px-2.5 py-0.5 rounded-md font-black text-[#0D9488]">
+                                VIDEO {(index + 1).toString().padStart(2, '0')}
+                              </span>
+                              {index === 0 && (
+                                <span className="text-[8px] bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-md font-black uppercase">
+                                  ★ Primary
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => {
+                                  const list = [...clinicalVideosList];
+                                  const temp = list[index];
+                                  list[index] = list[index - 1];
+                                  list[index - 1] = temp;
+                                  saveProcedureVideos(list);
+                                }}
+                                className="p-1 px-1.5 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer text-xs"
+                                title="Move Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === clinicalVideosList.length - 1}
+                                onClick={() => {
+                                  const list = [...clinicalVideosList];
+                                  const temp = list[index];
+                                  list[index] = list[index + 1];
+                                  list[index + 1] = temp;
+                                  saveProcedureVideos(list);
+                                }}
+                                className="p-1 px-1.5 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer text-xs"
+                                title="Move Down"
+                              >
+                                ▼
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const list = clinicalVideosList.filter((_, i) => i !== index);
+                                  saveProcedureVideos(list);
+                                }}
+                                className="p-1 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-lg text-slate-400 hover:text-rose-600 transition cursor-pointer ml-1"
+                                title="Delete Video"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-4 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Video Title</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. Laser Root Canal Walkthrough"
+                                value={vid.title || ''}
+                                onChange={(e) => {
+                                  const list = [...clinicalVideosList];
+                                  list[index] = { ...list[index], title: e.target.value };
+                                  saveProcedureVideos(list);
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Video URL (YouTube or Direct MP4)</span>
+                              <div className="flex gap-1">
+                                <input
+                                  type="text"
+                                  placeholder="https://www.youtube.com/watch?v=..."
+                                  value={vid.video_url || ''}
+                                  onChange={(e) => {
+                                    const list = [...clinicalVideosList];
+                                    list[index] = { ...list[index], video_url: e.target.value };
+                                    saveProcedureVideos(list);
+                                  }}
+                                  className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white font-mono text-slate-800"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    triggerUpload('video/*', (url) => {
+                                      const list = [...clinicalVideosList];
+                                      list[index] = { ...list[index], video_url: url };
+                                      saveProcedureVideos(list);
+                                    });
+                                  }}
+                                  className="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-semibold text-slate-600 transition cursor-pointer"
+                                >
+                                  Upload
+                                </button>
+                              </div>
+                            </div>
+                            <div className="sm:col-span-3 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Thumbnail Image URL</span>
+                              <div className="flex gap-1">
+                                <input
+                                  type="text"
+                                  placeholder="Thumbnail URL"
+                                  value={vid.thumbnail || ''}
+                                  onChange={(e) => {
+                                    const list = [...clinicalVideosList];
+                                    list[index] = { ...list[index], thumbnail: e.target.value };
+                                    saveProcedureVideos(list);
+                                  }}
+                                  className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white font-mono text-slate-800"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    triggerUpload('image/*', (url) => {
+                                      const list = [...clinicalVideosList];
+                                      list[index] = { ...list[index], thumbnail: url };
+                                      saveProcedureVideos(list);
+                                    });
+                                  }}
+                                  className="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-semibold text-slate-600 transition cursor-pointer"
+                                >
+                                  Upload
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-10 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Video Description</span>
+                              <textarea
+                                rows={1}
+                                placeholder="Describe what happens in this clinical or virtual consultation video..."
+                                value={vid.description || ''}
+                                onChange={(e) => {
+                                  const list = [...clinicalVideosList];
+                                  list[index] = { ...list[index], description: e.target.value };
+                                  saveProcedureVideos(list);
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium resize-none"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Order</span>
+                              <input
+                                type="number"
+                                value={vid.display_order || 0}
+                                onChange={(e) => {
+                                  const list = [...clinicalVideosList];
+                                  list[index] = { ...list[index], display_order: parseInt(e.target.value) || 0 };
+                                  saveProcedureVideos(list);
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-mono font-medium"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. PATIENT TESTIMONIAL VIDEOS */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Play className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Patient Testimonial Videos</h4>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddTestimonial}
+                      className="flex items-center gap-1.5 px-3 py-1 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-black rounded-lg transition cursor-pointer border border-teal-200"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Testimonial
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    Share patient stories specifically relevant to this clinical treatment. Provide their review quote alongside a video.
+                  </p>
+
+                  {(!Array.isArray(editingService.patient_testimonials) || editingService.patient_testimonials.length === 0) ? (
+                    <div className="p-6 bg-slate-50/50 border border-slate-150 rounded-2xl text-center">
+                      <p className="text-xs text-slate-400 font-semibold">No patient testimonial videos added yet.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {editingService.patient_testimonials.map((testi: any, index: number) => (
+                        <div key={index} className="p-4 bg-slate-50/40 border border-slate-150 rounded-xl space-y-3 relative group">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] bg-white border border-slate-200 px-2.5 py-0.5 rounded-md font-black text-[#0D9488]">
+                              TESTIMONIAL {(index + 1).toString().padStart(2, '0')}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  const temp = list[index];
+                                  list[index] = list[index - 1];
+                                  list[index - 1] = temp;
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="p-1 px-1.5 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer text-xs"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === (editingService.patient_testimonials || []).length - 1}
+                                onClick={() => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  const temp = list[index];
+                                  list[index] = list[index + 1];
+                                  list[index + 1] = temp;
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="p-1 px-1.5 hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer text-xs"
+                              >
+                                ▼
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const list = (editingService.patient_testimonials || []).filter((_, i) => i !== index);
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="p-1 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-lg text-slate-400 hover:text-rose-600 transition cursor-pointer ml-1"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-3 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Patient Name</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. Robert Downy"
+                                value={testi.patient_name || ''}
+                                onChange={(e) => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  list[index] = { ...list[index], patient_name: e.target.value };
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-3 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Treatment Received</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. All-On-4 Dental Implants"
+                                value={testi.treatment_name || ''}
+                                onChange={(e) => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  list[index] = { ...list[index], treatment_name: e.target.value };
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Star Rating</span>
+                              <select
+                                value={testi.star_rating || 5}
+                                onChange={(e) => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  list[index] = { ...list[index], star_rating: parseInt(e.target.value) || 5 };
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              >
+                                <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                                <option value="3">⭐⭐⭐ (3/5)</option>
+                                <option value="2">⭐⭐ (2/5)</option>
+                                <option value="1">⭐ (1/5)</option>
+                              </select>
+                            </div>
+                            <div className="sm:col-span-4 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Video URL (YouTube or Direct)</span>
+                              <div className="flex gap-1">
+                                <input
+                                  type="text"
+                                  placeholder="Video URL"
+                                  value={testi.video_url || ''}
+                                  onChange={(e) => {
+                                    const list = [...(editingService.patient_testimonials || [])];
+                                    list[index] = { ...list[index], video_url: e.target.value };
+                                    setEditingService({ ...editingService, patient_testimonials: list });
+                                  }}
+                                  className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white font-mono text-slate-800"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const fileInput = document.createElement('input');
+                                    fileInput.type = 'file';
+                                    fileInput.accept = 'video/*';
+                                    fileInput.onchange = async (eEvent: any) => {
+                                      if (eEvent.target.files && eEvent.target.files[0]) {
+                                        await handleUploadTestimonialVideo(index, eEvent.target.files[0]);
+                                      }
+                                    };
+                                    fileInput.click();
+                                  }}
+                                  className="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-semibold text-slate-600 transition"
+                                >
+                                  Upload
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-10 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Short Review Quote</span>
+                              <textarea
+                                rows={1}
+                                placeholder="Write a short summary review or a quote from the patient..."
+                                value={testi.short_review || ''}
+                                onChange={(e) => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  list[index] = { ...list[index], short_review: e.target.value };
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium resize-none"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Order</span>
+                              <input
+                                type="number"
+                                value={testi.display_order || 0}
+                                onChange={(e) => {
+                                  const list = [...(editingService.patient_testimonials || [])];
+                                  list[index] = { ...list[index], display_order: parseInt(e.target.value) || 0 };
+                                  setEditingService({ ...editingService, patient_testimonials: list });
+                                }}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-mono font-medium"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 5A. HOSPITAL / CLINIC PHOTOS */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Hospital / Clinic Photos</h4>
+                    </div>
+                    <span className="text-[10px] bg-teal-50 text-[#0D9488] border border-teal-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      {(mConfig.hospital_photos || []).length} Photos
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    Upload high-fidelity photos of the clinical facilities, reception desk, consulting suites, or treatment lounges.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* File Drag and Drop / Browse Upload */}
+                    <div className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/10 cursor-pointer relative min-h-[110px]">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            const newPhotos = [...(mConfig.hospital_photos || [])];
+                            for (let i = 0; i < e.target.files.length; i++) {
+                              const file = e.target.files[i];
+                              const url = await uploadImage(file);
+                              if (url) {
+                                newPhotos.push({
+                                  image_url: url,
+                                  title: file.name.split('.')[0].replace(/[-_]+/g, ' '),
+                                  caption: '',
+                                  display_order: (newPhotos.length + 1) * 10
+                                });
+                              }
+                            }
+                            updateMarketingConfig('hospital_photos', newPhotos);
+                          }
+                        }}
+                      />
+                      <Upload className="h-5 w-5 text-[#0D9488] mb-1.5" />
+                      <span className="text-[11px] font-bold text-slate-700">Drag & Drop or Click to Upload</span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">JPEG, PNG or WEBP up to 5MB</span>
+                    </div>
+
+                    {/* Manual URL Input */}
+                    <div className="p-4 border border-slate-150 rounded-xl bg-slate-50/5 space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Add by direct URL</span>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          id="new-hospital-photo-url-input"
+                          placeholder="https://images.unsplash.com/..."
+                          className="flex-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono text-slate-800 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const input = document.getElementById('new-hospital-photo-url-input') as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              const newPhotos = [...(mConfig.hospital_photos || [])];
+                              newPhotos.push({
+                                image_url: input.value.trim(),
+                                title: 'Hospital Facility',
+                                caption: '',
+                                display_order: (newPhotos.length + 1) * 10
+                              });
+                              updateMarketingConfig('hospital_photos', newPhotos);
+                              input.value = '';
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Add URL
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* List of Hospital Photos */}
+                  {Array.isArray(mConfig.hospital_photos) && mConfig.hospital_photos.length > 0 && (
+                    <div className="space-y-3 mt-4">
+                      {mConfig.hospital_photos.map((itemObj: any, index: number) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border border-slate-150 rounded-xl bg-slate-50/30">
+                          <div className="relative group w-24 h-18 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden shrink-0">
+                            <img src={itemObj.image_url} alt="Hospital preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          </div>
+
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Title</span>
+                              <input
+                                type="text"
+                                value={itemObj.title || ''}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.hospital_photos || [])];
+                                  list[index] = { ...list[index], title: e.target.value };
+                                  updateMarketingConfig('hospital_photos', list);
+                                }}
+                                placeholder="Title"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Caption</span>
+                              <input
+                                type="text"
+                                value={itemObj.caption || ''}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.hospital_photos || [])];
+                                  list[index] = { ...list[index], caption: e.target.value };
+                                  updateMarketingConfig('hospital_photos', list);
+                                }}
+                                placeholder="Caption"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Sort Order</span>
+                              <input
+                                type="number"
+                                value={itemObj.display_order || 0}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.hospital_photos || [])];
+                                  list[index] = { ...list[index], display_order: parseInt(e.target.value) || 0 };
+                                  updateMarketingConfig('hospital_photos', list);
+                                }}
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-mono font-medium"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end shrink-0 gap-2 sm:border-l sm:border-slate-100 sm:pl-3">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => {
+                                const list = [...(mConfig.hospital_photos || [])];
+                                const temp = list[index];
+                                list[index] = list[index - 1];
+                                list[index - 1] = temp;
+                                updateMarketingConfig('hospital_photos', list);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Up"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === (mConfig.hospital_photos || []).length - 1}
+                              onClick={() => {
+                                const list = [...(mConfig.hospital_photos || [])];
+                                const temp = list[index];
+                                list[index] = list[index + 1];
+                                list[index + 1] = temp;
+                                updateMarketingConfig('hospital_photos', list);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Down"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const list = (mConfig.hospital_photos || []).filter((_, i) => i !== index);
+                                updateMarketingConfig('hospital_photos', list);
+                              }}
+                              className="p-1 hover:bg-rose-50 rounded-lg text-rose-500 cursor-pointer"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 5B. CLINIC TEAM PHOTOS */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Team / Doctors Photos</h4>
+                    </div>
+                    <span className="text-[10px] bg-teal-50 text-[#0D9488] border border-teal-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      {(mConfig.team_photos || []).length} Photos
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    Upload photos of surgical experts, treatment doctors, nursing staff, or lab technicians performing procedures.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* File Drag and Drop / Browse Upload */}
+                    <div className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/10 cursor-pointer relative min-h-[110px]">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            const newPhotos = [...(mConfig.team_photos || [])];
+                            for (let i = 0; i < e.target.files.length; i++) {
+                              const file = e.target.files[i];
+                              const url = await uploadImage(file);
+                              if (url) {
+                                newPhotos.push({
+                                  image_url: url,
+                                  title: file.name.split('.')[0].replace(/[-_]+/g, ' '),
+                                  caption: '',
+                                  display_order: (newPhotos.length + 1) * 10
+                                });
+                              }
+                            }
+                            updateMarketingConfig('team_photos', newPhotos);
+                          }
+                        }}
+                      />
+                      <Upload className="h-5 w-5 text-[#0D9488] mb-1.5" />
+                      <span className="text-[11px] font-bold text-slate-700">Drag & Drop or Click to Upload</span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">JPEG, PNG or WEBP up to 5MB</span>
+                    </div>
+
+                    {/* Manual URL Input */}
+                    <div className="p-4 border border-slate-150 rounded-xl bg-slate-50/5 space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Add by direct URL</span>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          id="new-team-photo-url-input-split"
+                          placeholder="https://images.unsplash.com/..."
+                          className="flex-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono text-slate-800 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const input = document.getElementById('new-team-photo-url-input-split') as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              const newPhotos = [...(mConfig.team_photos || [])];
+                              newPhotos.push({
+                                image_url: input.value.trim(),
+                                title: 'Clinical Team Member',
+                                caption: '',
+                                display_order: (newPhotos.length + 1) * 10
+                              });
+                              updateMarketingConfig('team_photos', newPhotos);
+                              input.value = '';
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Add URL
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* List of Team Photos */}
+                  {Array.isArray(mConfig.team_photos) && mConfig.team_photos.length > 0 && (
+                    <div className="space-y-3 mt-4">
+                      {mConfig.team_photos.map((itemObj: any, index: number) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border border-slate-150 rounded-xl bg-slate-50/30">
+                          <div className="relative group w-24 h-18 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden shrink-0">
+                            <img src={itemObj.image_url} alt="Team preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          </div>
+
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Title</span>
+                              <input
+                                type="text"
+                                value={itemObj.title || itemObj.name || ''}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.team_photos || [])];
+                                  list[index] = { ...list[index], title: e.target.value, name: e.target.value };
+                                  updateMarketingConfig('team_photos', list);
+                                }}
+                                placeholder="Title / Name"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Caption</span>
+                              <input
+                                type="text"
+                                value={itemObj.caption || itemObj.designation || ''}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.team_photos || [])];
+                                  list[index] = { ...list[index], caption: e.target.value, designation: e.target.value };
+                                  updateMarketingConfig('team_photos', list);
+                                }}
+                                placeholder="Caption / Designation"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Sort Order</span>
+                              <input
+                                type="number"
+                                value={itemObj.display_order || 0}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.team_photos || [])];
+                                  list[index] = { ...list[index], display_order: parseInt(e.target.value) || 0 };
+                                  updateMarketingConfig('team_photos', list);
+                                }}
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-mono font-medium"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end shrink-0 gap-2 sm:border-l sm:border-slate-100 sm:pl-3">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => {
+                                const list = [...(mConfig.team_photos || [])];
+                                const temp = list[index];
+                                list[index] = list[index - 1];
+                                list[index - 1] = temp;
+                                updateMarketingConfig('team_photos', list);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Up"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === (mConfig.team_photos || []).length - 1}
+                              onClick={() => {
+                                const list = [...(mConfig.team_photos || [])];
+                                const temp = list[index];
+                                list[index] = list[index + 1];
+                                list[index + 1] = temp;
+                                updateMarketingConfig('team_photos', list);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Down"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const list = (mConfig.team_photos || []).filter((_, i) => i !== index);
+                                updateMarketingConfig('team_photos', list);
+                              }}
+                              className="p-1 hover:bg-rose-50 rounded-lg text-rose-500 cursor-pointer"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 5C. EQUIPMENT / TECHNOLOGY PHOTOS */}
+                <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-3xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="h-4 w-4 text-[#0D9488]" />
+                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Equipment / Technology Photos</h4>
+                    </div>
+                    <span className="text-[10px] bg-teal-50 text-[#0D9488] border border-teal-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      {(mConfig.equipment_photos || []).length} Photos
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    Upload photos of specialized state-of-the-art machinery, 3D intraoral scanners, dental lasers, or treatment chairs.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* File Drag and Drop / Browse Upload */}
+                    <div className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/10 cursor-pointer relative min-h-[110px]">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            const newPhotos = [...(mConfig.equipment_photos || [])];
+                            for (let i = 0; i < e.target.files.length; i++) {
+                              const file = e.target.files[i];
+                              const url = await uploadImage(file);
+                              if (url) {
+                                newPhotos.push({
+                                  image_url: url,
+                                  title: file.name.split('.')[0].replace(/[-_]+/g, ' '),
+                                  caption: '',
+                                  display_order: (newPhotos.length + 1) * 10
+                                });
+                              }
+                            }
+                            updateMarketingConfig('equipment_photos', newPhotos);
+                          }
+                        }}
+                      />
+                      <Upload className="h-5 w-5 text-[#0D9488] mb-1.5" />
+                      <span className="text-[11px] font-bold text-slate-700">Drag & Drop or Click to Upload</span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">JPEG, PNG or WEBP up to 5MB</span>
+                    </div>
+
+                    {/* Manual URL Input */}
+                    <div className="p-4 border border-slate-150 rounded-xl bg-slate-50/5 space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Add by direct URL</span>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          id="new-equip-photo-url-input"
+                          placeholder="https://images.unsplash.com/..."
+                          className="flex-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono text-slate-800 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const input = document.getElementById('new-equip-photo-url-input') as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              const newPhotos = [...(mConfig.equipment_photos || [])];
+                              newPhotos.push({
+                                image_url: input.value.trim(),
+                                title: 'Clinical Equipment',
+                                caption: '',
+                                display_order: (newPhotos.length + 1) * 10
+                              });
+                              updateMarketingConfig('equipment_photos', newPhotos);
+                              input.value = '';
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Add URL
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* List of Equipment Photos */}
+                  {Array.isArray(mConfig.equipment_photos) && mConfig.equipment_photos.length > 0 && (
+                    <div className="space-y-3 mt-4">
+                      {mConfig.equipment_photos.map((itemObj: any, index: number) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border border-slate-150 rounded-xl bg-slate-50/30">
+                          <div className="relative group w-24 h-18 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden shrink-0">
+                            <img src={itemObj.image_url} alt="Equipment preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          </div>
+
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Title</span>
+                              <input
+                                type="text"
+                                value={itemObj.title || itemObj.name || ''}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.equipment_photos || [])];
+                                  list[index] = { ...list[index], title: e.target.value, name: e.target.value };
+                                  updateMarketingConfig('equipment_photos', list);
+                                }}
+                                placeholder="Title / Name"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-5 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Caption</span>
+                              <input
+                                type="text"
+                                value={itemObj.caption || ''}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.equipment_photos || [])];
+                                  list[index] = { ...list[index], caption: e.target.value };
+                                  updateMarketingConfig('equipment_photos', list);
+                                }}
+                                placeholder="Caption"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+                            <div className="sm:col-span-2 space-y-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Sort Order</span>
+                              <input
+                                type="number"
+                                value={itemObj.display_order || 0}
+                                onChange={(e) => {
+                                  const list = [...(mConfig.equipment_photos || [])];
+                                  list[index] = { ...list[index], display_order: parseInt(e.target.value) || 0 };
+                                  updateMarketingConfig('equipment_photos', list);
+                                }}
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-mono font-medium"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end shrink-0 gap-2 sm:border-l sm:border-slate-100 sm:pl-3">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => {
+                                const list = [...(mConfig.equipment_photos || [])];
+                                const temp = list[index];
+                                list[index] = list[index - 1];
+                                list[index - 1] = temp;
+                                updateMarketingConfig('equipment_photos', list);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Up"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === (mConfig.equipment_photos || []).length - 1}
+                              onClick={() => {
+                                const list = [...(mConfig.equipment_photos || [])];
+                                const temp = list[index];
+                                list[index] = list[index + 1];
+                                list[index + 1] = temp;
+                                updateMarketingConfig('equipment_photos', list);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 disabled:opacity-30 cursor-pointer"
+                              title="Move Down"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const list = (mConfig.equipment_photos || []).filter((_, i) => i !== index);
+                                updateMarketingConfig('equipment_photos', list);
+                              }}
+                              className="p-1 hover:bg-rose-50 rounded-lg text-rose-500 cursor-pointer"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Bottom Sticky Action Buttons */}
@@ -4599,7 +6747,24 @@ export default function Admin({
                         </div>
 
                         {/* Metadata Inputs */}
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3 min-w-0">
+                          {/* Title */}
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Image Title</label>
+                            <input
+                              type="text"
+                              value={item.title || ''}
+                              onChange={(e) => {
+                                const updated = [...serviceGalleryList];
+                                updated[index] = { ...updated[index], title: e.target.value };
+                                setServiceGalleryList(updated);
+                              }}
+                              onBlur={(e) => handleUpdateGalleryItem(index, { title: e.target.value })}
+                              placeholder="e.g. Before Treatment"
+                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white font-medium text-slate-800"
+                            />
+                          </div>
+
                           {/* Caption */}
                           <div className="space-y-1">
                             <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Caption</label>
@@ -4652,7 +6817,7 @@ export default function Admin({
                   </div>
                 )}
               </div>
-            ) : (
+            ) : activeServiceEditorTab === 'faqs' ? (
               <div className="flex-1 overflow-y-auto p-6 flex flex-col space-y-6" id="service-faqs-tab">
                 {/* Status / Errors */}
                 {faqsError && (
@@ -4821,6 +6986,1198 @@ export default function Admin({
                   </div>
                 )}
               </div>
+            ) : (
+              /* MARKETING TAB */
+              <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-6 space-y-8 font-sans" id="service-marketing-tab">
+                {saveMessage && (
+                  <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 border animate-fade-in ${
+                    saveMessage.includes('successfully') 
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                      : 'bg-teal-50 border-teal-200 text-teal-800'
+                  }`}>
+                    <Check className="h-4 w-4 text-teal-600 shrink-0" />
+                    <span>{saveMessage}</span>
+                  </div>
+                )}
+
+                {(() => {
+                  const mConfig = typeof editingService?.marketing_config === 'string'
+                    ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+                    : (editingService?.marketing_config || {});
+
+                  return (
+                    <>
+                      <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100 shrink-0">
+                        <div className="min-w-0 pr-4">
+                          <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Marketing & CTA Management</h4>
+                          <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                            Configure offer banners, custom action links, social triggers, and floating contact bars for this service.
+                          </p>
+                        </div>
+                        <button
+                          type="submit"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                        >
+                          <Check className="h-4 w-4" />
+                          Save Changes
+                        </button>
+                      </div>
+
+                      {/* 0. SECTION VISIBILITY & ORDERING */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                          <div className="p-2 bg-teal-50 rounded-lg text-teal-600">
+                            <Sliders className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-900">0. Section Visibility & Layout Ordering</h4>
+                            <p className="text-[10px] text-slate-400">Show/Hide page sections and arrange their layout sequence on the screen</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {[
+                            { key: 'show_hero', label: 'Hero Section' },
+                            { key: 'show_introduction', label: 'Introduction' },
+                            { key: 'show_process', label: 'Process Steps' },
+                            { key: 'show_benefits', label: 'Benefits & Features' },
+                            { key: 'show_gallery', label: 'Before/After Gallery' },
+                            { key: 'show_procedure_video', label: 'Procedure Video' },
+                            { key: 'show_hospital_photos', label: 'Clinic/Hospital Split Photos' },
+                            { key: 'show_team_photos', label: 'Team/Doctor Split Photos' },
+                            { key: 'show_testimonials', label: 'Patient Video Testimonials' },
+                            { key: 'show_faq', label: 'FAQs Section' },
+                            { key: 'show_related_services', label: 'Related Services' },
+                            { key: 'show_bottom_cta', label: 'Bottom CTA' },
+                          ].map((sec) => {
+                            const isVisible = mConfig[sec.key as keyof typeof mConfig] !== false;
+                            return (
+                              <label key={sec.key} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between cursor-pointer select-none">
+                                <span className="text-xs font-bold text-slate-700">{sec.label}</span>
+                                <input
+                                  type="checkbox"
+                                  checked={isVisible}
+                                  onChange={(e) => updateMarketingConfig(sec.key, e.target.checked)}
+                                  className="rounded text-teal-600 focus:ring-teal-500 h-4 w-4 shadow-3xs"
+                                />
+                              </label>
+                            );
+                          })}
+                        </div>
+
+                        {/* Layout Order Manager */}
+                        <div className="space-y-2 pt-3 border-t border-slate-100">
+                          <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Layout Render Order</h5>
+                          <p className="text-[10px] text-slate-400">Rearrange the order of sections appearing on the treatment page</p>
+                          
+                          {(() => {
+                            const defaultOrder = [
+                              'hero',
+                              'intro',
+                              'process',
+                              'benefits',
+                              'gallery',
+                              'video',
+                              'hospital_photos',
+                              'team_photos',
+                              'testimonials',
+                              'faq',
+                              'related_services',
+                              'bottom_cta'
+                            ];
+                            const currentOrder = Array.isArray(mConfig.section_order) 
+                              ? mConfig.section_order 
+                              : defaultOrder;
+
+                            // Clean/merge in case any are missing
+                            const cleanOrder = [...currentOrder];
+                            defaultOrder.forEach(sec => {
+                              if (!cleanOrder.includes(sec)) {
+                                cleanOrder.push(sec);
+                              }
+                            });
+                            const finalOrder = cleanOrder.filter(sec => defaultOrder.includes(sec));
+
+                            const handleMoveSection = (index: number, direction: 'up' | 'down') => {
+                              const targetIdx = direction === 'up' ? index - 1 : index + 1;
+                              if (targetIdx < 0 || targetIdx >= finalOrder.length) return;
+                              const updated = [...finalOrder];
+                              const temp = updated[index];
+                              updated[index] = updated[targetIdx];
+                              updated[targetIdx] = temp;
+                              updateMarketingConfig('section_order', updated);
+                            };
+
+                            const sectionLabels: Record<string, string> = {
+                              hero: 'Hero Header Section',
+                              intro: 'Introduction Section',
+                              process: 'Treatment Process (Steps)',
+                              benefits: 'Benefits & Features list',
+                              gallery: 'Before / After Gallery',
+                              video: 'Procedure / Clinical Video',
+                              hospital_photos: 'Clinic & Hospital Split Photos',
+                              team_photos: 'Doctor & Panel Expert Split Photos',
+                              testimonials: 'Patient Video Testimonials',
+                              faq: 'Frequently Asked Questions',
+                              related_services: 'Related Treatments/Services',
+                              bottom_cta: 'Bottom CTA Promotional block'
+                            };
+
+                            return (
+                              <div className="space-y-1.5 max-w-xl">
+                                {finalOrder.map((sec, idx) => {
+                                  const isSecVisible = mConfig[`show_${sec === 'video' ? 'procedure_video' : sec}` as keyof typeof mConfig] !== false;
+                                  return (
+                                    <div key={sec} className={`flex items-center justify-between p-2.5 border rounded-xl gap-3 ${isSecVisible ? 'bg-slate-50/50 border-slate-100' : 'bg-slate-100/50 border-slate-200/60 opacity-60'}`}>
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <GripVertical className="h-3.5 w-3.5 text-slate-400 shrink-0 cursor-grab" />
+                                        <span className="text-xs font-bold text-slate-700 truncate">{sectionLabels[sec] || sec}</span>
+                                        {!isSecVisible && <span className="text-[9px] bg-slate-200 text-slate-500 font-bold px-1.5 py-0.5 rounded-md">Hidden</span>}
+                                      </div>
+                                      <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                                        <button
+                                          type="button"
+                                          disabled={idx === 0}
+                                          onClick={() => handleMoveSection(idx, 'up')}
+                                          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                        >
+                                          <ChevronUp className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={idx === finalOrder.length - 1}
+                                          onClick={() => handleMoveSection(idx, 'down')}
+                                          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                        >
+                                          <ChevronDown className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+
+                      {/* 1. OFFER BANNER */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+                              <Sparkles className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">1. Offer Banner</h4>
+                              <p className="text-[10px] text-slate-400">Display a floating top-promotional bar on this page</p>
+                            </div>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!mConfig.show_offer_banner}
+                              onChange={(e) => updateMarketingConfig('show_offer_banner', e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            <span className="ml-2 text-xs font-semibold text-slate-700">Enable</span>
+                          </label>
+                        </div>
+
+                        {mConfig.show_offer_banner && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Offer Title</label>
+                              <input
+                                type="text"
+                                value={mConfig.offer_title || ''}
+                                onChange={(e) => updateMarketingConfig('offer_title', e.target.value)}
+                                placeholder="e.g. Save Up To 50%"
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Offer Subtitle</label>
+                              <input
+                                type="text"
+                                value={mConfig.offer_subtitle || ''}
+                                onChange={(e) => updateMarketingConfig('offer_subtitle', e.target.value)}
+                                placeholder="e.g. On Dental Implants"
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                              />
+                            </div>
+                            <div className="space-y-1.5 md:col-span-2">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Offer Description</label>
+                              <textarea
+                                rows={2}
+                                value={mConfig.offer_description || ''}
+                                onChange={(e) => updateMarketingConfig('offer_description', e.target.value)}
+                                placeholder="Short description highlighting terms or benefits..."
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Offer Badge Text</label>
+                              <input
+                                type="text"
+                                value={mConfig.offer_badge_text || ''}
+                                onChange={(e) => updateMarketingConfig('offer_badge_text', e.target.value)}
+                                placeholder="e.g. Special Offer"
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
+                                <input
+                                  type="text"
+                                  value={mConfig.offer_button_text || ''}
+                                  onChange={(e) => updateMarketingConfig('offer_button_text', e.target.value)}
+                                  placeholder="e.g. Claim Offer"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Link</label>
+                                <input
+                                  type="text"
+                                  value={mConfig.offer_button_link || ''}
+                                  onChange={(e) => updateMarketingConfig('offer_button_link', e.target.value)}
+                                  placeholder="e.g. #appointment"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 2. CALL TO ACTION */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                          <div className="p-2 bg-teal-50 rounded-lg text-[#0D9488]">
+                            <Calendar className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-900">2. Hero Call To Action</h4>
+                            <p className="text-[10px] text-slate-400">Configure primary and secondary CTA actions below the treatment summary</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+                          {/* Primary CTA */}
+                          <div className="space-y-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                            <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Primary Button</h5>
+                            
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
+                              <input
+                                type="text"
+                                value={mConfig.primary_cta_btn_text || ''}
+                                onChange={(e) => updateMarketingConfig('primary_cta_btn_text', e.target.value)}
+                                placeholder="e.g. Book Appointment"
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Action</label>
+                              <select
+                                value={mConfig.primary_cta_action || 'appointment'}
+                                onChange={(e) => updateMarketingConfig('primary_cta_action', e.target.value)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              >
+                                <option value="appointment">Book Appointment (Modal Trigger)</option>
+                                <option value="custom">Custom Redirect URL</option>
+                              </select>
+                            </div>
+
+                            {mConfig.primary_cta_action === 'custom' && (
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom Redirect URL</label>
+                                <input
+                                  type="text"
+                                  value={mConfig.primary_cta_link || ''}
+                                  onChange={(e) => updateMarketingConfig('primary_cta_link', e.target.value)}
+                                  placeholder="e.g. https://myclinic.com/booking-page"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Secondary CTA */}
+                          <div className="space-y-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                            <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Secondary Button</h5>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
+                              <input
+                                type="text"
+                                value={mConfig.secondary_cta_btn_text || ''}
+                                onChange={(e) => updateMarketingConfig('secondary_cta_btn_text', e.target.value)}
+                                placeholder="e.g. WhatsApp Us"
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Action</label>
+                              <select
+                                value={mConfig.secondary_cta_action || 'whatsapp'}
+                                onChange={(e) => updateMarketingConfig('secondary_cta_action', e.target.value)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                              >
+                                <option value="whatsapp">WhatsApp Direct Chat</option>
+                                <option value="call">Make Telephone Call</option>
+                                <option value="custom">Custom Redirect URL</option>
+                              </select>
+                            </div>
+
+                            {mConfig.secondary_cta_action === 'custom' && (
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom Redirect URL</label>
+                                <input
+                                  type="text"
+                                  value={mConfig.secondary_cta_link || ''}
+                                  onChange={(e) => updateMarketingConfig('secondary_cta_link', e.target.value)}
+                                  placeholder="e.g. https://myclinic.com/contact"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3. CONTACT INFORMATION */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <Phone className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-900">3. Contact & Location Details</h4>
+                            <p className="text-[10px] text-slate-400">Specify treatment-specific clinic contact and Google Maps overrides</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Contact Number</label>
+                            <input
+                              type="text"
+                              value={mConfig.contact_call_number || ''}
+                              onChange={(e) => updateMarketingConfig('contact_call_number', e.target.value)}
+                              placeholder="e.g. +91 98765 43210"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">WhatsApp Number</label>
+                            <input
+                              type="text"
+                              value={mConfig.contact_whatsapp_number || ''}
+                              onChange={(e) => updateMarketingConfig('contact_whatsapp_number', e.target.value)}
+                              placeholder="e.g. +91 98765 43210 (with country code)"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Email Address</label>
+                            <input
+                              type="email"
+                              value={mConfig.contact_email || ''}
+                              onChange={(e) => updateMarketingConfig('contact_email', e.target.value)}
+                              placeholder="e.g. clinic@hospital.com"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Address</label>
+                            <input
+                              type="text"
+                              value={mConfig.contact_address || ''}
+                              onChange={(e) => updateMarketingConfig('contact_address', e.target.value)}
+                              placeholder="Full address of the branch performing this treatment..."
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Name</label>
+                            <input
+                              type="text"
+                              value={mConfig.contact_clinic_name || ''}
+                              onChange={(e) => updateMarketingConfig('contact_clinic_name', e.target.value)}
+                              placeholder="e.g. Patel Dental Hospital, Rajkot"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Working Hours</label>
+                            <input
+                              type="text"
+                              value={mConfig.contact_working_hours || ''}
+                              onChange={(e) => updateMarketingConfig('contact_working_hours', e.target.value)}
+                              placeholder="e.g. Mon - Sat: 9:00 AM - 8:00 PM"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                            />
+                          </div>
+                          <div className="space-y-1.5 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Google Maps Embed or Link URL</label>
+                            <input
+                              type="text"
+                              value={mConfig.contact_map_url || ''}
+                              onChange={(e) => updateMarketingConfig('contact_map_url', e.target.value)}
+                              placeholder="Google Maps sharing URL..."
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 4. FOLLOW US */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                          <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                            <Users className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-900">4. Social Media Integration ("Follow Us")</h4>
+                            <p className="text-[10px] text-slate-400">Toggle platforms on or off and set custom profiles for this treatment</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+                          {/* Facebook */}
+                          <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-black text-slate-700 block">Facebook</label>
+                              <input
+                                type="text"
+                                value={mConfig.social_facebook || ''}
+                                onChange={(e) => updateMarketingConfig('social_facebook', e.target.value)}
+                                placeholder="Page link or profile URL"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              />
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.social_facebook_enabled}
+                                onChange={(e) => updateMarketingConfig('social_facebook_enabled', e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            </label>
+                          </div>
+
+                          {/* Instagram */}
+                          <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-black text-slate-700 block">Instagram</label>
+                              <input
+                                type="text"
+                                value={mConfig.social_instagram || ''}
+                                onChange={(e) => updateMarketingConfig('social_instagram', e.target.value)}
+                                placeholder="Profile URL"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              />
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.social_instagram_enabled}
+                                onChange={(e) => updateMarketingConfig('social_instagram_enabled', e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            </label>
+                          </div>
+
+                          {/* YouTube */}
+                          <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-black text-slate-700 block">YouTube</label>
+                              <input
+                                type="text"
+                                value={mConfig.social_youtube || ''}
+                                onChange={(e) => updateMarketingConfig('social_youtube', e.target.value)}
+                                placeholder="Channel/Video link"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              />
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.social_youtube_enabled}
+                                onChange={(e) => updateMarketingConfig('social_youtube_enabled', e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            </label>
+                          </div>
+
+                          {/* LinkedIn */}
+                          <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-black text-slate-700 block">LinkedIn</label>
+                              <input
+                                type="text"
+                                value={mConfig.social_linkedin || ''}
+                                onChange={(e) => updateMarketingConfig('social_linkedin', e.target.value)}
+                                placeholder="Page or personal URL"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              />
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.social_linkedin_enabled}
+                                onChange={(e) => updateMarketingConfig('social_linkedin_enabled', e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            </label>
+                          </div>
+
+                          {/* Twitter/X */}
+                          <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-black text-slate-700 block">Twitter (X)</label>
+                              <input
+                                type="text"
+                                value={mConfig.social_twitter || ''}
+                                onChange={(e) => updateMarketingConfig('social_twitter', e.target.value)}
+                                placeholder="Profile/Handle URL"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              />
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.social_twitter_enabled}
+                                onChange={(e) => updateMarketingConfig('social_twitter_enabled', e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            </label>
+                          </div>
+
+                          {/* WhatsApp */}
+                          <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-black text-slate-700 block">WhatsApp Group/Invite</label>
+                              <input
+                                type="text"
+                                value={mConfig.social_whatsapp || ''}
+                                onChange={(e) => updateMarketingConfig('social_whatsapp', e.target.value)}
+                                placeholder="Direct chat/group invitation link"
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              />
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.social_whatsapp_enabled}
+                                onChange={(e) => updateMarketingConfig('social_whatsapp_enabled', e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 5. BOTTOM CTA SECTION */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                          <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <Building2 className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-900">5. Bottom CTA Section</h4>
+                            <p className="text-[10px] text-slate-400">Modify the large promotional card situated above the footer</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1.5 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">CTA Heading</label>
+                            <input
+                              type="text"
+                              value={mConfig.bottom_cta_heading || ''}
+                              onChange={(e) => updateMarketingConfig('bottom_cta_heading', e.target.value)}
+                              placeholder="e.g. Ready to Transform Your Smile?"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-bold"
+                            />
+                          </div>
+                          <div className="space-y-1.5 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">CTA Description</label>
+                            <textarea
+                              rows={3}
+                              value={mConfig.bottom_cta_description || ''}
+                              onChange={(e) => updateMarketingConfig('bottom_cta_description', e.target.value)}
+                              placeholder="Book a pain-free diagnostic consultation with our specialists in Rajkot..."
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 leading-relaxed"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Primary Button Text</label>
+                            <input
+                              type="text"
+                              value={mConfig.bottom_cta_primary_btn_text || ''}
+                              onChange={(e) => updateMarketingConfig('bottom_cta_primary_btn_text', e.target.value)}
+                              placeholder="e.g. Book Appointment"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-bold"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Primary Button Link</label>
+                            <input
+                              type="text"
+                              value={mConfig.bottom_cta_primary_btn_link || ''}
+                              onChange={(e) => updateMarketingConfig('bottom_cta_primary_btn_link', e.target.value)}
+                              placeholder="e.g. #appointment"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Secondary Button Text</label>
+                            <input
+                              type="text"
+                              value={mConfig.bottom_cta_secondary_btn_text || ''}
+                              onChange={(e) => updateMarketingConfig('bottom_cta_secondary_btn_text', e.target.value)}
+                              placeholder="e.g. WhatsApp Us"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-bold"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Secondary Button Link</label>
+                            <input
+                              type="text"
+                              value={mConfig.bottom_cta_secondary_btn_link || ''}
+                              onChange={(e) => updateMarketingConfig('bottom_cta_secondary_btn_link', e.target.value)}
+                              placeholder="e.g. https://wa.me/..."
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 6. CONTACT BAR */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-pink-50 rounded-lg text-pink-600">
+                              <Activity className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">6. Floating Mobile Contact Bar</h4>
+                              <p className="text-[10px] text-slate-400">Configure floating action widgets at the bottom screen margin</p>
+                            </div>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!mConfig.contact_bar_show}
+                              onChange={(e) => updateMarketingConfig('contact_bar_show', e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                            <span className="ml-2 text-xs font-semibold text-slate-700">Show Bar</span>
+                          </label>
+                        </div>
+
+                        {mConfig.contact_bar_show && (
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1 animate-fade-in">
+                            {/* Call Button */}
+                            <label className="p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between cursor-pointer select-none">
+                              <span className="text-xs font-bold text-slate-700">Call Action Button</span>
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.contact_bar_call_enabled}
+                                onChange={(e) => updateMarketingConfig('contact_bar_call_enabled', e.target.checked)}
+                                className="rounded text-teal-600 focus:ring-teal-500 h-4 w-4"
+                              />
+                            </label>
+
+                            {/* WhatsApp Button */}
+                            <label className="p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between cursor-pointer select-none">
+                              <span className="text-xs font-bold text-slate-700">WhatsApp Button</span>
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.contact_bar_whatsapp_enabled}
+                                onChange={(e) => updateMarketingConfig('contact_bar_whatsapp_enabled', e.target.checked)}
+                                className="rounded text-teal-600 focus:ring-teal-500 h-4 w-4"
+                              />
+                            </label>
+
+                            {/* Book Appointment Button */}
+                            <label className="p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between cursor-pointer select-none">
+                              <span className="text-xs font-bold text-slate-700">Book Appointment Button</span>
+                              <input
+                                type="checkbox"
+                                checked={!!mConfig.contact_bar_appointment_enabled}
+                                onChange={(e) => updateMarketingConfig('contact_bar_appointment_enabled', e.target.checked)}
+                                className="rounded text-teal-600 focus:ring-teal-500 h-4 w-4"
+                              />
+                            </label>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 7. RELATED SERVICES MANAGER */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
+                              <Layers className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">7. Related Services Manager</h4>
+                              <p className="text-[10px] text-slate-400">Configure which treatments to suggest as related, define order and visibility</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {(() => {
+                          const availableServices = servicesList.filter(s => s.id !== editingService.id);
+                          const configuredRelated = mConfig.related_services || [];
+                          
+                          // Merge configured list with any newly added services that aren't configured yet
+                          const merged = [...configuredRelated];
+                          availableServices.forEach(s => {
+                            if (!merged.some(r => r.id === s.id)) {
+                              merged.push({ id: s.id, enabled: false });
+                            }
+                          });
+                          
+                          // Filter out any services that are no longer present
+                          const cleanRelated = merged.filter(r => availableServices.some(s => s.id === r.id));
+
+                          const handleToggleRelated = (id: string, enabled: boolean) => {
+                            const updated = cleanRelated.map(r => r.id === id ? { ...r, enabled } : r);
+                            updateMarketingConfig('related_services', updated);
+                          };
+
+                          const handleMoveRelated = (index: number, direction: 'up' | 'down') => {
+                            const targetIdx = direction === 'up' ? index - 1 : index + 1;
+                            if (targetIdx < 0 || targetIdx >= cleanRelated.length) return;
+                            
+                            const updated = [...cleanRelated];
+                            const temp = updated[index];
+                            updated[index] = updated[targetIdx];
+                            updated[targetIdx] = temp;
+                            
+                            updateMarketingConfig('related_services', updated);
+                          };
+
+                          return (
+                            <div className="space-y-3 pt-1">
+                              {cleanRelated.length === 0 ? (
+                                <p className="text-xs text-slate-400 text-center py-4">No other services available to link.</p>
+                              ) : (
+                                <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                                  {cleanRelated.map((r, index) => {
+                                    const relatedSvc = availableServices.find(s => s.id === r.id);
+                                    if (!relatedSvc) return null;
+                                    
+                                    return (
+                                      <div key={r.id} className="flex items-center justify-between p-3 bg-slate-50/50 border border-slate-100 rounded-xl gap-4">
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                          <img 
+                                            src={relatedSvc.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=200'} 
+                                            alt={relatedSvc.title}
+                                            className="w-12 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200"
+                                            referrerPolicy="no-referrer"
+                                          />
+                                          <div className="min-w-0">
+                                            <h5 className="text-xs font-bold text-[#081C3A] truncate">{relatedSvc.title}</h5>
+                                            <p className="text-[10px] text-slate-400 truncate">{relatedSvc.slug}</p>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                          {/* Move Buttons */}
+                                          <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                                            <button
+                                              type="button"
+                                              disabled={index === 0}
+                                              onClick={() => handleMoveRelated(index, 'up')}
+                                              className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                            >
+                                              <ChevronUp className="h-3.5 w-3.5" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              disabled={index === cleanRelated.length - 1}
+                                              onClick={() => handleMoveRelated(index, 'down')}
+                                              className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                            >
+                                              <ChevronDown className="h-3.5 w-3.5" />
+                                            </button>
+                                          </div>
+
+                                          {/* Toggle */}
+                                          <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                              type="checkbox"
+                                              checked={!!r.enabled}
+                                              onChange={(e) => handleToggleRelated(r.id, e.target.checked)}
+                                              className="sr-only peer"
+                                            />
+                                            <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                                          </label>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
+
+                      {/* 8. WRITTEN REVIEWS & TRANSFORMATIONS */}
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-rose-50 rounded-lg text-rose-600">
+                              <MessageCircle className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">8. Written Reviews & Transformations</h4>
+                              <p className="text-[10px] text-slate-400">Manage patient written reviews, star ratings, and optional Before/After smile transformations</p>
+                            </div>
+                          </div>
+                          {editingReviewId === null && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingReviewId('new');
+                                setReviewDraftName('');
+                                setReviewDraftTreatment(editingService.title);
+                                setReviewDraftText('');
+                                setReviewDraftRating(5);
+                                setReviewDraftBeforeImage('');
+                                setReviewDraftAfterImage('');
+                                setReviewDraftDisplayOrder(10);
+                              }}
+                              className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                              Add Written Review
+                            </button>
+                          )}
+                        </div>
+
+                        {editingReviewId !== null ? (
+                          /* Edit/Add Review Form */
+                          <div className="p-4 bg-slate-50/50 border border-slate-150 rounded-xl space-y-4 animate-fade-in">
+                            <h5 className="text-xs font-bold text-[#081C3A]">
+                              {editingReviewId === 'new' ? 'Add New Written Testimonial' : 'Edit Written Testimonial'}
+                            </h5>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Patient Name *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={reviewDraftName}
+                                  onChange={(e) => setReviewDraftName(e.target.value)}
+                                  placeholder="e.g. Ramesh Patel"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800"
+                                />
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Treatment / Category *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={reviewDraftTreatment}
+                                  onChange={(e) => setReviewDraftTreatment(e.target.value)}
+                                  placeholder="e.g. Full Mouth Dental Implants"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800"
+                                />
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Star Rating *</label>
+                                <select
+                                  value={reviewDraftRating}
+                                  onChange={(e) => setReviewDraftRating(Number(e.target.value))}
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none"
+                                >
+                                  {[5, 4, 3, 2, 1].map(stars => (
+                                    <option key={stars} value={stars}>{stars} Stars</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Display Order</label>
+                                <input
+                                  type="number"
+                                  value={reviewDraftDisplayOrder}
+                                  onChange={(e) => setReviewDraftDisplayOrder(Number(e.target.value))}
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800"
+                                />
+                              </div>
+
+                              <div className="space-y-1 sm:col-span-2">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Review Text *</label>
+                                <textarea
+                                  required
+                                  rows={3}
+                                  value={reviewDraftText}
+                                  onChange={(e) => setReviewDraftText(e.target.value)}
+                                  placeholder="Patient review details..."
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800 leading-relaxed"
+                                />
+                              </div>
+
+                              {/* Before / After Optional Smile Photos */}
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase block">Before Treatment Photo (Optional)</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={reviewDraftBeforeImage}
+                                    onChange={(e) => setReviewDraftBeforeImage(e.target.value)}
+                                    placeholder="Before image URL"
+                                    className="flex-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-800"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => triggerUpload('image/*', (url) => setReviewDraftBeforeImage(url))}
+                                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition shrink-0"
+                                  >
+                                    Upload
+                                  </button>
+                                </div>
+                                {reviewDraftBeforeImage && (
+                                  <img 
+                                    src={reviewDraftBeforeImage} 
+                                    alt="Before" 
+                                    className="h-14 w-24 object-cover rounded border border-slate-200 bg-white" 
+                                    referrerPolicy="no-referrer"
+                                  />
+                                )}
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase block">After Treatment Photo (Optional)</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={reviewDraftAfterImage}
+                                    onChange={(e) => setReviewDraftAfterImage(e.target.value)}
+                                    placeholder="After image URL"
+                                    className="flex-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-800"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => triggerUpload('image/*', (url) => setReviewDraftAfterImage(url))}
+                                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition shrink-0"
+                                  >
+                                    Upload
+                                  </button>
+                                </div>
+                                {reviewDraftAfterImage && (
+                                  <img 
+                                    src={reviewDraftAfterImage} 
+                                    alt="After" 
+                                    className="h-14 w-24 object-cover rounded border border-slate-200 bg-white" 
+                                    referrerPolicy="no-referrer"
+                                  />
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-150">
+                              <button
+                                type="button"
+                                onClick={() => setEditingReviewId(null)}
+                                className="px-3.5 py-1.5 text-slate-500 hover:text-slate-800 text-xs font-bold rounded-lg transition"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!reviewDraftName || !reviewDraftTreatment || !reviewDraftText) {
+                                    alert('Please fill in Name, Treatment, and Review text fields.');
+                                    return;
+                                  }
+                                  const list = mConfig.written_reviews || [];
+                                  let updatedList = [...list];
+                                  if (editingReviewId === 'new') {
+                                    updatedList.push({
+                                      id: 'wr-' + Date.now(),
+                                      patient_name: reviewDraftName,
+                                      treatment_name: reviewDraftTreatment,
+                                      review: reviewDraftText,
+                                      rating: reviewDraftRating,
+                                      before_image: reviewDraftBeforeImage || undefined,
+                                      after_image: reviewDraftAfterImage || undefined,
+                                      display_order: reviewDraftDisplayOrder
+                                    });
+                                  } else {
+                                    updatedList = updatedList.map(r => r.id === editingReviewId ? {
+                                      ...r,
+                                      patient_name: reviewDraftName,
+                                      treatment_name: reviewDraftTreatment,
+                                      review: reviewDraftText,
+                                      rating: reviewDraftRating,
+                                      before_image: reviewDraftBeforeImage || undefined,
+                                      after_image: reviewDraftAfterImage || undefined,
+                                      display_order: reviewDraftDisplayOrder
+                                    } : r);
+                                  }
+                                  
+                                  // Sort the list by display order
+                                  updatedList.sort((a, b) => a.display_order - b.display_order);
+                                  
+                                  updateMarketingConfig('written_reviews', updatedList);
+                                  setEditingReviewId(null);
+                                }}
+                                className="px-4 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-lg transition animate-pulse-once"
+                              >
+                                Save Review
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* List of Reviews */
+                          <div className="space-y-3 pt-1">
+                            {(!mConfig.written_reviews || mConfig.written_reviews.length === 0) ? (
+                              <p className="text-xs text-slate-400 text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                                No written testimonials added yet. Click 'Add Written Review' above to display beautiful ratings & smile transformations.
+                              </p>
+                            ) : (
+                              <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                                {(mConfig.written_reviews as any[]).map((r, index) => (
+                                  <div key={r.id} className="flex items-start justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl gap-4">
+                                    <div className="flex-1 space-y-1 min-w-0">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="text-xs font-bold text-[#081C3A]">{r.patient_name}</span>
+                                        <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-semibold">{r.treatment_name}</span>
+                                        <div className="flex items-center text-amber-400 ml-1">
+                                          {Array.from({ length: r.rating || 5 }).map((_, i) => (
+                                            <Star key={i} className="h-3 w-3 fill-amber-400 shrink-0" />
+                                          ))}
+                                        </div>
+                                      </div>
+                                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed italic">"{r.review}"</p>
+                                      
+                                      {/* Before After Preview Thumbs */}
+                                      {(r.before_image || r.after_image) && (
+                                        <div className="flex items-center gap-3 pt-1.5">
+                                          {r.before_image && (
+                                            <div className="space-y-0.5">
+                                              <span className="text-[8px] font-black text-rose-500 block">BEFORE</span>
+                                              <img src={r.before_image} alt="Before" className="h-8 w-12 object-cover rounded border border-slate-200 font-sans" referrerPolicy="no-referrer" />
+                                            </div>
+                                          )}
+                                          {r.after_image && (
+                                            <div className="space-y-0.5">
+                                              <span className="text-[8px] font-black text-emerald-500 block">AFTER</span>
+                                              <img src={r.after_image} alt="After" className="h-8 w-12 object-cover rounded border border-slate-200 font-sans" referrerPolicy="no-referrer" />
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0 font-sans">
+                                      {/* Reordering */}
+                                      <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                                        <button
+                                          type="button"
+                                          disabled={index === 0}
+                                          onClick={() => {
+                                            const updated = [...mConfig.written_reviews];
+                                            const temp = updated[index];
+                                            updated[index] = updated[index - 1];
+                                            updated[index - 1] = temp;
+                                            updateMarketingConfig('written_reviews', updated);
+                                          }}
+                                          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                        >
+                                          <ChevronUp className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={index === mConfig.written_reviews.length - 1}
+                                          onClick={() => {
+                                            const updated = [...mConfig.written_reviews];
+                                            const temp = updated[index];
+                                            updated[index] = updated[index + 1];
+                                            updated[index + 1] = temp;
+                                            updateMarketingConfig('written_reviews', updated);
+                                          }}
+                                          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                        >
+                                          <ChevronDown className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+
+                                      {/* Action buttons */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setEditingReviewId(r.id);
+                                          setReviewDraftName(r.patient_name || '');
+                                          setReviewDraftTreatment(r.treatment_name || '');
+                                          setReviewDraftText(r.review || '');
+                                          setReviewDraftRating(r.rating || 5);
+                                          setReviewDraftBeforeImage(r.before_image || '');
+                                          setReviewDraftAfterImage(r.after_image || '');
+                                          setReviewDraftDisplayOrder(r.display_order || 10);
+                                        }}
+                                        className="p-1 text-[#0D9488] hover:text-[#0F766E] hover:bg-teal-50 rounded-lg transition"
+                                      >
+                                        <Pencil className="h-4 w-4" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          if (confirm('Are you sure you want to delete this written testimonial?')) {
+                                            const filtered = (mConfig.written_reviews as any[]).filter(item => item.id !== r.id);
+                                            updateMarketingConfig('written_reviews', filtered);
+                                          }
+                                        }}
+                                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                        <button
+                          type="submit"
+                          className="px-6 py-3 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Check className="h-4 w-4" />
+                          Save Service & Configurations
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
+              </form>
             )}
           </div>
         </div>

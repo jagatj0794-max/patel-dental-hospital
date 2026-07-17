@@ -22,7 +22,7 @@ const navHierarchy = [
     label: 'About Us', 
     id: 'about',
     dropdown: [
-      { label: 'About Hospital', id: 'about-hospital' },
+      { label: 'About Hospital', id: 'about' },
       { label: 'Meet Doctors', id: 'doctors' },
       { label: 'Our Team', id: 'team' },
       { label: 'Technology', id: 'technology' },
@@ -31,13 +31,8 @@ const navHierarchy = [
   {
     label: 'Why Choose Us?',
     id: 'why-choose-us',
-    dropdown: [
-      { label: 'Dental Implants', id: 'implants' },
-      { label: 'Full Mouth Rehabilitation', id: 'fmr' },
-      { label: 'Clear Aligners', id: 'aligners' },
-      { label: 'Smile Makeover', id: 'smile' },
-    ]
   },
+
   {
     label: 'Visiting From Abroad?',
     id: 'international',
@@ -168,7 +163,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between text-white text-[13px] font-medium tracking-wide">
           <div className="flex items-center space-x-2">
             <Phone className="h-3.5 w-3.5" />
-            <span>{contactInfo?.phone || '+91 79900 62009'}</span>
+            <span>{contactInfo?.phone || '+91 9510397046'}</span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPin className="h-3.5 w-3.5" />
@@ -194,9 +189,9 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             >
               <img 
                 id="navbar-brand-logo-img"
-                src="/patel-logo-vector.svg" 
+                src="/LOGO 3D FULL NAME WHITE (3).png" 
                 alt="Patel Dental Hospital Logo"
-                className="h-[28px] sm:h-[34px] lg:h-[40px] xl:h-[46px] w-auto max-w-[150px] sm:max-w-[180px] lg:max-w-[200px] xl:max-w-[240px] object-contain transition-transform duration-300 group-hover:scale-[1.02] origin-left bg-transparent"
+                className="h-[35px] sm:h-[42px] lg:h-[50px] xl:h-[58px] w-auto max-w-[190px] sm:max-w-[230px] lg:max-w-[250px] xl:max-w-[300px] object-contain transition-transform duration-300 group-hover:scale-[1.02] origin-left bg-transparent"
               />
             </div>
 

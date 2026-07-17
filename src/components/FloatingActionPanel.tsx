@@ -16,9 +16,9 @@ interface FloatingActionPanelProps {
 export default function FloatingActionPanel({ openAppointmentModal, contactInfo }: FloatingActionPanelProps) {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
-  const phoneRaw = contactInfo?.phoneRaw || '+917990062009';
-  const whatsappRaw = contactInfo?.whatsappRaw || '917990062009';
-  const displayPhone = contactInfo?.phone || '+91 79900 62009';
+  const phoneRaw = contactInfo?.phoneRaw || '+919510397046';
+  const whatsappRaw = contactInfo?.whatsappRaw || '919510397046';
+  const displayPhone = contactInfo?.phone || '+91 9510397046';
 
   const whatsappUrl = `https://wa.me/${whatsappRaw}?text=Hello%20Patel%20Dental%20Hospital,%20I%20would%20like%20to%20book%20a%20consultation%20appointment.%20Please%20guide%20me.`;
   const telephoneUrl = `tel:${phoneRaw}`;
@@ -117,46 +117,49 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo 
       {/* 2. MOBILE: Solid, Sticky Bottom Full Action Hub Bar (Compact & cleanly aligned with viewport bottom) */}
       <div 
         id="mobile-sticky-action-bar" 
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-905/98 backdrop-blur-md border-t border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.30)]"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900/98 backdrop-blur-md border-t border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.30)]"
       >
         <div className="p-2.5 flex items-center justify-between gap-2.5">
           {/* Action Call */}
-          <a
+          <motion.a
             id="mobile-call-action"
             href={telephoneUrl}
-            className="flex-1 flex items-center justify-center space-x-1.5 py-3 px-2.5 bg-slate-800/[0.4] active:bg-slate-800/80 border border-slate-700 rounded-xl text-white transition-all text-center cursor-pointer"
+            whileTap={{ scale: 0.95 }}
+            className="flex-1 h-11 flex items-center justify-center space-x-1 px-1 bg-gradient-to-r from-[#081C3A] via-[#0B2545] to-[#13315C] text-white font-extrabold rounded-xl border border-white/5 shadow-[0_2px_10px_rgba(8,28,58,0.25)] text-center cursor-pointer"
           >
-            <Phone className="h-3.5 w-3.5 text-brand-cyan fill-brand-cyan/5" />
-            <span className="text-[10px] uppercase font-black tracking-wider leading-none">
+            <Phone className="h-4 w-4 text-white fill-white/10 shrink-0" />
+            <span className="text-[10px] min-[370px]:text-[11px] uppercase font-black tracking-wider leading-none">
               Call Now
             </span>
-          </a>
+          </motion.a>
 
           {/* Action WhatsApp */}
-          <a
+          <motion.a
             id="mobile-whatsapp-action"
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center space-x-1.5 py-3 px-2.5 bg-emerald-500/10 active:bg-emerald-500/20 border border-emerald-500/15 rounded-xl text-emerald-400 transition-all text-center cursor-pointer"
+            whileTap={{ scale: 0.95 }}
+            className="flex-1 h-11 flex items-center justify-center space-x-1 px-1 bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-extrabold rounded-xl border border-white/5 shadow-[0_2px_10px_rgba(37,211,102,0.25)] text-center cursor-pointer"
           >
-            <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="text-[10px] uppercase font-black tracking-wider leading-none">
+            <MessageCircle className="h-4 w-4 text-white fill-white/10 shrink-0" />
+            <span className="text-[10px] min-[370px]:text-[11px] uppercase font-black tracking-wider leading-none">
               WhatsApp
             </span>
-          </a>
+          </motion.a>
 
           {/* Action Book Slot */}
-          <button
+          <motion.button
             id="mobile-book-action"
             onClick={() => openAppointmentModal()}
-            className="flex-1.2 flex items-center justify-center space-x-1.5 py-3 px-2.5 bg-brand-cyan active:bg-brand-teal rounded-xl text-brand-navy transition-all text-center cursor-pointer font-black"
+            whileTap={{ scale: 0.95 }}
+            className="flex-1 h-11 flex items-center justify-center space-x-1 px-1 bg-gradient-to-r from-[#11B5D8] to-[#0ea5e9] text-white font-extrabold rounded-xl border border-white/5 shadow-[0_2px_10px_rgba(17,181,216,0.25)] text-center cursor-pointer"
           >
-            <Calendar className="h-3.5 w-3.5 stroke-[2.2]" />
-            <span className="text-[10px] uppercase font-black tracking-wider leading-none">
+            <Calendar className="h-4 w-4 text-white shrink-0" />
+            <span className="text-[10px] min-[370px]:text-[11px] uppercase font-black tracking-wider leading-none">
               Book Slot
             </span>
-          </button>
+          </motion.button>
         </div>
       </div>
     </>

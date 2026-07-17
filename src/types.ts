@@ -92,6 +92,127 @@ export interface DentalVideo {
   treatment: string;
 }
 
+export interface MarketingConfig {
+  // Offer Banner
+  show_offer_banner?: boolean;
+  offer_title?: string;
+  offer_subtitle?: string;
+  offer_description?: string;
+  offer_badge_text?: string;
+  offer_button_text?: string;
+  offer_button_link?: string;
+
+  // Media Enhancements
+  hero_image_alt?: string;
+  procedure_videos?: {
+    title: string;
+    video_url: string;
+    thumbnail?: string;
+    description?: string;
+    display_order: number;
+  }[];
+  hospital_photos?: {
+    image_url: string;
+    title?: string;
+    caption?: string;
+    display_order: number;
+  }[];
+  team_photos?: {
+    image_url: string;
+    title?: string;
+    caption?: string;
+    display_order: number;
+    // legacy support fields
+    name?: string;
+    designation?: string;
+    photo_url?: string;
+  }[];
+  equipment_photos?: {
+    image_url: string;
+    title?: string;
+    caption?: string;
+    display_order: number;
+    // legacy support fields
+    name?: string;
+  }[];
+
+  // Call To Action
+  primary_cta_btn_text?: string;
+  primary_cta_action?: 'appointment' | 'custom';
+  primary_cta_link?: string;
+  secondary_cta_btn_text?: string;
+  secondary_cta_action?: 'whatsapp' | 'call' | 'custom';
+  secondary_cta_link?: string;
+
+  // Contact Information
+  contact_call_number?: string;
+  contact_whatsapp_number?: string;
+  contact_email?: string;
+  contact_address?: string;
+  contact_map_url?: string;
+
+  // Follow Us
+  social_facebook?: string;
+  social_facebook_enabled?: boolean;
+  social_instagram?: string;
+  social_instagram_enabled?: boolean;
+  social_youtube?: string;
+  social_youtube_enabled?: boolean;
+  social_linkedin?: string;
+  social_linkedin_enabled?: boolean;
+  social_twitter?: string;
+  social_twitter_enabled?: boolean;
+  social_whatsapp?: string;
+  social_whatsapp_enabled?: boolean;
+
+  // Bottom CTA Section
+  bottom_cta_heading?: string;
+  bottom_cta_description?: string;
+  bottom_cta_primary_btn_text?: string;
+  bottom_cta_primary_btn_link?: string;
+  bottom_cta_secondary_btn_text?: string;
+  bottom_cta_secondary_btn_link?: string;
+
+  // Contact Bar
+  contact_bar_show?: boolean;
+  contact_bar_call_enabled?: boolean;
+  contact_bar_whatsapp_enabled?: boolean;
+  contact_bar_appointment_enabled?: boolean;
+
+  // Bottom Contact Overrides
+  contact_clinic_name?: string;
+  contact_working_hours?: string;
+
+  // Section Visibility Flags
+  show_hero?: boolean;
+  show_introduction?: boolean;
+  show_process?: boolean;
+  show_benefits?: boolean;
+  show_gallery?: boolean;
+  show_procedure_video?: boolean;
+  show_hospital_photos?: boolean;
+  show_team_photos?: boolean;
+  show_testimonials?: boolean;
+  show_faq?: boolean;
+  show_related_services?: boolean;
+  show_bottom_cta?: boolean;
+
+  // Custom Related Services List
+  related_services?: { id: string; enabled: boolean }[];
+
+  // Written Reviews & Case Transformations
+  written_reviews?: {
+    id: string;
+    patient_name: string;
+    treatment_name: string;
+    review: string;
+    rating: number; // 1 to 5
+    before_image?: string;
+    after_image?: string;
+    display_order: number;
+  }[];
+}
+
 export interface Service {
   id: string;
   slug: string;
@@ -104,6 +225,23 @@ export interface Service {
   is_active: boolean;
   seo_title?: string | null;
   seo_description?: string | null;
+  homepage_card_image?: string | null;
+  homepage_short_description?: string | null;
+  hero_title?: string | null;
+  hero_description?: string | null;
+  hero_image_caption?: string | null;
+  intro_title?: string | null;
+  intro_description?: string | null;
+  process_steps?: any[] | string | null;
+  features?: any[] | string | null;
+  content_images?: any[] | string | null;
+  procedure_video_url?: string | null;
+  procedure_video_title?: string | null;
+  procedure_video_description?: string | null;
+  procedure_video_thumbnail?: string | null;
+  patient_testimonials?: any[] | string | null;
+  hospital_team_photos?: any[] | string | null;
+  marketing_config?: MarketingConfig | string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -112,6 +250,7 @@ export interface ServiceGalleryItem {
   id: string;
   service_id: string;
   image_url: string;
+  title?: string | null;
   caption?: string | null;
   alt_text?: string | null;
   display_order: number;

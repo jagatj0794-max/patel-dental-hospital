@@ -26,7 +26,7 @@ export default function WhatsAppButton() {
     };
   }, []);
 
-  const whatsappUrl = "https://wa.me/917990062009?text=Hello%20Patel%20Dental%20Hospital,%20I%20would%20like%20to%20book%20a%20consultation%20appointment.%20Please%20guide%20me.";
+  const whatsappUrl = "https://wa.me/919510397046?text=Hello%20Patel%20Dental%20Hospital,%20I%20would%20like%20to%20book%20a%20consultation%20appointment.%20Please%20guide%20me.";
 
   return (
     <div id="whatsapp-floating-trigger" className="hidden md:flex fixed bottom-6 right-6 z-40 flex-col items-end">

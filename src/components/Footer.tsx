@@ -59,7 +59,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             <div className="flex items-center">
               <img 
                 id="footer-brand-logo-img"
-                src="/patel-logo-vector.svg" 
+                src="/LOGO 3D FULL NAME WHITE (3).png" 
                 alt="Patel Dental Hospital Logo"
                 className="h-[55px] w-auto object-contain"
                 referrerPolicy="no-referrer"
@@ -230,11 +230,11 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/[0.04]">
                 <a 
-                  href={`tel:${contactInfo?.phoneRaw || '+917990062009'}`} 
+                  href={`tel:${contactInfo?.phoneRaw || '+919510397046'}`} 
                   className="inline-flex items-center space-x-1.5 text-xs font-extrabold text-white hover:text-brand-cyan transition-colors"
                 >
-                  <Phone className="h-3.5 w-3.5 text-brand-cyan" />
-                  <span>{contactInfo?.phone || '+91 79900 62009'}</span>
+                  <Phone className="h-3.5 w-3.5 text-[#11B5D8]" />
+                  <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
                   href={contactInfo?.mapsLink || 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot'} 
@@ -267,11 +267,11 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/[0.04]">
                 <a 
-                  href={`tel:${contactInfo?.phoneRaw || '+917990062009'}`} 
+                  href={`tel:${contactInfo?.phoneRaw || '+919510397046'}`} 
                   className="inline-flex items-center space-x-1.5 text-xs font-extrabold text-white hover:text-brand-cyan transition-colors"
                 >
-                  <Phone className="h-3.5 w-3.5 text-brand-cyan" />
-                  <span>{contactInfo?.phone || '+91 79900 62009'}</span>
+                  <Phone className="h-3.5 w-3.5 text-[#11B5D8]" />
+                  <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
                   href="https://maps.google.com/?q=Patel+Dental+Hospital+Mavdi+Rajkot" 

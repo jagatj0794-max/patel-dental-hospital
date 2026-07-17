@@ -7,10 +7,10 @@ import { ContactInfo } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export const DEFAULT_CONTACT_INFO: ContactInfo = {
-  phone: '+91 79900 62009',
-  phoneRaw: '+917990062009',
-  whatsapp: '+91 79900 62009',
-  whatsappRaw: '917990062009',
+  phone: '+91 9510397046',
+  phoneRaw: '+919510397046',
+  whatsapp: '+91 9510397046',
+  whatsappRaw: '919510397046',
   email: 'info@pateldentalrajkot.com',
   address: 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot, Gujarat 360002',
   mapsLink: 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot'

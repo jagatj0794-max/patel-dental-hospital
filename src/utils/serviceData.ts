@@ -20,6 +20,17 @@ export const DEFAULT_SERVICES: Service[] = [
     is_active: true
   },
   {
+    id: 'rct',
+    slug: 'root-canal-treatment',
+    title: 'Single Sitting Root Canal Treatment',
+    short_description: TREATMENTS.find(t => t.id === 'rct')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'rct')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'rct')?.image || '',
+    icon: 'Activity',
+    display_order: 2,
+    is_active: true
+  },
+  {
     id: 'fmr-srv',
     slug: 'full-mouth-rehabilitation',
     title: 'Full Mouth Rehabilitation',
@@ -27,28 +38,17 @@ export const DEFAULT_SERVICES: Service[] = [
     description: TREATMENTS.find(t => t.id === 'fullmouth')?.longDesc || '',
     hero_image: TREATMENTS.find(t => t.id === 'fullmouth')?.image || '',
     icon: 'Sparkles',
-    display_order: 2,
-    is_active: true
-  },
-  {
-    id: 'aligners-srv',
-    slug: 'clear-aligners',
-    title: 'Clear Aligners',
-    short_description: TREATMENTS.find(t => t.id === 'aligners')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'aligners')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'aligners')?.image || '',
-    icon: 'EyeOff',
     display_order: 3,
     is_active: true
   },
   {
-    id: 'rct',
-    slug: 'root-canal-treatment',
-    title: 'Root Canal Treatment',
-    short_description: TREATMENTS.find(t => t.id === 'rct')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'rct')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'rct')?.image || '',
-    icon: 'Activity',
+    id: 'aligners-srv',
+    slug: 'invisible-aligners',
+    title: 'Invisible Aligners',
+    short_description: TREATMENTS.find(t => t.id === 'aligners')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'aligners')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'aligners')?.image || '',
+    icon: 'EyeOff',
     display_order: 4,
     is_active: true
   },
@@ -75,14 +75,58 @@ export const DEFAULT_SERVICES: Service[] = [
     is_active: true
   },
   {
+    id: 'whitening-srv',
+    slug: 'teeth-whitening',
+    title: 'Teeth Whitening',
+    short_description: 'Brighten your smile with our premium clinical teeth whitening treatments.',
+    description: 'Our state-of-the-art dental teeth whitening uses advanced clinical whitening gels and specialized curing light systems to safe and fast lighten stains and discolouration.',
+    hero_image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600',
+    icon: 'Sparkles',
+    display_order: 7,
+    is_active: true
+  },
+  {
     id: 'kids',
-    slug: 'kids-dentistry',
-    title: 'Kids Dentistry',
+    slug: 'pediatric-dentistry',
+    title: 'Pediatric Dentistry',
     short_description: TREATMENTS.find(t => t.id === 'kids')?.shortDesc || '',
     description: TREATMENTS.find(t => t.id === 'kids')?.longDesc || '',
     hero_image: TREATMENTS.find(t => t.id === 'kids')?.image || '',
     icon: 'Baby',
-    display_order: 7,
+    display_order: 8,
+    is_active: true
+  },
+  {
+    id: 'braces-srv',
+    slug: 'braces-treatment',
+    title: 'Braces Treatment',
+    short_description: TREATMENTS.find(t => t.id === 'braces')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'braces')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'braces')?.image || '',
+    icon: 'Grid',
+    display_order: 9,
+    is_active: true
+  },
+  {
+    id: 'wisdom-srv',
+    slug: 'wisdom-tooth-surgery',
+    title: 'Wisdom Tooth Surgery',
+    short_description: TREATMENTS.find(t => t.id === 'wisdom')?.shortDesc || '',
+    description: TREATMENTS.find(t => t.id === 'wisdom')?.longDesc || '',
+    hero_image: TREATMENTS.find(t => t.id === 'wisdom')?.image || '',
+    icon: 'Scissors',
+    display_order: 10,
+    is_active: true
+  },
+  {
+    id: 'filling-srv',
+    slug: 'tooth-coloured-filling',
+    title: 'Tooth Coloured Filling (Composite Filling)',
+    short_description: 'Composite Filling, also known as Tooth Coloured Filling, is a long-lasting and natural-looking restoration used to repair decayed, chipped or broken teeth.',
+    description: 'Composite fillings are made from advanced ceramic and resin materials that chemically bond to the natural tooth, restoring both function and aesthetics.',
+    hero_image: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=600',
+    icon: 'CheckCircle',
+    display_order: 11,
     is_active: true
   }
 ];
@@ -93,6 +137,15 @@ export const serviceService = {
    */
   getServices: async (): Promise<Service[]> => {
     if (!isSupabaseConfigured()) {
+      const stored = localStorage.getItem('hospital_services');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error('Failed to parse services from localStorage:', e);
+        }
+      }
+      localStorage.setItem('hospital_services', JSON.stringify(DEFAULT_SERVICES));
       return DEFAULT_SERVICES;
     }
 
@@ -121,12 +174,23 @@ export const serviceService = {
           is_active: s.is_active,
           seo_title: s.seo_title || null,
           seo_description: s.seo_description || null,
+          homepage_card_image: null,
+          homepage_short_description: null,
           updated_at: new Date().toISOString()
         }));
 
-        const { error: insertError } = await supabase.client
+        let { error: insertError } = await supabase.client
           .from('services')
           .insert(seedRows);
+
+        if (insertError && (insertError.message?.includes('homepage_card_image') || insertError.message?.includes('homepage_short_description') || insertError.message?.includes('column'))) {
+          console.warn('Seeding failed due to missing new columns, retrying without new fields...');
+          const fallbackSeedRows = seedRows.map(({ homepage_card_image, homepage_short_description, ...rest }) => rest);
+          const { error: retryInsertError } = await supabase.client
+            .from('services')
+            .insert(fallbackSeedRows);
+          insertError = retryInsertError;
+        }
 
         if (insertError) {
           console.warn('Error seeding default services:', insertError);
@@ -144,6 +208,55 @@ export const serviceService = {
         }
 
         return refetchedData || DEFAULT_SERVICES;
+      } else {
+        // Table is not empty, but check if any of the default services are missing and seed them
+        const existingIds = new Set(data.map(s => s.id));
+        const missingServices = DEFAULT_SERVICES.filter(s => !existingIds.has(s.id));
+
+        if (missingServices.length > 0) {
+          console.log(`Table has data but is missing ${missingServices.length} default services. Seeding missing ones...`);
+          const seedRows = missingServices.map(s => ({
+            id: s.id,
+            slug: s.slug,
+            title: s.title,
+            short_description: s.short_description,
+            description: s.description,
+            hero_image: s.hero_image,
+            icon: s.icon || null,
+            display_order: s.display_order,
+            is_active: s.is_active,
+            seo_title: s.seo_title || null,
+            seo_description: s.seo_description || null,
+            homepage_card_image: null,
+            homepage_short_description: null,
+            updated_at: new Date().toISOString()
+          }));
+
+          let { error: insertError } = await supabase.client
+            .from('services')
+            .insert(seedRows);
+
+          if (insertError && (insertError.message?.includes('homepage_card_image') || insertError.message?.includes('homepage_short_description') || insertError.message?.includes('column'))) {
+            const fallbackSeedRows = seedRows.map(({ homepage_card_image, homepage_short_description, ...rest }) => rest);
+            const { error: retryInsertError } = await supabase.client
+              .from('services')
+              .insert(fallbackSeedRows);
+            insertError = retryInsertError;
+          }
+
+          if (insertError) {
+            console.warn('Error seeding missing default services:', insertError);
+          } else {
+            // Re-fetch to get the complete set
+            const { data: refetchedData, error: refetchError } = await supabase.client
+              .from('services')
+              .select('*')
+              .order('display_order', { ascending: true });
+            if (!refetchError && refetchedData) {
+              return refetchedData;
+            }
+          }
+        }
       }
 
       return data || [];
@@ -158,7 +271,8 @@ export const serviceService = {
    */
   getServiceBySlug: async (slug: string): Promise<Service | null> => {
     if (!isSupabaseConfigured()) {
-      return null;
+      const services = await serviceService.getServices();
+      return services.find(s => s.slug === slug) || null;
     }
 
     try {
@@ -185,12 +299,24 @@ export const serviceService = {
    */
   saveService: async (service: Service): Promise<{ success: boolean; error?: string }> => {
     if (!isSupabaseConfigured()) {
-      return { success: false, error: 'Supabase is not configured.' };
+      try {
+        const services = await serviceService.getServices();
+        const existingIndex = services.findIndex(s => s.id === service.id);
+        if (existingIndex >= 0) {
+          services[existingIndex] = { ...services[existingIndex], ...service };
+        } else {
+          services.push(service);
+        }
+        localStorage.setItem('hospital_services', JSON.stringify(services));
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message || String(e) };
+      }
     }
 
     console.log('Saving Service...');
     try {
-      const { error } = await supabase.client
+      let { error } = await supabase.client
         .from('services')
         .upsert({
           id: service.id,
@@ -204,8 +330,84 @@ export const serviceService = {
           is_active: service.is_active,
           seo_title: service.seo_title || null,
           seo_description: service.seo_description || null,
+          homepage_card_image: service.homepage_card_image || null,
+          homepage_short_description: service.homepage_short_description || null,
+          hero_title: service.hero_title || null,
+          hero_description: service.hero_description || null,
+          hero_image_caption: service.hero_image_caption || null,
+          intro_title: service.intro_title || null,
+          intro_description: service.intro_description || null,
+          process_steps: service.process_steps || null,
+          features: service.features || null,
+          content_images: service.content_images || null,
+          procedure_video_url: service.procedure_video_url || null,
+          procedure_video_title: service.procedure_video_title || null,
+          procedure_video_description: service.procedure_video_description || null,
+          procedure_video_thumbnail: service.procedure_video_thumbnail || null,
+          patient_testimonials: service.patient_testimonials || null,
+          hospital_team_photos: service.hospital_team_photos || null,
+          marketing_config: service.marketing_config || null,
           updated_at: new Date().toISOString()
         });
+
+      if (error && (error.message?.includes('marketing_config') || error.message?.includes('column "marketing_config"'))) {
+        console.warn('marketing_config column might not exist yet in Supabase table. Retrying save without marketing_config...', error);
+        const { error: retryError } = await supabase.client
+          .from('services')
+          .upsert({
+            id: service.id,
+            slug: service.slug,
+            title: service.title,
+            short_description: service.short_description,
+            description: service.description,
+            hero_image: service.hero_image,
+            icon: service.icon || null,
+            display_order: service.display_order,
+            is_active: service.is_active,
+            seo_title: service.seo_title || null,
+            seo_description: service.seo_description || null,
+            homepage_card_image: service.homepage_card_image || null,
+            homepage_short_description: service.homepage_short_description || null,
+            hero_title: service.hero_title || null,
+            hero_description: service.hero_description || null,
+            hero_image_caption: service.hero_image_caption || null,
+            intro_title: service.intro_title || null,
+            intro_description: service.intro_description || null,
+            process_steps: service.process_steps || null,
+            features: service.features || null,
+            content_images: service.content_images || null,
+            procedure_video_url: service.procedure_video_url || null,
+            procedure_video_title: service.procedure_video_title || null,
+            procedure_video_description: service.procedure_video_description || null,
+            procedure_video_thumbnail: service.procedure_video_thumbnail || null,
+            patient_testimonials: service.patient_testimonials || null,
+            hospital_team_photos: service.hospital_team_photos || null,
+            updated_at: new Date().toISOString()
+          });
+        error = retryError;
+      }
+
+      if (error && (error.message?.includes('homepage_card_image') || error.message?.includes('homepage_short_description') || error.message?.includes('hero_title') || error.message?.includes('content_images') || error.message?.includes('column'))) {
+        console.warn('New columns might not exist yet in Supabase table. Retrying save with basic fields only...', error);
+        // Retry without the new fields
+        const { error: retryError } = await supabase.client
+          .from('services')
+          .upsert({
+            id: service.id,
+            slug: service.slug,
+            title: service.title,
+            short_description: service.short_description,
+            description: service.description,
+            hero_image: service.hero_image,
+            icon: service.icon || null,
+            display_order: service.display_order,
+            is_active: service.is_active,
+            seo_title: service.seo_title || null,
+            seo_description: service.seo_description || null,
+            updated_at: new Date().toISOString()
+          });
+        error = retryError;
+      }
 
       if (error) {
         console.log(`Supabase Error: ${error.message}`);
@@ -228,7 +430,14 @@ export const serviceService = {
    */
   deleteService: async (id: string): Promise<boolean> => {
     if (!isSupabaseConfigured()) {
-      return false;
+      try {
+        const services = await serviceService.getServices();
+        const filtered = services.filter(s => s.id !== id);
+        localStorage.setItem('hospital_services', JSON.stringify(filtered));
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
 
     try {
@@ -363,14 +572,31 @@ export const serviceService = {
           id: item.id,
           service_id: serviceId,
           image_url: item.image_url,
+          title: item.title || null,
           caption: item.caption || null,
           alt_text: item.alt_text || null,
           display_order: item.display_order !== undefined ? item.display_order : idx
         }));
 
-        const { error: upsertError } = await supabase.client
+        let { error: upsertError } = await supabase.client
           .from('service_gallery')
           .upsert(rowsToUpsert);
+
+        if (upsertError && (upsertError.message?.includes('title') || upsertError.message?.includes('column'))) {
+          console.warn('The title column might be missing from service_gallery, retrying upsert without title field...');
+          const rowsFallback = items.map((item, idx) => ({
+            id: item.id,
+            service_id: serviceId,
+            image_url: item.image_url,
+            caption: item.caption || null,
+            alt_text: item.alt_text || null,
+            display_order: item.display_order !== undefined ? item.display_order : idx
+          }));
+          const { error: retryError } = await supabase.client
+            .from('service_gallery')
+            .upsert(rowsFallback);
+          upsertError = retryError;
+        }
 
         if (upsertError) {
           console.log(`Supabase Error: ${upsertError.message}`);

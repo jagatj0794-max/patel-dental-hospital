@@ -16,7 +16,7 @@ interface SameDayFixProps {
 
 export default function SameDayFix({ openAppointmentModal, contactInfo }: SameDayFixProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const phoneRaw = contactInfo?.phoneRaw || '+917990062009';
+  const phoneRaw = contactInfo?.phoneRaw || '+919510397046';
 
   const benefits = [
     {

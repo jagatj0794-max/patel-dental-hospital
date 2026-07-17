@@ -402,8 +402,8 @@ export default function Contact({
                   </div>
                   <div className="flex items-center">
                     <Phone className="h-4.5 w-4.5 text-brand-cyan mr-2 shrink-0" />
-                    <a href={`tel:${contactInfo?.phoneRaw || '+917990062009'}`} className="text-brand-navy hover:text-brand-cyan font-bold transition">
-                      {contactInfo?.phone || '+91 79900 62009'}
+                    <a href={`tel:${contactInfo?.phoneRaw || '+919510397046'}`} className="text-brand-navy hover:text-brand-cyan font-bold transition">
+                      {contactInfo?.phone || '+91 9510397046'}
                     </a>
                   </div>
                 </div>
@@ -426,8 +426,8 @@ export default function Contact({
                   </div>
                   <div className="flex items-center">
                     <Phone className="h-4.5 w-4.5 text-brand-cyan mr-2 shrink-0" />
-                    <a href={`tel:${contactInfo?.phoneRaw || '+917990062009'}`} className="text-brand-navy hover:text-brand-cyan font-bold transition">
-                      {contactInfo?.phone || '+91 79900 62009'}
+                    <a href={`tel:${contactInfo?.phoneRaw || '+919510397046'}`} className="text-brand-navy hover:text-brand-cyan font-bold transition">
+                      {contactInfo?.phone || '+91 9510397046'}
                     </a>
                   </div>
                 </div>

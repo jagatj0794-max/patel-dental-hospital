@@ -68,10 +68,14 @@ export default function AnimatedCounter({ value, duration = 2000, suffix = '', p
   const formattedCount = count.toLocaleString('en-US');
 
   return (
-    <span ref={elementRef} className="tabular-nums">
+    <span ref={elementRef} className="stat-number-premium" style={{ fontFamily: 'Heebo, sans-serif', fontWeight: 600 }}>
       {prefix}
       {formattedCount}
-      {suffix}
+      {suffix && (
+        <span className="stat-number-premium-suffix text-[0.7em] ml-0.5 inline-block align-baseline relative -top-[0.12em] opacity-85 select-none tracking-normal" style={{ fontFamily: 'Heebo, sans-serif', fontWeight: 600 }}>
+          {suffix}
+        </span>
+      )}
     </span>
   );
 }
