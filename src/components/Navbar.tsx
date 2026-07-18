@@ -156,7 +156,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
     >
       {/* Top Bar */}
       <div 
-        className={`bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] w-full transition-all duration-300 overflow-hidden ${
+        className={`bg-gradient-to-r from-[#1488CC] via-[#20B2AA] to-[#6BCB3C] w-full transition-all duration-300 overflow-hidden ${
           isScrolled ? 'h-0 opacity-0' : 'h-[40px] opacity-100'
         }`}
       >
@@ -189,7 +189,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             >
               <img 
                 id="navbar-brand-logo-img"
-                src="/LOGO 3D FULL NAME WHITE (3).png" 
+                src="/LOGO 3D FULL NAME WHITE (3)-1.png" 
                 alt="Patel Dental Hospital Logo"
                 className="h-[35px] sm:h-[42px] lg:h-[50px] xl:h-[58px] w-auto max-w-[190px] sm:max-w-[230px] lg:max-w-[250px] xl:max-w-[300px] object-contain transition-transform duration-300 group-hover:scale-[1.02] origin-left bg-transparent"
               />

@@ -288,6 +288,7 @@ interface HomeProps {
   heroHeading?: string;
   heroDescription?: string;
   heroBgImage?: string;
+  heroBgImageMobile?: string;
   mediaImages?: Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>;
   patientMoments?: PatientMoment[];
   videosList?: Array<{ id: string; title: string; treatment: string }>;
@@ -300,6 +301,7 @@ export default function Home({
   heroHeading = "Dental Implant, Aligner &\nFMR Specialists\nin Rajkot",
   heroDescription = "Trusted smiles. Advanced care. Exceptional results.",
   heroBgImage = "",
+  heroBgImageMobile = "",
   mediaImages = [],
   patientMoments,
   videosList = [],
@@ -391,13 +393,7 @@ export default function Home({
               className="w-full h-full object-cover object-center lg:object-[right_center]"
               referrerPolicy="no-referrer"
             />
-            {/* Desktop-oriented seamless left-to-right gradient, ending completely before the plant & doctors */}
-            <div 
-              className="absolute inset-0"
-              style={{ 
-                background: 'linear-gradient(to right, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.85) 30%, rgba(255,255,255,0.65) 38%, rgba(255,255,255,0) 45%)' 
-              }}
-            />
+
           </div>
 
           <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full relative z-20 flex flex-col justify-between flex-grow h-full">
@@ -414,59 +410,46 @@ export default function Home({
               {/* 2. Headline */}
               <div className="flex flex-col text-left space-y-2 lg:space-y-3 max-w-[550px]">
                 {/* Small Heading */}
-                <div className="font-display text-xs lg:text-[13px] font-extrabold tracking-widest text-[#0ea5e9] uppercase">
-                  Patel Dental Hospital <span className="text-slate-400">|</span> Rajkot
+                <div className="font-display text-xs lg:text-[13px] font-black tracking-widest uppercase">
+                  <span className="text-white">Patel Dental Hospital</span> <span className="text-[#4FD1FF]">| Rajkot</span>
                 </div>
                 {/* Main Heading */}
-                <h1 className="font-display text-[26px] sm:text-[32px] md:text-[36px] lg:text-[40px] xl:text-[46px] leading-[1.15] font-black text-[#081C3A] tracking-tight drop-shadow-[0_1px_4px_rgba(255,255,255,0.8)]">
+                <h1 className="font-display text-[26px] sm:text-[32px] md:text-[36px] lg:text-[40px] xl:text-[46px] leading-[1.15] font-black text-[#F8FBFF] tracking-tight">
                   Give You One More<br />
-                  <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6]">
+                  <span className="relative inline-block text-[#BEEBFF]">
                     Reason To Smile
                     {/* Subtle underline accent */}
-                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[4px] bg-gradient-to-r from-[#11B5D8]/80 to-[#0EA5C6]/80 rounded-full" />
+                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[4px] bg-[#E0F2FE] rounded-full" />
                   </span>
                 </h1>
                 {/* Secondary Heading */}
-                <div className="font-display text-sm sm:text-base lg:text-[17px] font-bold text-slate-800 leading-snug pt-1">
+                <div className="font-display text-sm sm:text-base lg:text-[17px] font-bold text-[#FFFFFF] leading-snug pt-1">
                   Advanced Implant Hospital <br className="hidden sm:inline" />
-                  <span className="text-[#0ea5e9]">with Fix Teeth in Just One Week</span>
+                  <span className="text-[#5EEBFF] font-extrabold">with Fix Teeth in Just One Week</span>
                 </div>
               </div>
 
               {/* Subtitle / Description & Trust Statement */}
               <div className="mt-4 flex flex-col space-y-2.5 text-left max-w-[480px]">
-                <p className="text-slate-700 font-sans text-sm md:text-base leading-relaxed font-medium">
+                <p className="font-sans text-sm md:text-base leading-relaxed font-medium text-[#F5F7FA]">
                   With Patel Dental Hospital, take the first step towards a beautiful smile and better dental health.
                 </p>
-                <p className="text-slate-600 font-sans text-xs md:text-sm font-semibold italic">
+                <p className="font-sans text-xs md:text-sm font-semibold italic text-[#E5EDF5]">
                   Experience Modern Dentistry With Gentle Touch.
                 </p>
                 {/* Trust Statement */}
-                <div className="flex items-center space-x-1.5 text-xs md:text-[13px] font-bold text-emerald-600 pt-0.5">
+                <div className="flex items-center space-x-1.5 text-xs md:text-[13px] font-bold text-white pt-0.5">
                   <Sparkles className="h-4 w-4 text-emerald-500 animate-pulse" />
                   <span>We Give You A Perfect Smile, Guaranteed.</span>
                 </div>
               </div>
 
-              {/* 3. Small Premium Pill Tags */}
-              <div className="mt-6 lg:mt-8 flex flex-wrap gap-2 max-w-[550px]">
-                {["Dental Implants", "Clear Aligners", "Full Mouth Rehabilitation", "Root Canal Treatment", "Smile Makeover"].map((service, index) => (
-                  <span 
-                    key={index}
-                    className="bg-white px-3.5 py-2 rounded-full text-[#081C3A] text-[12px] md:text-[13px] font-semibold flex items-center shadow-sm"
-                  >
-                    <CheckCircle className="h-3.5 w-3.5 text-[#11B5D8] mr-1.5" />
-                    {service}
-                  </span>
-                ))}
-              </div>
-
-              {/* 4. Two CTA buttons positioned exactly below services */}
+              {/* Two CTA buttons positioned exactly below description/trust statement */}
               <div className="mt-6 lg:mt-8 flex flex-col sm:flex-row items-center justify-start gap-4 w-full max-w-[450px]">
                 <button
                   id="hero-primary-cta"
                   onClick={openAppointmentModal}
-                  className="h-[54px] w-full sm:flex-1 bg-gradient-to-r from-[#0ea5e9] via-[#0284c7] to-[#0369a1] hover:from-[#0284c7] hover:to-[#1d4ed8] text-white text-[16.5px] font-extrabold rounded-[12px] shadow-[0_6px_20px_rgba(14,165,233,0.4)] cursor-pointer transform hover:scale-[1.02] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10"
+                  className="h-[56px] px-8 w-full sm:flex-1 bg-gradient-to-r from-[#0099F7] to-[#00C6A7] hover:from-[#00a3ff] hover:to-[#00d4b3] text-white text-[16.5px] font-extrabold rounded-[16px] shadow-[0_12px_30px_rgba(0,140,255,0.22)] hover:shadow-[0_15px_35px_rgba(0,140,255,0.32)] cursor-pointer transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
                 >
                   <Calendar className="h-5 w-5 shrink-0" />
                   <span className="whitespace-nowrap">Book Appointment</span>
@@ -476,9 +459,9 @@ export default function Home({
                   href={`https://wa.me/${whatsappRaw}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-[54px] w-full sm:flex-1 bg-white hover:bg-emerald-50/50 text-[#128C7E] hover:text-[#075E54] text-[16.5px] font-extrabold rounded-[12px] border-2 border-[#128C7E] shadow-[0_4px_12px_rgba(18,140,126,0.1)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:scale-[1.02] active:scale-98 transition-all duration-300"
+                  className="h-[56px] w-full sm:flex-1 bg-white hover:bg-[#F3FFFC] text-[#0F9D8F] text-[16.5px] font-extrabold rounded-[16px] border-2 border-[#14B8A6] hover:border-[#0F9D8F] shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
                 >
-                  <MessageCircle className="h-5 w-5 fill-emerald-500/10 shrink-0 text-[#128C7E]" strokeWidth={2.5} />
+                  <MessageCircle className="h-5 w-5 fill-[#0F9D8F]/10 shrink-0 text-[#0F9D8F]" strokeWidth={2.5} />
                   <span className="whitespace-nowrap">WhatsApp Us</span>
                 </a>
               </div>
@@ -500,7 +483,7 @@ export default function Home({
             */}
             {/* Mobile background (< 768px/md) */}
             <img 
-              src={heroBgImage || "/patel mobile hero.jpeg"} 
+              src={heroBgImageMobile || heroBgImage || "/patel mobile hero.jpeg"} 
               alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
               className="block md:hidden w-full h-full object-cover object-[center_68%]"
               referrerPolicy="no-referrer"
@@ -512,48 +495,42 @@ export default function Home({
               className="hidden md:block w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
             />
-            {/* Soft subtle white-to-transparent gradient only behind the top text area to ensure readability. */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.60) 25%, rgba(255,255,255,0) 45%)'
-              }}
-            />
+
           </div>
 
           <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3.5 px-4 sm:px-6 relative z-10 pt-8 sm:pt-10 pb-4">
             
             {/* 1. Label */}
-            <div className="animate-fade-in font-display text-[9px] sm:text-[10.5px] font-extrabold tracking-wider text-[#0ea5e9] uppercase">
-              Patel Dental Hospital <span className="text-slate-300">|</span> Rajkot
+            <div className="animate-fade-in font-display text-[9px] sm:text-[10.5px] font-black tracking-wider uppercase">
+              <span className="text-white">Patel Dental Hospital</span> <span className="text-[#4FD1FF]">| Rajkot</span>
             </div>
 
             {/* 2. Headline */}
             <div className="flex flex-col text-center space-y-1 max-w-[450px]">
               {/* Main Heading */}
-              <h1 className="font-display text-[21px] sm:text-[25px] leading-[1.2] font-black text-[#081C3A] tracking-tight">
+              <h1 className="font-display text-[21px] sm:text-[25px] leading-[1.2] font-black text-[#F8FBFF] tracking-tight">
                 Give You One More<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0ea5e9] to-[#0D9488]">
+                <span className="text-[#BEEBFF]">
                   Reason To Smile
                 </span>
               </h1>
               {/* Secondary Heading */}
-              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-slate-800 leading-snug">
-                Advanced Implant Hospital <span className="text-[#0ea5e9]">with Fix Teeth in Just One Week</span>
+              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#FFFFFF] leading-snug">
+                Advanced Implant Hospital <span className="text-[#5EEBFF] font-extrabold">with Fix Teeth in Just One Week</span>
               </div>
             </div>
 
             {/* 3. Short description & Supporting Line & Trust Statement */}
             <div className="flex flex-col space-y-1 text-center max-w-[450px]">
-              <p className="text-slate-700 font-sans text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[12px] sm:text-[14px] leading-relaxed font-semibold">
+              <p className="font-sans text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[12px] sm:text-[14px] leading-relaxed font-semibold text-[#F5F7FA]">
                 With Patel Dental Hospital, take the first step towards a beautiful smile and better dental health.
               </p>
-              <p className="text-slate-500 font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-bold italic">
+              <p className="font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-bold italic text-[#E5EDF5]">
                 Experience Modern Dentistry With Gentle Touch.
               </p>
               {/* Trust Statement */}
-              <p className="text-emerald-600 font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-extrabold flex items-center justify-center space-x-1 mt-0.5">
-                <Sparkles className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              <p className="text-white font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-extrabold flex items-center justify-center space-x-1 mt-0.5">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-400 shrink-0 animate-pulse" />
                 <span>We Give You A Perfect Smile, Guaranteed.</span>
               </p>
             </div>
@@ -562,9 +539,9 @@ export default function Home({
             <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[340px] sm:max-w-[380px] mx-auto">
               <button
                 onClick={openAppointmentModal}
-                className="h-[34px] flex-1 bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] text-white text-[11px] sm:text-[11.5px] font-extrabold rounded-lg shadow-xs cursor-pointer flex items-center justify-center space-x-1 border border-transparent transform active:scale-98 transition-all duration-300"
+                className="h-[46px] sm:h-[50px] flex-1 bg-gradient-to-r from-[#0099F7] to-[#00C6A7] hover:from-[#00a3ff] hover:to-[#00d4b3] text-white text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] shadow-[0_6px_15px_rgba(0,140,255,0.15)] hover:shadow-[0_10px_20px_rgba(0,140,255,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
-                <Calendar className="h-[13px] w-[13px] shrink-0" />
+                <Calendar className="h-[14px] w-[14px] shrink-0" />
                 <span className="whitespace-nowrap">Book Appointment</span>
               </button>
 
@@ -572,9 +549,9 @@ export default function Home({
                 href={`https://wa.me/${whatsappRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-[34px] flex-1 bg-white text-[#128C7E] text-[11px] sm:text-[11.5px] font-extrabold rounded-lg border-2 border-[#128C7E] shadow-3xs cursor-pointer flex items-center justify-center space-x-1 transform active:scale-98 transition-all duration-300"
+                className="h-[46px] sm:h-[50px] flex-1 bg-white text-[#0F9D8F] text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] border-2 border-[#14B8A6] hover:border-[#0F9D8F] hover:bg-[#F3FFFC] shadow-[0_5px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
-                <MessageCircle className="h-[13px] w-[13px] shrink-0 fill-emerald-500/10 text-[#128C7E]" strokeWidth={2.5} />
+                <MessageCircle className="h-[14px] w-[14px] shrink-0 fill-[#0F9D8F]/10 text-[#0F9D8F]" strokeWidth={2.5} />
                 <span className="whitespace-nowrap">WhatsApp Us</span>
               </a>
             </div>
@@ -584,92 +561,79 @@ export default function Home({
         {/* Compact Premium Visit Info Card for Mobile/Tablet (Visible on lg:hidden) - Floats over the hero image bottom border */}
         <div className="block lg:hidden px-4 relative z-20 -mt-10 sm:-mt-14 pb-6">
           <div 
-            className="w-full max-w-md mx-auto rounded-2xl p-5 flex flex-col space-y-4"
-            style={{
-              background: 'linear-gradient(135deg, #F4FFF7 0%, #ECFFF4 45%, #E5FFF1 100%)',
-              border: '1px solid rgba(16, 185, 129, 0.18)',
-              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.08), 0 2px 10px rgba(16, 185, 129, 0.05)'
-            }}
+            className="w-full max-w-md mx-auto rounded-[20px] overflow-hidden bg-white border border-[#E5E7EB] shadow-md flex flex-col"
           >
-            
-            {/* Header */}
-            <div className="flex items-center space-x-2 pb-3 border-b border-[#0EA5E9]/15">
-              <span className="p-1.5 rounded-lg bg-red-50 text-red-600 border border-red-100 animate-pulse">
-                <PhoneCall className="h-4.5 w-4.5" />
-              </span>
-              <h3 className="font-display font-[800] text-[#081C3A] text-[13px] uppercase tracking-wide">
-                Call Us For Emergency Dental Treatment
+            {/* SECTION 1 (Dark Blue) */}
+            <div className="bg-[#0B5FA5] p-6 text-center text-white flex flex-col items-center">
+              <h3 className="font-display font-bold text-[18px] sm:text-[20px] leading-tight text-white mb-3 max-w-[280px]">
+                Call us for Emergency Dental Treatment
               </h3>
+              <span className="text-[11px] font-bold text-white/80 tracking-widest uppercase mb-1">
+                Please Call Us At
+              </span>
+              <a 
+                href={`tel:${phoneRaw}`} 
+                className="text-white font-black text-[24px] sm:text-[28px] tracking-tight hover:text-white/90 transition-all duration-300 leading-none"
+              >
+                {displayPhone}
+              </a>
             </div>
 
-            {/* Appointment Information Box */}
-            <div className="bg-emerald-50/40 border border-emerald-100/30 rounded-xl p-3.5 text-center">
-              <p className="font-display font-bold text-[#081C3A] text-xs">
+            {/* SECTION 2 (Light Blue) */}
+            <div className="bg-[#1698D4] p-6 text-center text-white flex flex-col items-center">
+              <div className="flex items-center justify-center space-x-2 mb-3">
+                <Clock className="h-5 w-5 shrink-0 text-white" />
+                <h4 className="font-display font-bold text-[18px] text-white">
+                  Opening Hours
+                </h4>
+              </div>
+              
+              <p className="font-bold text-[14px] text-white/90 mb-4">
+                Monday – Saturday
+              </p>
+
+              <div className="w-full grid grid-cols-2 gap-4 max-w-xs">
+                <div className="text-center">
+                  <span className="text-[11px] font-bold text-white/75 tracking-wider uppercase block">Morning</span>
+                  <span className="font-black text-[14px] block mt-1 text-white">09:00 AM – 01:00 PM</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-[11px] font-bold text-white/75 tracking-wider uppercase block">Evening</span>
+                  <span className="font-black text-[14px] block mt-1 text-white">04:00 PM – 08:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3 (Green) */}
+            <div className="bg-[#5FAE2E] p-6 text-center text-white flex flex-col items-center">
+              <h4 className="font-display font-bold text-[18px] text-white mb-2">
+                Book an Appointment
+              </h4>
+              <p className="font-display font-extrabold text-[12px] tracking-wider uppercase leading-none text-white/90">
                 Patel Dental Hospital
               </p>
-              <p className="text-[10px] font-bold text-[#0D9488] mt-0.5">
+              <p className="text-[11px] font-bold text-white/85 mt-1 max-w-[280px]">
                 Awarded as Best Dental Hospital by FAMDENT
               </p>
-            </div>
 
-            {/* Content Details */}
-            <div className="space-y-3.5 text-left">
-              {/* Phone */}
-              <div className="flex items-start space-x-3">
-                <Phone className="h-4.5 w-4.5 text-[#0ea5e9] shrink-0 mt-1" />
-                <div>
-                  <span className="block text-[9.5px] font-[800] text-sky-700 tracking-wider uppercase mb-0.5">
-                    Phone Number
-                  </span>
-                  <a href={`tel:${phoneRaw}`} className="text-[#081C3A] font-extrabold text-[15px] hover:text-[#0ea5e9] transition-colors leading-none block mt-1">
-                    {displayPhone}
-                  </a>
-                </div>
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 w-full mt-5 max-w-xs">
+                <button
+                  onClick={openAppointmentModal}
+                  className="h-[44px] bg-white hover:bg-slate-50 text-[#5FAE2E] text-[13px] font-bold rounded-lg flex items-center justify-center active:scale-98 transition-all duration-300 shadow-sm text-center"
+                >
+                  Book Appointment
+                </button>
+
+                <a
+                  href={`https://wa.me/${whatsappRaw}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-[44px] bg-transparent hover:bg-white/10 text-white text-[13px] font-bold rounded-lg border-2 border-white flex items-center justify-center active:scale-98 transition-all duration-300 text-center"
+                >
+                  <span className="whitespace-nowrap">WhatsApp Us</span>
+                </a>
               </div>
-
-              {/* Working Hours */}
-              <div className="flex items-start space-x-3">
-                <Clock className="h-4.5 w-4.5 text-[#0ea5e9] shrink-0 mt-0.5" />
-                <div>
-                  <span className="block text-[9.5px] font-[800] text-sky-700 tracking-wider uppercase mb-0.5">
-                    Opening Hours
-                  </span>
-                  <div className="text-[#081C3A] font-bold text-[11.5px] space-y-1.5 leading-snug">
-                    <p className="text-[#081C3A] font-extrabold text-xs">Monday – Saturday</p>
-                    <div className="grid grid-cols-2 gap-4 mt-1 bg-white/60 p-2 rounded-lg border border-sky-100/50">
-                      <div>
-                        <span className="text-[10px] text-slate-500 block">Morning</span>
-                        <span className="text-[#081C3A] font-bold">09:00 AM – 01:00 PM</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-500 block">Evening</span>
-                        <span className="text-[#081C3A] font-bold">04:00 PM – 08:00 PM</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-[#0EA5E9]/10">
-              <a
-                href={`tel:${phoneRaw}`}
-                className="h-[38px] bg-[#0ea5e9] hover:bg-[#0284c7] text-white text-[12px] font-[800] rounded-xl flex items-center justify-center space-x-1.5 active:scale-98 transition-all duration-300 shadow-md text-center"
-              >
-                <Phone className="h-[13px] w-[13px] shrink-0" />
-                <span>Call Now</span>
-              </a>
-
-              <a
-                href="https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-[38px] bg-white hover:bg-slate-50 text-[#081C3A] text-[12px] font-[700] rounded-xl border border-sky-100/80 shrink-0 flex items-center justify-center space-x-1.5 active:scale-98 transition-all duration-300 shadow-3xs text-center"
-              >
-                <MapPin className="h-[13px] w-[13px] text-[#0ea5e9] shrink-0" />
-                <span className="whitespace-nowrap">Get Directions</span>
-              </a>
             </div>
 
           </div>
@@ -747,7 +711,7 @@ export default function Home({
         </div>
       </section>
       {/* 3. Patel Dental Hospital Milestones */}
-      <section className="pt-12 sm:pt-16 lg:pt-[160px] pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
+      <section className="pt-12 sm:pt-16 lg:pt-[160px] pb-8 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12">
             <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
@@ -766,7 +730,7 @@ export default function Home({
                 suffix: "+",
                 title: "Happy Families",
                 subtitle: "Trusted Patient Community",
-                icon: "/happy-family-round-icon-vector.jpg",
+                icon: "/family-silhouette-svgrepo-com.svg",
                 color: "text-[#11B5D8]",
                 bgColor: "bg-sky-50",
                 borderColor: "border-sky-100",
@@ -776,7 +740,7 @@ export default function Home({
                 suffix: "+",
                 title: "Satisfied Patients",
                 subtitle: "Exceptional Success Rate",
-                icon: "/10074057.png",
+                icon: "/happy-face-2-svgrepo-com.svg",
                 color: "text-[#0ea5e9]",
                 bgColor: "bg-blue-50/70",
                 borderColor: "border-blue-100/50",
@@ -786,7 +750,7 @@ export default function Home({
                 suffix: "+",
                 title: "NRI Patients",
                 subtitle: "Global Smile Standards",
-                icon: "/png-world-globe-transparent-world-globe-9.png",
+                icon: "/worldwide-world-svgrepo-com.svg",
                 color: "text-[#14B8A6]",
                 bgColor: "bg-[#F0FDFA]",
                 borderColor: "border-[#CCFBF1]",
@@ -796,7 +760,7 @@ export default function Home({
                 suffix: "+",
                 title: "Awards Won",
                 subtitle: "National & Regional Excellence",
-                icon: Trophy,
+                icon: "/awards-svgrepo-com.svg",
                 color: "text-[#0284c7]",
                 bgColor: "bg-cyan-50/60",
                 borderColor: "border-cyan-100/50",
@@ -806,7 +770,7 @@ export default function Home({
                 suffix: "+",
                 title: "Dental Implants",
                 subtitle: "Fixed Teeth Solutions",
-                icon: "/dental-implant-svg-icon.png",
+                icon: "/tooth-svgrepo-com (1).svg",
                 color: "text-rose-500",
                 bgColor: "bg-rose-50/50",
                 borderColor: "border-rose-100/40",
@@ -816,7 +780,7 @@ export default function Home({
                 suffix: "+",
                 title: "Years of Establishment",
                 subtitle: "Serving Since 2015",
-                icon: "/calendar-icon-design-free-vector.jpg",
+                icon: "/calendar-filled-svgrepo-com.svg",
                 color: "text-purple-500",
                 bgColor: "bg-purple-50/50",
                 borderColor: "border-purple-100/40",
@@ -838,7 +802,7 @@ export default function Home({
                   {/* Single unified premium layout for both mobile & desktop */}
                   <div className="flex flex-col items-center justify-center text-center relative z-10 w-full h-full">
                     {/* Icon on top */}
-                    <div className={`p-3.5 md:p-4 rounded-2xl ${item.bgColor} border ${item.borderColor} shrink-0 shadow-3xs mb-4 md:mb-5 transition-transform duration-300 group-hover:scale-105`}>
+                    <div className="p-3.5 md:p-4 shrink-0 mb-4 md:mb-5 transition-transform duration-300 group-hover:scale-105">
                       {isStringIcon ? (
                         <img 
                           src={item.icon} 
@@ -871,7 +835,7 @@ export default function Home({
       </section>
 
       {/* Services Section */}
-      <section className="py-24 lg:py-32 bg-[#FAFAFC] relative z-10 border-t border-slate-100" id="services">
+      <section className="pt-12 sm:pt-16 lg:pt-32 pb-24 lg:pb-32 bg-[#FAFAFC] relative z-10 border-t border-slate-100" id="services">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">

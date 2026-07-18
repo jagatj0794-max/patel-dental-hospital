@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="#85BE37">
+<g>
+  <!-- Outer circle border of the globe -->
+  <circle cx="256" cy="256" r="230" fill="none" stroke="#85BE37" stroke-width="24" />
+  
+  <!-- Horizontal Latitude lines -->
+  <line x1="26" y1="256" x2="486" y2="256" stroke="#85BE37" stroke-width="20" />
+  <path d="M60 160 C 130 200, 382 200, 452 160" fill="none" stroke="#85BE37" stroke-width="20" />
+  <path d="M60 352 C 130 312, 382 312, 452 352" fill="none" stroke="#85BE37" stroke-width="20" />
+  
+  <!-- Vertical Longitude lines -->
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#85BE37" stroke-width="20" />
+  <ellipse cx="256" cy="256" rx="230" ry="80" fill="none" stroke="#85BE37" stroke-width="20" transform="rotate(90 256 256)" />
+  <line x1="256" y1="26" x2="256" y2="486" stroke="#85BE37" stroke-width="20" />
+</g>
+</svg>

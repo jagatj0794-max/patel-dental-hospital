@@ -108,6 +108,7 @@ export default function App() {
   const [heroHeading, setHeroHeading] = useState("Dental Implant, Aligner &\nFMR Specialists\nin Rajkot");
   const [heroDescription, setHeroDescription] = useState("Trusted smiles. Advanced care. Exceptional results.");
   const [heroBgImage, setHeroBgImage] = useState("");
+  const [heroBgImageMobile, setHeroBgImageMobile] = useState("");
 
   // Load Hero section from Supabase on mount
   useEffect(() => {
@@ -118,7 +119,28 @@ export default function App() {
         if (active) {
           setHeroHeading(data.heading);
           setHeroDescription(data.description);
-          setHeroBgImage(data.bg_image);
+          
+          let desktopImg = "";
+          let mobileImg = "";
+          
+          if (data.bg_image) {
+            const trimmed = data.bg_image.trim();
+            if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+              try {
+                const parsed = JSON.parse(trimmed);
+                desktopImg = parsed.desktop || "";
+                mobileImg = parsed.mobile || "";
+              } catch (parseErr) {
+                console.warn("Failed to parse bg_image as JSON, falling back to plain string", parseErr);
+                desktopImg = data.bg_image;
+              }
+            } else {
+              desktopImg = data.bg_image;
+            }
+          }
+          
+          setHeroBgImage(desktopImg);
+          setHeroBgImageMobile(mobileImg);
         }
       } catch (e) {
         console.warn("Failed to load hero from Supabase on mount (using local/default values):", e);
@@ -510,6 +532,7 @@ export default function App() {
             heroHeading={heroHeading}
             heroDescription={heroDescription}
             heroBgImage={heroBgImage}
+            heroBgImageMobile={heroBgImageMobile}
             mediaImages={mediaImages}
             patientMoments={patientMoments}
             videosList={videosList}
@@ -564,6 +587,8 @@ export default function App() {
             setHeroDescription={setHeroDescription}
             heroBgImage={heroBgImage}
             setHeroBgImage={setHeroBgImage}
+            heroBgImageMobile={heroBgImageMobile}
+            setHeroBgImageMobile={setHeroBgImageMobile}
             doctorsList={doctorsList}
             setDoctorsList={setDoctorsList}
             mediaImages={mediaImages}

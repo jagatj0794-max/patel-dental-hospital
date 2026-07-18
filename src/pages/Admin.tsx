@@ -62,6 +62,8 @@ interface AdminProps {
   setHeroDescription: (val: string) => void;
   heroBgImage: string;
   setHeroBgImage: (val: string) => void;
+  heroBgImageMobile: string;
+  setHeroBgImageMobile: (val: string) => void;
   doctorsList: Doctor[];
   setDoctorsList: (val: Doctor[]) => void;
   mediaImages: Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>;
@@ -84,6 +86,8 @@ export default function Admin({
   setHeroDescription, 
   heroBgImage, 
   setHeroBgImage,
+  heroBgImageMobile,
+  setHeroBgImageMobile,
   doctorsList,
   setDoctorsList,
   mediaImages,
@@ -102,13 +106,15 @@ export default function Admin({
   const [draftHeading, setDraftHeading] = useState(heroHeading);
   const [draftDescription, setDraftDescription] = useState(heroDescription);
   const [draftBgImage, setDraftBgImage] = useState(heroBgImage);
+  const [draftBgImageMobile, setDraftBgImageMobile] = useState(heroBgImageMobile);
 
   // Synchronize draft states when parent props change (e.g. once loaded from Supabase)
   useEffect(() => {
     setDraftHeading(heroHeading);
     setDraftDescription(heroDescription);
     setDraftBgImage(heroBgImage);
-  }, [heroHeading, heroDescription, heroBgImage]);
+    setDraftBgImageMobile(heroBgImageMobile);
+  }, [heroHeading, heroDescription, heroBgImage, heroBgImageMobile]);
 
   // Contact details draft state
   const [draftPhone, setDraftPhone] = useState(contactInfo?.phone || '');
@@ -1305,6 +1311,7 @@ export default function Admin({
   }, [doctorsList]);
 
   const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingMobile, setIsDraggingMobile] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
@@ -1321,6 +1328,10 @@ export default function Admin({
   useEffect(() => {
     setDraftBgImage(heroBgImage);
   }, [heroBgImage]);
+
+  useEffect(() => {
+    setDraftBgImageMobile(heroBgImageMobile);
+  }, [heroBgImageMobile]);
 
   // Tabs config
   const tabs = [
@@ -1359,13 +1370,37 @@ export default function Admin({
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
+      handleFile(e.dataTransfer.files[0], 'desktop');
     }
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
+      handleFile(e.target.files[0], 'desktop');
+    }
+  };
+
+  // Mobile upload handlers
+  const handleDragOverMobile = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingMobile(true);
+  };
+
+  const handleDragLeaveMobile = () => {
+    setIsDraggingMobile(false);
+  };
+
+  const handleDropMobile = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingMobile(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0], 'mobile');
+    }
+  };
+
+  const handleFileInputMobile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0], 'mobile');
     }
   };
 
@@ -1378,7 +1413,7 @@ export default function Admin({
     });
   };
 
-  const handleFile = async (file: File) => {
+  const handleFile = async (file: File, target: 'desktop' | 'mobile' = 'desktop') => {
     if (!file.type.startsWith('image/')) {
       alert('Please upload a valid image file.');
       return;
@@ -1391,15 +1426,25 @@ export default function Admin({
 
     try {
       const imageUrl = await uploadImage(file);
-      setDraftBgImage(imageUrl);
-      setSaveMessage('Hero background image uploaded successfully!');
+      if (target === 'desktop') {
+        setDraftBgImage(imageUrl);
+        setSaveMessage('Hero background image (Desktop) uploaded successfully!');
+      } else {
+        setDraftBgImageMobile(imageUrl);
+        setSaveMessage('Hero background image (Mobile) uploaded successfully!');
+      }
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (err: any) {
       console.warn('Supabase storage upload failed, falling back to local Base64 storage:', err);
       try {
         const localDataUrl = await readFileAsDataURL(file);
-        setDraftBgImage(localDataUrl);
-        setSaveMessage('Notice: The image was loaded locally because the Supabase storage connection is restricted or offline. Your background will still render and persist correctly on this device.');
+        if (target === 'desktop') {
+          setDraftBgImage(localDataUrl);
+          setSaveMessage('Notice: The Desktop image was loaded locally because the Supabase storage connection is restricted or offline.');
+        } else {
+          setDraftBgImageMobile(localDataUrl);
+          setSaveMessage('Notice: The Mobile image was loaded locally because the Supabase storage connection is restricted or offline.');
+        }
         setTimeout(() => setSaveMessage(null), 5000);
       } catch (fallbackErr: any) {
         console.error('Local fallback failed:', fallbackErr);
@@ -1412,23 +1457,35 @@ export default function Admin({
     setDraftBgImage('');
   };
 
+  const handleResetImageMobile = () => {
+    setDraftBgImageMobile('');
+  };
+
   // Save changes
   const handleSave = async () => {
     setSaveMessage('Saving Hero content...');
     const oldHeading = heroHeading;
     const oldDescription = heroDescription;
     const oldBgImage = heroBgImage;
+    const oldBgImageMobile = heroBgImageMobile;
 
     // Optimistically update parent-level states immediately
     setHeroHeading(draftHeading);
     setHeroDescription(draftDescription);
     setHeroBgImage(draftBgImage);
+    setHeroBgImageMobile(draftBgImageMobile);
 
     try {
+      // Pack both images as a JSON string to keep database backward compatibility
+      const packedBgImage = JSON.stringify({
+        desktop: draftBgImage,
+        mobile: draftBgImageMobile
+      });
+
       const success = await heroService.saveHeroContent({
         heading: draftHeading,
         description: draftDescription,
-        bg_image: draftBgImage
+        bg_image: packedBgImage
       });
 
       if (success) {
@@ -1438,6 +1495,7 @@ export default function Admin({
         setHeroHeading(oldHeading);
         setHeroDescription(oldDescription);
         setHeroBgImage(oldBgImage);
+        setHeroBgImageMobile(oldBgImageMobile);
         setSaveMessage('Failed to save Hero content to Supabase. Check your connection or table setup.');
       }
     } catch (err: any) {
@@ -1445,6 +1503,7 @@ export default function Admin({
       setHeroHeading(oldHeading);
       setHeroDescription(oldDescription);
       setHeroBgImage(oldBgImage);
+      setHeroBgImageMobile(oldBgImageMobile);
       setSaveMessage('Error saving Hero content: ' + (err.message || err));
     } finally {
       setTimeout(() => setSaveMessage(null), 4000);
@@ -1456,6 +1515,7 @@ export default function Admin({
     setDraftHeading(heroHeading);
     setDraftDescription(heroDescription);
     setDraftBgImage(heroBgImage);
+    setDraftBgImageMobile(heroBgImageMobile);
     setSaveMessage('Changes discarded.');
     setTimeout(() => setSaveMessage(null), 2500);
   };
@@ -1705,10 +1765,10 @@ export default function Admin({
                 </p>
               </div>
 
-              {/* Background Image Upload Zone */}
+              {/* Desktop Background Image Upload Zone */}
               <div className="space-y-3">
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Hero Background Image
+                  Hero Background Image (Desktop)
                 </label>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -1729,7 +1789,7 @@ export default function Admin({
                     </div>
                     <div className="space-y-1">
                       <p className="text-xs font-bold text-slate-700">
-                        Drag and drop your background image here, or{' '}
+                        Drag and drop your desktop background image here, or{' '}
                         <label htmlFor="hero-bg-file-input" className="text-blue-600 hover:underline cursor-pointer">
                           browse file
                         </label>
@@ -1750,7 +1810,7 @@ export default function Admin({
                   {/* Image Preview Window */}
                   <div className="lg:col-span-5 bg-slate-50 border border-slate-150 rounded-2xl p-4 flex flex-col justify-between min-h-[180px]">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
-                      Active Image Preview
+                      Desktop Image Preview
                     </span>
 
                     {draftBgImage ? (
@@ -1758,7 +1818,7 @@ export default function Admin({
                         <div className="relative rounded-lg overflow-hidden border border-slate-200 h-[100px] w-full bg-slate-100 shadow-3xs">
                           <img 
                             src={draftBgImage} 
-                            alt="Custom Background Preview" 
+                            alt="Custom Desktop Background Preview" 
                             className="w-full h-full object-cover object-center"
                             referrerPolicy="no-referrer"
                           />
@@ -1773,7 +1833,7 @@ export default function Admin({
                         </div>
                         <div className="flex items-center justify-between text-[11px] text-slate-500">
                           <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                            <Check className="h-3.5 w-3.5" /> Custom image loaded
+                            <Check className="h-3.5 w-3.5" /> Desktop image loaded
                           </span>
                           <button 
                             type="button" 
@@ -1787,8 +1847,98 @@ export default function Admin({
                     ) : (
                       <div className="flex-grow flex flex-col items-center justify-center text-center text-slate-400 py-4">
                         <ImageIcon className="h-8 w-8 text-slate-300 mb-2" />
-                        <p className="text-[11px] font-medium">Using hospital standard template images</p>
-                        <p className="text-[9px] text-slate-400 mt-0.5">(/parel doctor.png and /patel mobile hero.jpeg)</p>
+                        <p className="text-[11px] font-medium">Using hospital standard Desktop template</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">(/parel doctor.png)</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Background Image Upload Zone */}
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Hero Background Image (Mobile)
+                </label>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                  {/* Drag and Drop Zone */}
+                  <div 
+                    onDragOver={handleDragOverMobile}
+                    onDragLeave={handleDragLeaveMobile}
+                    onDrop={handleDropMobile}
+                    className={`
+                      lg:col-span-7 border-2 border-dashed rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-3 transition-all duration-200 min-h-[180px]
+                      ${isDraggingMobile 
+                        ? 'border-blue-500 bg-blue-50/50' 
+                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/30'}
+                    `}
+                  >
+                    <div className="h-10 w-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                      <Upload className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-slate-700">
+                        Drag and drop your mobile background image here, or{' '}
+                        <label htmlFor="hero-bg-mobile-file-input" className="text-blue-600 hover:underline cursor-pointer">
+                          browse file
+                        </label>
+                        <input 
+                          type="file" 
+                          id="hero-bg-mobile-file-input"
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleFileInputMobile}
+                        />
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        PNG, JPG, JPEG or WEBP formats. High resolution recommended.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Image Preview Window */}
+                  <div className="lg:col-span-5 bg-slate-50 border border-slate-150 rounded-2xl p-4 flex flex-col justify-between min-h-[180px]">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
+                      Mobile Image Preview
+                    </span>
+
+                    {draftBgImageMobile ? (
+                      <div className="space-y-3 flex-grow flex flex-col justify-between">
+                        <div className="relative rounded-lg overflow-hidden border border-slate-200 h-[100px] w-full bg-slate-100 shadow-3xs">
+                          <img 
+                            src={draftBgImageMobile} 
+                            alt="Custom Mobile Background Preview" 
+                            className="w-full h-full object-cover object-center"
+                            referrerPolicy="no-referrer"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleResetImageMobile}
+                            className="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition shadow-xs cursor-pointer"
+                            title="Remove image"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-500">
+                          <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                            <Check className="h-3.5 w-3.5" /> Mobile image loaded
+                          </span>
+                          <button 
+                            type="button" 
+                            onClick={handleResetImageMobile}
+                            className="text-rose-600 hover:underline font-semibold cursor-pointer"
+                          >
+                            Reset to default
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex-grow flex flex-col items-center justify-center text-center text-slate-400 py-4">
+                        <ImageIcon className="h-8 w-8 text-slate-300 mb-2" />
+                        <p className="text-[11px] font-medium">Using fallback Desktop image</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">({draftBgImage ? 'Custom Desktop Image' : '/patel mobile hero.jpeg'})</p>
                       </div>
                     )}
                   </div>
@@ -4238,7 +4388,7 @@ export default function Admin({
                 <div className="w-[340px] h-[520px] bg-white rounded-2xl relative border border-slate-200 overflow-hidden shadow-md flex flex-col justify-start">
                   <div className="absolute inset-0 z-0">
                     <img 
-                      src={draftBgImage || "/patel mobile hero.jpeg"} 
+                      src={draftBgImageMobile || draftBgImage || "/patel mobile hero.jpeg"} 
                       alt="Mobile Reception View" 
                       className="w-full h-full object-cover object-[center_60%]"
                       referrerPolicy="no-referrer"
