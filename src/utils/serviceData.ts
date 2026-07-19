@@ -493,7 +493,17 @@ export const serviceService = {
    */
   getGallery: async (serviceId: string): Promise<ServiceGalleryItem[]> => {
     if (!isSupabaseConfigured()) {
-      return [];
+      const stored = localStorage.getItem(`gallery_${serviceId}`);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error('Failed to parse gallery from localStorage:', e);
+        }
+      }
+      const defaults = DEFAULT_SERVICE_GALLERY.filter(item => item.service_id === serviceId);
+      localStorage.setItem(`gallery_${serviceId}`, JSON.stringify(defaults));
+      return defaults;
     }
 
     try {
@@ -548,7 +558,12 @@ export const serviceService = {
    */
   saveGallery: async (serviceId: string, items: ServiceGalleryItem[]): Promise<{ success: boolean; error?: string }> => {
     if (!isSupabaseConfigured()) {
-      return { success: false, error: 'Supabase is not configured.' };
+      try {
+        localStorage.setItem(`gallery_${serviceId}`, JSON.stringify(items));
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message || String(e) };
+      }
     }
 
     console.log('Saving Gallery...');
@@ -649,7 +664,24 @@ export const serviceService = {
    */
   deleteGalleryImage: async (id: string): Promise<{ success: boolean; error?: string }> => {
     if (!isSupabaseConfigured()) {
-      return { success: false, error: 'Supabase is not configured.' };
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('gallery_')) {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+              const items: ServiceGalleryItem[] = JSON.parse(stored);
+              const filtered = items.filter(item => item.id !== id);
+              if (filtered.length !== items.length) {
+                localStorage.setItem(key, JSON.stringify(filtered));
+              }
+            }
+          }
+        }
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message || String(e) };
+      }
     }
 
     try {
@@ -677,7 +709,17 @@ export const serviceService = {
    */
   getFaqs: async (serviceId: string): Promise<ServiceFaq[]> => {
     if (!isSupabaseConfigured()) {
-      return [];
+      const stored = localStorage.getItem(`faqs_${serviceId}`);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error('Failed to parse FAQs from localStorage:', e);
+        }
+      }
+      const defaults = DEFAULT_SERVICE_FAQS.filter(item => item.service_id === serviceId);
+      localStorage.setItem(`faqs_${serviceId}`, JSON.stringify(defaults));
+      return defaults;
     }
 
     try {
@@ -732,7 +774,12 @@ export const serviceService = {
    */
   saveFaqs: async (serviceId: string, faqs: ServiceFaq[]): Promise<{ success: boolean; error?: string }> => {
     if (!isSupabaseConfigured()) {
-      return { success: false, error: 'Supabase is not configured.' };
+      try {
+        localStorage.setItem(`faqs_${serviceId}`, JSON.stringify(faqs));
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message || String(e) };
+      }
     }
 
     console.log('Saving FAQ...');
@@ -815,7 +862,24 @@ export const serviceService = {
    */
   deleteFaq: async (id: string): Promise<{ success: boolean; error?: string }> => {
     if (!isSupabaseConfigured()) {
-      return { success: false, error: 'Supabase is not configured.' };
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('faqs_')) {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+              const items: ServiceFaq[] = JSON.parse(stored);
+              const filtered = items.filter(item => item.id !== id);
+              if (filtered.length !== items.length) {
+                localStorage.setItem(key, JSON.stringify(filtered));
+              }
+            }
+          }
+        }
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message || String(e) };
+      }
     }
 
     try {

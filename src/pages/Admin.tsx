@@ -146,6 +146,9 @@ export default function Admin({
 
   // Services Tab states
   const [servicesList, setServicesList] = useState<Service[]>([]);
+  const sortedServicesList = React.useMemo(() => {
+    return [...servicesList].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+  }, [servicesList]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [servicesError, setServicesError] = useState<string | null>(null);
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
@@ -408,7 +411,7 @@ export default function Admin({
       title: '',
       short_description: '',
       description: '',
-      hero_image: '',
+      hero_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=1200',
       icon: 'Stethoscope',
       display_order: servicesList.length > 0 ? Math.max(...servicesList.map(s => s.display_order)) + 10 : 10,
       is_active: true,
@@ -430,50 +433,121 @@ export default function Admin({
       procedure_video_thumbnail: '',
       patient_testimonials: [],
       hospital_team_photos: [],
-      marketing_config: {},
+      marketing_config: {
+        show_hero: true,
+        show_introduction: true,
+        show_process: true,
+        show_benefits: true,
+        show_gallery: true,
+        show_procedure_video: true,
+        show_hospital_photos: true,
+        show_team_photos: true,
+        show_testimonials: true,
+        show_faq: true,
+        show_related_services: true,
+        show_bottom_cta: true,
+        
+        cta_appointment_enabled: true,
+        cta_appointment_text: 'Book Appointment',
+        cta_appointment_dest: 'appointment',
+        
+        cta_call_enabled: true,
+        cta_call_text: 'Call Now',
+        cta_call_dest: 'clinic',
+        
+        cta_whatsapp_enabled: true,
+        cta_whatsapp_text: 'WhatsApp Us',
+        cta_whatsapp_dest: 'clinic',
+        
+        show_offer_banner: true,
+        offer_show: true,
+        offer_title: 'Special Promotional Offer',
+        offer_subtitle: 'Limited Time Only',
+        offer_description: 'Claim your exclusive discount on our premium treatment packages today.',
+        offer_badge: 'Exclusive Offer',
+        offer_badge_text: 'Exclusive Offer',
+        offer_button_text: 'Claim Offer Now',
+        
+        bottom_cta_heading: 'Ready to Transform Your Smile?',
+        bottom_cta_description: 'Book your consultation today and experience world-class, personalized dental care.',
+        bottom_cta_primary_btn_text: 'Book Clinic Slot',
+        bottom_cta_secondary_btn_text: 'WhatsApp Us'
+      }
     });
   };
 
   const handleSaveService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingService) return;
+    if (isSavingService) return; // Prevent duplicate requests
 
     setServiceFormError(null);
+    setServiceValidationErrors({});
 
-    // Validate fields
-    if (!editingService.title.trim()) {
-      setServiceFormError('Service title is required.');
-      return;
+    // Robust validation
+    const errors: Record<string, string> = {};
+
+    if (!editingService.title || !editingService.title.trim()) {
+      errors.title = 'Service title is required.';
     }
-    if (!editingService.slug.trim()) {
-      setServiceFormError('Service slug is required.');
-      return;
+    if (!editingService.slug || !editingService.slug.trim()) {
+      errors.slug = 'Service slug is required.';
+    } else {
+      const sanitizedSlug = editingService.slug.trim().toLowerCase().replace(/\s+/g, '-');
+      if (!isSlugUnique(sanitizedSlug, editingService.id)) {
+        errors.slug = 'Service slug must be unique. This slug is already in use.';
+      }
     }
-    // Validate slug uniqueness
-    if (!isSlugUnique(editingService.slug, editingService.id)) {
-      setServiceFormError('Service slug must be unique. This slug is already in use.');
-      return;
+    if (!editingService.short_description || !editingService.short_description.trim()) {
+      errors.short_description = 'Short description is required.';
     }
-    if (!editingService.short_description.trim()) {
-      setServiceFormError('Short description is required.');
-      return;
+    if (!editingService.description || !editingService.description.trim()) {
+      errors.description = 'Full description is required.';
     }
-    if (!editingService.description.trim()) {
-      setServiceFormError('Full description is required.');
-      return;
-    }
-    if (!editingService.hero_image.trim()) {
-      setServiceFormError('Hero image is required. Please upload or specify an image URL.');
-      return;
-    }
-    if (isNaN(Number(editingService.display_order))) {
-      setServiceFormError('Display order must be a valid numeric value.');
-      return;
+    if (!editingService.hero_image || !editingService.hero_image.trim()) {
+      errors.hero_image = 'Hero image is required.';
     }
 
-    setSaveMessage('Saving service to Supabase...');
+    const orderNum = Number(editingService.display_order);
+    if (isNaN(orderNum)) {
+      errors.display_order = 'Display order must be a valid numeric value.';
+    }
+
+    // Optional URL validation
+    if (editingService.procedure_video_url && editingService.procedure_video_url.trim()) {
+      const vidUrl = editingService.procedure_video_url.trim();
+      if (!vidUrl.startsWith('http://') && !vidUrl.startsWith('https://')) {
+        errors.procedure_video_url = 'Video URL must be a valid link starting with http:// or https://';
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setServiceValidationErrors(errors);
+      setServiceFormError('Please resolve the validation errors highlighted in this section.');
+      // Auto-switch to the details tab where the required invalid fields are located so they are visible
+      if (errors.title || errors.slug || errors.short_description || errors.description || errors.hero_image) {
+        setActiveServiceEditorTab('details');
+      }
+      return;
+    }
+
+    setIsSavingService(true);
+    setSaveMessage('Saving service configurations securely...');
+
     try {
       const isNew = !servicesList.some(s => s.id === editingService.id);
+      const original = servicesList.find(s => s.id === editingService.id);
+
+      // Secure helper to never overwrite existing non-empty values with empty drafts
+      const preserveIfBlank = (field: keyof Service, val: any) => {
+        if (val === undefined || val === null || (typeof val === 'string' && val.trim() === '')) {
+          if (original && original[field] !== undefined && original[field] !== null && original[field] !== '') {
+            return original[field];
+          }
+        }
+        return val;
+      };
+
       const serviceToSave: Service = {
         ...editingService,
         title: editingService.title.trim(),
@@ -481,24 +555,25 @@ export default function Admin({
         short_description: editingService.short_description.trim(),
         description: editingService.description.trim(),
         display_order: Number(editingService.display_order),
-        seo_title: editingService.seo_title?.trim() || null,
-        seo_description: editingService.seo_description?.trim() || null,
-        homepage_card_image: editingService.homepage_card_image?.trim() || null,
-        homepage_short_description: editingService.homepage_short_description?.trim() || null,
-        hero_title: editingService.hero_title?.trim() || null,
-        hero_description: editingService.hero_description?.trim() || null,
-        hero_image_caption: editingService.hero_image_caption?.trim() || null,
-        intro_title: editingService.intro_title?.trim() || null,
-        intro_description: editingService.intro_description?.trim() || null,
+        seo_title: preserveIfBlank('seo_title', editingService.seo_title?.trim() || null),
+        seo_description: preserveIfBlank('seo_description', editingService.seo_description?.trim() || null),
+        homepage_card_image: preserveIfBlank('homepage_card_image', editingService.homepage_card_image?.trim() || null),
+        homepage_short_description: preserveIfBlank('homepage_short_description', editingService.homepage_short_description?.trim() || null),
+        hero_title: preserveIfBlank('hero_title', editingService.hero_title?.trim() || null),
+        hero_description: preserveIfBlank('hero_description', editingService.hero_description?.trim() || null),
+        hero_image_caption: preserveIfBlank('hero_image_caption', editingService.hero_image_caption?.trim() || null),
+        intro_title: preserveIfBlank('intro_title', editingService.intro_title?.trim() || null),
+        intro_description: preserveIfBlank('intro_description', editingService.intro_description?.trim() || null),
         process_steps: editingService.process_steps || [],
         features: editingService.features || [],
         content_images: editingService.content_images || [],
-        procedure_video_url: editingService.procedure_video_url?.trim() || null,
-        procedure_video_title: editingService.procedure_video_title?.trim() || null,
-        procedure_video_description: editingService.procedure_video_description?.trim() || null,
-        procedure_video_thumbnail: editingService.procedure_video_thumbnail?.trim() || null,
+        procedure_video_url: preserveIfBlank('procedure_video_url', editingService.procedure_video_url?.trim() || null),
+        procedure_video_title: preserveIfBlank('procedure_video_title', editingService.procedure_video_title?.trim() || null),
+        procedure_video_description: preserveIfBlank('procedure_video_description', editingService.procedure_video_description?.trim() || null),
+        procedure_video_thumbnail: preserveIfBlank('procedure_video_thumbnail', editingService.procedure_video_thumbnail?.trim() || null),
         patient_testimonials: editingService.patient_testimonials || [],
         hospital_team_photos: editingService.hospital_team_photos || [],
+        marketing_config: computedPreviewService ? computedPreviewService.marketing_config : editingService.marketing_config,
       };
 
       // Store a backup of the current list for rollback on error
@@ -517,8 +592,9 @@ export default function Admin({
       // Keep the editor open in edit mode instantly with the new data
       setEditingService(serviceToSave);
 
-      // Perform background database synchronization
+      // Perform background database synchronization with retry capability
       serviceService.saveService(serviceToSave).then((result) => {
+        setIsSavingService(false);
         if (result.success) {
           if (isNew) {
             setSaveMessage('Service created successfully. You can now add Gallery images and FAQs.');
@@ -528,16 +604,18 @@ export default function Admin({
         } else {
           // Revert local state if save fails
           setServicesList(oldServicesList);
-          setServiceFormError(result.error || 'Failed to save service on Supabase.');
+          setServiceFormError(result.error || 'Failed to save service on database server. Please try again.');
           setSaveMessage(null);
         }
       }).catch((err: any) => {
+        setIsSavingService(false);
         setServicesList(oldServicesList);
         setServiceFormError('Error saving service: ' + (err.message || err));
         setSaveMessage(null);
       });
 
     } catch (err: any) {
+      setIsSavingService(false);
       console.error('Error in save service setup:', err);
       setServiceFormError('Error saving service: ' + (err.message || err));
       setSaveMessage(null);
@@ -1062,6 +1140,142 @@ export default function Admin({
 
   const [visFormError, setVisFormError] = useState<string | null>(null);
   const [visFormSuccess, setVisFormSuccess] = useState<string | null>(null);
+
+  // Live Preview configuration
+  const [showLivePreview, setShowLivePreview] = useState(false);
+
+  const computedPreviewService = React.useMemo(() => {
+    if (!editingService) return null;
+    
+    const baseConfig = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    const mergedConfig = {
+      ...baseConfig,
+      // Section Visibility
+      show_hero: visHeroDraft,
+      show_introduction: visIntroDraft,
+      show_process: visProcessDraft,
+      show_benefits: visBenefitsDraft,
+      show_gallery: visGalleryDraft,
+      show_procedure_video: visVideoDraft,
+      show_hospital_photos: visHospitalDraft,
+      show_team_photos: visTeamDraft,
+      show_testimonials: visTestimonialsDraft,
+      show_offer_banner: visOfferBannerDraft,
+      offer_show: visOfferBannerDraft,
+      show_faq: visFaqDraft,
+      show_related_services: visRelatedServicesDraft,
+      show_bottom_cta: visBottomCtaDraft,
+      
+      // Contact Section
+      contact_clinic_name: contactClinicNameDraft,
+      contact_address: contactAddressDraft,
+      contact_call_number: contactCallNumberDraft,
+      contact_whatsapp_number: contactWhatsappNumberDraft,
+      contact_email: contactEmailDraft,
+      contact_working_hours: contactWorkingHoursDraft,
+      contact_map_url: contactMapUrlDraft,
+
+      // Social Links
+      social_facebook: socialFbLinkDraft,
+      social_fb_link: socialFbLinkDraft,
+      social_facebook_enabled: socialFbEnabledDraft,
+      social_fb_enabled: socialFbEnabledDraft,
+      social_instagram: socialIgLinkDraft,
+      social_ig_link: socialIgLinkDraft,
+      social_instagram_enabled: socialIgEnabledDraft,
+      social_ig_enabled: socialIgEnabledDraft,
+      social_youtube: socialYtLinkDraft,
+      social_yt_link: socialYtLinkDraft,
+      social_youtube_enabled: socialYtEnabledDraft,
+      social_yt_enabled: socialYtEnabledDraft,
+      social_linkedin: socialLiLinkDraft,
+      social_li_link: socialLiLinkDraft,
+      social_linkedin_enabled: socialLiEnabledDraft,
+      social_li_enabled: socialLiEnabledDraft,
+      social_twitter: socialTwLinkDraft,
+      social_tw_link: socialTwLinkDraft,
+      social_twitter_enabled: socialTwEnabledDraft,
+      social_tw_enabled: socialTwEnabledDraft,
+      social_whatsapp: socialWaLinkDraft,
+      social_wa_link: socialWaLinkDraft,
+      social_whatsapp_enabled: socialWaEnabledDraft,
+      social_wa_enabled: socialWaEnabledDraft,
+
+      // CTA buttons
+      cta_appointment_enabled: ctaAppointmentEnabledDraft,
+      cta_appointment_text: ctaAppointmentTextDraft,
+      cta_appointment_dest: ctaAppointmentDestDraft,
+      cta_appointment_dest_value: ctaAppointmentDestValueDraft,
+      cta_call_enabled: ctaCallEnabledDraft,
+      cta_call_text: ctaCallTextDraft,
+      cta_call_dest: ctaCallDestDraft,
+      cta_call_dest_value: ctaCallDestValueDraft,
+      cta_whatsapp_enabled: ctaWhatsappEnabledDraft,
+      cta_whatsapp_text: ctaWhatsappTextDraft,
+      cta_whatsapp_dest: ctaWhatsappDestDraft,
+      cta_whatsapp_dest_value: ctaWhatsappDestValueDraft,
+      cta_custom_enabled: ctaCustomEnabledDraft,
+      cta_custom_text: ctaCustomTextDraft,
+      cta_custom_dest_value: ctaCustomDestValueDraft,
+    };
+
+    return {
+      ...editingService,
+      marketing_config: mergedConfig
+    };
+  }, [
+    editingService,
+    visHeroDraft,
+    visIntroDraft,
+    visProcessDraft,
+    visBenefitsDraft,
+    visGalleryDraft,
+    visVideoDraft,
+    visHospitalDraft,
+    visTeamDraft,
+    visTestimonialsDraft,
+    visOfferBannerDraft,
+    visFaqDraft,
+    visRelatedServicesDraft,
+    visBottomCtaDraft,
+    contactClinicNameDraft,
+    contactAddressDraft,
+    contactCallNumberDraft,
+    contactWhatsappNumberDraft,
+    contactEmailDraft,
+    contactWorkingHoursDraft,
+    contactMapUrlDraft,
+    socialFbLinkDraft,
+    socialFbEnabledDraft,
+    socialIgLinkDraft,
+    socialIgEnabledDraft,
+    socialYtLinkDraft,
+    socialYtEnabledDraft,
+    socialLiLinkDraft,
+    socialLiEnabledDraft,
+    socialTwLinkDraft,
+    socialTwEnabledDraft,
+    socialWaLinkDraft,
+    socialWaEnabledDraft,
+    ctaAppointmentEnabledDraft,
+    ctaAppointmentTextDraft,
+    ctaAppointmentDestDraft,
+    ctaAppointmentDestValueDraft,
+    ctaCallEnabledDraft,
+    ctaCallTextDraft,
+    ctaCallDestDraft,
+    ctaCallDestValueDraft,
+    ctaWhatsappEnabledDraft,
+    ctaWhatsappTextDraft,
+    ctaWhatsappDestDraft,
+    ctaWhatsappDestValueDraft,
+    ctaCustomEnabledDraft,
+    ctaCustomTextDraft,
+    ctaCustomDestValueDraft
+  ]);
 
   // Synchronize drafts when editingService changes
   useEffect(() => {
@@ -2398,6 +2612,9 @@ export default function Admin({
   const [isDragging, setIsDragging] = useState(false);
   const [isDraggingMobile, setIsDraggingMobile] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isSavingService, setIsSavingService] = useState(false);
+  const [serviceValidationErrors, setServiceValidationErrors] = useState<Record<string, string>>({});
+  const [reviewFormError, setReviewFormError] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
 
@@ -5132,7 +5349,7 @@ export default function Admin({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {servicesList.map((svc) => (
+                      {sortedServicesList.map((svc) => (
                         <tr 
                           key={svc.id} 
                           className="hover:bg-slate-50/30 transition-all duration-150"
@@ -5829,7 +6046,11 @@ export default function Admin({
           />
 
           {/* Right Drawer Box */}
-          <div className="relative w-full md:w-[750px] bg-white h-full shadow-2xl flex flex-col z-110 border-l border-slate-100 animate-slide-in">
+          <div className={`relative bg-white h-full shadow-2xl flex flex-col z-110 border-l border-slate-100 animate-slide-in transition-all duration-300 ${
+            showLivePreview 
+              ? 'w-full lg:w-[95vw] xl:w-[1440px]' 
+              : 'w-full md:w-[750px]'
+          }`}>
             {/* Drawer Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
               <div className="flex items-center gap-3">
@@ -5842,15 +6063,28 @@ export default function Admin({
                   <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
                   <span>← Back</span>
                 </button>
+
+                {/* Live Preview Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowLivePreview(!showLivePreview)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0 ${
+                    showLivePreview 
+                      ? 'bg-[#E0F2FE] border-blue-200 text-blue-700 hover:bg-blue-100' 
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                  }`}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>{showLivePreview ? 'Hide Preview' : 'Live Preview'}</span>
+                </button>
                 
-                <div className="min-w-0">
-                  <h3 className="font-display font-extrabold text-[#081C3A] text-base md:text-lg leading-tight">
+                <div className="min-w-0 hidden sm:block">
+                  <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
                     {servicesList.some(s => s.id === editingService.id) 
-                      ? `Edit Treatment Service (ID: ${editingService.id})` 
-                      : 'Add New Service'}
+                      ? `Edit Treatment` 
+                      : 'Add New'}
                   </h3>
-                  <p className="text-slate-500 text-[11px] font-medium mt-0.5 truncate flex items-center gap-1">
-                    <span className="font-bold text-[#0D9488]">ID:</span>
+                  <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
                     <span className="font-mono text-slate-700">{editingService.id}</span>
                   </p>
                 </div>
@@ -5863,6 +6097,41 @@ export default function Admin({
                 <X className="h-5 w-5" />
               </button>
             </div>
+
+            {/* Split Panel Wrapper */}
+            <div className="flex flex-1 overflow-hidden min-h-0 w-full">
+              {/* Left Pane - Live Preview */}
+              {showLivePreview && (
+                <div className="flex-grow lg:flex-1 h-full bg-slate-100 border-r border-slate-200 flex flex-col min-w-0">
+                  <div className="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center justify-between shrink-0">
+                    <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#0D9488] animate-pulse" />
+                      Interactive Live Preview (Draft)
+                    </span>
+                    <span className="text-[10px] bg-amber-50 text-amber-700 font-semibold border border-amber-200 px-2 py-0.5 rounded-full">
+                      Unsaved Changes Only
+                    </span>
+                  </div>
+                  <div className="flex-grow overflow-y-auto p-4 bg-slate-100">
+                    <div className="w-full bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden min-h-full">
+                      <ServiceDetail
+                        slug={editingService.slug}
+                        openAppointmentModal={() => {}}
+                        setCurrentPage={() => {}}
+                        previewService={computedPreviewService}
+                        previewGallery={serviceGalleryList}
+                        previewFaqs={serviceFaqsList}
+                        previewRelatedServices={servicesList}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Right Pane - Editor Form */}
+              <div className={`h-full flex flex-col bg-white overflow-hidden ${
+                showLivePreview ? 'hidden lg:flex lg:w-[680px] shrink-0' : 'w-full'
+              }`}>
 
             {/* Tab Bar */}
             <div className="flex border-b border-slate-100 bg-slate-50/20 px-6 shrink-0">
@@ -5981,11 +6250,14 @@ export default function Admin({
 
                 {/* Service Title */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Service Title *</label>
+                  <label htmlFor="service-title-input" className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Service Title *</label>
                   <input
+                    id="service-title-input"
                     type="text"
                     required
                     value={editingService.title}
+                    aria-invalid={!!serviceValidationErrors.title}
+                    aria-describedby={serviceValidationErrors.title ? "service-error-title" : undefined}
                     onChange={(e) => {
                       const newTitle = e.target.value;
                       let nextSlug = editingService.slug;
@@ -6000,45 +6272,101 @@ export default function Admin({
                         title: newTitle,
                         slug: nextSlug
                       });
+                      if (serviceValidationErrors.title) {
+                        setServiceValidationErrors(prev => {
+                          const copy = { ...prev };
+                          delete copy.title;
+                          return copy;
+                        });
+                      }
                     }}
                     placeholder="e.g. Oral & Maxillofacial Surgery"
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                    className={`w-full px-3.5 py-2.5 text-xs border rounded-xl focus:outline-none focus:ring-2 font-medium bg-white text-slate-800 transition-colors ${
+                      serviceValidationErrors.title 
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 ring-2 ring-rose-500/20 bg-rose-50/5' 
+                        : 'border-slate-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    }`}
                   />
+                  {serviceValidationErrors.title && (
+                    <p id="service-error-title" role="alert" className="text-rose-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                      <span>⚠️</span> {serviceValidationErrors.title}
+                    </p>
+                  )}
                 </div>
 
                 {/* Slug */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Web Slug *</label>
+                  <label htmlFor="service-slug-input" className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Web Slug *</label>
                   <input
+                    id="service-slug-input"
                     type="text"
                     required
                     value={editingService.slug}
+                    aria-invalid={!!serviceValidationErrors.slug}
+                    aria-describedby={serviceValidationErrors.slug ? "service-error-slug" : "service-slug-desc"}
                     onChange={(e) => {
                       setIsSlugTouched(true);
                       setEditingService({
                         ...editingService,
                         slug: e.target.value.toLowerCase().replace(/\s+/g, '-')
                       });
+                      if (serviceValidationErrors.slug) {
+                        setServiceValidationErrors(prev => {
+                          const copy = { ...prev };
+                          delete copy.slug;
+                          return copy;
+                        });
+                      }
                     }}
                     placeholder="e.g. maxillofacial-surgery"
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                    className={`w-full px-3.5 py-2.5 text-xs border rounded-xl focus:outline-none focus:ring-2 font-mono bg-white text-slate-800 transition-colors ${
+                      serviceValidationErrors.slug 
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 ring-2 ring-rose-500/20 bg-rose-50/5' 
+                        : 'border-slate-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    }`}
                   />
-                  <p className="text-[10px] text-slate-400 font-medium">
+                  <p id="service-slug-desc" className="text-[10px] text-slate-400 font-medium">
                     The unique path segment for the service URL. Only letters, numbers, and hyphens.
                   </p>
+                  {serviceValidationErrors.slug && (
+                    <p id="service-error-slug" role="alert" className="text-rose-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                      <span>⚠️</span> {serviceValidationErrors.slug}
+                    </p>
+                  )}
                 </div>
 
                 {/* Short Description */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Short Description *</label>
+                  <label htmlFor="service-short-desc-input" className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Short Description *</label>
                   <textarea
+                    id="service-short-desc-input"
                     rows={2}
                     required
                     value={editingService.short_description}
-                    onChange={(e) => setEditingService({ ...editingService, short_description: e.target.value })}
+                    aria-invalid={!!serviceValidationErrors.short_description}
+                    aria-describedby={serviceValidationErrors.short_description ? "service-error-short_description" : undefined}
+                    onChange={(e) => {
+                      setEditingService({ ...editingService, short_description: e.target.value });
+                      if (serviceValidationErrors.short_description) {
+                        setServiceValidationErrors(prev => {
+                          const copy = { ...prev };
+                          delete copy.short_description;
+                          return copy;
+                        });
+                      }
+                    }}
                     placeholder="A brief summary of the service displayed in search results and card lists..."
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                    className={`w-full px-3.5 py-2.5 text-xs border rounded-xl focus:outline-none focus:ring-2 font-medium bg-white text-slate-800 resize-none transition-colors ${
+                      serviceValidationErrors.short_description 
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 ring-2 ring-rose-500/20 bg-rose-50/5' 
+                        : 'border-slate-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    }`}
                   />
+                  {serviceValidationErrors.short_description && (
+                    <p id="service-error-short_description" role="alert" className="text-rose-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                      <span>⚠️</span> {serviceValidationErrors.short_description}
+                    </p>
+                  )}
                 </div>
 
                 {/* Home Page Short Description */}
@@ -6061,15 +6389,36 @@ export default function Admin({
 
                 {/* Full Description */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Full Service Description *</label>
+                  <label htmlFor="service-desc-input" className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Full Service Description *</label>
                   <textarea
+                    id="service-desc-input"
                     rows={6}
                     required
                     value={editingService.description}
-                    onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                    aria-invalid={!!serviceValidationErrors.description}
+                    aria-describedby={serviceValidationErrors.description ? "service-error-description" : undefined}
+                    onChange={(e) => {
+                      setEditingService({ ...editingService, description: e.target.value });
+                      if (serviceValidationErrors.description) {
+                        setServiceValidationErrors(prev => {
+                          const copy = { ...prev };
+                          delete copy.description;
+                          return copy;
+                        });
+                      }
+                    }}
                     placeholder="Detailed explanation of clinical procedures, medical methodologies, recovery time, etc..."
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                    className={`w-full px-3.5 py-2.5 text-xs border rounded-xl focus:outline-none focus:ring-2 font-medium bg-white text-slate-800 transition-colors ${
+                      serviceValidationErrors.description 
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 ring-2 ring-rose-500/20 bg-rose-50/5' 
+                        : 'border-slate-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    }`}
                   />
+                  {serviceValidationErrors.description && (
+                    <p id="service-error-description" role="alert" className="text-rose-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                      <span>⚠️</span> {serviceValidationErrors.description}
+                    </p>
+                  )}
                 </div>
 
                 {/* Hero Image Box & Upload Zone */}
@@ -6086,7 +6435,7 @@ export default function Admin({
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                         <button
-                          type="button"
+                           type="button"
                           onClick={() => setEditingService({ ...editingService, hero_image: '' })}
                           className="p-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-md cursor-pointer"
                         >
@@ -6100,7 +6449,11 @@ export default function Admin({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* File Drag and Drop */}
                     <div 
-                      className="border-2 border-dashed border-slate-200 hover:border-teal-500/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/30 transition duration-150 relative cursor-pointer"
+                      className={`border-2 border-dashed rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-slate-50/30 transition duration-150 relative cursor-pointer ${
+                        serviceValidationErrors.hero_image 
+                          ? 'border-rose-500 bg-rose-50/5' 
+                          : 'border-slate-200 hover:border-teal-500/50'
+                      }`}
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={async (e) => {
                         e.preventDefault();
@@ -6134,19 +6487,44 @@ export default function Admin({
                     </div>
 
                     {/* Manual URL Input */}
-                    <div className="p-4 border border-slate-150 rounded-2xl bg-white space-y-2">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Or Specify Direct URL</span>
-                      <input
-                        type="text"
-                        placeholder="https://images.unsplash.com/photo-..."
-                        value={editingService.hero_image}
-                        onChange={(e) => setEditingService({ ...editingService, hero_image: e.target.value })}
-                        className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
-                      />
-                      <p className="text-[9px] text-slate-400 leading-relaxed">
-                        You can paste a stock photo link directly from Unsplash, Pexels or other clinical galleries.
-                      </p>
-                    </div>
+                     <div className={`p-4 border rounded-2xl bg-white space-y-2 transition-all ${
+                       serviceValidationErrors.hero_image 
+                         ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/5' 
+                         : 'border-slate-150'
+                     }`}>
+                       <label htmlFor="service-hero-url-input" className="text-[10px] font-bold text-slate-500 uppercase block">Or Specify Direct URL</label>
+                       <input
+                         id="service-hero-url-input"
+                         type="text"
+                         placeholder="https://images.unsplash.com/photo-..."
+                         value={editingService.hero_image}
+                         aria-invalid={!!serviceValidationErrors.hero_image}
+                         aria-describedby={serviceValidationErrors.hero_image ? "service-error-hero-image" : undefined}
+                         onChange={(e) => {
+                           setEditingService({ ...editingService, hero_image: e.target.value });
+                           if (serviceValidationErrors.hero_image) {
+                             setServiceValidationErrors(prev => {
+                               const copy = { ...prev };
+                               delete copy.hero_image;
+                               return copy;
+                               });
+                           }
+                         }}
+                         className={`w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-2 font-mono bg-white text-slate-800 transition-colors ${
+                           serviceValidationErrors.hero_image 
+                             ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' 
+                             : 'border-slate-200 focus:border-teal-500 focus:ring-teal-500/20'
+                         }`}
+                       />
+                       <p className="text-[9px] text-slate-400 leading-relaxed">
+                         You can paste a stock photo link directly from Unsplash, Pexels or other clinical galleries.
+                       </p>
+                       {serviceValidationErrors.hero_image && (
+                         <p id="service-error-hero-image" role="alert" className="text-rose-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                           <span>⚠️</span> {serviceValidationErrors.hero_image}
+                         </p>
+                       )}
+                     </div>
                   </div>
                 </div>
 
@@ -6522,15 +6900,32 @@ export default function Admin({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Display Order */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Display Order *</label>
+                    <label htmlFor="service-display-order" className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Display Order *</label>
                     <input
+                      id="service-display-order"
                       type="number"
                       required
                       value={editingService.display_order}
-                      onChange={(e) => setEditingService({ ...editingService, display_order: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                      aria-invalid={!!serviceValidationErrors.display_order}
+                      aria-describedby={serviceValidationErrors.display_order ? "service-error-display-order" : undefined}
+                      onChange={(e) => {
+                        setEditingService({ ...editingService, display_order: parseInt(e.target.value) || 0 });
+                        if (serviceValidationErrors.display_order) {
+                          setServiceValidationErrors(prev => {
+                            const copy = { ...prev };
+                            delete copy.display_order;
+                            return copy;
+                          });
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 font-mono bg-white text-slate-800"
                     />
                     <p className="text-[10px] text-slate-400 font-medium">Used for custom sorting. Lower numbers sort first.</p>
+                    {serviceValidationErrors.display_order && (
+                      <p id="service-error-display-order" role="alert" className="text-rose-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                        <span>⚠️</span> {serviceValidationErrors.display_order}
+                      </p>
+                    )}
                   </div>
 
                   {/* Active/Inactive Status Toggle */}
@@ -6587,17 +6982,30 @@ export default function Admin({
                 <div className="border-t border-slate-100 pt-6 flex items-center justify-end gap-3 shrink-0">
                   <button
                     type="button"
+                    disabled={isSavingService}
                     onClick={() => setEditingService(null)}
-                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                    disabled={isSavingService}
+                    className={`px-6 py-2.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition flex items-center gap-1.5 ${
+                      isSavingService ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
                   >
-                    <Check className="h-4 w-4" />
-                    {servicesList.some(s => s.id === editingService.id) ? 'Update Service' : 'Save Service'}
+                    {isSavingService ? (
+                      <>
+                        <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent animate-spin mr-1" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4" />
+                        <span>{servicesList.some(s => s.id === editingService.id) ? 'Update Service' : 'Save Service'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
@@ -7849,17 +8257,30 @@ export default function Admin({
                 <div className="border-t border-slate-100 pt-6 flex items-center justify-end gap-3 shrink-0">
                   <button
                     type="button"
+                    disabled={isSavingService}
                     onClick={() => setEditingService(null)}
-                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                    disabled={isSavingService}
+                    className={`px-6 py-2.5 text-xs font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl shadow-xs transition flex items-center gap-1.5 ${
+                      isSavingService ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
                   >
-                    <Check className="h-4 w-4" />
-                    {servicesList.some(s => s.id === editingService.id) ? 'Update Service' : 'Save Service'}
+                    {isSavingService ? (
+                      <>
+                        <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent animate-spin mr-1" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4" />
+                        <span>{servicesList.some(s => s.id === editingService.id) ? 'Update Service' : 'Save Service'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
@@ -10407,10 +10828,22 @@ export default function Admin({
                       <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                         <button
                           type="submit"
-                          className="px-6 py-3 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer"
+                          disabled={isSavingService}
+                          className={`px-6 py-3 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-1.5 ${
+                            isSavingService ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                          }`}
                         >
-                          <Check className="h-4 w-4" />
-                          Save Service & Configurations
+                          {isSavingService ? (
+                            <>
+                              <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent animate-spin mr-1" />
+                              <span>Saving configurations...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Check className="h-4 w-4" />
+                              <span>Save Service & Configurations</span>
+                            </>
+                          )}
                         </button>
                       </div>
                     </>
@@ -10418,6 +10851,8 @@ export default function Admin({
                 })()}
               </form>
             )}
+              </div> {/* Close Right Pane */}
+            </div> {/* Close Split Panel Wrapper */}
           </div>
         </div>
       )}

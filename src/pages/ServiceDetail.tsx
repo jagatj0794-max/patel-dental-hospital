@@ -154,6 +154,33 @@ function getFallbackMedia(slug: string, title: string) {
     youtubeVideo = 'cbVcmy53KBs';
   }
 
+  // Generate generic premium fallbacks for steps, features, and FAQs if they are empty
+  if (steps.length === 0) {
+    steps = [
+      { display_order: 10, title: 'Clinical Diagnostics', description: `A thorough dental examination and check-up by our specialists to prepare your personalized ${title || 'treatment'} path.` },
+      { display_order: 20, title: 'Digital Treatment Planning', description: 'Using advanced 3D scanning and diagnostic imaging to plan each precise detail of your therapy.' },
+      { display_order: 30, title: 'Comfortable Execution', description: 'Performing the primary procedure using world-class equipment and painless localized comfort measures.' },
+      { display_order: 40, title: 'Post-Care & Maintenance', description: 'Providing comprehensive recovery instructions, follow-up checkups, and guidance for long-term health.' }
+    ];
+  }
+
+  if (features.length === 0) {
+    features = [
+      { display_order: 10, title: 'Modern Sterile Technology', description: 'We integrate advanced clinical equipment and strict international sterilization standards for patient safety.' },
+      { display_order: 20, title: 'Painless Comfort Protocols', description: 'Enjoy a completely stress-free experience with modern localized anesthesia and active anxiety control.' },
+      { display_order: 30, title: 'Qualified Doctor Panels', description: 'Your care is designed and executed by highly qualified dental specialists with extensive clinical experience.' },
+      { display_order: 40, title: 'Reliable Stable Results', description: 'We use premium FDA-approved biocompatible materials to ensure optimal functional and aesthetic longevity.' }
+    ];
+  }
+
+  if (faqs.length === 0) {
+    faqs = [
+      { id: 'faq-1', question: `What is the typical timeline for ${title || 'this treatment'}?`, answer: 'The duration depends on your specific clinical condition. A standard procedure is completed in a single session or a few scheduled visits.', display_order: 10 },
+      { id: 'faq-2', question: `Is the ${title || 'treatment'} procedure painful?`, answer: 'No, we implement computerized local anesthesia and modern pain-protection measures to ensure complete physical comfort throughout the procedure.', display_order: 20 },
+      { id: 'faq-3', question: `How should I care for my teeth after the procedure?`, answer: 'We will provide a detailed post-treatment checklist. Standard recovery involves gentle brushing, soft foods, and avoiding extremely hot or cold beverages for the first 24 hours.', display_order: 30 }
+    ];
+  }
+
   return {
     hero_image: heroImg,
     hero_image_caption: heroCap,
@@ -383,7 +410,7 @@ export default function ServiceDetail({
     return () => {
       active = false;
     };
-  }, [slug]);
+  }, [slug, previewService, previewGallery, previewFaqs, previewRelatedServices]);
 
   // Check if we have any custom text fields or media fields populated
   const hasCustomContent = React.useMemo(() => {
