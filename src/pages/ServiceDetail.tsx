@@ -723,62 +723,126 @@ export default function ServiceDetail({
     return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
   };
 
-  const renderCtaButton = (type: 'primary' | 'secondary', defaultText: string, defaultIcon: React.ReactNode, isPrimary: boolean) => {
-    const text = type === 'primary' 
-      ? (mConfig.cta_primary_text || defaultText) 
-      : (mConfig.cta_secondary_text || defaultText);
+  // Get configured Call To Action buttons dynamically
+  const getCtaButtons = () => {
+    const list: Array<{
+      id: string;
+      text: string;
+      icon: React.ReactNode;
+      onClick: () => void;
+      isWhatsappSecondary: boolean;
+    }> = [];
+
+    // 1. Book Appointment Button
+    const appointmentEnabled = mConfig.cta_appointment_enabled !== undefined 
+      ? !!mConfig.cta_appointment_enabled 
+      : true; // Default fallback: enabled
     
-    const actionType = type === 'primary'
-      ? (mConfig.cta_primary_action || 'appointment')
-      : (mConfig.cta_secondary_action || 'whatsapp');
-
-    const customValue = type === 'primary'
-      ? mConfig.cta_primary_value
-      : mConfig.cta_secondary_value;
-
-    const baseClass = isPrimary
-      ? "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
-      : "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
-
-    // Set specialized class for WhatsApp if it's the WhatsApp action and not styled as primary
-    let resolvedClass = baseClass;
-    if (actionType === 'whatsapp' && !isPrimary) {
-      resolvedClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
+    if (appointmentEnabled) {
+      const text = mConfig.cta_appointment_text || 'Book Appointment';
+      const dest = mConfig.cta_appointment_dest || 'appointment';
+      const value = mConfig.cta_appointment_dest_value || '';
+      
+      list.push({
+        id: 'appointment',
+        text,
+        icon: <Calendar className="h-4 w-4" />,
+        onClick: () => {
+          if (dest === 'appointment') {
+            openAppointmentModal(`${service?.title} - Book Appointment`);
+          } else if (dest === 'internal') {
+            window.location.href = value;
+          } else if (dest === 'external') {
+            const url = value.startsWith('http') ? value : 'https://' + value;
+            window.open(url, '_blank', 'noopener,noreferrer');
+          }
+        },
+        isWhatsappSecondary: false
+      });
     }
 
-    const handleClick = () => {
-      if (actionType === 'appointment') {
-        openAppointmentModal(`${service.title} - CTA`);
-      } else if (actionType === 'whatsapp') {
-        const textMsg = `Hi Patel Dental Hospital, I'm interested in booking a consultation for "${service.title}".`;
-        const num = (customValue && customValue.trim() !== '') 
-          ? customValue.replace(/\s+/g, '') 
-          : (mConfig.contact_whatsapp_number ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw);
-        window.open(`https://wa.me/${num}?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
-      } else if (actionType === 'call') {
-        const phone = (customValue && customValue.trim() !== '')
-          ? customValue.replace(/\s+/g, '')
-          : (mConfig.contact_call_number ? mConfig.contact_call_number.replace(/\s+/g, '') : contactInfo.callRaw);
-        window.location.href = `tel:${phone}`;
-      } else if (actionType === 'custom') {
-        if (customValue && customValue.trim() !== '') {
-          window.open(customValue, '_blank', 'noopener,noreferrer');
-        }
-      }
-    };
+    // 2. Call Now Button
+    const callEnabled = mConfig.cta_call_enabled !== undefined 
+      ? !!mConfig.cta_call_enabled 
+      : false; // Default fallback: disabled
+    
+    if (callEnabled) {
+      const text = mConfig.cta_call_text || 'Call Now';
+      const dest = mConfig.cta_call_dest || 'clinic';
+      const value = mConfig.cta_call_dest_value || '';
+      
+      list.push({
+        id: 'call',
+        text,
+        icon: <Phone className="h-4 w-4" />,
+        onClick: () => {
+          const phone = dest === 'custom' 
+            ? value.replace(/\s+/g, '') 
+            : (mConfig.contact_call_number ? mConfig.contact_call_number.replace(/\s+/g, '') : contactInfo.callRaw || '9924225500');
+          window.location.href = `tel:${phone}`;
+        },
+        isWhatsappSecondary: false
+      });
+    }
 
-    const icon = actionType === 'appointment' ? <Calendar className="h-4 w-4" />
-      : actionType === 'whatsapp' ? <MessageCircle className="h-4 w-4" />
-      : actionType === 'call' ? <Phone className="h-4 w-4" />
-      : defaultIcon;
+    // 3. WhatsApp Button
+    const whatsappEnabled = mConfig.cta_whatsapp_enabled !== undefined 
+      ? !!mConfig.cta_whatsapp_enabled 
+      : true; // Default fallback: enabled
+    
+    if (whatsappEnabled) {
+      const text = mConfig.cta_whatsapp_text || 'WhatsApp Us';
+      const dest = mConfig.cta_whatsapp_dest || 'clinic';
+      const value = mConfig.cta_whatsapp_dest_value || '';
+      
+      list.push({
+        id: 'whatsapp',
+        text,
+        icon: <MessageCircle className="h-4 w-4" />,
+        onClick: () => {
+          if (dest === 'custom') {
+            const url = value.startsWith('http') ? value : 'https://' + value;
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } else {
+            const textMsg = `Hi Patel Dental Hospital, I'm interested in booking a consultation for "${service?.title}".`;
+            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
+              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
+              : contactInfo.whatsappRaw || '919924225500';
+            window.open(`https://wa.me/${num}?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          }
+        },
+        isWhatsappSecondary: true
+      });
+    }
 
-    return (
-      <button type="button" onClick={handleClick} className={resolvedClass}>
-        {icon}
-        <span>{text}</span>
-        {actionType === 'appointment' && isPrimary && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
-      </button>
-    );
+    // 4. Custom Button
+    const customEnabled = mConfig.cta_custom_enabled !== undefined 
+      ? !!mConfig.cta_custom_enabled 
+      : false; // Default fallback: disabled
+    
+    if (customEnabled) {
+      const text = mConfig.cta_custom_text || 'More Info';
+      const value = mConfig.cta_custom_dest_value || '';
+      
+      list.push({
+        id: 'custom',
+        text,
+        icon: <ArrowRight className="h-4 w-4" />,
+        onClick: () => {
+          if (value.startsWith('tel:') || value.startsWith('mailto:')) {
+            window.location.href = value;
+          } else if (value.startsWith('/')) {
+            window.location.href = value;
+          } else {
+            const url = value.startsWith('http') ? value : 'https://' + value;
+            window.open(url, '_blank', 'noopener,noreferrer');
+          }
+        },
+        isWhatsappSecondary: false
+      });
+    }
+
+    return list;
   };
 
 
@@ -875,7 +939,7 @@ export default function ServiceDetail({
         </div>
 
         {/* Dynamic Offer Banner (Promotional Section) */}
-        {mConfig.offer_show && (
+        {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -976,8 +1040,25 @@ export default function ServiceDetail({
 
                 {/* Book Appointment & WhatsApp Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                  {renderCtaButton('primary', 'Book Appointment', <Calendar className="h-4 w-4" />, true)}
-                  {renderCtaButton('secondary', 'WhatsApp Us', <MessageCircle className="h-4 w-4" />, false)}
+                  {getCtaButtons().map((btn, index) => {
+                    const isPrimary = index === 0;
+                    const baseClass = isPrimary
+                      ? "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                      : "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
+
+                    let resolvedClass = baseClass;
+                    if (btn.isWhatsappSecondary && !isPrimary) {
+                      resolvedClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
+                    }
+
+                    return (
+                      <button key={btn.id} type="button" onClick={btn.onClick} className={resolvedClass}>
+                        {btn.icon}
+                        <span>{btn.text}</span>
+                        {btn.id === 'appointment' && isPrimary && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1297,7 +1378,9 @@ export default function ServiceDetail({
             );
           };
 
-          const testimonialsElement = (mConfig.show_testimonials !== false && (displayTestimonials.length > 0 || (mConfig.written_reviews && mConfig.written_reviews.length > 0))) ? (
+          const enabledWrittenReviews = (mConfig.written_reviews || []).filter((r: any) => r.enabled !== false);
+
+          const testimonialsElement = (mConfig.show_testimonials !== false && (displayTestimonials.length > 0 || enabledWrittenReviews.length > 0)) ? (
             <div className="py-12 border-t border-slate-100 space-y-12 animate-fade-in" id="cms-section-testimonials">
               {/* Video Testimonials Section */}
               {displayTestimonials.length > 0 && (
@@ -1384,7 +1467,7 @@ export default function ServiceDetail({
               )}
 
               {/* Written Reviews & Transformation Smiles */}
-              {mConfig.written_reviews && mConfig.written_reviews.length > 0 && (
+              {enabledWrittenReviews.length > 0 && (
                 <div className="space-y-8 pt-8 border-t border-slate-100">
                   <div className="text-center max-w-xl mx-auto space-y-2">
                     <span className="text-[10px] text-[#0D9488] font-black uppercase tracking-widest block">
@@ -1400,7 +1483,7 @@ export default function ServiceDetail({
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    {mConfig.written_reviews.map((r) => (
+                    {enabledWrittenReviews.map((r) => (
                       <div key={r.id} className="bg-white rounded-3xl border border-slate-150 p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-5">
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">

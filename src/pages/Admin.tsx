@@ -41,7 +41,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq } from '../types';
-import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link } from 'lucide-react';
+import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
 import { uploadImage } from '../utils/supabaseStorage';
@@ -154,6 +154,8 @@ export default function Admin({
   const [homePageImgUploading, setHomePageImgUploading] = useState(false);
   const [serviceFormError, setServiceFormError] = useState<string | null>(null);
   const [isSlugTouched, setIsSlugTouched] = useState(false);
+  const [relatedSearchQuery, setRelatedSearchQuery] = useState('');
+  const [relatedDragIndex, setRelatedDragIndex] = useState<number | null>(null);
 
   const steps: any[] = Array.isArray(editingService?.process_steps)
     ? editingService.process_steps
@@ -625,13 +627,338 @@ export default function Admin({
   };
 
   // Service Gallery Tab states
-  const [activeServiceEditorTab, setActiveServiceEditorTab] = useState<'details' | 'media' | 'gallery' | 'faqs' | 'marketing'>('details');
+  const [activeServiceEditorTab, setActiveServiceEditorTab] = useState<'details' | 'media' | 'gallery' | 'faqs' | 'marketing' | 'ordering'>('details');
+
   const [serviceGalleryList, setServiceGalleryList] = useState<ServiceGalleryItem[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [gallerySaving, setGallerySaving] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // Display Order Manager states
+  const [orderStepsDraft, setOrderStepsDraft] = useState<any[]>([]);
+  const [orderBenefitsDraft, setOrderBenefitsDraft] = useState<any[]>([]);
+  const [orderGalleryDraft, setOrderGalleryDraft] = useState<any[]>([]);
+  const [orderTestimonialsDraft, setOrderTestimonialsDraft] = useState<any[]>([]);
+  const [orderRelatedDraft, setOrderRelatedDraft] = useState<any[]>([]);
+  const [orderSuccessMsg, setOrderSuccessMsg] = useState<Record<string, string | null>>({});
+  const [orderErrorMsg, setOrderErrorMsg] = useState<Record<string, string | null>>({});
+  const [draggedOrderInfo, setDraggedOrderInfo] = useState<{ category: string; index: number } | null>(null);
+
+  const initDisplayOrderDrafts = React.useCallback(() => {
+    if (!editingService) return;
+
+    // 1. Steps
+    const rawSteps = Array.isArray(editingService.process_steps)
+      ? editingService.process_steps
+      : (typeof editingService.process_steps === 'string'
+          ? (() => { try { return JSON.parse(editingService.process_steps || '[]') } catch(e) { return [] } })()
+          : []);
+    const sortedSteps = [...rawSteps].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderStepsDraft(sortedSteps);
+
+    // 2. Benefits
+    const rawFeats = Array.isArray(editingService.features)
+      ? editingService.features
+      : (typeof editingService.features === 'string'
+          ? (() => { try { return JSON.parse(editingService.features || '[]') } catch(e) { return [] } })()
+          : []);
+    const sortedFeats = [...rawFeats].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderBenefitsDraft(sortedFeats);
+
+    // 3. Gallery
+    const sortedGallery = [...serviceGalleryList].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderGalleryDraft(sortedGallery);
+
+    // 4. Testimonials
+    const rawTestimonials = Array.isArray(editingService.patient_testimonials)
+      ? editingService.patient_testimonials
+      : (typeof editingService.patient_testimonials === 'string'
+          ? (() => { try { return JSON.parse(editingService.patient_testimonials || '[]') } catch(e) { return [] } })()
+          : []);
+    const sortedTestimonials = [...rawTestimonials].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderTestimonialsDraft(sortedTestimonials);
+
+    // 5. Related Services
+    const mConfigObj = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+    const rawRelated = mConfigObj.related_services || [];
+    const cleanRelated = rawRelated.filter((r: any) => 
+      r && r.id && servicesList.some(s => s.id === r.id)
+    );
+    setOrderRelatedDraft(cleanRelated);
+
+    setOrderSuccessMsg({});
+    setOrderErrorMsg({});
+  }, [editingService, serviceGalleryList, servicesList]);
+
+  React.useEffect(() => {
+    if (activeServiceEditorTab === 'ordering') {
+      initDisplayOrderDrafts();
+    }
+  }, [activeServiceEditorTab, editingService?.id, initDisplayOrderDrafts]);
+
+  const moveOrderItem = (
+    draft: any[],
+    setDraft: React.Dispatch<React.SetStateAction<any[]>>,
+    index: number,
+    direction: 'up' | 'down'
+  ) => {
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= draft.length) return;
+    const updated = [...draft];
+    const temp = updated[index];
+    updated[index] = updated[targetIdx];
+    updated[targetIdx] = temp;
+    setDraft(updated);
+  };
+
+  const handleOrderDragStart = (e: React.DragEvent, category: string, index: number) => {
+    setDraggedOrderInfo({ category, index });
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleOrderDragOver = (e: React.DragEvent, category: string, index: number, draft: any[], setDraft: React.Dispatch<React.SetStateAction<any[]>>) => {
+    e.preventDefault();
+    if (!draggedOrderInfo || draggedOrderInfo.category !== category || draggedOrderInfo.index === index) return;
+
+    const updated = [...draft];
+    const draggedItem = updated[draggedOrderInfo.index];
+    updated.splice(draggedOrderInfo.index, 1);
+    updated.splice(index, 0, draggedItem);
+
+    setDraft(updated);
+    setDraggedOrderInfo({ category, index });
+  };
+
+  const handleOrderDragEnd = () => {
+    setDraggedOrderInfo(null);
+  };
+
+  const handleResetStepsOrder = () => {
+    if (!editingService) return;
+    const rawSteps = Array.isArray(editingService.process_steps)
+      ? editingService.process_steps
+      : (typeof editingService.process_steps === 'string'
+          ? (() => { try { return JSON.parse(editingService.process_steps || '[]') } catch(e) { return [] } })()
+          : []);
+    const sortedSteps = [...rawSteps].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderStepsDraft(sortedSteps);
+    setOrderErrorMsg(prev => ({ ...prev, steps: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, steps: null }));
+  };
+
+  const handleResetBenefitsOrder = () => {
+    if (!editingService) return;
+    const rawFeats = Array.isArray(editingService.features)
+      ? editingService.features
+      : (typeof editingService.features === 'string'
+          ? (() => { try { return JSON.parse(editingService.features || '[]') } catch(e) { return [] } })()
+          : []);
+    const sortedFeats = [...rawFeats].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderBenefitsDraft(sortedFeats);
+    setOrderErrorMsg(prev => ({ ...prev, benefits: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, benefits: null }));
+  };
+
+  const handleResetGalleryOrder = () => {
+    if (!editingService) return;
+    const sortedGallery = [...serviceGalleryList].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderGalleryDraft(sortedGallery);
+    setOrderErrorMsg(prev => ({ ...prev, gallery: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, gallery: null }));
+  };
+
+  const handleResetTestimonialsOrder = () => {
+    if (!editingService) return;
+    const rawTestimonials = Array.isArray(editingService.patient_testimonials)
+      ? editingService.patient_testimonials
+      : (typeof editingService.patient_testimonials === 'string'
+          ? (() => { try { return JSON.parse(editingService.patient_testimonials || '[]') } catch(e) { return [] } })()
+          : []);
+    const sortedTestimonials = [...rawTestimonials].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    setOrderTestimonialsDraft(sortedTestimonials);
+    setOrderErrorMsg(prev => ({ ...prev, testimonials: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, testimonials: null }));
+  };
+
+  const handleResetRelatedOrder = () => {
+    if (!editingService) return;
+    const mConfigObj = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+    const rawRelated = mConfigObj.related_services || [];
+    const cleanRelated = rawRelated.filter((r: any) => 
+      r && r.id && servicesList.some(s => s.id === r.id)
+    );
+    setOrderRelatedDraft(cleanRelated);
+    setOrderErrorMsg(prev => ({ ...prev, related: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, related: null }));
+  };
+
+  const handleSaveStepsOrder = async () => {
+    if (!editingService) return;
+    setOrderErrorMsg(prev => ({ ...prev, steps: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, steps: null }));
+
+    try {
+      const updatedSteps = orderStepsDraft.map((step, idx) => ({
+        ...step,
+        display_order: (idx + 1) * 10
+      }));
+
+      const updatedService = {
+        ...editingService,
+        process_steps: updatedSteps
+      };
+      setEditingService(updatedService);
+
+      const result = await serviceService.saveService(updatedService);
+      if (result.success) {
+        setServicesList(prev => prev.map(s => s.id === updatedService.id ? updatedService : s));
+        setOrderSuccessMsg(prev => ({ ...prev, steps: 'Steps display order saved successfully!' }));
+        setTimeout(() => setOrderSuccessMsg(prev => ({ ...prev, steps: null })), 4000);
+      } else {
+        setOrderErrorMsg(prev => ({ ...prev, steps: result.error || 'Failed to save steps order.' }));
+      }
+    } catch (err: any) {
+      console.error('Error saving steps order:', err);
+      setOrderErrorMsg(prev => ({ ...prev, steps: err.message || 'An error occurred.' }));
+    }
+  };
+
+  const handleSaveBenefitsOrder = async () => {
+    if (!editingService) return;
+    setOrderErrorMsg(prev => ({ ...prev, benefits: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, benefits: null }));
+
+    try {
+      const updatedBenefits = orderBenefitsDraft.map((feat, idx) => ({
+        ...feat,
+        display_order: (idx + 1) * 10
+      }));
+
+      const updatedService = {
+        ...editingService,
+        features: updatedBenefits
+      };
+      setEditingService(updatedService);
+
+      const result = await serviceService.saveService(updatedService);
+      if (result.success) {
+        setServicesList(prev => prev.map(s => s.id === updatedService.id ? updatedService : s));
+        setOrderSuccessMsg(prev => ({ ...prev, benefits: 'Benefits display order saved successfully!' }));
+        setTimeout(() => setOrderSuccessMsg(prev => ({ ...prev, benefits: null })), 4000);
+      } else {
+        setOrderErrorMsg(prev => ({ ...prev, benefits: result.error || 'Failed to save benefits order.' }));
+      }
+    } catch (err: any) {
+      console.error('Error saving benefits order:', err);
+      setOrderErrorMsg(prev => ({ ...prev, benefits: err.message || 'An error occurred.' }));
+    }
+  };
+
+  const handleSaveGalleryOrder = async () => {
+    if (!editingService) return;
+    setOrderErrorMsg(prev => ({ ...prev, gallery: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, gallery: null }));
+
+    try {
+      const updatedGallery = orderGalleryDraft.map((item, idx) => ({
+        ...item,
+        display_order: (idx + 1) * 10
+      }));
+
+      const result = await serviceService.saveGallery(editingService.id, updatedGallery);
+      if (result.success) {
+        setServiceGalleryList(updatedGallery);
+        setOrderSuccessMsg(prev => ({ ...prev, gallery: 'Gallery images display order saved successfully!' }));
+        setTimeout(() => setOrderSuccessMsg(prev => ({ ...prev, gallery: null })), 4000);
+      } else {
+        setOrderErrorMsg(prev => ({ ...prev, gallery: result.error || 'Failed to save gallery order.' }));
+      }
+    } catch (err: any) {
+      console.error('Error saving gallery order:', err);
+      setOrderErrorMsg(prev => ({ ...prev, gallery: err.message || 'An error occurred.' }));
+    }
+  };
+
+  const handleSaveTestimonialsOrder = async () => {
+    if (!editingService) return;
+    setOrderErrorMsg(prev => ({ ...prev, testimonials: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, testimonials: null }));
+
+    try {
+      const updatedTestimonials = orderTestimonialsDraft.map((testi, idx) => ({
+        ...testi,
+        display_order: (idx + 1) * 10
+      }));
+
+      const updatedService = {
+        ...editingService,
+        patient_testimonials: updatedTestimonials
+      };
+      setEditingService(updatedService);
+
+      const result = await serviceService.saveService(updatedService);
+      if (result.success) {
+        setServicesList(prev => prev.map(s => s.id === updatedService.id ? updatedService : s));
+        setOrderSuccessMsg(prev => ({ ...prev, testimonials: 'Testimonials display order saved successfully!' }));
+        setTimeout(() => setOrderSuccessMsg(prev => ({ ...prev, testimonials: null })), 4000);
+      } else {
+        setOrderErrorMsg(prev => ({ ...prev, testimonials: result.error || 'Failed to save testimonials order.' }));
+      }
+    } catch (err: any) {
+      console.error('Error saving testimonials order:', err);
+      setOrderErrorMsg(prev => ({ ...prev, testimonials: err.message || 'An error occurred.' }));
+    }
+  };
+
+  const handleSaveRelatedOrder = async () => {
+    if (!editingService) return;
+    setOrderErrorMsg(prev => ({ ...prev, related: null }));
+    setOrderSuccessMsg(prev => ({ ...prev, related: null }));
+
+    try {
+      const cfg = typeof editingService.marketing_config === 'string'
+        ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+        : (editingService.marketing_config || {});
+
+      const existingRelated = cfg.related_services || [];
+      const remainingRelated = existingRelated.filter((item: any) => 
+        !orderRelatedDraft.some(d => d.id === (typeof item === 'string' ? item : item.id))
+      );
+
+      const updatedRelated = [...orderRelatedDraft, ...remainingRelated];
+
+      const updatedConfig = {
+        ...cfg,
+        related_services: updatedRelated
+      };
+
+      const updatedService = {
+        ...editingService,
+        marketing_config: updatedConfig
+      };
+      setEditingService(updatedService);
+
+      const result = await serviceService.saveService(updatedService);
+      if (result.success) {
+        setServicesList(prev => prev.map(s => s.id === updatedService.id ? updatedService : s));
+        setOrderSuccessMsg(prev => ({ ...prev, related: 'Related services display order saved successfully!' }));
+        setTimeout(() => setOrderSuccessMsg(prev => ({ ...prev, related: null })), 4000);
+      } else {
+        setOrderErrorMsg(prev => ({ ...prev, related: result.error || 'Failed to save related services order.' }));
+      }
+    } catch (err: any) {
+      console.error('Error saving related services order:', err);
+      setOrderErrorMsg(prev => ({ ...prev, related: err.message || 'An error occurred.' }));
+    }
+  };
+
+
 
   // Add by URL states
   const [isAddByUrlOpen, setIsAddByUrlOpen] = useState(false);
@@ -665,6 +992,764 @@ export default function Admin({
   const [reviewDraftBeforeImage, setReviewDraftBeforeImage] = useState('');
   const [reviewDraftAfterImage, setReviewDraftAfterImage] = useState('');
   const [reviewDraftDisplayOrder, setReviewDraftDisplayOrder] = useState<number>(10);
+  const [reviewDraftEnabled, setReviewDraftEnabled] = useState<boolean>(true);
+  const [reviewDragIndex, setReviewDragIndex] = useState<number | null>(null);
+
+  // Bottom Contact Section draft states
+  const [contactClinicNameDraft, setContactClinicNameDraft] = useState('');
+  const [contactAddressDraft, setContactAddressDraft] = useState('');
+  const [contactCallNumberDraft, setContactCallNumberDraft] = useState('');
+  const [contactWhatsappNumberDraft, setContactWhatsappNumberDraft] = useState('');
+  const [contactEmailDraft, setContactEmailDraft] = useState('');
+  const [contactWorkingHoursDraft, setContactWorkingHoursDraft] = useState('');
+  const [contactMapUrlDraft, setContactMapUrlDraft] = useState('');
+  const [contactFormError, setContactFormError] = useState<string | null>(null);
+  const [contactFormSuccess, setContactFormSuccess] = useState<string | null>(null);
+
+  // Social Links draft states
+  const [socialFbLinkDraft, setSocialFbLinkDraft] = useState('');
+  const [socialFbEnabledDraft, setSocialFbEnabledDraft] = useState(true);
+  const [socialIgLinkDraft, setSocialIgLinkDraft] = useState('');
+  const [socialIgEnabledDraft, setSocialIgEnabledDraft] = useState(true);
+  const [socialYtLinkDraft, setSocialYtLinkDraft] = useState('');
+  const [socialYtEnabledDraft, setSocialYtEnabledDraft] = useState(false);
+  const [socialLiLinkDraft, setSocialLiLinkDraft] = useState('');
+  const [socialLiEnabledDraft, setSocialLiEnabledDraft] = useState(false);
+  const [socialTwLinkDraft, setSocialTwLinkDraft] = useState('');
+  const [socialTwEnabledDraft, setSocialTwEnabledDraft] = useState(false);
+  const [socialWaLinkDraft, setSocialWaLinkDraft] = useState('');
+  const [socialWaEnabledDraft, setSocialWaEnabledDraft] = useState(false);
+  const [socialFormError, setSocialFormError] = useState<string | null>(null);
+  const [socialFormSuccess, setSocialFormSuccess] = useState<string | null>(null);
+
+  // CTA Settings draft states
+  const [ctaAppointmentEnabledDraft, setCtaAppointmentEnabledDraft] = useState(true);
+  const [ctaAppointmentTextDraft, setCtaAppointmentTextDraft] = useState('');
+  const [ctaAppointmentDestDraft, setCtaAppointmentDestDraft] = useState<'appointment' | 'internal' | 'external'>('appointment');
+  const [ctaAppointmentDestValueDraft, setCtaAppointmentDestValueDraft] = useState('');
+
+  const [ctaCallEnabledDraft, setCtaCallEnabledDraft] = useState(false);
+  const [ctaCallTextDraft, setCtaCallTextDraft] = useState('');
+  const [ctaCallDestDraft, setCtaCallDestDraft] = useState<'clinic' | 'custom'>('clinic');
+  const [ctaCallDestValueDraft, setCtaCallDestValueDraft] = useState('');
+
+  const [ctaWhatsappEnabledDraft, setCtaWhatsappEnabledDraft] = useState(true);
+  const [ctaWhatsappTextDraft, setCtaWhatsappTextDraft] = useState('');
+  const [ctaWhatsappDestDraft, setCtaWhatsappDestDraft] = useState<'clinic' | 'custom'>('clinic');
+  const [ctaWhatsappDestValueDraft, setCtaWhatsappDestValueDraft] = useState('');
+
+  const [ctaCustomEnabledDraft, setCtaCustomEnabledDraft] = useState(false);
+  const [ctaCustomTextDraft, setCtaCustomTextDraft] = useState('');
+  const [ctaCustomDestValueDraft, setCtaCustomDestValueDraft] = useState('');
+
+  const [ctaFormError, setCtaFormError] = useState<string | null>(null);
+  const [ctaFormSuccess, setCtaFormSuccess] = useState<string | null>(null);
+
+  // Section Visibility Manager draft states
+  const [visHeroDraft, setVisHeroDraft] = useState(true);
+  const [visIntroDraft, setVisIntroDraft] = useState(true);
+  const [visProcessDraft, setVisProcessDraft] = useState(true);
+  const [visBenefitsDraft, setVisBenefitsDraft] = useState(true);
+  const [visGalleryDraft, setVisGalleryDraft] = useState(true);
+  const [visVideoDraft, setVisVideoDraft] = useState(true);
+  const [visHospitalDraft, setVisHospitalDraft] = useState(true);
+  const [visTeamDraft, setVisTeamDraft] = useState(true);
+  const [visTestimonialsDraft, setVisTestimonialsDraft] = useState(true);
+  const [visOfferBannerDraft, setVisOfferBannerDraft] = useState(true);
+  const [visFaqDraft, setVisFaqDraft] = useState(true);
+  const [visRelatedServicesDraft, setVisRelatedServicesDraft] = useState(true);
+  const [visBottomCtaDraft, setVisBottomCtaDraft] = useState(true);
+
+  const [visFormError, setVisFormError] = useState<string | null>(null);
+  const [visFormSuccess, setVisFormSuccess] = useState<string | null>(null);
+
+  // Synchronize drafts when editingService changes
+  useEffect(() => {
+    if (editingService) {
+      const cfg = typeof editingService.marketing_config === 'string'
+        ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+        : (editingService.marketing_config || {});
+      setContactClinicNameDraft(cfg.contact_clinic_name || '');
+      setContactAddressDraft(cfg.contact_address || '');
+      setContactCallNumberDraft(cfg.contact_call_number || '');
+      setContactWhatsappNumberDraft(cfg.contact_whatsapp_number || '');
+      setContactEmailDraft(cfg.contact_email || '');
+      setContactWorkingHoursDraft(cfg.contact_working_hours || '');
+      setContactMapUrlDraft(cfg.contact_map_url || '');
+      setContactFormError(null);
+      setContactFormSuccess(null);
+
+      // Social links synchronization
+      const fbEnabled = cfg.social_fb_enabled !== undefined 
+        ? !!cfg.social_fb_enabled 
+        : (cfg.social_facebook_enabled !== undefined ? !!cfg.social_facebook_enabled : true);
+      const fbLink = cfg.social_fb_link || cfg.social_facebook || '';
+
+      const igEnabled = cfg.social_ig_enabled !== undefined 
+        ? !!cfg.social_ig_enabled 
+        : (cfg.social_instagram_enabled !== undefined ? !!cfg.social_instagram_enabled : true);
+      const igLink = cfg.social_ig_link || cfg.social_instagram || '';
+
+      const ytEnabled = cfg.social_yt_enabled !== undefined 
+        ? !!cfg.social_yt_enabled 
+        : (cfg.social_youtube_enabled !== undefined ? !!cfg.social_youtube_enabled : false);
+      const ytLink = cfg.social_yt_link || cfg.social_youtube || '';
+
+      const liEnabled = cfg.social_li_enabled !== undefined 
+        ? !!cfg.social_li_enabled 
+        : (cfg.social_linkedin_enabled !== undefined ? !!cfg.social_linkedin_enabled : false);
+      const liLink = cfg.social_li_link || cfg.social_linkedin || '';
+
+      const twEnabled = cfg.social_tw_enabled !== undefined 
+        ? !!cfg.social_tw_enabled 
+        : (cfg.social_twitter_enabled !== undefined ? !!cfg.social_twitter_enabled : false);
+      const twLink = cfg.social_tw_link || cfg.social_twitter || '';
+
+      const waEnabled = cfg.social_wa_enabled !== undefined 
+        ? !!cfg.social_wa_enabled 
+        : (cfg.social_whatsapp_enabled !== undefined ? !!cfg.social_whatsapp_enabled : false);
+      const waLink = cfg.social_wa_link || cfg.social_whatsapp || '';
+
+      setSocialFbLinkDraft(fbLink);
+      setSocialFbEnabledDraft(fbEnabled);
+      setSocialIgLinkDraft(igLink);
+      setSocialIgEnabledDraft(igEnabled);
+      setSocialYtLinkDraft(ytLink);
+      setSocialYtEnabledDraft(ytEnabled);
+      setSocialLiLinkDraft(liLink);
+      setSocialLiEnabledDraft(liEnabled);
+      setSocialTwLinkDraft(twLink);
+      setSocialTwEnabledDraft(twEnabled);
+      setSocialWaLinkDraft(waLink);
+      setSocialWaEnabledDraft(waEnabled);
+      setSocialFormError(null);
+      setSocialFormSuccess(null);
+
+      // CTA Settings initialization
+      setCtaAppointmentEnabledDraft(cfg.cta_appointment_enabled !== undefined ? !!cfg.cta_appointment_enabled : true);
+      setCtaAppointmentTextDraft(cfg.cta_appointment_text || '');
+      setCtaAppointmentDestDraft(cfg.cta_appointment_dest || 'appointment');
+      setCtaAppointmentDestValueDraft(cfg.cta_appointment_dest_value || '');
+
+      setCtaCallEnabledDraft(cfg.cta_call_enabled !== undefined ? !!cfg.cta_call_enabled : false);
+      setCtaCallTextDraft(cfg.cta_call_text || '');
+      setCtaCallDestDraft(cfg.cta_call_dest || 'clinic');
+      setCtaCallDestValueDraft(cfg.cta_call_dest_value || '');
+
+      setCtaWhatsappEnabledDraft(cfg.cta_whatsapp_enabled !== undefined ? !!cfg.cta_whatsapp_enabled : true);
+      setCtaWhatsappTextDraft(cfg.cta_whatsapp_text || '');
+      setCtaWhatsappDestDraft(cfg.cta_whatsapp_dest || 'clinic');
+      setCtaWhatsappDestValueDraft(cfg.cta_whatsapp_dest_value || '');
+
+      setCtaCustomEnabledDraft(cfg.cta_custom_enabled !== undefined ? !!cfg.cta_custom_enabled : false);
+      setCtaCustomTextDraft(cfg.cta_custom_text || '');
+      setCtaCustomDestValueDraft(cfg.cta_custom_dest_value || '');
+
+      setCtaFormError(null);
+      setCtaFormSuccess(null);
+
+      // Section Visibility initialization
+      setVisHeroDraft(cfg.show_hero !== false);
+      setVisIntroDraft(cfg.show_introduction !== false);
+      setVisProcessDraft(cfg.show_process !== false);
+      setVisBenefitsDraft(cfg.show_benefits !== false);
+      setVisGalleryDraft(cfg.show_gallery !== false);
+      setVisVideoDraft(cfg.show_procedure_video !== false);
+      setVisHospitalDraft(cfg.show_hospital_photos !== false);
+      setVisTeamDraft(cfg.show_team_photos !== false);
+      setVisTestimonialsDraft(cfg.show_testimonials !== false);
+      setVisOfferBannerDraft(cfg.show_offer_banner !== false && cfg.offer_show !== false);
+      setVisFaqDraft(cfg.show_faq !== false);
+      setVisRelatedServicesDraft(cfg.show_related_services !== false);
+      setVisBottomCtaDraft(cfg.show_bottom_cta !== false);
+
+      setVisFormError(null);
+      setVisFormSuccess(null);
+    }
+  }, [editingService?.id]);
+
+  const handleResetSocialDrafts = () => {
+    if (!editingService) return;
+    const cfg = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    const fbEnabled = cfg.social_fb_enabled !== undefined 
+      ? !!cfg.social_fb_enabled 
+      : (cfg.social_facebook_enabled !== undefined ? !!cfg.social_facebook_enabled : true);
+    const fbLink = cfg.social_fb_link || cfg.social_facebook || '';
+
+    const igEnabled = cfg.social_ig_enabled !== undefined 
+      ? !!cfg.social_ig_enabled 
+      : (cfg.social_instagram_enabled !== undefined ? !!cfg.social_instagram_enabled : true);
+    const igLink = cfg.social_ig_link || cfg.social_instagram || '';
+
+    const ytEnabled = cfg.social_yt_enabled !== undefined 
+      ? !!cfg.social_yt_enabled 
+      : (cfg.social_youtube_enabled !== undefined ? !!cfg.social_youtube_enabled : false);
+    const ytLink = cfg.social_yt_link || cfg.social_youtube || '';
+
+    const liEnabled = cfg.social_li_enabled !== undefined 
+      ? !!cfg.social_li_enabled 
+      : (cfg.social_linkedin_enabled !== undefined ? !!cfg.social_linkedin_enabled : false);
+    const liLink = cfg.social_li_link || cfg.social_linkedin || '';
+
+    const twEnabled = cfg.social_tw_enabled !== undefined 
+      ? !!cfg.social_tw_enabled 
+      : (cfg.social_twitter_enabled !== undefined ? !!cfg.social_twitter_enabled : false);
+    const twLink = cfg.social_tw_link || cfg.social_twitter || '';
+
+    const waEnabled = cfg.social_wa_enabled !== undefined 
+      ? !!cfg.social_wa_enabled 
+      : (cfg.social_whatsapp_enabled !== undefined ? !!cfg.social_whatsapp_enabled : false);
+    const waLink = cfg.social_wa_link || cfg.social_whatsapp || '';
+
+    setSocialFbLinkDraft(fbLink);
+    setSocialFbEnabledDraft(fbEnabled);
+    setSocialIgLinkDraft(igLink);
+    setSocialIgEnabledDraft(igEnabled);
+    setSocialYtLinkDraft(ytLink);
+    setSocialYtEnabledDraft(ytEnabled);
+    setSocialLiLinkDraft(liLink);
+    setSocialLiEnabledDraft(liEnabled);
+    setSocialTwLinkDraft(twLink);
+    setSocialTwEnabledDraft(twEnabled);
+    setSocialWaLinkDraft(waLink);
+    setSocialWaEnabledDraft(waEnabled);
+    setSocialFormError(null);
+    setSocialFormSuccess(null);
+  };
+
+  const handleSaveSocialDrafts = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!editingService) return;
+    setSocialFormError(null);
+    setSocialFormSuccess(null);
+
+    const cfg = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    const currentFbLink = cfg.social_fb_link || cfg.social_facebook || '';
+    const currentIgLink = cfg.social_ig_link || cfg.social_instagram || '';
+    const currentYtLink = cfg.social_yt_link || cfg.social_youtube || '';
+    const currentLiLink = cfg.social_li_link || cfg.social_linkedin || '';
+    const currentTwLink = cfg.social_tw_link || cfg.social_twitter || '';
+    const currentWaLink = cfg.social_wa_link || cfg.social_whatsapp || '';
+
+    const validationErrors: string[] = [];
+
+    // Helper URL format validator and normalizer
+    const normalizeUrl = (val: string) => {
+      let temp = val.trim();
+      if (!temp) return '';
+      if (!/^https?:\/\//i.test(temp)) {
+        temp = 'https://' + temp;
+      }
+      return temp;
+    };
+
+    const isValidUrl = (val: string) => {
+      try {
+        const u = new URL(val);
+        return u.hostname.includes('.') && u.hostname.length > 3;
+      } catch {
+        return false;
+      }
+    };
+
+    // Facebook
+    let fbUrlToSave = socialFbLinkDraft.trim();
+    if (fbUrlToSave) {
+      fbUrlToSave = normalizeUrl(fbUrlToSave);
+    }
+
+    if (socialFbEnabledDraft) {
+      if (!fbUrlToSave) {
+        fbUrlToSave = currentFbLink;
+        if (!fbUrlToSave) {
+          validationErrors.push('Facebook URL cannot be empty when enabled.');
+        }
+      } else if (!isValidUrl(fbUrlToSave)) {
+        validationErrors.push('Facebook URL format is invalid.');
+      }
+    } else {
+      if (!fbUrlToSave && currentFbLink) {
+        fbUrlToSave = currentFbLink;
+      }
+    }
+
+    // Instagram
+    let igUrlToSave = socialIgLinkDraft.trim();
+    if (igUrlToSave) {
+      igUrlToSave = normalizeUrl(igUrlToSave);
+    }
+
+    if (socialIgEnabledDraft) {
+      if (!igUrlToSave) {
+        igUrlToSave = currentIgLink;
+        if (!igUrlToSave) {
+          validationErrors.push('Instagram URL cannot be empty when enabled.');
+        }
+      } else if (!isValidUrl(igUrlToSave)) {
+        validationErrors.push('Instagram URL format is invalid.');
+      }
+    } else {
+      if (!igUrlToSave && currentIgLink) {
+        igUrlToSave = currentIgLink;
+      }
+    }
+
+    // YouTube
+    let ytUrlToSave = socialYtLinkDraft.trim();
+    if (ytUrlToSave) {
+      ytUrlToSave = normalizeUrl(ytUrlToSave);
+    }
+
+    if (socialYtEnabledDraft) {
+      if (!ytUrlToSave) {
+        ytUrlToSave = currentYtLink;
+        if (!ytUrlToSave) {
+          validationErrors.push('YouTube URL cannot be empty when enabled.');
+        }
+      } else if (!isValidUrl(ytUrlToSave)) {
+        validationErrors.push('YouTube URL format is invalid.');
+      }
+    } else {
+      if (!ytUrlToSave && currentYtLink) {
+        ytUrlToSave = currentYtLink;
+      }
+    }
+
+    // LinkedIn
+    let liUrlToSave = socialLiLinkDraft.trim();
+    if (liUrlToSave) {
+      liUrlToSave = normalizeUrl(liUrlToSave);
+    }
+
+    if (socialLiEnabledDraft) {
+      if (!liUrlToSave) {
+        liUrlToSave = currentLiLink;
+        if (!liUrlToSave) {
+          validationErrors.push('LinkedIn URL cannot be empty when enabled.');
+        }
+      } else if (!isValidUrl(liUrlToSave)) {
+        validationErrors.push('LinkedIn URL format is invalid.');
+      }
+    } else {
+      if (!liUrlToSave && currentLiLink) {
+        liUrlToSave = currentLiLink;
+      }
+    }
+
+    // Twitter
+    let twUrlToSave = socialTwLinkDraft.trim();
+    if (twUrlToSave) {
+      twUrlToSave = normalizeUrl(twUrlToSave);
+    }
+
+    if (socialTwEnabledDraft) {
+      if (!twUrlToSave) {
+        twUrlToSave = currentTwLink;
+        if (!twUrlToSave) {
+          validationErrors.push('Twitter URL cannot be empty when enabled.');
+        }
+      } else if (!isValidUrl(twUrlToSave)) {
+        validationErrors.push('Twitter URL format is invalid.');
+      }
+    } else {
+      if (!twUrlToSave && currentTwLink) {
+        twUrlToSave = currentTwLink;
+      }
+    }
+
+    // WhatsApp
+    let waUrlToSave = socialWaLinkDraft.trim();
+    if (waUrlToSave) {
+      waUrlToSave = normalizeUrl(waUrlToSave);
+    }
+
+    if (socialWaEnabledDraft) {
+      if (!waUrlToSave) {
+        waUrlToSave = currentWaLink;
+        if (!waUrlToSave) {
+          validationErrors.push('WhatsApp URL cannot be empty when enabled.');
+        }
+      } else {
+        const isValidWa = waUrlToSave.startsWith('https://wa.me/') || waUrlToSave.startsWith('https://api.whatsapp.com/');
+        if (!isValidWa) {
+          validationErrors.push('WhatsApp URL must start with https://wa.me/ or https://api.whatsapp.com/');
+        }
+      }
+    } else {
+      if (!waUrlToSave && currentWaLink) {
+        waUrlToSave = currentWaLink;
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      setSocialFormError(validationErrors.join(' '));
+      return;
+    }
+
+    const updatedConfig = {
+      ...cfg,
+      social_facebook: fbUrlToSave || undefined,
+      social_fb_link: fbUrlToSave || undefined,
+      social_facebook_enabled: socialFbEnabledDraft,
+      social_fb_enabled: socialFbEnabledDraft,
+
+      social_instagram: igUrlToSave || undefined,
+      social_ig_link: igUrlToSave || undefined,
+      social_instagram_enabled: socialIgEnabledDraft,
+      social_ig_enabled: socialIgEnabledDraft,
+
+      social_youtube: ytUrlToSave || undefined,
+      social_yt_link: ytUrlToSave || undefined,
+      social_youtube_enabled: socialYtEnabledDraft,
+      social_yt_enabled: socialYtEnabledDraft,
+
+      social_linkedin: liUrlToSave || undefined,
+      social_li_link: liUrlToSave || undefined,
+      social_linkedin_enabled: socialLiEnabledDraft,
+      social_li_enabled: socialLiEnabledDraft,
+
+      social_twitter: twUrlToSave || undefined,
+      social_tw_link: twUrlToSave || undefined,
+      social_twitter_enabled: socialTwEnabledDraft,
+      social_tw_enabled: socialTwEnabledDraft,
+
+      social_whatsapp: waUrlToSave || undefined,
+      social_wa_link: waUrlToSave || undefined,
+      social_whatsapp_enabled: socialWaEnabledDraft,
+      social_wa_enabled: socialWaEnabledDraft,
+    };
+
+    setEditingService({
+      ...editingService,
+      marketing_config: updatedConfig
+    });
+
+    setSocialFormSuccess('Social links details updated locally. Click "Save Service & Configurations" at the bottom of the page to save permanently.');
+    setTimeout(() => setSocialFormSuccess(null), 5000);
+  };
+
+  const handleResetCtaDrafts = () => {
+    if (!editingService) return;
+    const cfg = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    setCtaAppointmentEnabledDraft(cfg.cta_appointment_enabled !== undefined ? !!cfg.cta_appointment_enabled : true);
+    setCtaAppointmentTextDraft(cfg.cta_appointment_text || '');
+    setCtaAppointmentDestDraft(cfg.cta_appointment_dest || 'appointment');
+    setCtaAppointmentDestValueDraft(cfg.cta_appointment_dest_value || '');
+
+    setCtaCallEnabledDraft(cfg.cta_call_enabled !== undefined ? !!cfg.cta_call_enabled : false);
+    setCtaCallTextDraft(cfg.cta_call_text || '');
+    setCtaCallDestDraft(cfg.cta_call_dest || 'clinic');
+    setCtaCallDestValueDraft(cfg.cta_call_dest_value || '');
+
+    setCtaWhatsappEnabledDraft(cfg.cta_whatsapp_enabled !== undefined ? !!cfg.cta_whatsapp_enabled : true);
+    setCtaWhatsappTextDraft(cfg.cta_whatsapp_text || '');
+    setCtaWhatsappDestDraft(cfg.cta_whatsapp_dest || 'clinic');
+    setCtaWhatsappDestValueDraft(cfg.cta_whatsapp_dest_value || '');
+
+    setCtaCustomEnabledDraft(cfg.cta_custom_enabled !== undefined ? !!cfg.cta_custom_enabled : false);
+    setCtaCustomTextDraft(cfg.cta_custom_text || '');
+    setCtaCustomDestValueDraft(cfg.cta_custom_dest_value || '');
+
+    setCtaFormError(null);
+    setCtaFormSuccess(null);
+  };
+
+  const handleSaveCtaDrafts = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!editingService) return;
+    setCtaFormError(null);
+    setCtaFormSuccess(null);
+
+    const cfg = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    const validationErrors: string[] = [];
+
+    // Helper URL format validator
+    const isValidUrl = (val: string) => {
+      let temp = val.trim();
+      if (!temp) return false;
+      if (!/^https?:\/\//i.test(temp)) {
+        temp = 'https://' + temp;
+      }
+      try {
+        const u = new URL(temp);
+        return u.hostname.includes('.') && u.hostname.length > 3;
+      } catch {
+        return false;
+      }
+    };
+
+    // 1. Book Appointment Button validation
+    let appointmentText = ctaAppointmentTextDraft.trim();
+    let appointmentDest = ctaAppointmentDestDraft;
+    let appointmentValue = ctaAppointmentDestValueDraft.trim();
+
+    if (ctaAppointmentEnabledDraft) {
+      if (!appointmentText) {
+        validationErrors.push('Book Appointment button text cannot be empty when enabled.');
+      }
+      if (appointmentDest !== 'appointment') {
+        if (!appointmentValue) {
+          validationErrors.push('Destination URL/Route cannot be empty for Book Appointment custom destination.');
+        } else if (appointmentDest === 'external' && !isValidUrl(appointmentValue)) {
+          validationErrors.push('Book Appointment external destination must be a valid URL (e.g., https://example.com).');
+        }
+      }
+    }
+
+    // 2. Call Now Button validation
+    let callText = ctaCallTextDraft.trim();
+    let callDest = ctaCallDestDraft;
+    let callValue = ctaCallDestValueDraft.trim();
+
+    if (ctaCallEnabledDraft) {
+      if (!callText) {
+        validationErrors.push('Call Now button text cannot be empty when enabled.');
+      }
+      if (callDest === 'custom') {
+        if (!callValue) {
+          validationErrors.push('Custom phone number cannot be empty when custom destination is selected.');
+        }
+      }
+    }
+
+    // 3. WhatsApp Button validation
+    let whatsappText = ctaWhatsappTextDraft.trim();
+    let whatsappDest = ctaWhatsappDestDraft;
+    let whatsappValue = ctaWhatsappDestValueDraft.trim();
+
+    if (ctaWhatsappEnabledDraft) {
+      if (!whatsappText) {
+        validationErrors.push('WhatsApp button text cannot be empty when enabled.');
+      }
+      if (whatsappDest === 'custom') {
+        if (!whatsappValue) {
+          validationErrors.push('Custom WhatsApp destination cannot be empty.');
+        } else {
+          const isValidWa = whatsappValue.startsWith('https://wa.me/') || whatsappValue.startsWith('https://api.whatsapp.com/');
+          if (!isValidWa) {
+            validationErrors.push('WhatsApp custom destination must start with https://wa.me/ or https://api.whatsapp.com/');
+          }
+        }
+      }
+    }
+
+    // 4. Custom Button validation
+    let customText = ctaCustomTextDraft.trim();
+    let customValue = ctaCustomDestValueDraft.trim();
+
+    if (ctaCustomEnabledDraft) {
+      if (!customText) {
+        validationErrors.push('Custom button text cannot be empty when enabled.');
+      }
+      if (!customValue) {
+        validationErrors.push('Custom button destination URL/route cannot be empty when enabled.');
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      setCtaFormError(validationErrors.join(' '));
+      return;
+    }
+
+    const updatedConfig = {
+      ...cfg,
+      cta_appointment_enabled: ctaAppointmentEnabledDraft,
+      cta_appointment_text: appointmentText || cfg.cta_appointment_text || 'Book Appointment',
+      cta_appointment_dest: appointmentDest,
+      cta_appointment_dest_value: appointmentValue || cfg.cta_appointment_dest_value,
+
+      cta_call_enabled: ctaCallEnabledDraft,
+      cta_call_text: callText || cfg.cta_call_text || 'Call Now',
+      cta_call_dest: callDest,
+      cta_call_dest_value: callValue || cfg.cta_call_dest_value,
+
+      cta_whatsapp_enabled: ctaWhatsappEnabledDraft,
+      cta_whatsapp_text: whatsappText || cfg.cta_whatsapp_text || 'WhatsApp Us',
+      cta_whatsapp_dest: whatsappDest,
+      cta_whatsapp_dest_value: whatsappValue || cfg.cta_whatsapp_dest_value,
+
+      cta_custom_enabled: ctaCustomEnabledDraft,
+      cta_custom_text: customText || cfg.cta_custom_text || 'More Info',
+      cta_custom_dest_value: customValue || cfg.cta_custom_dest_value,
+    };
+
+    setEditingService({
+      ...editingService,
+      marketing_config: updatedConfig
+    });
+
+    setCtaFormSuccess('CTA configuration updated locally. Click "Save Service & Configurations" at the bottom of the page to save permanently.');
+    setTimeout(() => setCtaFormSuccess(null), 5000);
+  };
+
+  const handleResetVisibilityDrafts = () => {
+    if (!editingService) return;
+    const cfg = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    setVisHeroDraft(cfg.show_hero !== false);
+    setVisIntroDraft(cfg.show_introduction !== false);
+    setVisProcessDraft(cfg.show_process !== false);
+    setVisBenefitsDraft(cfg.show_benefits !== false);
+    setVisGalleryDraft(cfg.show_gallery !== false);
+    setVisVideoDraft(cfg.show_procedure_video !== false);
+    setVisHospitalDraft(cfg.show_hospital_photos !== false);
+    setVisTeamDraft(cfg.show_team_photos !== false);
+    setVisTestimonialsDraft(cfg.show_testimonials !== false);
+    setVisOfferBannerDraft(cfg.show_offer_banner !== false && cfg.offer_show !== false);
+    setVisFaqDraft(cfg.show_faq !== false);
+    setVisRelatedServicesDraft(cfg.show_related_services !== false);
+    setVisBottomCtaDraft(cfg.show_bottom_cta !== false);
+
+    setVisFormError(null);
+    setVisFormSuccess(null);
+  };
+
+  const handleSaveVisibilityDrafts = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!editingService) return;
+    setVisFormError(null);
+    setVisFormSuccess(null);
+
+    const cfg = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    const updatedConfig = {
+      ...cfg,
+      show_hero: visHeroDraft,
+      show_introduction: visIntroDraft,
+      show_process: visProcessDraft,
+      show_benefits: visBenefitsDraft,
+      show_gallery: visGalleryDraft,
+      show_procedure_video: visVideoDraft,
+      show_hospital_photos: visHospitalDraft,
+      show_team_photos: visTeamDraft,
+      show_testimonials: visTestimonialsDraft,
+      show_offer_banner: visOfferBannerDraft,
+      offer_show: visOfferBannerDraft,
+      show_faq: visFaqDraft,
+      show_related_services: visRelatedServicesDraft,
+      show_bottom_cta: visBottomCtaDraft,
+    };
+
+    setEditingService({
+      ...editingService,
+      marketing_config: updatedConfig
+    });
+
+    setVisFormSuccess('Section visibility configuration updated locally. Click "Save Service & Configurations" at the bottom of the page to save permanently.');
+    setTimeout(() => setVisFormSuccess(null), 5000);
+  };
+
+  const handleResetContactDrafts = () => {
+    if (!editingService) return;
+    setContactClinicNameDraft(mConfig.contact_clinic_name || '');
+    setContactAddressDraft(mConfig.contact_address || '');
+    setContactCallNumberDraft(mConfig.contact_call_number || '');
+    setContactWhatsappNumberDraft(mConfig.contact_whatsapp_number || '');
+    setContactEmailDraft(mConfig.contact_email || '');
+    setContactWorkingHoursDraft(mConfig.contact_working_hours || '');
+    setContactMapUrlDraft(mConfig.contact_map_url || '');
+    setContactFormError(null);
+    setContactFormSuccess(null);
+  };
+
+  const handleSaveContactDrafts = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!editingService) return;
+    setContactFormError(null);
+    setContactFormSuccess(null);
+
+    const clinicNameVal = contactClinicNameDraft.trim();
+    const addressVal = contactAddressDraft.trim();
+    const callNumberVal = contactCallNumberDraft.trim();
+    const whatsappNumberVal = contactWhatsappNumberDraft.trim();
+    const emailVal = contactEmailDraft.trim();
+    const workingHoursVal = contactWorkingHoursDraft.trim();
+    const mapUrlVal = contactMapUrlDraft.trim();
+
+    // VALIDATION
+    if (!clinicNameVal) {
+      setContactFormError('Clinic Name cannot be empty.');
+      return;
+    }
+    if (!addressVal) {
+      setContactFormError('Address cannot be empty.');
+      return;
+    }
+    if (!callNumberVal) {
+      setContactFormError('Phone Number cannot be empty.');
+      return;
+    }
+
+    if (emailVal) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailVal)) {
+        setContactFormError('Email must be valid.');
+        return;
+      }
+    }
+
+    if (mapUrlVal) {
+      try {
+        const urlToTest = mapUrlVal.startsWith('http') ? mapUrlVal : 'http://' + mapUrlVal;
+        new URL(urlToTest);
+      } catch (e) {
+        setContactFormError('Google Map Link must be a valid URL if provided.');
+        return;
+      }
+    }
+
+    // Save changes
+    const currentConfig = typeof editingService.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+      : (editingService.marketing_config || {});
+
+    const updatedConfig = {
+      ...currentConfig,
+      contact_clinic_name: clinicNameVal,
+      contact_address: addressVal,
+      contact_call_number: callNumberVal,
+      contact_whatsapp_number: whatsappNumberVal || undefined,
+      contact_email: emailVal || undefined,
+      contact_working_hours: workingHoursVal || undefined,
+      contact_map_url: mapUrlVal || undefined,
+    };
+
+    setEditingService({
+      ...editingService,
+      marketing_config: updatedConfig
+    });
+
+    setContactFormSuccess('Contact section details updated locally. Click "Save Service & Configurations" at the bottom of the page to save permanently.');
+    setTimeout(() => setContactFormSuccess(null), 5000);
+  };
 
   // Derived Marketing Media States
   const mConfig = typeof editingService?.marketing_config === 'string'
@@ -4857,6 +5942,22 @@ export default function Admin({
                 <Sparkles className="h-4 w-4" />
                 Marketing & CTA
               </button>
+              <button
+                type="button"
+                disabled={!editingService || !servicesList.some(s => s.id === editingService.id)}
+                onClick={() => editingService && servicesList.some(s => s.id === editingService.id) && setActiveServiceEditorTab('ordering')}
+                className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
+                  !(editingService && servicesList.some(s => s.id === editingService.id))
+                    ? 'opacity-40 cursor-not-allowed text-slate-400 border-transparent'
+                    : activeServiceEditorTab === 'ordering'
+                    ? 'border-[#0D9488] text-[#0D9488] cursor-pointer'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 cursor-pointer'
+                }`}
+                title={!(editingService && servicesList.some(s => s.id === editingService.id)) ? "Please save service details first to enable Display Order." : "Manage display order of repeatable content"}
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                Display Order
+              </button>
             </div>
 
             {/* Scrollable Form */}
@@ -7136,6 +8237,478 @@ export default function Admin({
                   </div>
                 )}
               </div>
+            ) : activeServiceEditorTab === 'ordering' ? (
+              /* ORDERING TAB */
+              <div className="flex-1 overflow-y-auto p-6 space-y-8 font-sans" id="service-ordering-tab">
+                <div className="bg-[#081C3A] text-white p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+                  <div className="space-y-1 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] bg-teal-500/20 text-teal-300 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Display Order Manager
+                      </span>
+                    </div>
+                    <h3 className="font-display font-black text-lg tracking-tight">Manage Section Item Sequencing</h3>
+                    <p className="text-slate-300 text-xs max-w-xl">
+                      Reorder repeating elements such as clinical process steps, gallery cases, testimonials, benefits, and related services using drag & drop or directional arrows. Save each section's order independently.
+                    </p>
+                  </div>
+                  <div className="absolute right-0 bottom-0 translate-y-4 translate-x-4 opacity-5 pointer-events-none">
+                    <ArrowUpDown className="h-40 w-40" />
+                  </div>
+                </div>
+
+                {/* 1. PROCESS STEPS */}
+                <div className="p-5 bg-white border border-slate-150 rounded-2xl shadow-3xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-teal-50 rounded-lg text-teal-600">
+                        <Activity className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">1. Treatment Process Steps</h4>
+                        <p className="text-[10px] text-slate-400">Change display order of steps describing clinical stages</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-sans">
+                      <button
+                        type="button"
+                        onClick={handleResetStepsOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                      >
+                        Reset Order
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveStepsOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Save Order
+                      </button>
+                    </div>
+                  </div>
+
+                  {orderSuccessMsg.steps && (
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ✓ {orderSuccessMsg.steps}
+                    </div>
+                  )}
+                  {orderErrorMsg.steps && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ⚠️ {orderErrorMsg.steps}
+                    </div>
+                  )}
+
+                  {orderStepsDraft.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">No process steps found to reorder.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {orderStepsDraft.map((step, idx) => (
+                        <div
+                          key={idx}
+                          draggable
+                          onDragStart={(e) => handleOrderDragStart(e, 'steps', idx)}
+                          onDragOver={(e) => handleOrderDragOver(e, 'steps', idx, orderStepsDraft, setOrderStepsDraft)}
+                          onDragEnd={handleOrderDragEnd}
+                          className={`flex items-center gap-3 p-3 bg-slate-50/50 border border-slate-100 rounded-xl transition-all cursor-grab active:cursor-grabbing hover:bg-slate-50 ${
+                            draggedOrderInfo?.category === 'steps' && draggedOrderInfo.index === idx ? 'opacity-40 border-dashed border-teal-300' : ''
+                          }`}
+                        >
+                          <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />
+                          <span className="text-xs font-black text-slate-400 font-mono w-5 text-right shrink-0">{(idx + 1)}.</span>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-slate-800 truncate">{step.title || '(Untitled Step)'}</h5>
+                            {step.description && <p className="text-[10px] text-slate-400 truncate mt-0.5">{step.description}</p>}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0 font-sans">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveOrderItem(orderStepsDraft, setOrderStepsDraft, idx, 'up')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === orderStepsDraft.length - 1}
+                              onClick={() => moveOrderItem(orderStepsDraft, setOrderStepsDraft, idx, 'down')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▼
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. BENEFITS & FEATURES */}
+                <div className="p-5 bg-white border border-slate-150 rounded-2xl shadow-3xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">2. Benefits & Features</h4>
+                        <p className="text-[10px] text-slate-400">Change display order of benefits & value propositions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-sans">
+                      <button
+                        type="button"
+                        onClick={handleResetBenefitsOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                      >
+                        Reset Order
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveBenefitsOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Save Order
+                      </button>
+                    </div>
+                  </div>
+
+                  {orderSuccessMsg.benefits && (
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ✓ {orderSuccessMsg.benefits}
+                    </div>
+                  )}
+                  {orderErrorMsg.benefits && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ⚠️ {orderErrorMsg.benefits}
+                    </div>
+                  )}
+
+                  {orderBenefitsDraft.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">No benefits found to reorder.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {orderBenefitsDraft.map((feat, idx) => (
+                        <div
+                          key={idx}
+                          draggable
+                          onDragStart={(e) => handleOrderDragStart(e, 'benefits', idx)}
+                          onDragOver={(e) => handleOrderDragOver(e, 'benefits', idx, orderBenefitsDraft, setOrderBenefitsDraft)}
+                          onDragEnd={handleOrderDragEnd}
+                          className={`flex items-center gap-3 p-3 bg-slate-50/50 border border-slate-100 rounded-xl transition-all cursor-grab active:cursor-grabbing hover:bg-slate-50 ${
+                            draggedOrderInfo?.category === 'benefits' && draggedOrderInfo.index === idx ? 'opacity-40 border-dashed border-teal-300' : ''
+                          }`}
+                        >
+                          <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />
+                          <span className="text-xs font-black text-slate-400 font-mono w-5 text-right shrink-0">{(idx + 1)}.</span>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-slate-800 truncate">{feat.title || '(Untitled Benefit)'}</h5>
+                            {feat.description && <p className="text-[10px] text-slate-400 truncate mt-0.5">{feat.description}</p>}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0 font-sans">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveOrderItem(orderBenefitsDraft, setOrderBenefitsDraft, idx, 'up')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === orderBenefitsDraft.length - 1}
+                              onClick={() => moveOrderItem(orderBenefitsDraft, setOrderBenefitsDraft, idx, 'down')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▼
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. GALLERY IMAGES */}
+                <div className="p-5 bg-white border border-slate-150 rounded-2xl shadow-3xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                        <ImageIcon className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">3. Before/After Gallery Images</h4>
+                        <p className="text-[10px] text-slate-400">Change display order of patient case results and clinical gallery</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-sans">
+                      <button
+                        type="button"
+                        onClick={handleResetGalleryOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                      >
+                        Reset Order
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveGalleryOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Save Order
+                      </button>
+                    </div>
+                  </div>
+
+                  {orderSuccessMsg.gallery && (
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ✓ {orderSuccessMsg.gallery}
+                    </div>
+                  )}
+                  {orderErrorMsg.gallery && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ⚠️ {orderErrorMsg.gallery}
+                    </div>
+                  )}
+
+                  {orderGalleryDraft.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">No gallery images found to reorder.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {orderGalleryDraft.map((item, idx) => (
+                        <div
+                          key={idx}
+                          draggable
+                          onDragStart={(e) => handleOrderDragStart(e, 'gallery', idx)}
+                          onDragOver={(e) => handleOrderDragOver(e, 'gallery', idx, orderGalleryDraft, setOrderGalleryDraft)}
+                          onDragEnd={handleOrderDragEnd}
+                          className={`flex items-center gap-3 p-3 bg-slate-50/50 border border-slate-100 rounded-xl transition-all cursor-grab active:cursor-grabbing hover:bg-slate-50 ${
+                            draggedOrderInfo?.category === 'gallery' && draggedOrderInfo.index === idx ? 'opacity-40 border-dashed border-teal-300' : ''
+                          }`}
+                        >
+                          <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />
+                          <span className="text-xs font-black text-slate-400 font-mono w-5 text-right shrink-0">{(idx + 1)}.</span>
+                          {item.image_url && (
+                            <img
+                              src={item.image_url}
+                              alt={item.caption || 'Gallery thumb'}
+                              className="w-10 h-10 object-cover rounded-lg border border-slate-200"
+                              referrerPolicy="no-referrer"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-slate-800 truncate">{item.caption || item.title || '(No Caption Set)'}</h5>
+                            {item.alt_text && <p className="text-[10px] text-slate-400 truncate mt-0.5">{item.alt_text}</p>}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0 font-sans">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveOrderItem(orderGalleryDraft, setOrderGalleryDraft, idx, 'up')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === orderGalleryDraft.length - 1}
+                              onClick={() => moveOrderItem(orderGalleryDraft, setOrderGalleryDraft, idx, 'down')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▼
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. PATIENT TESTIMONIALS */}
+                <div className="p-5 bg-white border border-slate-150 rounded-2xl shadow-3xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+                        <MessageCircle className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">4. Patient Testimonials</h4>
+                        <p className="text-[10px] text-slate-400">Change display order of patient feedback videos</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-sans">
+                      <button
+                        type="button"
+                        onClick={handleResetTestimonialsOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                      >
+                        Reset Order
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveTestimonialsOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Save Order
+                      </button>
+                    </div>
+                  </div>
+
+                  {orderSuccessMsg.testimonials && (
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ✓ {orderSuccessMsg.testimonials}
+                    </div>
+                  )}
+                  {orderErrorMsg.testimonials && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ⚠️ {orderErrorMsg.testimonials}
+                    </div>
+                  )}
+
+                  {orderTestimonialsDraft.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">No patient testimonials found to reorder.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {orderTestimonialsDraft.map((testi, idx) => (
+                        <div
+                          key={idx}
+                          draggable
+                          onDragStart={(e) => handleOrderDragStart(e, 'testimonials', idx)}
+                          onDragOver={(e) => handleOrderDragOver(e, 'testimonials', idx, orderTestimonialsDraft, setOrderTestimonialsDraft)}
+                          onDragEnd={handleOrderDragEnd}
+                          className={`flex items-center gap-3 p-3 bg-slate-50/50 border border-slate-100 rounded-xl transition-all cursor-grab active:cursor-grabbing hover:bg-slate-50 ${
+                            draggedOrderInfo?.category === 'testimonials' && draggedOrderInfo.index === idx ? 'opacity-40 border-dashed border-teal-300' : ''
+                          }`}
+                        >
+                          <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />
+                          <span className="text-xs font-black text-slate-400 font-mono w-5 text-right shrink-0">{(idx + 1)}.</span>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-slate-800 truncate">{testi.patient_name || '(Anonymous Patient)'}</h5>
+                            <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                              {testi.treatment_name || 'Treatment Review'} {testi.short_review ? `• "${testi.short_review}"` : ''}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0 font-sans">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveOrderItem(orderTestimonialsDraft, setOrderTestimonialsDraft, idx, 'up')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === orderTestimonialsDraft.length - 1}
+                              onClick={() => moveOrderItem(orderTestimonialsDraft, setOrderTestimonialsDraft, idx, 'down')}
+                              className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                            >
+                              ▼
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 5. RELATED SERVICES */}
+                <div className="p-5 bg-white border border-slate-150 rounded-2xl shadow-3xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                        <Layers className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">5. Related Services</h4>
+                        <p className="text-[10px] text-slate-400">Change display order of cross-promoted treatment shortcuts</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-sans">
+                      <button
+                        type="button"
+                        onClick={handleResetRelatedOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                      >
+                        Reset Order
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveRelatedOrder}
+                        className="px-3 py-1.5 text-[10px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition flex items-center gap-1"
+                      >
+                        <Check className="h-3 w-3" />
+                        Save Order
+                      </button>
+                    </div>
+                  </div>
+
+                  {orderSuccessMsg.related && (
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ✓ {orderSuccessMsg.related}
+                    </div>
+                  )}
+                  {orderErrorMsg.related && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-semibold rounded-xl animate-fade-in">
+                      ⚠️ {orderErrorMsg.related}
+                    </div>
+                  )}
+
+                  {orderRelatedDraft.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">No related services configured to reorder.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {orderRelatedDraft.map((item, idx) => {
+                        const sId = typeof item === 'string' ? item : item.id;
+                        const s = servicesList.find(svc => svc.id === sId);
+                        const isEnabled = item.enabled !== false;
+                        return (
+                          <div
+                            key={idx}
+                            draggable
+                            onDragStart={(e) => handleOrderDragStart(e, 'related', idx)}
+                            onDragOver={(e) => handleOrderDragOver(e, 'related', idx, orderRelatedDraft, setOrderRelatedDraft)}
+                            onDragEnd={handleOrderDragEnd}
+                            className={`flex items-center gap-3 p-3 border rounded-xl transition-all cursor-grab active:cursor-grabbing hover:bg-slate-50 ${
+                              draggedOrderInfo?.category === 'related' && draggedOrderInfo.index === idx ? 'opacity-40 border-dashed border-teal-300' : ''
+                            } ${isEnabled ? 'bg-slate-50/50 border-slate-100' : 'bg-slate-100/50 border-slate-200/60 opacity-60'}`}
+                          >
+                            <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />
+                            <span className="text-xs font-black text-slate-400 font-mono w-5 text-right shrink-0">{(idx + 1)}.</span>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="text-xs font-bold text-slate-800 truncate">{s?.title || '(Service Not Found)'}</h5>
+                              <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                                Slug: {s?.slug || 'n/a'} {!isEnabled && '• Disabled'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0 font-sans">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => moveOrderItem(orderRelatedDraft, setOrderRelatedDraft, idx, 'up')}
+                                className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === orderRelatedDraft.length - 1}
+                                onClick={() => moveOrderItem(orderRelatedDraft, setOrderRelatedDraft, idx, 'down')}
+                                className="p-1 hover:bg-white border border-transparent hover:border-slate-200 rounded text-slate-500 hover:text-teal-600 disabled:opacity-30 transition"
+                              >
+                                ▼
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : (
               /* MARKETING TAB */
               <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-6 space-y-8 font-sans" id="service-marketing-tab">
@@ -7185,34 +8758,68 @@ export default function Admin({
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                           {[
-                            { key: 'show_hero', label: 'Hero Section' },
-                            { key: 'show_introduction', label: 'Introduction' },
-                            { key: 'show_process', label: 'Process Steps' },
-                            { key: 'show_benefits', label: 'Benefits & Features' },
-                            { key: 'show_gallery', label: 'Before/After Gallery' },
-                            { key: 'show_procedure_video', label: 'Procedure Video' },
-                            { key: 'show_hospital_photos', label: 'Clinic/Hospital Split Photos' },
-                            { key: 'show_team_photos', label: 'Team/Doctor Split Photos' },
-                            { key: 'show_testimonials', label: 'Patient Video Testimonials' },
-                            { key: 'show_faq', label: 'FAQs Section' },
-                            { key: 'show_related_services', label: 'Related Services' },
-                            { key: 'show_bottom_cta', label: 'Bottom CTA' },
-                          ].map((sec) => {
-                            const isVisible = mConfig[sec.key as keyof typeof mConfig] !== false;
-                            return (
-                              <label key={sec.key} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between cursor-pointer select-none">
-                                <span className="text-xs font-bold text-slate-700">{sec.label}</span>
+                            { id: 'hero', label: 'Hero Header', desc: 'Main top header', checked: visHeroDraft, onChange: setVisHeroDraft },
+                            { id: 'intro', label: 'Introduction', desc: 'About clinical treatment', checked: visIntroDraft, onChange: setVisIntroDraft },
+                            { id: 'process', label: 'Treatment Process', desc: 'Step-by-step guidance', checked: visProcessDraft, onChange: setVisProcessDraft },
+                            { id: 'benefits', label: 'Benefits & Features', desc: 'Value propositions & highlights', checked: visBenefitsDraft, onChange: setVisBenefitsDraft },
+                            { id: 'gallery', label: 'Before / After Gallery', desc: 'Visual case transformations', checked: visGalleryDraft, onChange: setVisGalleryDraft },
+                            { id: 'video', label: 'Procedure Video', desc: 'Procedural/clinical animation', checked: visVideoDraft, onChange: setVisVideoDraft },
+                            { id: 'hospital', label: 'Clinic & Hospital Photos', desc: 'Hospital premises & rooms', checked: visHospitalDraft, onChange: setVisHospitalDraft },
+                            { id: 'team', label: 'Team & Doctor Photos', desc: 'Doctors, experts & staff', checked: visTeamDraft, onChange: setVisTeamDraft },
+                            { id: 'testimonials', label: 'Patient Testimonials', desc: 'Recorded patient video reviews', checked: visTestimonialsDraft, onChange: setVisTestimonialsDraft },
+                            { id: 'offer', label: 'Offer Banner', desc: 'Floating top-promotional bar', checked: visOfferBannerDraft, onChange: setVisOfferBannerDraft },
+                            { id: 'faq', label: 'Frequently Asked Questions', desc: 'Helpful query dropdowns', checked: visFaqDraft, onChange: setVisFaqDraft },
+                            { id: 'related', label: 'Related Services', desc: 'Cross-promoted treatments', checked: visRelatedServicesDraft, onChange: setVisRelatedServicesDraft },
+                            { id: 'bottom_cta', label: 'Bottom Contact Section', desc: 'Footer lead-generation callouts', checked: visBottomCtaDraft, onChange: setVisBottomCtaDraft },
+                          ].map((sec) => (
+                            <div key={sec.id} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
+                              <div className="space-y-0.5 pr-2">
+                                <span className="text-xs font-bold text-slate-800 block">{sec.label}</span>
+                                <span className="text-[9px] text-slate-400 block font-normal leading-normal">{sec.desc}</span>
+                              </div>
+                              <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                 <input
                                   type="checkbox"
-                                  checked={isVisible}
-                                  onChange={(e) => updateMarketingConfig(sec.key, e.target.checked)}
-                                  className="rounded text-teal-600 focus:ring-teal-500 h-4 w-4 shadow-3xs"
+                                  checked={sec.checked}
+                                  onChange={(e) => sec.onChange(e.target.checked)}
+                                  className="sr-only peer"
                                 />
+                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
                               </label>
-                            );
-                          })}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Section Visibility Manager Action Buttons */}
+                        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 pt-3 border-t border-slate-100">
+                          {visFormError && (
+                            <p className="text-[11px] font-semibold text-rose-600 animate-fade-in mr-auto">
+                              {visFormError}
+                            </p>
+                          )}
+                          {visFormSuccess && (
+                            <p className="text-[11px] font-semibold text-teal-600 animate-fade-in mr-auto">
+                              {visFormSuccess}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <button
+                              type="button"
+                              onClick={handleResetVisibilityDrafts}
+                              className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition duration-300 cursor-pointer"
+                            >
+                              Reset Section
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleSaveVisibilityDrafts}
+                              className="px-4 py-2 text-xs font-black text-white bg-[#0D9488] hover:bg-[#0F766E] rounded-xl transition duration-300 cursor-pointer"
+                            >
+                              Apply Visibility Changes
+                            </button>
+                          </div>
                         </div>
 
                         {/* Layout Order Manager */}
@@ -7403,183 +9010,385 @@ export default function Admin({
                         )}
                       </div>
 
-                      {/* 2. CALL TO ACTION */}
+                      {/* 2. CALL TO ACTION SETTINGS MANAGER */}
                       <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
-                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                          <div className="p-2 bg-teal-50 rounded-lg text-[#0D9488]">
-                            <Calendar className="h-4 w-4" />
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-teal-50 rounded-lg text-[#0D9488]">
+                              <Calendar className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">2. CTA Settings Manager</h4>
+                              <p className="text-[10px] text-slate-400">Configure appointment, call, whatsapp, and custom buttons independently</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-slate-900">2. Hero Call To Action</h4>
-                            <p className="text-[10px] text-slate-400">Configure primary and secondary CTA actions below the treatment summary</p>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleResetCtaDrafts}
+                              className="px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-[10px] font-bold rounded-lg transition cursor-pointer"
+                            >
+                              Reset Section
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleSaveCtaDrafts}
+                              className="px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-[10px] font-bold rounded-lg transition cursor-pointer"
+                            >
+                              Apply CTA Changes
+                            </button>
                           </div>
                         </div>
 
+                        {ctaFormError && (
+                          <div className="p-3 bg-rose-50 text-rose-600 rounded-xl text-xs font-semibold">
+                            {ctaFormError}
+                          </div>
+                        )}
+                        {ctaFormSuccess && (
+                          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-semibold">
+                            {ctaFormSuccess}
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
-                          {/* Primary CTA */}
+                          {/* 1. Book Appointment Button */}
                           <div className="space-y-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                            <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Primary Button</h5>
-                            
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
-                              <input
-                                type="text"
-                                value={mConfig.primary_cta_btn_text || ''}
-                                onChange={(e) => updateMarketingConfig('primary_cta_btn_text', e.target.value)}
-                                placeholder="e.g. Book Appointment"
-                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
-                              />
+                            <div className="flex items-center justify-between">
+                              <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Book Appointment Button</h5>
+                              <label className="relative inline-flex items-center cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={ctaAppointmentEnabledDraft}
+                                  onChange={(e) => setCtaAppointmentEnabledDraft(e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-8 h-4 bg-slate-200 rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-teal-500"></div>
+                                <span className="ml-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{ctaAppointmentEnabledDraft ? 'Enabled' : 'Disabled'}</span>
+                              </label>
                             </div>
 
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Action</label>
-                              <select
-                                value={mConfig.primary_cta_action || 'appointment'}
-                                onChange={(e) => updateMarketingConfig('primary_cta_action', e.target.value)}
-                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
-                              >
-                                <option value="appointment">Book Appointment (Modal Trigger)</option>
-                                <option value="custom">Custom Redirect URL</option>
-                              </select>
-                            </div>
-
-                            {mConfig.primary_cta_action === 'custom' && (
+                            <div className="space-y-3">
                               <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom Redirect URL</label>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
                                 <input
                                   type="text"
-                                  value={mConfig.primary_cta_link || ''}
-                                  onChange={(e) => updateMarketingConfig('primary_cta_link', e.target.value)}
-                                  placeholder="e.g. https://myclinic.com/booking-page"
-                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                  value={ctaAppointmentTextDraft}
+                                  onChange={(e) => setCtaAppointmentTextDraft(e.target.value)}
+                                  disabled={!ctaAppointmentEnabledDraft}
+                                  placeholder="Book Appointment"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
                                 />
                               </div>
-                            )}
+
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Destination Option</label>
+                                <select
+                                  value={ctaAppointmentDestDraft}
+                                  onChange={(e) => setCtaAppointmentDestDraft(e.target.value as any)}
+                                  disabled={!ctaAppointmentEnabledDraft}
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
+                                >
+                                  <option value="appointment">Existing Appointment System</option>
+                                  <option value="internal">Internal Page / Relative Route</option>
+                                  <option value="external">External URL</option>
+                                </select>
+                              </div>
+
+                              {ctaAppointmentDestDraft !== 'appointment' && (
+                                <div className="space-y-1.5">
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                                    {ctaAppointmentDestDraft === 'internal' ? 'Internal Page Route (e.g. /contact)' : 'External URL (e.g. https://...)'}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={ctaAppointmentDestValueDraft}
+                                    onChange={(e) => setCtaAppointmentDestValueDraft(e.target.value)}
+                                    disabled={!ctaAppointmentEnabledDraft}
+                                    placeholder={ctaAppointmentDestDraft === 'internal' ? '/contact' : 'https://example.com/book'}
+                                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400"
+                                  />
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Secondary CTA */}
+                          {/* 2. Call Now Button */}
                           <div className="space-y-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                            <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Secondary Button</h5>
-
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
-                              <input
-                                type="text"
-                                value={mConfig.secondary_cta_btn_text || ''}
-                                onChange={(e) => updateMarketingConfig('secondary_cta_btn_text', e.target.value)}
-                                placeholder="e.g. WhatsApp Us"
-                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
-                              />
+                            <div className="flex items-center justify-between">
+                              <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Call Now Button</h5>
+                              <label className="relative inline-flex items-center cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={ctaCallEnabledDraft}
+                                  onChange={(e) => setCtaCallEnabledDraft(e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-8 h-4 bg-slate-200 rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-teal-500"></div>
+                                <span className="ml-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{ctaCallEnabledDraft ? 'Enabled' : 'Disabled'}</span>
+                              </label>
                             </div>
 
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Action</label>
-                              <select
-                                value={mConfig.secondary_cta_action || 'whatsapp'}
-                                onChange={(e) => updateMarketingConfig('secondary_cta_action', e.target.value)}
-                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
-                              >
-                                <option value="whatsapp">WhatsApp Direct Chat</option>
-                                <option value="call">Make Telephone Call</option>
-                                <option value="custom">Custom Redirect URL</option>
-                              </select>
-                            </div>
-
-                            {mConfig.secondary_cta_action === 'custom' && (
+                            <div className="space-y-3">
                               <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom Redirect URL</label>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
                                 <input
                                   type="text"
-                                  value={mConfig.secondary_cta_link || ''}
-                                  onChange={(e) => updateMarketingConfig('secondary_cta_link', e.target.value)}
-                                  placeholder="e.g. https://myclinic.com/contact"
-                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                  value={ctaCallTextDraft}
+                                  onChange={(e) => setCtaCallTextDraft(e.target.value)}
+                                  disabled={!ctaCallEnabledDraft}
+                                  placeholder="Call Now"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
                                 />
                               </div>
-                            )}
+
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Destination Option</label>
+                                <select
+                                  value={ctaCallDestDraft}
+                                  onChange={(e) => setCtaCallDestDraft(e.target.value as any)}
+                                  disabled={!ctaCallEnabledDraft}
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
+                                >
+                                  <option value="clinic">Clinic Phone Number</option>
+                                  <option value="custom">Custom Phone Number</option>
+                                </select>
+                              </div>
+
+                              {ctaCallDestDraft === 'custom' && (
+                                <div className="space-y-1.5">
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom Phone Number</label>
+                                  <input
+                                    type="text"
+                                    value={ctaCallDestValueDraft}
+                                    onChange={(e) => setCtaCallDestValueDraft(e.target.value)}
+                                    disabled={!ctaCallEnabledDraft}
+                                    placeholder="+123456789"
+                                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 3. WhatsApp Button */}
+                          <div className="space-y-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                            <div className="flex items-center justify-between">
+                              <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">WhatsApp Button</h5>
+                              <label className="relative inline-flex items-center cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={ctaWhatsappEnabledDraft}
+                                  onChange={(e) => setCtaWhatsappEnabledDraft(e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-8 h-4 bg-slate-200 rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-teal-500"></div>
+                                <span className="ml-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{ctaWhatsappEnabledDraft ? 'Enabled' : 'Disabled'}</span>
+                              </label>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
+                                <input
+                                  type="text"
+                                  value={ctaWhatsappTextDraft}
+                                  onChange={(e) => setCtaWhatsappTextDraft(e.target.value)}
+                                  disabled={!ctaWhatsappEnabledDraft}
+                                  placeholder="WhatsApp Us"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
+                                />
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Destination Option</label>
+                                <select
+                                  value={ctaWhatsappDestDraft}
+                                  onChange={(e) => setCtaWhatsappDestDraft(e.target.value as any)}
+                                  disabled={!ctaWhatsappEnabledDraft}
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
+                                >
+                                  <option value="clinic">Clinic WhatsApp Number</option>
+                                  <option value="custom">Custom WhatsApp URL</option>
+                                </select>
+                              </div>
+
+                              {ctaWhatsappDestDraft === 'custom' && (
+                                <div className="space-y-1.5">
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom WhatsApp URL</label>
+                                  <input
+                                    type="text"
+                                    value={ctaWhatsappDestValueDraft}
+                                    onChange={(e) => setCtaWhatsappDestValueDraft(e.target.value)}
+                                    disabled={!ctaWhatsappEnabledDraft}
+                                    placeholder="https://wa.me/123456789"
+                                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 4. One Custom Button */}
+                          <div className="space-y-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                            <div className="flex items-center justify-between">
+                              <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Custom Button</h5>
+                              <label className="relative inline-flex items-center cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={ctaCustomEnabledDraft}
+                                  onChange={(e) => setCtaCustomEnabledDraft(e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-8 h-4 bg-slate-200 rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-teal-500"></div>
+                                <span className="ml-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{ctaCustomEnabledDraft ? 'Enabled' : 'Disabled'}</span>
+                              </label>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Button Text</label>
+                                <input
+                                  type="text"
+                                  value={ctaCustomTextDraft}
+                                  onChange={(e) => setCtaCustomTextDraft(e.target.value)}
+                                  disabled={!ctaCustomEnabledDraft}
+                                  placeholder="More Info"
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium disabled:bg-slate-100 disabled:text-slate-400"
+                                />
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Custom Destination URL / Route</label>
+                                <input
+                                  type="text"
+                                  value={ctaCustomDestValueDraft}
+                                  onChange={(e) => setCtaCustomDestValueDraft(e.target.value)}
+                                  disabled={!ctaCustomEnabledDraft}
+                                  placeholder="e.g. /about, tel:..., mailto:..."
+                                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* 3. CONTACT INFORMATION */}
+                      {/* 3. BOTTOM CONTACT SECTION MANAGER */}
                       <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
-                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                            <Phone className="h-4 w-4" />
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                              <Phone className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">3. Bottom Contact Section Manager</h4>
+                              <p className="text-[10px] text-slate-400">Manage treatment-specific contact card information shown at the bottom of the page</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-slate-900">3. Contact & Location Details</h4>
-                            <p className="text-[10px] text-slate-400">Specify treatment-specific clinic contact and Google Maps overrides</p>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleResetContactDrafts}
+                              className="px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-[10px] font-bold rounded-lg transition cursor-pointer"
+                            >
+                              Reset Unsaved Changes
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveContactDrafts()}
+                              className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white text-[10px] font-bold rounded-lg transition cursor-pointer shadow-3xs"
+                            >
+                              Save Changes
+                            </button>
                           </div>
                         </div>
 
+                        {/* Status Messages */}
+                        {contactFormError && (
+                          <div className="p-3 bg-red-50 border border-red-100 text-red-700 text-[11px] rounded-xl font-medium animate-fade-in">
+                            {contactFormError}
+                          </div>
+                        )}
+                        {contactFormSuccess && (
+                          <div className="p-3 bg-teal-50 border border-teal-100 text-teal-800 text-[11px] rounded-xl font-medium animate-fade-in">
+                            {contactFormSuccess}
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Contact Number</label>
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Name <span className="text-red-500">*</span></label>
                             <input
                               type="text"
-                              value={mConfig.contact_call_number || ''}
-                              onChange={(e) => updateMarketingConfig('contact_call_number', e.target.value)}
+                              value={contactClinicNameDraft}
+                              onChange={(e) => setContactClinicNameDraft(e.target.value)}
+                              placeholder="e.g. Patel Dental Hospital, Rajkot"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Contact Number <span className="text-red-500">*</span></label>
+                            <input
+                              type="text"
+                              value={contactCallNumberDraft}
+                              onChange={(e) => setContactCallNumberDraft(e.target.value)}
                               placeholder="e.g. +91 98765 43210"
                               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
                             />
                           </div>
+
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">WhatsApp Number</label>
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Address <span className="text-red-500">*</span></label>
                             <input
                               type="text"
-                              value={mConfig.contact_whatsapp_number || ''}
-                              onChange={(e) => updateMarketingConfig('contact_whatsapp_number', e.target.value)}
-                              placeholder="e.g. +91 98765 43210 (with country code)"
-                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Email Address</label>
-                            <input
-                              type="email"
-                              value={mConfig.contact_email || ''}
-                              onChange={(e) => updateMarketingConfig('contact_email', e.target.value)}
-                              placeholder="e.g. clinic@hospital.com"
-                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Address</label>
-                            <input
-                              type="text"
-                              value={mConfig.contact_address || ''}
-                              onChange={(e) => updateMarketingConfig('contact_address', e.target.value)}
+                              value={contactAddressDraft}
+                              onChange={(e) => setContactAddressDraft(e.target.value)}
                               placeholder="Full address of the branch performing this treatment..."
                               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
                             />
                           </div>
+
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Clinic Name</label>
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">WhatsApp Number</label>
                             <input
                               type="text"
-                              value={mConfig.contact_clinic_name || ''}
-                              onChange={(e) => updateMarketingConfig('contact_clinic_name', e.target.value)}
-                              placeholder="e.g. Patel Dental Hospital, Rajkot"
-                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                              value={contactWhatsappNumberDraft}
+                              onChange={(e) => setContactWhatsappNumberDraft(e.target.value)}
+                              placeholder="e.g. +91 98765 43210 (with country code)"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
                             />
                           </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Email Address</label>
+                            <input
+                              type="email"
+                              value={contactEmailDraft}
+                              onChange={(e) => setContactEmailDraft(e.target.value)}
+                              placeholder="e.g. clinic@hospital.com"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
+                            />
+                          </div>
+
                           <div className="space-y-1.5">
                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Working Hours</label>
                             <input
                               type="text"
-                              value={mConfig.contact_working_hours || ''}
-                              onChange={(e) => updateMarketingConfig('contact_working_hours', e.target.value)}
+                              value={contactWorkingHoursDraft}
+                              onChange={(e) => setContactWorkingHoursDraft(e.target.value)}
                               placeholder="e.g. Mon - Sat: 9:00 AM - 8:00 PM"
-                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
                             />
                           </div>
+
                           <div className="space-y-1.5 md:col-span-2">
                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Google Maps Embed or Link URL</label>
                             <input
                               type="text"
-                              value={mConfig.contact_map_url || ''}
-                              onChange={(e) => updateMarketingConfig('contact_map_url', e.target.value)}
+                              value={contactMapUrlDraft}
+                              onChange={(e) => setContactMapUrlDraft(e.target.value)}
                               placeholder="Google Maps sharing URL..."
                               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
                             />
@@ -7587,17 +9396,47 @@ export default function Admin({
                         </div>
                       </div>
 
-                      {/* 4. FOLLOW US */}
+                      {/* 4. SOCIAL LINKS MANAGER */}
                       <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
-                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                          <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
-                            <Users className="h-4 w-4" />
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                              <Users className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900">4. Social Links Manager</h4>
+                              <p className="text-[10px] text-slate-400">Manage treatment-specific follow-us social media platform links shown on this page</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-slate-900">4. Social Media Integration ("Follow Us")</h4>
-                            <p className="text-[10px] text-slate-400">Toggle platforms on or off and set custom profiles for this treatment</p>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleResetSocialDrafts}
+                              className="px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-[10px] font-bold rounded-lg transition cursor-pointer"
+                            >
+                              Reset Unsaved Changes
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveSocialDrafts()}
+                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold rounded-lg transition cursor-pointer shadow-3xs"
+                            >
+                              Save Changes
+                            </button>
                           </div>
                         </div>
+
+                        {/* Status Messages */}
+                        {socialFormError && (
+                          <div className="p-3 bg-red-50 border border-red-100 text-red-700 text-[11px] rounded-xl font-medium animate-fade-in">
+                            {socialFormError}
+                          </div>
+                        )}
+                        {socialFormSuccess && (
+                          <div className="p-3 bg-teal-50 border border-teal-100 text-teal-800 text-[11px] rounded-xl font-medium animate-fade-in">
+                            {socialFormSuccess}
+                          </div>
+                        )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
                           {/* Facebook */}
@@ -7606,8 +9445,8 @@ export default function Admin({
                               <label className="text-[10px] font-black text-slate-700 block">Facebook</label>
                               <input
                                 type="text"
-                                value={mConfig.social_facebook || ''}
-                                onChange={(e) => updateMarketingConfig('social_facebook', e.target.value)}
+                                value={socialFbLinkDraft}
+                                onChange={(e) => setSocialFbLinkDraft(e.target.value)}
                                 placeholder="Page link or profile URL"
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
                               />
@@ -7615,8 +9454,8 @@ export default function Admin({
                             <label className="relative inline-flex items-center cursor-pointer mt-5">
                               <input
                                 type="checkbox"
-                                checked={!!mConfig.social_facebook_enabled}
-                                onChange={(e) => updateMarketingConfig('social_facebook_enabled', e.target.checked)}
+                                checked={socialFbEnabledDraft}
+                                onChange={(e) => setSocialFbEnabledDraft(e.target.checked)}
                                 className="sr-only peer"
                               />
                               <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
@@ -7629,8 +9468,8 @@ export default function Admin({
                               <label className="text-[10px] font-black text-slate-700 block">Instagram</label>
                               <input
                                 type="text"
-                                value={mConfig.social_instagram || ''}
-                                onChange={(e) => updateMarketingConfig('social_instagram', e.target.value)}
+                                value={socialIgLinkDraft}
+                                onChange={(e) => setSocialIgLinkDraft(e.target.value)}
                                 placeholder="Profile URL"
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
                               />
@@ -7638,8 +9477,8 @@ export default function Admin({
                             <label className="relative inline-flex items-center cursor-pointer mt-5">
                               <input
                                 type="checkbox"
-                                checked={!!mConfig.social_instagram_enabled}
-                                onChange={(e) => updateMarketingConfig('social_instagram_enabled', e.target.checked)}
+                                checked={socialIgEnabledDraft}
+                                onChange={(e) => setSocialIgEnabledDraft(e.target.checked)}
                                 className="sr-only peer"
                               />
                               <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
@@ -7652,8 +9491,8 @@ export default function Admin({
                               <label className="text-[10px] font-black text-slate-700 block">YouTube</label>
                               <input
                                 type="text"
-                                value={mConfig.social_youtube || ''}
-                                onChange={(e) => updateMarketingConfig('social_youtube', e.target.value)}
+                                value={socialYtLinkDraft}
+                                onChange={(e) => setSocialYtLinkDraft(e.target.value)}
                                 placeholder="Channel/Video link"
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
                               />
@@ -7661,8 +9500,8 @@ export default function Admin({
                             <label className="relative inline-flex items-center cursor-pointer mt-5">
                               <input
                                 type="checkbox"
-                                checked={!!mConfig.social_youtube_enabled}
-                                onChange={(e) => updateMarketingConfig('social_youtube_enabled', e.target.checked)}
+                                checked={socialYtEnabledDraft}
+                                onChange={(e) => setSocialYtEnabledDraft(e.target.checked)}
                                 className="sr-only peer"
                               />
                               <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
@@ -7675,8 +9514,8 @@ export default function Admin({
                               <label className="text-[10px] font-black text-slate-700 block">LinkedIn</label>
                               <input
                                 type="text"
-                                value={mConfig.social_linkedin || ''}
-                                onChange={(e) => updateMarketingConfig('social_linkedin', e.target.value)}
+                                value={socialLiLinkDraft}
+                                onChange={(e) => setSocialLiLinkDraft(e.target.value)}
                                 placeholder="Page or personal URL"
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
                               />
@@ -7684,8 +9523,8 @@ export default function Admin({
                             <label className="relative inline-flex items-center cursor-pointer mt-5">
                               <input
                                 type="checkbox"
-                                checked={!!mConfig.social_linkedin_enabled}
-                                onChange={(e) => updateMarketingConfig('social_linkedin_enabled', e.target.checked)}
+                                checked={socialLiEnabledDraft}
+                                onChange={(e) => setSocialLiEnabledDraft(e.target.checked)}
                                 className="sr-only peer"
                               />
                               <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
@@ -7698,8 +9537,8 @@ export default function Admin({
                               <label className="text-[10px] font-black text-slate-700 block">Twitter (X)</label>
                               <input
                                 type="text"
-                                value={mConfig.social_twitter || ''}
-                                onChange={(e) => updateMarketingConfig('social_twitter', e.target.value)}
+                                value={socialTwLinkDraft}
+                                onChange={(e) => setSocialTwLinkDraft(e.target.value)}
                                 placeholder="Profile/Handle URL"
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
                               />
@@ -7707,8 +9546,8 @@ export default function Admin({
                             <label className="relative inline-flex items-center cursor-pointer mt-5">
                               <input
                                 type="checkbox"
-                                checked={!!mConfig.social_twitter_enabled}
-                                onChange={(e) => updateMarketingConfig('social_twitter_enabled', e.target.checked)}
+                                checked={socialTwEnabledDraft}
+                                onChange={(e) => setSocialTwEnabledDraft(e.target.checked)}
                                 className="sr-only peer"
                               />
                               <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
@@ -7721,8 +9560,8 @@ export default function Admin({
                               <label className="text-[10px] font-black text-slate-700 block">WhatsApp Group/Invite</label>
                               <input
                                 type="text"
-                                value={mConfig.social_whatsapp || ''}
-                                onChange={(e) => updateMarketingConfig('social_whatsapp', e.target.value)}
+                                value={socialWaLinkDraft}
+                                onChange={(e) => setSocialWaLinkDraft(e.target.value)}
                                 placeholder="Direct chat/group invitation link"
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
                               />
@@ -7730,8 +9569,8 @@ export default function Admin({
                             <label className="relative inline-flex items-center cursor-pointer mt-5">
                               <input
                                 type="checkbox"
-                                checked={!!mConfig.social_whatsapp_enabled}
-                                onChange={(e) => updateMarketingConfig('social_whatsapp_enabled', e.target.checked)}
+                                checked={socialWaEnabledDraft}
+                                onChange={(e) => setSocialWaEnabledDraft(e.target.checked)}
                                 className="sr-only peer"
                               />
                               <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
@@ -7879,7 +9718,7 @@ export default function Admin({
                       </div>
 
                       {/* 7. RELATED SERVICES MANAGER */}
-                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs font-sans">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                           <div className="flex items-center gap-2">
                             <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
@@ -7887,28 +9726,52 @@ export default function Admin({
                             </div>
                             <div>
                               <h4 className="text-xs font-bold text-slate-900">7. Related Services Manager</h4>
-                              <p className="text-[10px] text-slate-400">Configure which treatments to suggest as related, define order and visibility</p>
+                              <p className="text-[10px] text-slate-400">Add, remove, toggle, search, and reorder related treatments for this service</p>
                             </div>
                           </div>
                         </div>
 
                         {(() => {
-                          const availableServices = servicesList.filter(s => s.id !== editingService.id);
+                          const currentServiceId = editingService.id;
+                          // All other active services that can be added (not the current service)
+                          const availableServices = servicesList.filter(s => s.id !== currentServiceId);
+                          
+                          // Configured related services array
                           const configuredRelated = mConfig.related_services || [];
                           
-                          // Merge configured list with any newly added services that aren't configured yet
-                          const merged = [...configuredRelated];
-                          availableServices.forEach(s => {
-                            if (!merged.some(r => r.id === s.id)) {
-                              merged.push({ id: s.id, enabled: false });
-                            }
-                          });
-                          
-                          // Filter out any services that are no longer present
-                          const cleanRelated = merged.filter(r => availableServices.some(s => s.id === r.id));
+                          // Filter out invalid items and self-references just in case
+                          const cleanRelated = configuredRelated.filter((r: any) => 
+                            r && r.id && r.id !== currentServiceId && servicesList.some(s => s.id === r.id)
+                          );
+
+                          // Search filter for service addition
+                          // Let's filter out services that are ALREADY added as related
+                          const nonSelectedServices = availableServices.filter(s => 
+                            !cleanRelated.some((r: any) => r.id === s.id)
+                          );
+
+                          const filteredAvailable = nonSelectedServices.filter(s =>
+                            s.title.toLowerCase().includes(relatedSearchQuery.toLowerCase())
+                          );
+
+                          const handleAddRelated = (serviceId: string) => {
+                            // Prevent adding current service
+                            if (serviceId === currentServiceId) return;
+                            // Prevent duplicates
+                            if (cleanRelated.some((r: any) => r.id === serviceId)) return;
+                            
+                            const updated = [...cleanRelated, { id: serviceId, enabled: true }];
+                            updateMarketingConfig('related_services', updated);
+                            setRelatedSearchQuery(''); // clear search
+                          };
+
+                          const handleRemoveRelated = (serviceId: string) => {
+                            const updated = cleanRelated.filter((r: any) => r.id !== serviceId);
+                            updateMarketingConfig('related_services', updated);
+                          };
 
                           const handleToggleRelated = (id: string, enabled: boolean) => {
-                            const updated = cleanRelated.map(r => r.id === id ? { ...r, enabled } : r);
+                            const updated = cleanRelated.map((r: any) => r.id === id ? { ...r, enabled } : r);
                             updateMarketingConfig('related_services', updated);
                           };
 
@@ -7924,75 +9787,195 @@ export default function Admin({
                             updateMarketingConfig('related_services', updated);
                           };
 
+                          // Drag & drop handlers specifically for related services
+                          const handleRelatedDragStart = (e: React.DragEvent, index: number) => {
+                            setRelatedDragIndex(index);
+                            e.dataTransfer.effectAllowed = 'move';
+                          };
+
+                          const handleRelatedDragOver = (e: React.DragEvent, index: number) => {
+                            e.preventDefault();
+                            if (relatedDragIndex === null || relatedDragIndex === index) return;
+                            
+                            const updated = [...cleanRelated];
+                            const draggedItem = updated[relatedDragIndex];
+                            updated.splice(relatedDragIndex, 1);
+                            updated.splice(index, 0, draggedItem);
+                            
+                            updateMarketingConfig('related_services', updated);
+                            setRelatedDragIndex(index);
+                          };
+
+                          const handleRelatedDragEnd = () => {
+                            setRelatedDragIndex(null);
+                          };
+
                           return (
-                            <div className="space-y-3 pt-1">
-                              {cleanRelated.length === 0 ? (
-                                <p className="text-xs text-slate-400 text-center py-4">No other services available to link.</p>
-                              ) : (
-                                <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                                  {cleanRelated.map((r, index) => {
-                                    const relatedSvc = availableServices.find(s => s.id === r.id);
-                                    if (!relatedSvc) return null;
-                                    
-                                    return (
-                                      <div key={r.id} className="flex items-center justify-between p-3 bg-slate-50/50 border border-slate-100 rounded-xl gap-4">
-                                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                                          <img 
-                                            src={relatedSvc.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=200'} 
-                                            alt={relatedSvc.title}
-                                            className="w-12 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200"
+                            <div className="space-y-4 pt-1">
+                              {/* Search & Add Input dropdown */}
+                              <div className="relative space-y-2">
+                                <label className="text-xs font-semibold text-slate-700">Add Related Service</label>
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <input
+                                      type="text"
+                                      placeholder="Search service by name..."
+                                      value={relatedSearchQuery}
+                                      onChange={(e) => setRelatedSearchQuery(e.target.value)}
+                                      className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 focus:bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                    />
+                                    {relatedSearchQuery && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setRelatedSearchQuery('')}
+                                        className="absolute right-2.5 top-2.5 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Floating Autocomplete Dropdown Search Results */}
+                                {relatedSearchQuery.trim() && (
+                                  <div className="absolute z-30 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-56 overflow-y-auto divide-y divide-slate-100">
+                                    {filteredAvailable.length === 0 ? (
+                                      <div className="p-3 text-center text-xs text-slate-400">No matching services found.</div>
+                                    ) : (
+                                      filteredAvailable.map(svc => (
+                                        <button
+                                          key={svc.id}
+                                          type="button"
+                                          onClick={() => handleAddRelated(svc.id)}
+                                          className="w-full flex items-center gap-3 p-2.5 hover:bg-slate-50 text-left transition"
+                                        >
+                                          <img
+                                            src={svc.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=200'}
+                                            alt={svc.title}
+                                            className="w-10 h-7 rounded-md object-cover bg-slate-100"
                                             referrerPolicy="no-referrer"
                                           />
-                                          <div className="min-w-0">
-                                            <h5 className="text-xs font-bold text-[#081C3A] truncate">{relatedSvc.title}</h5>
-                                            <p className="text-[10px] text-slate-400 truncate">{relatedSvc.slug}</p>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="text-xs font-bold text-slate-800 truncate">{svc.title}</div>
+                                            <div className="text-[10px] text-slate-400 truncate">{svc.slug}</div>
                                           </div>
-                                        </div>
+                                          <Plus className="h-4 w-4 text-teal-600 shrink-0" />
+                                        </button>
+                                      ))
+                                    )}
+                                  </div>
+                                )}
+                              </div>
 
-                                        <div className="flex items-center gap-3">
-                                          {/* Move Buttons */}
-                                          <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
-                                            <button
-                                              type="button"
-                                              disabled={index === 0}
-                                              onClick={() => handleMoveRelated(index, 'up')}
-                                              className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
-                                            >
-                                              <ChevronUp className="h-3.5 w-3.5" />
-                                            </button>
-                                            <button
-                                              type="button"
-                                              disabled={index === cleanRelated.length - 1}
-                                              onClick={() => handleMoveRelated(index, 'down')}
-                                              className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
-                                            >
-                                              <ChevronDown className="h-3.5 w-3.5" />
-                                            </button>
-                                          </div>
+                              {/* Configured Related Services List */}
+                              <div className="space-y-2">
+                                <span className="text-xs font-semibold text-slate-700">Configured Related Services ({cleanRelated.length})</span>
+                                {cleanRelated.length === 0 ? (
+                                  <div className="border border-dashed border-slate-200 rounded-xl p-6 text-center text-xs text-slate-400 bg-slate-50/50">
+                                    No related services added yet. Search above to link treatments.
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                                    {cleanRelated.map((r: any, index: number) => {
+                                      const relatedSvc = servicesList.find(s => s.id === r.id);
+                                      if (!relatedSvc) return null;
+                                      
+                                      const isDragged = relatedDragIndex === index;
 
-                                          {/* Toggle */}
-                                          <label className="relative inline-flex items-center cursor-pointer">
-                                            <input
-                                              type="checkbox"
-                                              checked={!!r.enabled}
-                                              onChange={(e) => handleToggleRelated(r.id, e.target.checked)}
-                                              className="sr-only peer"
+                                      return (
+                                        <div 
+                                          key={r.id} 
+                                          draggable
+                                          onDragStart={(e) => handleRelatedDragStart(e, index)}
+                                          onDragOver={(e) => handleRelatedDragOver(e, index)}
+                                          onDragEnd={handleRelatedDragEnd}
+                                          className={`flex items-center justify-between p-3 bg-white border rounded-xl gap-3 transition-all duration-200 ${
+                                            isDragged 
+                                              ? 'border-teal-500 bg-teal-50/20 scale-[0.98] shadow-inner opacity-60' 
+                                              : 'border-slate-150 hover:border-slate-250 shadow-3xs'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                                            {/* Drag Handle */}
+                                            <div 
+                                              className="cursor-grab active:cursor-grabbing p-1 text-slate-400 hover:text-slate-600 transition shrink-0"
+                                              title="Drag to reorder"
+                                            >
+                                              <GripVertical className="h-3.5 w-3.5" />
+                                            </div>
+
+                                            <img 
+                                              src={relatedSvc.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=200'} 
+                                              alt={relatedSvc.title}
+                                              className="w-12 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200 shrink-0"
+                                              referrerPolicy="no-referrer"
                                             />
-                                            <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                                          </label>
+                                            <div className="min-w-0">
+                                              <h5 className="text-xs font-bold text-[#081C3A] truncate">{relatedSvc.title}</h5>
+                                              <p className="text-[10px] text-slate-400 truncate">{relatedSvc.slug}</p>
+                                            </div>
+                                          </div>
+
+                                          <div className="flex items-center gap-2">
+                                            {/* Move Buttons as accessible backup */}
+                                            <div className="flex items-center gap-0.5 bg-slate-50 border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                                              <button
+                                                type="button"
+                                                disabled={index === 0}
+                                                onClick={() => handleMoveRelated(index, 'up')}
+                                                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-white disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                                title="Move up"
+                                              >
+                                                <ChevronUp className="h-3 w-3" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                disabled={index === cleanRelated.length - 1}
+                                                onClick={() => handleMoveRelated(index, 'down')}
+                                                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-white disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                                title="Move down"
+                                              >
+                                                <ChevronDown className="h-3 w-3" />
+                                              </button>
+                                            </div>
+
+                                            {/* Toggle */}
+                                            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-150 rounded-lg px-2 py-1">
+                                              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{r.enabled ? 'Active' : 'Disabled'}</span>
+                                              <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                  type="checkbox"
+                                                  checked={!!r.enabled}
+                                                  onChange={(e) => handleToggleRelated(r.id, e.target.checked)}
+                                                  className="sr-only peer"
+                                                />
+                                                <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                                              </label>
+                                            </div>
+
+                                            {/* Remove Button */}
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRemoveRelated(r.id)}
+                                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                              title="Remove related service"
+                                            >
+                                              <Trash2 className="h-3.5 w-3.5" />
+                                            </button>
+                                          </div>
                                         </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           );
                         })()}
                       </div>
 
                       {/* 8. WRITTEN REVIEWS & TRANSFORMATIONS */}
-                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs">
+                      <div className="bg-white border border-slate-150 rounded-2xl p-5 space-y-4 shadow-3xs font-sans">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                           <div className="flex items-center gap-2">
                             <div className="p-2 bg-rose-50 rounded-lg text-rose-600">
@@ -8015,6 +9998,7 @@ export default function Admin({
                                 setReviewDraftBeforeImage('');
                                 setReviewDraftAfterImage('');
                                 setReviewDraftDisplayOrder(10);
+                                setReviewDraftEnabled(true);
                               }}
                               className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition flex items-center gap-1 cursor-pointer"
                             >
@@ -8107,7 +10091,7 @@ export default function Admin({
                                     onClick={() => triggerUpload('image/*', (url) => setReviewDraftBeforeImage(url))}
                                     className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition shrink-0"
                                   >
-                                    Upload
+                                    Upload / Replace
                                   </button>
                                 </div>
                                 {reviewDraftBeforeImage && (
@@ -8135,7 +10119,7 @@ export default function Admin({
                                     onClick={() => triggerUpload('image/*', (url) => setReviewDraftAfterImage(url))}
                                     className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition shrink-0"
                                   >
-                                    Upload
+                                    Upload / Replace
                                   </button>
                                 </div>
                                 {reviewDraftAfterImage && (
@@ -8146,6 +10130,23 @@ export default function Admin({
                                     referrerPolicy="no-referrer"
                                   />
                                 )}
+                              </div>
+
+                              {/* Enable / Disable toggle in Edit Form */}
+                              <div className="space-y-1 sm:col-span-2">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Status</label>
+                                <div className="flex items-center gap-2 h-9">
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={reviewDraftEnabled}
+                                      onChange={(e) => setReviewDraftEnabled(e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                                  </label>
+                                  <span className="text-xs font-semibold text-slate-700">{reviewDraftEnabled ? 'Review Enabled (Visible to public)' : 'Review Disabled (Hidden from public)'}</span>
+                                </div>
                               </div>
                             </div>
 
@@ -8160,38 +10161,53 @@ export default function Admin({
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (!reviewDraftName || !reviewDraftTreatment || !reviewDraftText) {
-                                    alert('Please fill in Name, Treatment, and Review text fields.');
+                                  if (!reviewDraftName.trim()) {
+                                    alert('Patient Name cannot be empty.');
                                     return;
                                   }
+                                  if (!reviewDraftTreatment.trim()) {
+                                    alert('Treatment Name cannot be empty.');
+                                    return;
+                                  }
+                                  if (!reviewDraftText.trim()) {
+                                    alert('Review Text cannot be empty.');
+                                    return;
+                                  }
+                                  if (reviewDraftRating < 1 || reviewDraftRating > 5) {
+                                    alert('Rating must be between 1 and 5.');
+                                    return;
+                                  }
+
                                   const list = mConfig.written_reviews || [];
                                   let updatedList = [...list];
                                   if (editingReviewId === 'new') {
                                     updatedList.push({
                                       id: 'wr-' + Date.now(),
-                                      patient_name: reviewDraftName,
-                                      treatment_name: reviewDraftTreatment,
-                                      review: reviewDraftText,
+                                      patient_name: reviewDraftName.trim(),
+                                      treatment_name: reviewDraftTreatment.trim(),
+                                      review: reviewDraftText.trim(),
                                       rating: reviewDraftRating,
                                       before_image: reviewDraftBeforeImage || undefined,
                                       after_image: reviewDraftAfterImage || undefined,
-                                      display_order: reviewDraftDisplayOrder
+                                      display_order: reviewDraftDisplayOrder,
+                                      enabled: reviewDraftEnabled
                                     });
                                   } else {
                                     updatedList = updatedList.map(r => r.id === editingReviewId ? {
                                       ...r,
-                                      patient_name: reviewDraftName,
-                                      treatment_name: reviewDraftTreatment,
-                                      review: reviewDraftText,
+                                      patient_name: reviewDraftName.trim(),
+                                      treatment_name: reviewDraftTreatment.trim(),
+                                      review: reviewDraftText.trim(),
                                       rating: reviewDraftRating,
                                       before_image: reviewDraftBeforeImage || undefined,
                                       after_image: reviewDraftAfterImage || undefined,
-                                      display_order: reviewDraftDisplayOrder
+                                      display_order: reviewDraftDisplayOrder,
+                                      enabled: reviewDraftEnabled
                                     } : r);
                                   }
                                   
                                   // Sort the list by display order
-                                  updatedList.sort((a, b) => a.display_order - b.display_order);
+                                  updatedList.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
                                   
                                   updateMarketingConfig('written_reviews', updatedList);
                                   setEditingReviewId(null);
@@ -8204,114 +10220,187 @@ export default function Admin({
                           </div>
                         ) : (
                           /* List of Reviews */
-                          <div className="space-y-3 pt-1">
-                            {(!mConfig.written_reviews || mConfig.written_reviews.length === 0) ? (
-                              <p className="text-xs text-slate-400 text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                                No written testimonials added yet. Click 'Add Written Review' above to display beautiful ratings & smile transformations.
-                              </p>
-                            ) : (
-                              <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                                {(mConfig.written_reviews as any[]).map((r, index) => (
-                                  <div key={r.id} className="flex items-start justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl gap-4">
-                                    <div className="flex-1 space-y-1 min-w-0">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-xs font-bold text-[#081C3A]">{r.patient_name}</span>
-                                        <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-semibold">{r.treatment_name}</span>
-                                        <div className="flex items-center text-amber-400 ml-1">
-                                          {Array.from({ length: r.rating || 5 }).map((_, i) => (
-                                            <Star key={i} className="h-3 w-3 fill-amber-400 shrink-0" />
-                                          ))}
-                                        </div>
-                                      </div>
-                                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed italic">"{r.review}"</p>
-                                      
-                                      {/* Before After Preview Thumbs */}
-                                      {(r.before_image || r.after_image) && (
-                                        <div className="flex items-center gap-3 pt-1.5">
-                                          {r.before_image && (
-                                            <div className="space-y-0.5">
-                                              <span className="text-[8px] font-black text-rose-500 block">BEFORE</span>
-                                              <img src={r.before_image} alt="Before" className="h-8 w-12 object-cover rounded border border-slate-200 font-sans" referrerPolicy="no-referrer" />
-                                            </div>
-                                          )}
-                                          {r.after_image && (
-                                            <div className="space-y-0.5">
-                                              <span className="text-[8px] font-black text-emerald-500 block">AFTER</span>
-                                              <img src={r.after_image} alt="After" className="h-8 w-12 object-cover rounded border border-slate-200 font-sans" referrerPolicy="no-referrer" />
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
+                          (() => {
+                            const handleReviewDragStart = (e: React.DragEvent, index: number) => {
+                              setReviewDragIndex(index);
+                              e.dataTransfer.effectAllowed = 'move';
+                            };
 
-                                    <div className="flex items-center gap-2 shrink-0 font-sans">
-                                      {/* Reordering */}
-                                      <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
-                                        <button
-                                          type="button"
-                                          disabled={index === 0}
-                                          onClick={() => {
-                                            const updated = [...mConfig.written_reviews];
-                                            const temp = updated[index];
-                                            updated[index] = updated[index - 1];
-                                            updated[index - 1] = temp;
-                                            updateMarketingConfig('written_reviews', updated);
-                                          }}
-                                          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
-                                        >
-                                          <ChevronUp className="h-3.5 w-3.5" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          disabled={index === mConfig.written_reviews.length - 1}
-                                          onClick={() => {
-                                            const updated = [...mConfig.written_reviews];
-                                            const temp = updated[index];
-                                            updated[index] = updated[index + 1];
-                                            updated[index + 1] = temp;
-                                            updateMarketingConfig('written_reviews', updated);
-                                          }}
-                                          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
-                                        >
-                                          <ChevronDown className="h-3.5 w-3.5" />
-                                        </button>
-                                      </div>
+                            const handleReviewDragOver = (e: React.DragEvent, index: number) => {
+                              e.preventDefault();
+                              if (reviewDragIndex === null || reviewDragIndex === index) return;
+                              
+                              const updated = [...(mConfig.written_reviews || [])];
+                              const draggedItem = updated[reviewDragIndex];
+                              updated.splice(reviewDragIndex, 1);
+                              updated.splice(index, 0, draggedItem);
+                              
+                              updateMarketingConfig('written_reviews', updated);
+                              setReviewDragIndex(index);
+                            };
 
-                                      {/* Action buttons */}
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setEditingReviewId(r.id);
-                                          setReviewDraftName(r.patient_name || '');
-                                          setReviewDraftTreatment(r.treatment_name || '');
-                                          setReviewDraftText(r.review || '');
-                                          setReviewDraftRating(r.rating || 5);
-                                          setReviewDraftBeforeImage(r.before_image || '');
-                                          setReviewDraftAfterImage(r.after_image || '');
-                                          setReviewDraftDisplayOrder(r.display_order || 10);
-                                        }}
-                                        className="p-1 text-[#0D9488] hover:text-[#0F766E] hover:bg-teal-50 rounded-lg transition"
-                                      >
-                                        <Pencil className="h-4 w-4" />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          if (confirm('Are you sure you want to delete this written testimonial?')) {
-                                            const filtered = (mConfig.written_reviews as any[]).filter(item => item.id !== r.id);
-                                            updateMarketingConfig('written_reviews', filtered);
-                                          }
-                                        }}
-                                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </button>
-                                    </div>
+                            const handleReviewDragEnd = () => {
+                              setReviewDragIndex(null);
+                            };
+
+                            return (
+                              <div className="space-y-3 pt-1">
+                                {(!mConfig.written_reviews || mConfig.written_reviews.length === 0) ? (
+                                  <p className="text-xs text-slate-400 text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                                    No written testimonials added yet. Click 'Add Written Review' above to display beautiful ratings & smile transformations.
+                                  </p>
+                                ) : (
+                                  <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                                    {(mConfig.written_reviews as any[]).map((r, index) => {
+                                      const isDragged = reviewDragIndex === index;
+                                      return (
+                                        <div 
+                                          key={r.id} 
+                                          draggable
+                                          onDragStart={(e) => handleReviewDragStart(e, index)}
+                                          onDragOver={(e) => handleReviewDragOver(e, index)}
+                                          onDragEnd={handleReviewDragEnd}
+                                          className={`flex items-start justify-between p-3.5 border rounded-xl gap-4 transition-all duration-200 ${
+                                            isDragged 
+                                              ? 'border-teal-500 bg-teal-50/20 scale-[0.98] shadow-inner opacity-60' 
+                                              : 'bg-slate-50/50 border-slate-100 hover:border-slate-200 shadow-3xs'
+                                          }`}
+                                        >
+                                          {/* Drag Handle */}
+                                          <div 
+                                            className="cursor-grab active:cursor-grabbing p-1.5 text-slate-400 hover:text-slate-600 transition shrink-0 self-center"
+                                            title="Drag to reorder"
+                                          >
+                                            <GripVertical className="h-3.5 w-3.5" />
+                                          </div>
+
+                                          <div className="flex-1 space-y-1 min-w-0">
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                              <span className="text-xs font-bold text-[#081C3A]">{r.patient_name}</span>
+                                              <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-semibold">{r.treatment_name}</span>
+                                              <div className="flex items-center text-amber-400 ml-1">
+                                                {Array.from({ length: r.rating || 5 }).map((_, i) => (
+                                                  <Star key={i} className="h-3 w-3 fill-amber-400 shrink-0" />
+                                                ))}
+                                              </div>
+                                              <span className="text-[9px] text-slate-400 font-bold ml-auto">Order: {r.display_order ?? 10}</span>
+                                            </div>
+                                            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed italic">"{r.review}"</p>
+                                            
+                                            {/* Before After Preview Thumbs */}
+                                            {(r.before_image || r.after_image) && (
+                                              <div className="flex items-center gap-3 pt-1.5">
+                                                {r.before_image && (
+                                                  <div className="space-y-0.5">
+                                                    <span className="text-[8px] font-black text-rose-500 block">BEFORE</span>
+                                                    <img src={r.before_image} alt="Before" className="h-8 w-12 object-cover rounded border border-slate-200 font-sans" referrerPolicy="no-referrer" />
+                                                  </div>
+                                                )}
+                                                {r.after_image && (
+                                                  <div className="space-y-0.5">
+                                                    <span className="text-[8px] font-black text-emerald-500 block">AFTER</span>
+                                                    <img src={r.after_image} alt="After" className="h-8 w-12 object-cover rounded border border-slate-200 font-sans" referrerPolicy="no-referrer" />
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
+                                          </div>
+
+                                          <div className="flex items-center gap-2 shrink-0 font-sans self-center">
+                                            {/* Reordering */}
+                                            <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                                              <button
+                                                type="button"
+                                                disabled={index === 0}
+                                                onClick={() => {
+                                                  const updated = [...mConfig.written_reviews];
+                                                  const temp = updated[index];
+                                                  updated[index] = updated[index - 1];
+                                                  updated[index - 1] = temp;
+                                                  updateMarketingConfig('written_reviews', updated);
+                                                }}
+                                                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                                title="Move Up"
+                                              >
+                                                <ChevronUp className="h-3.5 w-3.5" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                disabled={index === mConfig.written_reviews.length - 1}
+                                                onClick={() => {
+                                                  const updated = [...mConfig.written_reviews];
+                                                  const temp = updated[index];
+                                                  updated[index] = updated[index + 1];
+                                                  updated[index + 1] = temp;
+                                                  updateMarketingConfig('written_reviews', updated);
+                                                }}
+                                                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none rounded transition"
+                                                title="Move Down"
+                                              >
+                                                <ChevronDown className="h-3.5 w-3.5" />
+                                              </button>
+                                            </div>
+
+                                            {/* Enable / Disable switch inline */}
+                                            <div className="flex items-center gap-1 bg-white border border-slate-150 rounded-lg px-2 py-1 shadow-3xs">
+                                              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{r.enabled !== false ? 'Active' : 'Disabled'}</span>
+                                              <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                  type="checkbox"
+                                                  checked={r.enabled !== false}
+                                                  onChange={(e) => {
+                                                    const updated = mConfig.written_reviews.map((item: any) =>
+                                                      item.id === r.id ? { ...item, enabled: e.target.checked } : item
+                                                    );
+                                                    updateMarketingConfig('written_reviews', updated);
+                                                  }}
+                                                  className="sr-only peer"
+                                                />
+                                                <div className="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                                              </label>
+                                            </div>
+
+                                            {/* Action buttons */}
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setEditingReviewId(r.id);
+                                                setReviewDraftName(r.patient_name || '');
+                                                setReviewDraftTreatment(r.treatment_name || '');
+                                                setReviewDraftText(r.review || '');
+                                                setReviewDraftRating(r.rating || 5);
+                                                setReviewDraftBeforeImage(r.before_image || '');
+                                                setReviewDraftAfterImage(r.after_image || '');
+                                                setReviewDraftDisplayOrder(r.display_order || 10);
+                                                setReviewDraftEnabled(r.enabled !== false);
+                                              }}
+                                              className="p-1 text-[#0D9488] hover:text-[#0F766E] hover:bg-teal-50 rounded-lg transition"
+                                              title="Edit Review"
+                                            >
+                                              <Pencil className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                if (confirm('Are you sure you want to delete this written testimonial?')) {
+                                                  const filtered = (mConfig.written_reviews as any[]).filter(item => item.id !== r.id);
+                                                  updateMarketingConfig('written_reviews', filtered);
+                                                }
+                                              }}
+                                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                                              title="Delete Review"
+                                            >
+                                              <Trash2 className="h-4 w-4" />
+                                            </button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
-                                ))}
+                                )}
                               </div>
-                            )}
-                          </div>
+                            );
+                          })()
                         )}
                       </div>
 

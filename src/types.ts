@@ -144,6 +144,26 @@ export interface MarketingConfig {
   secondary_cta_action?: 'whatsapp' | 'call' | 'custom';
   secondary_cta_link?: string;
 
+  // CTA Settings Manager
+  cta_appointment_enabled?: boolean;
+  cta_appointment_text?: string;
+  cta_appointment_dest?: 'appointment' | 'internal' | 'external';
+  cta_appointment_dest_value?: string;
+
+  cta_call_enabled?: boolean;
+  cta_call_text?: string;
+  cta_call_dest?: 'clinic' | 'custom';
+  cta_call_dest_value?: string;
+
+  cta_whatsapp_enabled?: boolean;
+  cta_whatsapp_text?: string;
+  cta_whatsapp_dest?: 'clinic' | 'custom';
+  cta_whatsapp_dest_value?: string;
+
+  cta_custom_enabled?: boolean;
+  cta_custom_text?: string;
+  cta_custom_dest_value?: string;
+
   // Contact Information
   contact_call_number?: string;
   contact_whatsapp_number?: string;
