@@ -28,7 +28,6 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Treatments from './pages/Treatments';
 import SameDayFix from './pages/SameDayFix';
-import Implants from './pages/Implants';
 import SmileGallery from './pages/SmileGallery';
 import Doctors from './pages/Doctors';
 import Contact from './pages/Contact';
@@ -546,7 +545,13 @@ export default function App() {
       case 'sameday':
         return <SameDayFix openAppointmentModal={openAppointmentModal} contactInfo={contactInfo} />;
       case 'implants':
-        return <Implants setCurrentPage={setCurrentPage} openAppointmentModal={openAppointmentModal} />;
+        return (
+          <ServiceDetail
+            slug="dental-implants"
+            openAppointmentModal={openAppointmentModal}
+            setCurrentPage={setCurrentPage}
+          />
+        );
       case 'gallery':
         return (
           <SmileGallery

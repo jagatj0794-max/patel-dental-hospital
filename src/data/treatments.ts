@@ -5,21 +5,21 @@
 
 import { Treatment } from '../types';
 
-import imgImplants from '../assets/images/dental_implants_1780610766218.png';
-import imgSameday from '../assets/images/sameday_fix_1780610780326.png';
-import imgFullmouth from '../assets/images/fullmouth_rehab_1780610792469.png';
-import imgRct from '../assets/images/root_canal_1780610807649.png';
-import imgBraces from '../assets/images/metal_braces_1780610824433.png';
-import imgAligners from '../assets/images/clear_aligners_1780610837512.png';
-import imgKids from '../assets/images/kids_dentistry_1780610850929.png';
-import imgCosmetic from '../assets/images/cosmetic_dentistry_1780610862769.png';
-import imgGum from '../assets/images/gum_treatment_1780610880072.png';
-import imgCleaning from '../assets/images/teeth_cleaning_1780610893042.png';
-import imgWisdom from '../assets/images/wisdom_tooth_1780610905625.png';
-import imgDentures from '../assets/images/dentures_set_1780610918720.png';
-import imgCrowns from '../assets/images/crowns_bridges_1780610933368.png';
-import imgSmilemakeover from '../assets/images/smile_makeover_1780610947126.png';
-import imgOralsurgery from '../assets/images/oral_surgery_1780610960891.png';
+const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const imgSameday = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const imgFullmouth = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const imgRct = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const imgBraces = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
+const imgAligners = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
+const imgKids = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const imgCosmetic = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const imgGum = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const imgCleaning = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const imgWisdom = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const imgDentures = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const imgCrowns = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const imgSmilemakeover = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800';
+const imgOralsurgery = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
 
 export const TREATMENTS: Treatment[] = [
   {

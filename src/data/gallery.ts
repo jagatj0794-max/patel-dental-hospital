@@ -5,22 +5,22 @@
 
 import { GalleryItem } from '../types';
 
-import imgCase1Before from '../assets/images/gallery_case1_before_1780611450331.png';
-import imgCase1After from '../assets/images/gallery_case1_after_1780611466649.png';
-import imgCase2Before from '../assets/images/gallery_case2_before_1780611481933.png';
-import imgCase2After from '../assets/images/gallery_case2_after_1780611494535.png';
-import imgCase3Before from '../assets/images/smile_before_1780608028713.png';
-import imgCase3After from '../assets/images/smile_after_1780608044346.png';
+const imgCase1Before = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=600';
+const imgCase1After = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=600';
+const imgCase2Before = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=600';
+const imgCase2After = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=600';
+const imgCase3Before = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600';
+const imgCase3After = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=600';
 
 // Newly generated treatment-specific clinical before/after photographs
-import imgAlignersBefore from '../assets/images/aligners_teeth_before_1780687415680.png';
-import imgAlignersAfter from '../assets/images/aligners_teeth_after_1780687432806.png';
-import imgCrownsBefore from '../assets/images/crowns_teeth_before_1780687451589.png';
-import imgCrownsAfter from '../assets/images/crowns_teeth_after_1780687466941.png';
-import imgGumBefore from '../assets/images/gum_teeth_before_1780687482800.png';
-import imgGumAfter from '../assets/images/gum_teeth_after_1780687499886.png';
-import imgRehabBefore from '../assets/images/rehab_teeth_before_1780687516367.png';
-import imgRehabAfter from '../assets/images/rehab_teeth_after_1780687532302.png';
+const imgAlignersBefore = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=600';
+const imgAlignersAfter = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600';
+const imgCrownsBefore = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=600';
+const imgCrownsAfter = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=600';
+const imgGumBefore = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600';
+const imgGumAfter = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=600';
+const imgRehabBefore = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=600';
+const imgRehabAfter = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=600';
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {

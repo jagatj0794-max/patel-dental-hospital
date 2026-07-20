@@ -226,26 +226,26 @@ const ToothColouredFillingIcon = ({ className }: { className?: string }) => (
     <path d="M18 5l1.5 1.5L21 5l-1.5-1.5z" fill="currentColor" stroke="none" />
   </svg>
 );
-import clinicInterior from '../assets/images/patel_clinic_interior_1781166076431.png';
-import heroBannerBg from '../assets/images/premium_hero_implant_dental_1780660944760.png';
-import doctorsImg from '../assets/images/patel_dental_doctors_1780949395339.png';
+const clinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800';
+const heroBannerBg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
+const doctorsImg = 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800';
 import AnimatedCounter from '../components/AnimatedCounter';
-import sameDayTeethImg from '../assets/images/same_day_teeth_1780659066674.png';
-import dentalImplantsImg from '../assets/images/dental_implants_card_1780659083888.png';
-import fullMouthRehabImg from '../assets/images/full_mouth_rehab_1780659100244.png';
-import clearAlignersImg from '../assets/images/clear_aligners_1780659117253.png';
-import rootCanalImg from '../assets/images/root_canal_rct_1780659131735.png';
-import smileMakeoverImg from '../assets/images/smile_makeover_1780610947126.png';
-import crownsBridgesImg from '../assets/images/crowns_bridges_1780610933368.png';
-import teethCleaningImg from '../assets/images/teeth_cleaning_1780610893042.png';
-import kidsDentistryImg from '../assets/images/kids_dentistry_1780659150873.png';
-import bracesImg from '../assets/images/metal_braces_1780610824433.png';
-import wisdomToothImg from '../assets/images/wisdom_tooth_1780610905625.png';
-import compositeFillingImg from '../assets/images/cosmetic_dentistry_1780610862769.png';
-import fdaApprovedImplantImg from '../assets/images/fda_approved_implant_1781124163464.png';
+const sameDayTeethImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const dentalImplantsImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const fullMouthRehabImg = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const clearAlignersImg = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
+const rootCanalImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const smileMakeoverImg = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800';
+const crownsBridgesImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const teethCleaningImg = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const kidsDentistryImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const bracesImg = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
+const wisdomToothImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const compositeFillingImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const fdaApprovedImplantImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
 import cbctScanTechImg from '../assets/images/cbct_scan_tech_1781124177680.png';
-import patelDentistPatient1 from '../assets/images/patel_dentist_patient_treatment_1781166161823.png';
-import patelReceptionLounge from '../assets/images/patel_reception_lounge_1781166095656.png';
+const patelDentistPatient1 = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
 import { GALLERY_ITEMS } from '../data/gallery';
 import { PATIENT_MOMENTS } from '../data/patientMoments';
 

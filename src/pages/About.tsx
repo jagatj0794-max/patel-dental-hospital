@@ -8,10 +8,10 @@ import {
   Microscope, Users, HeartHandshake, Sparkles, GraduationCap, Quote, Calendar, ArrowRight
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import patelClinicInterior from '../assets/images/patel_clinic_interior_1781166076431.png';
-import patelCbctImaging from '../assets/images/patel_cbct_imaging_1781166123983.png';
-import patelReceptionLounge from '../assets/images/patel_reception_lounge_1781166095656.png';
-import patelSterilizationZone from '../assets/images/patel_sterilization_zone_1781166142899.png';
+const patelClinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800';
+const patelCbctImaging = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
+const patelSterilizationZone = 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&q=80&w=800';
 
 interface AboutProps {
   openAppointmentModal: () => void;

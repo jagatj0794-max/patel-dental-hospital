@@ -53,6 +53,7 @@ import { contactService } from '../utils/contactData';
 import { serviceService } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
+import DentalImplantsCms from '../components/DentalImplantsCms';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -76,7 +77,7 @@ interface AdminProps {
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>;
 }
 
-type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services';
+type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services' | 'implants-cms';
 
 export default function Admin({ 
   setCurrentPage, 
@@ -2644,6 +2645,7 @@ export default function Admin({
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'services', label: 'Services', icon: Stethoscope },
+    { id: 'implants-cms', label: 'Dental Implants', icon: ShieldCheck },
   ] as const;
 
   const handleLogout = async () => {
@@ -5270,6 +5272,8 @@ export default function Admin({
         );
       case 'appointments':
         return <Appointments />;
+      case 'implants-cms':
+        return <DentalImplantsCms />;
       case 'services':
         return (
           <div className="space-y-6" id="admin-services-view">
@@ -5407,10 +5411,14 @@ export default function Admin({
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setActiveServiceEditorTab('details');
-                                  setEditingService(svc);
-                                  setIsSlugTouched(true);
-                                  setServiceFormError(null);
+                                  if (svc.slug === 'dental-implants' || svc.id === 'implants-srv') {
+                                    setActiveTab('implants-cms');
+                                  } else {
+                                    setActiveServiceEditorTab('details');
+                                    setEditingService(svc);
+                                    setIsSlugTouched(true);
+                                    setServiceFormError(null);
+                                  }
                                 }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#0D9488] bg-[#F0FDFA] hover:bg-[#CCFBF1] rounded-lg transition cursor-pointer"
                                 title="Edit Service details"
