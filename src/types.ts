@@ -95,6 +95,9 @@ export interface DentalVideo {
 export interface MarketingConfig {
   process_section_title?: string;
   benefits_section_title?: string;
+  testimonials_section_title?: string;
+  testimonial_section_title?: string;
+  patient_testimonials?: any[];
   // Offer Banner
   show_offer_banner?: boolean;
   offer_title?: string;
@@ -212,6 +215,9 @@ export interface MarketingConfig {
   show_benefits?: boolean;
   show_gallery?: boolean;
   show_procedure_video?: boolean;
+  procedure_video_title?: string;
+  procedure_video_description?: string;
+  procedure_video_url?: string;
   show_hospital_photos?: boolean;
   show_team_photos?: boolean;
   show_testimonials?: boolean;

@@ -17,6 +17,7 @@ import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
+import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
 
@@ -98,6 +99,18 @@ export default function ServiceDetail({
   const [implantCategory, setImplantCategory] = useState<string>('all');
   const [implantLightboxIndex, setImplantLightboxIndex] = useState<number | null>(null);
 
+  const mConfig = React.useMemo(() => {
+    if (!service || !service.marketing_config) return {};
+    if (typeof service.marketing_config === 'string') {
+      try {
+        return JSON.parse(service.marketing_config);
+      } catch (e) {
+        return {};
+      }
+    }
+    return service.marketing_config || {};
+  }, [service]);
+
   const fallback = React.useMemo(() => {
     return getFallbackMedia(slug, service?.title || '');
   }, [slug, service?.title]);
@@ -122,11 +135,15 @@ export default function ServiceDetail({
   }, [service, fallback]);
 
   const displayGallery = React.useMemo(() => {
+    if (service?.id === 'implants-srv') {
+      const raw = Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : [];
+      return [...raw].sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    }
     if (gallery && gallery.length > 0) {
       return gallery;
     }
     return fallback.gallery;
-  }, [gallery, fallback]);
+  }, [service, gallery, fallback, mConfig]);
 
   const displayTestimonials = React.useMemo(() => {
     if (!service) return [];
@@ -138,11 +155,30 @@ export default function ServiceDetail({
         list = JSON.parse(service.patient_testimonials);
       } catch (e) {}
     }
+    if ((!list || list.length === 0) && mConfig) {
+      if (Array.isArray(mConfig.patient_testimonials)) {
+        list = mConfig.patient_testimonials;
+      } else if (typeof mConfig.patient_testimonials === 'string') {
+        try {
+          list = JSON.parse(mConfig.patient_testimonials);
+        } catch (e) {}
+      }
+    }
     if (!list || list.length === 0) {
-      return fallback.patient_testimonials;
+      if (service.id === 'implants-srv') {
+        return [
+          {
+            id: 'testi-1',
+            patient_name: 'Patient Testimonial',
+            video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+            display_order: 10
+          }
+        ];
+      }
+      return fallback.patient_testimonials || [];
     }
     return [...list].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [service, fallback]);
+  }, [service, fallback, mConfig]);
 
   const displayTeamPhotos = React.useMemo(() => {
     if (!service) return [];
@@ -372,18 +408,6 @@ export default function ServiceDetail({
         }
       };
     }
-  }, [service]);
-
-  const mConfig = React.useMemo(() => {
-    if (!service || !service.marketing_config) return {};
-    if (typeof service.marketing_config === 'string') {
-      try {
-        return JSON.parse(service.marketing_config);
-      } catch (e) {
-        return {};
-      }
-    }
-    return service.marketing_config || {};
   }, [service]);
 
   const displaySteps: any[] = React.useMemo(() => {
@@ -1163,71 +1187,33 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const videoElement = (mConfig.show_procedure_video !== false && videoUrl) ? (
-            <div className="py-12 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-video">
-              <div className="text-center max-w-xl mx-auto space-y-2">
-                <span className="text-[10px] text-[#0D9488] font-black uppercase tracking-widest block">
-                  Visual Treatment Guide
-                </span>
-                <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
-                  {videoTitle || 'Procedure Video'}
-                </h2>
-                {videoDesc && (
-                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto">
-                    {videoDesc}
-                  </p>
-                )}
-                <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full mt-4" />
-              </div>
+          const defaultImplantsUrl = service?.id === 'implants-srv' ? 'https://www.instagram.com/reel/C8qLd9MyWwG/' : '';
+          const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultImplantsUrl || '').trim();
+          const rawVideoTitle = service?.procedure_video_title || mConfig.procedure_video_title || mConfig.video_heading || '';
+          const effectiveVideoTitle = typeof rawVideoTitle === 'string' ? rawVideoTitle.trim() : '';
+          const rawVideoDesc = service?.procedure_video_description || mConfig.procedure_video_description || mConfig.video_description || '';
+          const effectiveVideoDesc = typeof rawVideoDesc === 'string' ? rawVideoDesc.trim() : '';
 
-              <div className="bg-white rounded-3xl border border-slate-150 p-4 md:p-6 shadow-md max-w-3xl mx-auto">
-                <div className="aspect-video w-full bg-slate-900 rounded-2xl relative overflow-hidden shadow-inner">
-                  {activeVideos['proc-vid'] ? (
-                    isYouTubeUrl(videoUrl) ? (
-                      <iframe
-                        className="w-full h-full border-0 absolute inset-0 z-10"
-                        src={`${getYouTubeEmbedUrl(videoUrl)}?autoplay=1&rel=0`}
-                        title={videoTitle || 'Procedure Video'}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        loading="lazy"
-                      ></iframe>
-                    ) : (
-                      <video
-                        className="w-full h-full absolute inset-0 z-10 bg-black"
-                        src={videoUrl}
-                        controls
-                        autoPlay
-                        referrerPolicy="no-referrer"
-                      />
-                    )
-                  ) : (
-                    <button
-                      onClick={() => setActiveVideos(prev => ({ ...prev, 'proc-vid': true }))}
-                      className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group focus:outline-none"
-                      aria-label="Play procedure guide video"
-                    >
-                      <img
-                        src={isYouTubeUrl(videoUrl) ? `https://img.youtube.com/vi/${videoUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || 'cbVcmy53KBs'}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600'}
-                        alt="Procedure video thumbnail"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors duration-300 pointer-events-none" />
-                      <div className="absolute z-20 flex items-center justify-center w-14 h-14 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover:scale-110 transition-all duration-300 pointer-events-none">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="w-6 h-6 translate-x-0.5"
-                        >
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </button>
+          const videoElement = (mConfig.show_procedure_video !== false && effectiveVideoUrl) ? (
+            <div className="py-6 border-t border-slate-100 space-y-4 animate-fade-in" id="cms-section-video">
+              {effectiveVideoTitle && (
+                <div className="text-center max-w-xl mx-auto px-4">
+                  <h2 className="font-sans font-black text-xl sm:text-2xl text-[#081C3A] tracking-tight leading-tight text-center">
+                    {effectiveVideoTitle}
+                  </h2>
+                  {effectiveVideoDesc && (
+                    <p className="text-slate-500 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed text-center mt-1">
+                      {effectiveVideoDesc}
+                    </p>
                   )}
                 </div>
+              )}
+
+              <div className="max-w-[440px] mx-auto w-full px-2 sm:px-0">
+                <InstagramEmbed
+                  url={effectiveVideoUrl}
+                  title={effectiveVideoTitle || 'Procedure Video'}
+                />
               </div>
             </div>
           ) : null;
@@ -1286,179 +1272,43 @@ export default function ServiceDetail({
             );
           };
 
-          const enabledWrittenReviews = (mConfig.written_reviews || []).filter((r: any) => r.enabled !== false);
+          const validTestimonialVideos = displayTestimonials.filter((t: any) => {
+            const url = (t?.video_url || t?.instagram_url || t?.reel_url || '').trim();
+            return url !== '';
+          });
 
-          const testimonialsElement = (mConfig.show_testimonials !== false && (displayTestimonials.length > 0 || enabledWrittenReviews.length > 0)) ? (
-            <div className="py-12 border-t border-slate-100 space-y-12 animate-fade-in" id="cms-section-testimonials">
-              {/* Video Testimonials Section */}
-              {displayTestimonials.length > 0 && (
-                <div className="space-y-8">
-                  <div className="text-center max-w-xl mx-auto space-y-2">
-                    <span className="text-[10px] text-[#0D9488] font-black uppercase tracking-widest block">
-                      Clinical Outcomes
-                    </span>
-                    <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
-                      Patient Testimonial Videos
-                    </h2>
-                    <p className="text-slate-500 text-xs sm:text-sm mt-2 leading-relaxed">
-                      Listen to the clinical satisfaction shared directly by our happy patients who underwent {service.title} treatment.
-                    </p>
-                    <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full mt-4" />
-                  </div>
+          const rawTestimonialsTitle = service?.testimonials_title || mConfig.testimonials_section_title || mConfig.testimonial_section_title || '';
+          const testimonialsTitle = typeof rawTestimonialsTitle === 'string' ? rawTestimonialsTitle.trim() : '';
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    {displayTestimonials.map((t, idx) => (
-                      <div key={idx} className="bg-white rounded-3xl border border-slate-150 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-4 flex flex-col justify-between">
-                        {t.video_url && (
-                          <div className="aspect-video w-full bg-slate-900 rounded-xl relative overflow-hidden shadow-inner">
-                            {activeVideos[`testimonial-${idx}`] ? (
-                              isYouTubeUrl(t.video_url) ? (
-                                <iframe
-                                  className="w-full h-full border-0 absolute inset-0 z-10"
-                                  src={`${getYouTubeEmbedUrl(t.video_url)}?autoplay=1&rel=0`}
-                                  title={`${t.patient_name}'s Review`}
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  allowFullScreen
-                                  loading="lazy"
-                                ></iframe>
-                              ) : (
-                                <video
-                                  className="w-full h-full absolute inset-0 z-10 bg-black"
-                                  src={t.video_url}
-                                  controls
-                                  autoPlay
-                                  referrerPolicy="no-referrer"
-                                />
-                              )
-                            ) : (
-                              <button
-                                onClick={() => setActiveVideos(prev => ({ ...prev, [`testimonial-${idx}`]: true }))}
-                                className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group focus:outline-none"
-                                aria-label={`Play review by ${t.patient_name}`}
-                              >
-                                <img
-                                  src={isYouTubeUrl(t.video_url) ? `https://img.youtube.com/vi/${t.video_url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/)?.[2] || 'cbVcmy53KBs'}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600'}
-                                  alt={`${t.patient_name}'s video review thumbnail`}
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
-                                  loading="lazy"
-                                  referrerPolicy="no-referrer"
-                                />
-                                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors duration-300 pointer-events-none" />
-                                <div className="absolute z-20 flex items-center justify-center w-12 h-12 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover:scale-110 transition-all duration-300 pointer-events-none">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    className="w-5 h-5 translate-x-0.5"
-                                  >
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
-                                </div>
-                              </button>
-                            )}
-                          </div>
-                        )}
-
-                        <div className="space-y-2 flex-1 flex flex-col justify-between pt-2">
-                          <p className="text-slate-600 text-xs sm:text-sm font-medium italic leading-relaxed">
-                            "{t.short_review || t.review || 'No written review text provided.'}"
-                          </p>
-                          <div className="border-t border-slate-100 pt-3 mt-2">
-                            <span className="block text-xs font-black text-[#081C3A]">{t.patient_name || 'Anonymous'}</span>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t.treatment_name || service.title} Patient</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+          const testimonialsElement = (mConfig.show_testimonials !== false && validTestimonialVideos.length > 0) ? (
+            <div className="py-8 border-t border-slate-100 space-y-6 animate-fade-in" id="cms-section-testimonials">
+              {testimonialsTitle && (
+                <div className="text-center max-w-xl mx-auto px-4">
+                  <h2 className="font-sans font-black text-xl sm:text-2xl text-[#081C3A] tracking-tight leading-tight text-center">
+                    {testimonialsTitle}
+                  </h2>
                 </div>
               )}
 
-              {/* Written Reviews & Transformation Smiles */}
-              {enabledWrittenReviews.length > 0 && (
-                <div className="space-y-8 pt-8 border-t border-slate-100">
-                  <div className="text-center max-w-xl mx-auto space-y-2">
-                    <span className="text-[10px] text-[#0D9488] font-black uppercase tracking-widest block">
-                      Patient Journals & Transformations
-                    </span>
-                    <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
-                      Written Testimonials & Smile Gallery
-                    </h2>
-                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                      Read verified patient experiences and view their beautiful smile transformations.
-                    </p>
-                    <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full mt-4" />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    {enabledWrittenReviews.map((r) => (
-                      <div key={r.id} className="bg-white rounded-3xl border border-slate-150 p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-5">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center text-amber-400">
-                              {Array.from({ length: r.rating || 5 }).map((_, i) => (
-                                <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400 shrink-0" />
-                              ))}
-                            </div>
-                            <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-semibold tracking-wide uppercase">
-                              {r.treatment_name || service.title}
-                            </span>
-                          </div>
-
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed italic">
-                            "{r.review}"
-                          </p>
-                        </div>
-
-                        {/* Before/After Transformation Smile Photos */}
-                        {(r.before_image || r.after_image) && (
-                          <div className="grid grid-cols-2 gap-3 pt-2">
-                            {r.before_image && (
-                              <div className="space-y-1 relative group">
-                                <span className="absolute top-2 left-2 z-10 bg-rose-500/95 backdrop-blur-xs text-white text-[8px] font-black px-1.5 py-0.5 rounded-md">
-                                  BEFORE
-                                </span>
-                                <div className="rounded-xl overflow-hidden aspect-[4/3] border border-slate-150 bg-slate-50">
-                                  <img 
-                                    src={r.before_image} 
-                                    alt={`${r.patient_name} Before`}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                </div>
-                              </div>
-                            )}
-                            {r.after_image && (
-                              <div className="space-y-1 relative group">
-                                <span className="absolute top-2 left-2 z-10 bg-emerald-500/95 backdrop-blur-xs text-white text-[8px] font-black px-1.5 py-0.5 rounded-md">
-                                  AFTER
-                                </span>
-                                <div className="rounded-xl overflow-hidden aspect-[4/3] border border-slate-150 bg-slate-50">
-                                  <img 
-                                    src={r.after_image} 
-                                    alt={`${r.patient_name} After`}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
-                          <div>
-                            <span className="block text-xs font-black text-[#081C3A]">{r.patient_name}</span>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Verified Patient Journey</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+                {validTestimonialVideos.map((t: any, idx: number) => {
+                  const reelUrl = (t.video_url || t.instagram_url || t.reel_url || '').trim();
+                  const patientName = typeof t.patient_name === 'string' ? t.patient_name.trim() : '';
+                  return (
+                    <div key={t.id || idx} className="flex flex-col items-center w-full">
+                      <InstagramEmbed
+                        url={reelUrl}
+                        title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
+                      />
+                      {patientName && patientName !== 'Patient Name' && (
+                        <span className="text-xs font-bold text-slate-700 mt-2 text-center block">
+                          {patientName}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : null;
 
@@ -1677,9 +1527,9 @@ export default function ServiceDetail({
             'benefits',
             'gallery',
             'video',
+            'testimonials',
             'hospital_photos',
             'team_photos',
-            'testimonials',
             'faq',
             'related_services',
             'bottom_cta'
@@ -1819,23 +1669,19 @@ export default function ServiceDetail({
                   </div>
                 )}
 
-                {/* Section 8.7: Interactive Before & After Smile Transformations (100% CMS-driven) */}
+                {/* Section 5: Interactive Before & After Smile Transformations (100% CMS-driven) */}
                 {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
                   <div className="space-y-12 pt-10 border-t border-slate-100" id="before-after-gallery-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full inline-block">
                         Transformations
                       </span>
-                      {mConfig.before_after_heading && (
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                          {mConfig.before_after_heading}
-                        </h2>
-                      )}
-                      {mConfig.before_after_description && (
-                        <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed">
-                          {mConfig.before_after_description}
-                        </p>
-                      )}
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        {mConfig.before_after_heading || 'Before & After Smile Transformations'}
+                      </h2>
+                      <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed text-center">
+                        {mConfig.before_after_description || 'See real smile transformations of our dental implant patients.'}
+                      </p>
                       <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
                     </div>
 
@@ -1855,6 +1701,21 @@ export default function ServiceDetail({
                     </div>
                   </div>
                 )}
+
+                {/* Section 6: Clinical Case Gallery (CMS Category-based Accordion Sliders) */}
+                {mConfig.show_gallery !== false && (
+                  <ClinicalCaseGallery
+                    heading={mConfig.gallery_heading || 'Clinical Case Gallery'}
+                    description={mConfig.gallery_description}
+                    items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
+                  />
+                )}
+
+                {/* Section 6: Procedure Video (Loaded dynamically from CMS Instagram Reel) */}
+                {videoElement}
+
+                {/* Section 7: Patient Testimonial Reels */}
+                {testimonialsElement}
               </div>
             );
           }

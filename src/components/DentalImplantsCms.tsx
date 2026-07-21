@@ -261,10 +261,8 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
     const nextOrder = galleryItems.length > 0 ? Math.max(...galleryItems.map((g: any) => Number(g.display_order) || 0)) + 10 : 10;
     const newItem = {
       id: `gallery-item-${Date.now()}`,
-      image_url: url || 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800',
-      category: 'single',
-      title: '',
-      caption: '',
+      image_url: url || '',
+      category: 'Single Implant',
       display_order: nextOrder
     };
     updateMConfigField('gallery_items', [...galleryItems, newItem]);
@@ -1124,12 +1122,12 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
 
                 {galleryItems.length === 0 ? (
                   <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    No custom gallery items uploaded. Page will render default 5 high-res clinical cases fallback.
+                    No clinical case gallery items added yet. This section will be hidden on the live page unless items are added.
                   </p>
                 ) : (
                   <div className="space-y-3">
                     {galleryItems.map((item: any, idx: number) => (
-                      <div key={item.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex items-center gap-4 relative shadow-3xs hover:border-slate-300 transition-colors">
+                      <div key={item.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4 relative shadow-3xs hover:border-slate-300 transition-colors">
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="h-7 w-7 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-300 shadow-xs">
                             {idx + 1}
@@ -1156,9 +1154,9 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                           </div>
                         </div>
 
-                        {/* Image Preview & File Browser */}
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-16 w-24 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                        {/* Image Preview & Replacement */}
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="relative h-16 w-24 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
                             <img src={item.image_url} alt="Gallery item" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           </div>
                           <div>
@@ -1184,10 +1182,31 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                           </div>
                         </div>
 
+                        {/* Category Field */}
+                        <div className="flex-1 space-y-1 w-full">
+                          <label className="text-[9px] font-bold text-slate-500 uppercase">Category</label>
+                          <select
+                            value={
+                              item.category === 'single' ? 'Single Implant' :
+                              item.category === 'double' ? 'Double Implant' :
+                              item.category === 'quadrant' ? 'Quadrant' :
+                              item.category === 'fmr' ? 'Full Mouth Rehabilitation (FMR)' :
+                              item.category || 'Single Implant'
+                            }
+                            onChange={(e) => updateGalleryItemField(idx, 'category', e.target.value)}
+                            className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800 font-bold"
+                          >
+                            <option value="Single Implant">Single Implant</option>
+                            <option value="Double Implant">Double Implant</option>
+                            <option value="Quadrant">Quadrant</option>
+                            <option value="Full Mouth Rehabilitation (FMR)">Full Mouth Rehabilitation (FMR)</option>
+                          </select>
+                        </div>
+
                         <button
                           type="button"
                           onClick={() => deleteGalleryItem(idx)}
-                          className="ml-auto p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition duration-200"
+                          className="ml-auto p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition duration-200 shrink-0"
                           title="Delete Item"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1235,7 +1254,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
                 <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Procedure Video</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure title description, video embed URL, and custom overlay thumbnail</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure title, description, and Instagram Reel URL</span>
               </div>
             </div>
             {expandedSections.video ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
@@ -1289,17 +1308,6 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                   className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 leading-normal"
                 />
               </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video Thumbnail overlay (optional)</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_thumbnail || ''}
-                  onChange={(e) => updateServiceField('procedure_video_thumbnail', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                  placeholder="URL of a cover photo when video is not active"
-                />
-              </div>
             </div>
           )}
         </div>
@@ -1339,22 +1347,33 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                 </label>
               </div>
 
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-600 uppercase">Section Title</label>
+                <input
+                  type="text"
+                  value={mConfig.testimonials_section_title !== undefined ? mConfig.testimonials_section_title : (mConfig.testimonial_section_title || 'Patient Testimonial Reels')}
+                  onChange={(e) => updateMConfigField('testimonials_section_title', e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none bg-white font-semibold text-slate-800"
+                  placeholder="e.g. Patient Testimonial Reels"
+                />
+              </div>
+
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Patient Testimonial Videos</h5>
+                  <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Patient Testimonial Reels</h5>
                   <button
                     type="button"
                     onClick={addTestimonialItem}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 hover:text-teal-600 rounded-lg text-xs font-bold transition cursor-pointer text-slate-700"
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    Add Testimonial Video
+                    Add Instagram Reel
                   </button>
                 </div>
 
                 {testimonials.length === 0 ? (
                   <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    No custom testimonial videos added yet. Live page will use default placeholder cards.
+                    No Instagram Reels added yet. Only Instagram Reel links added here will appear on the website.
                   </p>
                 ) : (
                   <div className="space-y-4">

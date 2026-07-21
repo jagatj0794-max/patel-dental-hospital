@@ -102,10 +102,26 @@ export const DEFAULT_SERVICES: Service[] = [
         display_order: 100
       }
     ],
+    procedure_video_title: 'Procedure Video',
+    procedure_video_description: '',
+    procedure_video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+    patient_testimonials: [
+      {
+        id: 'testi-1',
+        patient_name: 'Patient Testimonial',
+        video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+        display_order: 10
+      }
+    ],
     marketing_config: {
       green_highlight_line: DEFAULT_GREEN_HIGHLIGHT_LINE,
       process_section_title: 'How We Perform Dental Implants',
-      benefits_section_title: 'How our Ultra Modern Method is superior to basal implants or any other Implant?'
+      benefits_section_title: 'How our Ultra Modern Method is superior to basal implants or any other Implant?',
+      testimonials_section_title: 'Patient Testimonial Reels',
+      show_procedure_video: true,
+      procedure_video_title: 'Procedure Video',
+      procedure_video_description: '',
+      procedure_video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/'
     }
   },
   {
