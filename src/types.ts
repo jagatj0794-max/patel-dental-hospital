@@ -93,6 +93,8 @@ export interface DentalVideo {
 }
 
 export interface MarketingConfig {
+  process_section_title?: string;
+  benefits_section_title?: string;
   // Offer Banner
   show_offer_banner?: boolean;
   offer_title?: string;

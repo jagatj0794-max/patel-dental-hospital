@@ -398,16 +398,11 @@ export default function ServiceDetail({
         rawSteps = [];
       }
     }
-    if (service.id === 'implants-srv') {
-      return Array.isArray(rawSteps)
-        ? [...rawSteps].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-        : [];
-    }
     if (rawSteps.length === 0 && fallback.process_steps) {
       return fallback.process_steps;
     }
     return Array.isArray(rawSteps)
-      ? [...rawSteps].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
+      ? [...rawSteps].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
       : [];
   }, [service, fallback]);
 
@@ -423,12 +418,6 @@ export default function ServiceDetail({
         rawFeatures = [];
       }
     }
-    if (service.id === 'implants-srv') {
-      // For Dental Implants, we do NOT load any fallback features
-      return Array.isArray(rawFeatures)
-        ? [...rawFeatures].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-        : [];
-    }
     if (rawFeatures.length === 0 && fallback.features) {
       return fallback.features;
     }
@@ -436,13 +425,6 @@ export default function ServiceDetail({
       ? [...rawFeatures].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
       : [];
   }, [service, fallback]);
-
-  const beforeAfterPairs: any[] = React.useMemo(() => {
-    if (!mConfig || !Array.isArray(mConfig.before_after_pairs)) return [];
-    return [...mConfig.before_after_pairs]
-      .filter((p: any) => p && p.before_image && p.after_image)
-      .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [mConfig]);
 
   // If loading, display the skeleton state first
   if (isLoading) {
@@ -733,6 +715,1099 @@ export default function ServiceDetail({
     );
   }
 
+  const isDentalImplants = slug === 'dental-implants' || (service && service.slug === 'dental-implants');
+
+  if (isDentalImplants) {
+    // Parse marketing_config safely
+    const rawConfig = service?.marketing_config || {};
+    const mConfig: any = typeof rawConfig === 'string'
+      ? (() => { try { return JSON.parse(rawConfig); } catch(e) { return {}; } })()
+      : rawConfig;
+
+    // 1. Hero variables
+    const showHero = mConfig.show_hero !== false;
+    const heroTitle = service?.title || 'Dental Implants';
+    const heroSubtitle = service?.hero_title || 'Restore Your Natural Smile & Chewing Strength';
+    const heroDescText = service?.hero_description || "Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and to enhance your smile and quality of life.\n\nIt is ideal for replacing missing teeth and loose teeth due to pyorrhea.\n\nPatel Dental Hospital provides fixed teeth in just one week using advanced dental implant technology.";
+    const heroImgUrl = service?.hero_image || service?.homepage_card_image || imgImplants;
+    const bookBtnText = mConfig.cta_appointment_text || 'Book Appointment';
+    const bookBtnLink = mConfig.primary_cta_link || '';
+    const whatsappBtnText = mConfig.cta_whatsapp_text || 'WhatsApp Now';
+    const whatsappNumber = mConfig.contact_whatsapp_number || '919510397046';
+    const greenHighlightLine = mConfig.green_highlight_line !== undefined 
+      ? mConfig.green_highlight_line 
+      : (isDentalImplants 
+          ? DEFAULT_GREEN_HIGHLIGHT_LINE 
+          : "");
+
+    // 2. Overview variables
+    const showOverview = mConfig.show_overview !== false;
+    const overviewSubtitle = mConfig.overview_subtitle || 'Procedural Overview';
+    const overviewTitle = mConfig.overview_title || 'What Are Dental Implants?';
+    const overviewDesc = service?.description || "Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and to enhance your smile and quality of life.\n\nIt is ideal for replacing missing teeth and loose teeth due to pyorrhea.\n\nPatel Dental Hospital provides fixed teeth in just one week using advanced dental implant technology.";
+    const overviewHighlight = mConfig.overview_highlight || "Ideal solution for patients suffering from loose teeth or severe bone loss due to pyorrhea, restoring 100% biting and chewing force.";
+    
+    const DEFAULT_INFO_CARDS = [
+      { title: "Missing Teeth Replacement", desc: "Permanently fills single, multiple, or completely bare dental arches with natural-looking teeth." },
+      { title: "Loose Teeth due to Pyorrhea", desc: "Provides absolute stability for loose teeth, anchoring them firmly into healthy, supportive bone." },
+      { title: "Better Chewing Efficiency", desc: "Fully restores mastication forces, allowing you to eat tough or firm foods with ease." },
+      { title: "Better Smile Aesthetics", desc: "Crafts a natural look that aligns perfectly with your facial features and lip support." },
+      { title: "Better Quality of Life", desc: "Enhances communication, dietary freedom, and daily confidence permanently." }
+    ];
+    const infoCards = Array.isArray(mConfig.info_cards) && mConfig.info_cards.length > 0
+      ? mConfig.info_cards
+      : DEFAULT_INFO_CARDS;
+
+    // 3. Workflow steps variables
+    const showWorkflow = mConfig.show_workflow !== false;
+    const workflowBadge = mConfig.workflow_badge || 'Scientific Protocol';
+    const workflowTitle = mConfig.workflow_title || 'Our Advanced Clinical Workflow';
+    const workflowSubtitle = mConfig.workflow_subtitle || 'Step-by-step path to delivering permanently fixed, high-functioning teeth with absolute precision and safety.';
+    
+    // Workflow process_steps array from service
+    const rawSteps = service?.process_steps;
+    const stepsArray = Array.isArray(rawSteps)
+      ? rawSteps
+      : (typeof rawSteps === 'string'
+        ? (() => { try { return JSON.parse(rawSteps); } catch(e) { return []; } })()
+        : []);
+    
+    // Bullet list for Step 2 of workflow
+    const DEFAULT_VIRTUAL_BULLETS = [
+      { label: "Accurate implant positioning", text: "Mathematically mapped to avoid vital nerves." },
+      { label: "Opposite arch alignment", text: "Guarantees a perfectly balanced chewing bite." },
+      { label: "Better chewing efficiency", text: "Restores massive chewing and biting forces." },
+      { label: "Smile line enhancement", text: "Aligns crowns flawlessly with your lip contours." },
+      { label: "Better aesthetics", text: "Replicates natural tooth contours and shade." },
+      { label: "Better cleansability", text: "Designed for simple daily flossing & hygiene." },
+      { label: "Long implant life", text: "Increases structural stability for lifelong success." }
+    ];
+    const virtualBullets = Array.isArray(mConfig.virtual_planning_bullets) && mConfig.virtual_planning_bullets.length > 0
+      ? mConfig.virtual_planning_bullets
+      : DEFAULT_VIRTUAL_BULLETS;
+
+    // 4. Clinical Cards variables
+    const showSuperior = mConfig.show_superior !== false;
+    const superiorBadge = mConfig.superior_badge || 'Aesthetic Superiority';
+    const superiorTitle = mConfig.superior_title || 'Why Our Method Is Superior';
+    const superiorSubtitle = mConfig.superior_subtitle || 'A comparison of our advanced surgical and prosthetic standards against conventional alternatives.';
+    
+    // Clinical cards array from service.features
+    const rawFeatures = service?.features;
+    const featuresArray = Array.isArray(rawFeatures)
+      ? rawFeatures
+      : (typeof rawFeatures === 'string'
+        ? (() => { try { return JSON.parse(rawFeatures); } catch(e) { return []; } })()
+        : []);
+
+    const DEFAULT_FEATURES = [
+      {
+        title: "Osseointegrated Stability",
+        text: "Our dental implants are permanently attached and biological fused directly into your bone, ensuring massive support. We completely avoid temporary or conventional basal implants, which offer inferior bone bonding and stability."
+      },
+      {
+        title: "Screw Retained Prosthesis",
+        text: "Instead of using messy cement which can leak and trigger gum infections, we implement high-tech, clean screw-retained prosthetics which are incredibly safe and stable."
+      },
+      {
+        title: "5-Minute Removal Capability",
+        text: "Our specialized screw-on systems allow the doctor to safely remove the entire prosthetic teeth within five minutes for deep clinical cleaning, sterilization, and easy maintenance checkups."
+      },
+      {
+        title: "Ideal for Pan Masala Patients",
+        text: "Engineered specifically using high-grade, resilient materials that can withstand high abrasive mastication and biting forces. It is the ideal setup even for pan masala chewing patients."
+      },
+      {
+        title: "Screw-on-Screw Fixation",
+        text: "Our advanced double screw-on-screw secure system guarantees that the connection remains perfectly rigid and completely eliminates any risk of screw loosening, drastically extending implant assembly life."
+      },
+      {
+        title: "Profound Clinical Volume",
+        text: "Led by Dr. Vipul Patel, our clinical team has completed over 7000+ successful dental implant placements and over 350+ complex Full Mouth Rehabilitation cases with impeccable outcomes."
+      },
+      {
+        title: "In-House CBCT Verification",
+        text: "We perform an immediate in-house CBCT scan checkup post-placement. This allows our clinical team to instantly verify the exact perfect angle, depth, and osseous alignment."
+      },
+      {
+        title: "Advanced Bone Grafting",
+        text: "No bone? No problem. We perform specialized sinus lifts, ridge expansions, and advanced bone grafting for patients with deficient or thin bone structure, enabling lifelong implant stability."
+      },
+      {
+        title: "Long-Term Proven Safety",
+        text: "We don't just place and forget. Our clinical records track active patient follow-up cases spanning 2 to 5 years, showcasing zero bone resorption and 100% active chewing success."
+      },
+      {
+        title: "International Implant Standards",
+        text: "We import only the finest clinical systems. Patel Dental Hospital utilizes strictly premium, US FDA-approved titanium implants and high-purity zirconia materials matching European centers."
+      }
+    ];
+
+    const finalFeatures = featuresArray.length > 0 ? featuresArray : DEFAULT_FEATURES;
+
+    // 5. Clinical Gallery variables
+    const showGallery = mConfig.show_gallery !== false;
+    const galleryBadge = mConfig.gallery_badge || 'Visual Evidence';
+    const galleryTitle = mConfig.gallery_title || 'Clinical Case Gallery';
+    const gallerySubtitle = mConfig.gallery_subtitle || 'Explore real successful clinical outcomes from Patel Dental Hospital.';
+    
+    const IMPLANT_GALLERY_ITEMS = Array.isArray(mConfig.gallery_items) && mConfig.gallery_items.length > 0
+      ? mConfig.gallery_items
+      : [
+          {
+            id: 'g-single-1',
+            category: 'single',
+            image_url: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800',
+            caption: 'Single Tooth Implant with precision ceramic crown replacement',
+            alt_text: 'Single Implant restoration'
+          },
+          {
+            id: 'g-double-1',
+            category: 'double',
+            image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800',
+            caption: 'Double Dental Implant anchors for stable tooth-coloured restoration',
+            alt_text: 'Double Implant placement'
+          },
+          {
+            id: 'g-quadrant-1',
+            category: 'quadrant',
+            image_url: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=800',
+            caption: 'Partial Quadrant bridge supported securely by titanium implants',
+            alt_text: 'Quadrant dental implant restoration'
+          },
+          {
+            id: 'g-fullmouth-1',
+            category: 'fullmouth',
+            image_url: 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800',
+            caption: 'Complete Full Mouth Rehabilitation with implant-supported hybrid prosthesis',
+            alt_text: 'Full Mouth Rehabilitation'
+          },
+          {
+            id: 'g-fullmouth-2',
+            category: 'fullmouth',
+            image_url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800',
+            caption: 'Restored smile bite and face harmony with fixed screw-retained bridges',
+            alt_text: 'Smile transformation full arch'
+          }
+        ];
+
+    const IMPLANT_REVIEWS = Array.isArray(mConfig.written_reviews) && mConfig.written_reviews.length > 0
+      ? mConfig.written_reviews
+      : [
+          {
+            name: 'Rajesh Shah',
+            age: 58,
+            location: 'Ahmedabad',
+            treatment: 'Full Mouth Rehabilitation',
+            text: "For years I suffered from loose teeth due to pyorrhea and couldn't chew properly. Dr. Vipul Patel placed implants and within a week, I received my fixed teeth. I can eat everything comfortably now, my chewing efficiency is back!",
+            rating: 5
+          },
+          {
+            name: 'Meena Patel',
+            age: 46,
+            location: 'Mehsana',
+            treatment: 'Single & Double Implants',
+            text: "The digital CBCT planning made the procedure painless. The placement was so accurate and there was no swelling. The cost of implants at Patel Dental Hospital was half of what other clinics quoted, with US FDA standard quality.",
+            rating: 5
+          },
+          {
+            name: 'Anil Desai',
+            age: 62,
+            location: 'Unjha',
+            treatment: 'Screw-Retained Prosthesis',
+            text: "Highly recommended for dental implants. The screw-on-screw technology is excellent, and Dr. Patel explained everything very professionally. Their in-house CBCT scan verified everything perfectly.",
+            rating: 5
+          }
+        ];
+
+    const filteredGallery = implantCategory === 'all'
+      ? IMPLANT_GALLERY_ITEMS
+      : IMPLANT_GALLERY_ITEMS.filter((item: any) => item.category === implantCategory);
+
+    // 6. Procedure Video variables
+    const showProcedureVideo = mConfig.show_procedure_video !== false;
+    const procedureVideoBadge = mConfig.procedure_video_badge || 'Procedure Guide Video';
+    const procedureVideoTitle = mConfig.procedure_video_title || 'Screw Retained Prosthesis Procedure';
+    const procedureVideoSubtitle = mConfig.procedure_video_subtitle || 'Watch this comprehensive guide detailing how we construct, position, and securely lock the modern screw-retained teeth prosthesis onto premium implants.';
+    const procedureVideoEmbedUrl = mConfig.procedure_video_embed_url || 'https://www.instagram.com/reel/C8qLd9MyWwG/';
+
+    // 7. Patient Testimonial Videos variables
+    const showTestimonialSection = mConfig.show_testimonials !== false;
+    const testimonialsBadge = mConfig.testimonials_badge || 'Clinical Outcomes';
+    const testimonialsTitle = mConfig.testimonials_title || 'Patient Testimonial Videos';
+
+    // 8. Hospital & Team variables
+    const showHospitalSection = mConfig.show_hospital_team !== false;
+    const hospitalBadge = mConfig.hospital_team_badge || 'Hospital & Team';
+    const hospitalTitle = mConfig.hospital_team_title || 'Our Advanced Premise & Elite Team';
+    const hospitalSubtitle = mConfig.hospital_team_subtitle || 'A visual tour of our world-class surgical theatres, high-resolution diagnosis suits, and doctor-team collaboration environments.';
+    
+    // 9. Final CTA variables
+    const showFinalCta = mConfig.show_bottom_cta !== false;
+    const ctaTitle = mConfig.bottom_cta_heading || 'Ready For Fixed Teeth In 1 Week?';
+    const ctaSubtitle = mConfig.bottom_cta_description || 'Take the first step towards perfect chewing and a premium beautiful smile. Schedule your 3D CBCT consultation with Dr. Vipul Patel today.';
+    const ctaCallText = mConfig.final_cta_call_text || 'Call Now';
+    const ctaCallNumber = mConfig.contact_call_number || '+919510397046';
+    const ctaWhatsappText = mConfig.final_cta_whatsapp_text || 'WhatsApp';
+    const ctaWhatsappNumber = mConfig.contact_whatsapp_number || '919510397046';
+    const ctaCallbackText = mConfig.bottom_cta_secondary_btn_text || 'Request Callback';
+
+    // 10. Missing Alignment variables for CMS sections
+    const finalSteps = stepsArray.length > 0 ? stepsArray : [
+      {
+        tag: "Diagnostic Phase",
+        title: "3D CBCT Scan & Clinical Evaluation",
+        description: "We capture high-resolution 3D bone scans to accurately evaluate bone depth, density, and nerve positions before planning."
+      },
+      {
+        tag: "Virtual Planning",
+        title: "Computer-Guided Implant Design",
+        description: "Our surgeons plan the exact entry point and angulation of your implant virtually in 3D, guaranteeing millimeter-level accuracy."
+      },
+      {
+        tag: "Precision Placement",
+        title: "Millimeter-Level Guided Surgery",
+        description: "We construct and place the titanium implant securely into the bone with computerized surgical templates, avoiding sutures."
+      },
+      {
+        tag: "Osseointegration",
+        title: "Biological Bone Fusion",
+        description: "The medical-grade titanium fuses directly into your natural bone structure over days, providing a strong anchoring base."
+      },
+      {
+        tag: "Prosthetic Design",
+        title: "CAD/CAM Digital Crown Engineering",
+        description: "Your new teeth are custom fabricated using computerized CAD/CAM engineering, ensuring a perfect aesthetic and chewing bite."
+      },
+      {
+        tag: "Permanent Fixation",
+        title: "Anti-Loosening Screw Retained Lock",
+        description: "The finished custom-fit teeth prosthetic is locked down securely onto the implants, delivering robust chewing power."
+      }
+    ];
+
+    const showVideo = showProcedureVideo;
+    const videoSource = procedureVideoEmbedUrl;
+    const showTestimonialVideos = showTestimonialSection;
+    const testimonialVideosSubtitle = testimonialsBadge;
+    const testimonialVideosTitle = testimonialsTitle;
+
+    // Call & Questions section
+    const showQuestions = mConfig.show_questions !== false;
+    const questionsBadge = mConfig.questions_badge || 'Direct Consult';
+    const questionsTitle = mConfig.questions_title || 'Have Dental Implant Questions?';
+    const questionsDesc = mConfig.questions_desc || 'Connect instantly with our hospital team to answer your medical queries, clarify procedures, and schedule priority slots.';
+    const questionsCallLink = mConfig.questions_call_link || 'tel:+919510397046';
+    const questionsCallText = mConfig.questions_call_text || 'Call Clinic Now';
+    const questionsWaLink = mConfig.questions_wa_link || 'https://wa.me/919510397046';
+    const questionsWaText = mConfig.questions_wa_text || 'Chat with Specialist';
+    const questionsCallbackText = mConfig.questions_callback_text || 'Request Fast Callback';
+
+    // Cost section
+    const showCost = mConfig.show_cost !== false;
+    const costHeading = mConfig.cost_heading || 'Cost of Dental Implants';
+    const costHighlightText = mConfig.cost_highlight_text || 'Save up to 50%';
+    const costHighlightSub = mConfig.cost_highlight_sub || 'On Dental Implants';
+    const costContactText = mConfig.cost_contact_text || 'Contact now for more information.';
+    const costPhoneNumber = mConfig.cost_phone_number || '+91 9510397046';
+    const costCallLabel = mConfig.cost_call_label || '📞 Call Now';
+    const costWhatsappLabel = mConfig.cost_whatsapp_label || '💬 WhatsApp Now';
+
+    // Before & After Gallery section
+    const showBeforeAfter = mConfig.show_before_after !== false;
+    const beforeAfterHeading = mConfig.before_after_heading || 'Before & After Smile Transformations';
+    const beforeAfterDescription = mConfig.before_after_description || 'See real smile transformations of our dental implant patients.';
+    const beforeAfterPairs = Array.isArray(mConfig.before_after_pairs) && mConfig.before_after_pairs.length > 0
+      ? [...mConfig.before_after_pairs].sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
+      : [
+          {
+            before_image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600",
+            after_image: "https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600",
+            caption: "Full arch reconstruction for teeth damaged by severe pyorrhea",
+            display_order: 1
+          },
+          {
+            before_image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=600",
+            after_image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=600",
+            caption: "Single missing front tooth replaced with biological titanium implant",
+            display_order: 2
+          }
+        ];
+
+    // Hospital Section
+    const showHospital = showHospitalSection;
+    const hospitalImage = mConfig.hospital_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800';
+    const hospitalDoctorName = mConfig.hospital_doctor_name || 'Dr. Vipul Patel';
+    const hospitalDoctorTitle = mConfig.hospital_doctor_title || 'Chief Implantologist & Reconstructive Surgeon';
+    const hospitalDoctorDesc = mConfig.hospital_doctor_desc || 'Dr. Vipul Patel has successfully placed over 7,000+ implants with precise biological osseointegration, specialising in full mouth rehabilitation, complex ridge grafting, and same-day teeth placement.';
+    const hospitalLegacyTitle = mConfig.hospital_legacy_title || 'Clinical Legacy';
+    const hospitalLegacyDesc = mConfig.hospital_legacy_desc || 'Serving patients across Mehsana & Unjha for over 25+ years with impeccable safety.';
+    const hospitalEquipTitle = mConfig.hospital_equip_title || 'Ultra-Modern Tech';
+    const hospitalEquipDesc = mConfig.hospital_equip_desc || 'Equipped with direct in-house CBCT scan diagnostics and dynamic CAD/CAM laboratory.';
+
+    return (
+      <div className="min-h-screen bg-slate-50/50 pb-20 selection:bg-[#0D9488]/20 selection:text-[#081C3A] font-sans antialiased text-slate-800">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={handleBackToServices}
+              className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#0D9488] transition-colors py-2 px-4 bg-white border border-slate-200/80 rounded-xl shadow-xs cursor-pointer group"
+            >
+              <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              Back to Treatments
+            </button>
+            <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+              <span className="cursor-pointer hover:text-slate-600" onClick={handleBackToServices}>Treatments</span>
+              <span>/</span>
+              <span className="text-[#0D9488] font-black">Dental Implants</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 1: Premium Hero */}
+        {showHero && (
+          <section className="relative overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-28">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                {/* Hero content */}
+                <div className="lg:col-span-7 space-y-8 text-left">
+                  
+                  <div className="space-y-4">
+                    <h1 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-[#081C3A] tracking-tight leading-[1.1]">
+                      {heroTitle}
+                    </h1>
+                    <p className="text-lg sm:text-xl text-[#0D9488] font-bold tracking-wide">
+                      {heroSubtitle}
+                    </p>
+                  </div>
+
+                  <div className="text-slate-600 space-y-4 text-sm sm:text-base leading-relaxed max-w-2xl">
+                    {heroDescText.split(/\r?\n\r?\n/).map((para, pIdx) => (
+                      <p key={pIdx} className={pIdx === heroDescText.split(/\r?\n\r?\n/).length - 1 ? "font-semibold text-[#081C3A]" : ""}>
+                        {para}
+                      </p>
+                    ))}
+                  </div>
+
+                  {/* Hero CTA buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    {bookBtnLink ? (
+                      <a
+                        href={bookBtnLink}
+                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                      >
+                        <Calendar className="h-4 w-4" />
+                        <span>{bookBtnText}</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() => openAppointmentModal("Dental Implants - Hero Page CTA")}
+                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                      >
+                        <Calendar className="h-4 w-4" />
+                        <span>{bookBtnText}</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    )}
+                    <a
+                      href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=Hi%20Patel%20Dental%20Hospital,%20I%20am%20interested%20in%20Dental%20Implants.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-sm font-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                      <MessageSquare className="h-4 w-4 fill-white" />
+                      <span>{whatsappBtnText}</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Hero image panel */}
+                <div className="lg:col-span-5 relative">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/10 to-transparent rounded-3xl blur-2xl -z-10" />
+                  <div className="border border-slate-200/60 bg-white p-3 rounded-[32px] shadow-xl overflow-hidden">
+                    <img
+                      src={heroImgUrl}
+                      alt={heroTitle}
+                      className="w-full h-[400px] object-cover rounded-[24px]"
+                      referrerPolicy="no-referrer"
+                    />
+                    {greenHighlightLine && (
+                      <div className="bg-[#14B8A6] text-white py-3 px-6 mt-3 text-center text-xs sm:text-sm font-bold tracking-wide leading-relaxed rounded-[20px]">
+                        {greenHighlightLine}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 3: Treatment Overview */}
+        {showOverview && (
+          <section className="py-16 bg-white border-y border-slate-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                {/* Text column */}
+                <div className="space-y-6 text-left">
+                  <div className="space-y-2">
+                    <p className="text-xs font-black text-[#0D9488] uppercase tracking-widest">{overviewSubtitle}</p>
+                    <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                      {overviewTitle}
+                    </h2>
+                  </div>
+                  
+                  <div className="text-slate-600 leading-relaxed text-sm sm:text-base space-y-4">
+                    {overviewDesc.split(/\r?\n\r?\n/).map((para, pIdx) => (
+                      <p key={pIdx}>{para}</p>
+                    ))}
+                  </div>
+
+                  <div className="border-l-4 border-[#0D9488] pl-4 py-1.5 bg-teal-50/30 rounded-r-xl">
+                    <p className="text-[#081C3A] font-bold text-sm leading-relaxed">
+                      {overviewHighlight}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Value list column */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {infoCards.map((item: any, idx: number) => (
+                    <div key={idx} className="p-5 bg-slate-50 border border-slate-150 rounded-2xl text-left space-y-2 hover:border-teal-500/20 transition-all">
+                      <div className="h-8 w-8 bg-teal-50 text-[#0D9488] rounded-lg flex items-center justify-center font-bold text-xs">
+                        0{idx + 1}
+                      </div>
+                      <h3 className="font-bold text-[#081C3A] text-sm">{item.title}</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">{item.desc || item.description}</p>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 4: How We Perform Dental Implants */}
+        {showWorkflow && (
+          <section className="py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest">{workflowBadge}</span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {workflowTitle}
+                </h2>
+                <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+                  {workflowSubtitle}
+                </p>
+              </div>
+
+              {/* Vertical timeline */}
+              <div className="max-w-4xl mx-auto relative before:absolute before:inset-y-0 before:left-4 sm:before:left-1/2 before:w-0.5 before:bg-slate-200">
+                {finalSteps.map((step: any, idx: number) => {
+                  const isEven = idx % 2 === 0;
+                  return (
+                    <div key={idx} className={`relative ${idx === finalSteps.length - 1 ? "" : "mb-12 sm:mb-16"}`}>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-12">
+                        {/* Left / Top panel */}
+                        {isEven ? (
+                          <div className="sm:w-[45%] text-left sm:text-right space-y-2 pl-10 sm:pl-0 order-2 sm:order-1">
+                            <span className="inline-block px-3 py-1 bg-teal-50 text-[#0D9488] text-[10px] font-extrabold uppercase rounded-md">{step.tag || step.badge || 'Clinical Phase'}</span>
+                            <h3 className="font-display font-black text-lg text-[#081C3A]">{step.title}</h3>
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                              {step.description || step.desc}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="sm:w-[45%] hidden sm:block order-1" />
+                        )}
+
+                        {/* Timeline circle */}
+                        <div className={`absolute left-0 sm:left-1/2 -translate-x-1/2 h-8 w-8 bg-[#0D9488] text-white rounded-full flex items-center justify-center font-bold text-xs shadow-md z-10 ${isEven ? 'order-1' : 'order-2'}`}>
+                          {idx + 1}
+                        </div>
+
+                        {/* Right / Bottom panel */}
+                        {!isEven ? (
+                          <div className="sm:w-[45%] text-left space-y-3 pl-10 sm:pl-0 order-3">
+                            <span className="inline-block px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-extrabold uppercase rounded-md">{step.tag || step.badge || 'Clinical Phase'}</span>
+                            <h3 className="font-display font-black text-lg text-[#081C3A]">{step.title}</h3>
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                              {step.description || step.desc}
+                            </p>
+                            
+                            {/* If index is 1 (Step 2: Virtual Planning), we can display the custom bullets list! */}
+                            {idx === 1 && (
+                              <div className="grid grid-cols-1 gap-2 border-t border-slate-100 pt-3">
+                                {virtualBullets.map((bullet: any, bidx: number) => (
+                                  <div key={bidx} className="flex items-start gap-2 text-xs text-left">
+                                    <CheckCircle className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                    <div>
+                                      <span className="font-bold text-[#081C3A]">{bullet.label}</span>
+                                      <span className="text-slate-500"> - {bullet.text}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="sm:w-[45%] order-3 hidden sm:block" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 5: Why Our Ultra Modern Method Is Superior */}
+        {showSuperior && (
+          <section className="py-20 bg-white border-y border-slate-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest">{superiorBadge}</span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {superiorTitle}
+                </h2>
+                <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+                  {superiorSubtitle}
+                </p>
+              </div>
+
+              {/* 10 elegant numbered cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {finalFeatures.map((point: any, pidx: number) => (
+                  <div 
+                    key={pidx} 
+                    className="flex flex-col h-full p-8 bg-white border border-slate-100 rounded-3xl text-left space-y-6 hover:border-[#0D9488]/30 transition-all duration-300 hover:shadow-xl relative overflow-hidden group shadow-xs"
+                  >
+                    <div className="absolute top-0 right-0 h-32 w-32 bg-gradient-to-bl from-[#0D9488]/5 to-transparent rounded-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+                    
+                    <div className="h-12 w-12 bg-teal-50/75 border border-teal-100/50 rounded-2xl flex items-center justify-center font-display font-black text-[#0D9488] shadow-xs group-hover:bg-[#0D9488] group-hover:text-white transition-colors duration-300">
+                      {String(pidx + 1).padStart(2, '0')}
+                    </div>
+
+                    <div className="space-y-3 flex-grow">
+                      <h3 className="font-display font-black text-lg text-[#081C3A] tracking-tight group-hover:text-[#0D9488] transition-colors duration-300">
+                        {point.title}
+                      </h3>
+                      <p className="text-sm text-slate-500 leading-relaxed font-normal">
+                        {point.text || point.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 5.5: Interactive Before & After Smile Transformations */}
+        {showBeforeAfter && (
+          <section className="py-20 bg-slate-50 border-b border-slate-100" id="before-after-gallery-section">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full inline-block">
+                  Transformations
+                </span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {beforeAfterHeading}
+                </h2>
+                <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                  {beforeAfterDescription}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                {beforeAfterPairs.map((pair: any, pIdx: number) => (
+                  <div key={pair.id || pIdx} className="rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
+                    <BeforeAfterSlider
+                      beforeImage={pair.before_image}
+                      afterImage={pair.after_image}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 6: Clinical Case Gallery */}
+        {showGallery && (
+          <section className="py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest">{galleryBadge}</span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {galleryTitle}
+                </h2>
+                <p className="text-slate-500 text-sm sm:text-base">
+                  {gallerySubtitle}
+                </p>
+              </div>
+
+              {/* Category tabs */}
+              <div className="flex flex-wrap justify-center gap-2 mb-10">
+                {[
+                  { id: 'all', label: 'All Cases' },
+                  { id: 'single', label: 'Single Implant' },
+                  { id: 'double', label: 'Double Implant' },
+                  { id: 'quadrant', label: 'Quadrant Cases' },
+                  { id: 'fullmouth', label: 'Full Mouth Rehabilitation' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setImplantCategory(tab.id)}
+                    className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                      implantCategory === tab.id
+                        ? 'bg-[#0D9488] text-white shadow-md'
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Gallery Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredGallery.map((item: any, idx: number) => (
+                  <div
+                    key={item.id || idx}
+                    onClick={() => setImplantLightboxIndex(idx)}
+                    className="bg-white border border-slate-150 rounded-2xl hover:border-teal-500/40 transition-all hover:shadow-lg cursor-zoom-in group overflow-hidden"
+                  >
+                    <div className="relative overflow-hidden h-56 bg-slate-100">
+                      <img
+                        src={item.image_url}
+                        alt={item.caption}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                        <span className="text-white text-xs font-semibold flex items-center gap-1.5">
+                          <ImageIcon className="h-4 w-4" />
+                          Click to view full case
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 7: Procedure Video */}
+        {showVideo && (
+          <section className="py-20 bg-white border-y border-slate-100">
+            <div className="max-w-4xl mx-auto px-4 text-center space-y-8">
+              <div className="space-y-3">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest block mb-1">Procedure Guide Video</span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {videoTitle}
+                </h2>
+                <p className="text-slate-500 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+                  {videoDesc}
+                </p>
+              </div>
+
+              <div className="max-w-sm mx-auto bg-white rounded-3xl border border-slate-150 p-3 shadow-xl">
+                <InstagramEmbed
+                  url={videoSource}
+                  thumbnailUrl={videoThumb}
+                  title={videoTitle}
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 7.5: Patient Testimonial Videos */}
+        {showTestimonialVideos && (
+          <section className="py-20 bg-slate-50 border-b border-slate-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
+              <div className="space-y-3 max-w-2xl mx-auto">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest block mb-1">
+                  {testimonialVideosSubtitle}
+                </span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {testimonialVideosTitle}
+                </h2>
+              </div>
+
+              {displayTestimonials.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {displayTestimonials.map((t: any, idx: number) => (
+                    <div key={idx} className="bg-white rounded-3xl border border-slate-150 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300 space-y-4 flex flex-col justify-between">
+                      {t.video_url && (
+                        <InstagramEmbed
+                          url={t.video_url}
+                          thumbnailUrl={t.thumbnail}
+                          title={`${t.patient_name}'s Review`}
+                        />
+                      )}
+                      <div className="text-left space-y-1">
+                        <h4 className="font-display font-black text-base text-[#081C3A] tracking-tight">{t.patient_name}</h4>
+                        <p className="text-xs text-[#0D9488] font-bold uppercase tracking-wider">{t.treatment_name || 'Patient Testimonial'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[1, 2, 3].map((num) => (
+                    <div key={num} className="bg-white rounded-3xl border border-slate-150 p-4 sm:p-5 shadow-sm space-y-4 flex flex-col justify-between opacity-80">
+                      <div className="aspect-[9/16] w-full max-h-[480px] bg-slate-100 rounded-2xl relative overflow-hidden flex items-center justify-center border border-dashed border-slate-200">
+                        <div className="flex flex-col items-center justify-center space-y-2 text-slate-400">
+                          <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 text-[#0D9488]">
+                            <Instagram className="w-5 h-5" />
+                          </div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider">CMS Ready Reel Placeholder</span>
+                        </div>
+                      </div>
+                      <div className="text-left space-y-1">
+                        <h4 className="font-display font-black text-base text-slate-300 tracking-tight">Patient Name</h4>
+                        <p className="text-xs text-slate-300 font-bold uppercase tracking-wider">Short Treatment Title</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 8: Call & WhatsApp Section */}
+        {showQuestions && (
+          <section className="py-16">
+            <div className="max-w-5xl mx-auto px-4">
+              <div className="bg-white border border-slate-150 rounded-3xl p-8 sm:p-12 shadow-xl text-center space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4 text-left">
+                    <span className="inline-flex px-3 py-1 bg-teal-50 text-[#0D9488] text-[10px] font-black uppercase tracking-widest rounded-md leading-none">
+                      {questionsBadge}
+                    </span>
+                    <h3 className="font-display font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+                      {questionsTitle}
+                    </h3>
+                    <p className="text-slate-500 text-sm leading-relaxed max-w-xl">
+                      {questionsDesc}
+                    </p>
+                  </div>
+
+                  <div className="lg:col-span-5 flex flex-col gap-3.5 w-full">
+                    <a
+                      href={questionsCallLink}
+                      className="w-full py-4 px-6 bg-white border border-slate-200 hover:bg-slate-50 text-[#081C3A] font-black text-sm rounded-xl flex items-center justify-center gap-3 shadow-md hover:-translate-y-0.5 transition-all"
+                    >
+                      <Phone className="h-4 w-4 text-[#0D9488]" />
+                      <span>{questionsCallText}</span>
+                    </a>
+                    <a
+                      href={questionsWaLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-4 px-6 bg-[#25D366] hover:bg-[#20BA5A] text-white font-black text-sm rounded-xl flex items-center justify-center gap-3 shadow-md hover:-translate-y-0.5 transition-all"
+                    >
+                      <MessageSquare className="h-4 w-4 fill-white" />
+                      <span>{questionsWaText}</span>
+                    </a>
+                    <button
+                      onClick={() => openAppointmentModal("Dental Implants - Quick Connect Section")}
+                      className="w-full py-4 px-6 bg-amber-500 hover:bg-amber-600 text-[#081C3A] font-black text-sm rounded-xl flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
+                    >
+                      <Calendar className="h-4 w-4" />
+                      <span>{questionsCallbackText}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 9: Cost Of Dental Implants */}
+        {showCost && (
+          <section className="py-16 bg-white border-y border-slate-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white border-2 border-teal-500/10 rounded-[32px] p-8 sm:p-12 md:p-16 shadow-xl relative overflow-hidden text-center space-y-8">
+                {/* Subtle teal accents */}
+                <div className="absolute -top-12 -left-12 w-24 h-24 bg-teal-50 rounded-full blur-2xl opacity-70"></div>
+                <div className="absolute -bottom-12 -right-12 w-24 h-24 bg-teal-50 rounded-full blur-2xl opacity-70"></div>
+                
+                <div className="space-y-3 relative z-10">
+                  <h3 className="font-display font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight">
+                    {costHeading}
+                  </h3>
+                  <div className="h-1 w-12 bg-[#0D9488] mx-auto rounded-full" />
+                </div>
+
+                <div className="space-y-1 relative z-10">
+                  <div className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-[#0D9488] tracking-tight">
+                    {costHighlightText}
+                  </div>
+                  <div className="font-display font-bold text-lg sm:text-xl text-[#081C3A]/80 tracking-wide uppercase">
+                    {costHighlightSub}
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-6 border-t border-slate-100 max-w-md mx-auto relative z-10">
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-none">
+                    {costContactText}
+                  </p>
+                  <p className="text-2xl sm:text-3xl font-black text-[#081C3A] tracking-tight font-mono">
+                    {costPhoneNumber}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-sm mx-auto pt-2 relative z-10">
+                  <a
+                    href={`tel:${costPhoneNumber.replace(/\s+/g, '')}`}
+                    className="w-full sm:flex-1 py-4 px-6 bg-[#0D9488] hover:bg-[#0F766E] text-white font-black text-sm rounded-xl flex items-center justify-center gap-2.5 shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
+                  >
+                    <span>{costCallLabel}</span>
+                  </a>
+                  <a
+                    href={`https://wa.me/${costPhoneNumber.replace(/[^0-9]/g, '')}?text=Hi%20Patel%20Dental%20Hospital,%20I'm%20interested%20in%20Dental%20Implants.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:flex-1 py-4 px-6 bg-[#25D366] hover:bg-[#20BA5A] text-white font-black text-sm rounded-xl flex items-center justify-center gap-2.5 shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
+                  >
+                    <span>{costWhatsappLabel}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 10: Hospital & Team */}
+        {showHospital && (
+          <section className="py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest">{hospitalBadge}</span>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                  {hospitalTitle}
+                </h2>
+                <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+                  {hospitalSubtitle}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                
+                {/* Hospital image */}
+                <div className="lg:col-span-6">
+                  <div className="border border-slate-200 p-2.5 bg-white rounded-3xl shadow-lg">
+                    <img
+                      src={hospitalImage}
+                      alt={hospitalTitle}
+                      className="w-full h-80 object-cover rounded-2xl"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                </div>
+
+                {/* Team profile info */}
+                <div className="lg:col-span-6 text-left space-y-6">
+                  <div className="space-y-1">
+                    <h3 className="font-display font-black text-2xl text-[#081C3A]">{hospitalDoctorName}</h3>
+                    <p className="text-[#0D9488] text-sm font-black uppercase tracking-wider">{hospitalDoctorTitle}</p>
+                  </div>
+
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    {hospitalDoctorDesc}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-white border border-slate-150 rounded-xl">
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{hospitalLegacyTitle}</p>
+                      <p className="text-sm font-bold text-[#081C3A]">{hospitalLegacyDesc}</p>
+                    </div>
+                    <div className="p-4 bg-white border border-slate-150 rounded-xl">
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{hospitalEquipTitle}</p>
+                      <p className="text-sm font-bold text-[#081C3A]">{hospitalEquipDesc}</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 11: Patient Reviews */}
+        <section className="py-20 bg-white border-y border-slate-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+              <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest">Testimonials</span>
+              <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight">
+                Patient Success Stories
+              </h2>
+              <p className="text-slate-500 text-sm sm:text-base">
+                Read real-life transformations from patients who restored their chewing force and smiles.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {IMPLANT_REVIEWS.map((review, ridx) => (
+                <div key={ridx} className="p-6 bg-slate-50 border border-slate-150 rounded-2xl text-left space-y-4 hover:border-teal-500/20 transition-all flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex gap-1">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 text-amber-500 fill-amber-500" />
+                      ))}
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                      "{review.text}"
+                    </p>
+                  </div>
+                  
+                  <div className="border-t border-slate-150 pt-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-black text-[#081C3A]">{review.name}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{review.treatment} - {review.location}</p>
+                    </div>
+                    <span className="text-[10px] font-black bg-teal-50 text-[#0D9488] py-1 px-2.5 rounded-md uppercase tracking-wider">Verified</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 12: Final CTA */}
+        {showFinalCta && (
+          <section className="py-20 bg-slate-50/30">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white border border-slate-150 rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl text-center space-y-8">
+                <div className="space-y-3">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full">
+                    <Sparkles className="h-3.5 w-3.5 text-[#0D9488] animate-pulse" />
+                    Restore Your Smile Today
+                  </span>
+                  <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-tight">
+                    {ctaTitle}
+                  </h2>
+                  <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                    {ctaSubtitle}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
+                  <button
+                    onClick={() => openAppointmentModal("Dental Implants - Final CTA")}
+                    className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    <span>{ctaCallbackText}</span>
+                  </button>
+                  <a
+                    href={`tel:${ctaCallNumber.replace(/\s+/g, '')}`}
+                    className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 text-[#081C3A] text-xs font-black rounded-xl shadow-md hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Phone className="h-4 w-4 text-[#0D9488]" />
+                    <span>{ctaCallText}</span>
+                  </a>
+                  <a
+                    href={`https://wa.me/${ctaWhatsappNumber.replace(/[^0-9]/g, '')}?text=Hi%20Patel%20Dental%20Hospital,%20I'm%20interested%20in%20Dental%20Implants.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-8 py-4 bg-[#25D366] text-white text-xs font-black rounded-xl shadow-md hover:bg-[#20BA5A] transition-all flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="h-4 w-4 fill-white" />
+                    <span>{ctaWhatsappText}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Custom Lightbox Overlay for Section 6 */}
+        <AnimatePresence>
+          {implantLightboxIndex !== null && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setImplantLightboxIndex(null)}
+              className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 cursor-zoom-out select-none"
+            >
+              <div className="w-full max-w-5xl mx-auto flex items-center justify-between text-white py-2">
+                <span className="text-xs font-mono text-slate-400 font-semibold uppercase tracking-widest">
+                  CASE IMAGE {implantLightboxIndex + 1} OF {filteredGallery.length}
+                </span>
+                <button
+                  onClick={() => setImplantLightboxIndex(null)}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors text-white cursor-pointer focus:outline-none"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="flex-1 flex items-center justify-center max-w-5xl mx-auto w-full relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setImplantLightboxIndex((implantLightboxIndex - 1 + filteredGallery.length) % filteredGallery.length);
+                  }}
+                  className="absolute left-0 p-3 bg-white/10 hover:bg-white/20 active:scale-95 rounded-full text-white transition-all cursor-pointer focus:outline-none z-10"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+
+                <motion.img
+                  key={implantLightboxIndex}
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  src={filteredGallery[implantLightboxIndex].image_url}
+                  alt={filteredGallery[implantLightboxIndex].caption}
+                  className="max-h-[70vh] max-w-full object-contain rounded-xl shadow-2xl"
+                  referrerPolicy="no-referrer"
+                />
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setImplantLightboxIndex((implantLightboxIndex + 1) % filteredGallery.length);
+                  }}
+                  className="absolute right-0 p-3 bg-white/10 hover:bg-white/20 active:scale-95 rounded-full text-white transition-all cursor-pointer focus:outline-none z-10"
+                >
+                  <ChevronLeft className="h-6 w-6 rotate-180" />
+                </button>
+              </div>
+
+              <div className="w-full max-w-3xl mx-auto text-center py-4 space-y-1 text-white">
+                <p className="text-sm font-bold tracking-wide">
+                  {filteredGallery[implantLightboxIndex].caption}
+                </p>
+                <p className="text-xs text-slate-400">
+                  Patel Dental Hospital - Treatment Case Result
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 selection:bg-[#0D9488]/20 selection:text-[#081C3A]">
       <div className="max-w-6xl mx-auto space-y-10">
@@ -755,7 +1830,7 @@ export default function ServiceDetail({
         </div>
 
         {/* Dynamic Offer Banner (Promotional Section) */}
-        {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false && service.id !== 'implants-srv') && (
+        {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -817,222 +1892,130 @@ export default function ServiceDetail({
 
           // Helper definitions for the 12 CMS sections
           const heroElement = (mConfig.show_hero !== false) ? (
-            service.id === 'implants-srv' ? (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs relative overflow-hidden" id="dental-implants-hero-section">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  
-                  {/* LEFT SIDE: Content */}
-                  <div className="lg:col-span-7 space-y-6 md:space-y-8 order-2 lg:order-1 text-left">
-                    <div className="space-y-3">
-                      {/* Hero Title */}
-                      <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-[1.15]">
-                        {service.title}
-                      </h1>
-                      
-                      {/* Hero Subtitle */}
-                      {service.hero_title && service.hero_title.trim() !== '' && (
-                        <p className="text-[#0D9488] font-sans font-extrabold text-base sm:text-lg md:text-xl tracking-tight uppercase">
-                          {service.hero_title}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Hero Description */}
-                    <p className="text-slate-600 text-xs sm:text-sm md:text-base font-medium leading-relaxed whitespace-pre-line">
-                      {service.hero_description && service.hero_description.trim() !== '' ? service.hero_description : service.short_description}
-                    </p>
-
-                    {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
-                      {getCtaButtons().map((btn) => {
-                        const isAppointment = btn.id === 'appointment';
-                        const isWhatsapp = btn.id === 'whatsapp';
-                        
-                        // Only render Book Appointment and WhatsApp buttons for Section 1
-                        if (!isAppointment && !isWhatsapp) return null;
-
-                        let btnClass = "";
-                        if (isAppointment) {
-                          btnClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group";
-                        } else {
-                          btnClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#081C3A] hover:bg-[#112C55] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer";
-                        }
-
-                        return (
-                          <button key={btn.id} type="button" onClick={btn.onClick} className={btnClass}>
-                            {btn.icon}
-                            <span>{btn.text}</span>
-                            {isAppointment && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* RIGHT SIDE: Large Hero Image */}
-                  <div className="lg:col-span-5 order-1 lg:order-2">
-                    <div className="relative aspect-[4/3] sm:aspect-[1.5] lg:aspect-[4/5] xl:aspect-square w-full bg-slate-50 rounded-2xl overflow-hidden shadow-md">
-                      <img
-                        src={heroImage}
-                        alt={service.title}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white border border-slate-150 rounded-3xl overflow-hidden shadow-sm relative grid grid-cols-1 md:grid-cols-12" id="cms-section-hero">
-                {/* Hero Left Info Section */}
-                <div className="p-8 sm:p-12 md:col-span-7 flex flex-col justify-center space-y-6 relative z-10">
-                  <div className="space-y-3">
-                    <span className="inline-flex items-center gap-1 bg-teal-50 text-[#0D9488] text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-teal-100/50">
-                      <Sparkles className="h-3 w-3 text-[#0D9488] animate-pulse" />
-                      Premium Care treatment
-                    </span>
-                    <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-tight">
-                      {service.hero_title && service.hero_title.trim() !== '' ? service.hero_title : service.title}
-                    </h1>
-                  </div>
-                  
-                  <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
-                    {service.hero_description && service.hero_description.trim() !== '' ? service.hero_description : service.short_description}
-                  </p>
-
-                  {/* Quick trust bullet points */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 border-t border-slate-100 pt-5">
-                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                      FDA-Approved Standards
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                      Painless Sedation Therapy
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                      Top Panel Specialists
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                      Lifetime Work Warranty
-                    </div>
-                  </div>
-
-                  {/* Book Appointment & WhatsApp Actions */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                    {getCtaButtons().map((btn, index) => {
-                      const isPrimary = index === 0;
-                      const baseClass = isPrimary
-                        ? "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                        : "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
-
-                      let resolvedClass = baseClass;
-                      if (btn.isWhatsappSecondary && !isPrimary) {
-                        resolvedClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
-                      }
-
-                      return (
-                        <button key={btn.id} type="button" onClick={btn.onClick} className={resolvedClass}>
-                          {btn.icon}
-                          <span>{btn.text}</span>
-                          {btn.id === 'appointment' && isPrimary && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Hero Right Media Image Section */}
-                <div className="md:col-span-5 relative min-h-[300px] md:min-h-[450px] overflow-hidden bg-slate-100">
-                  <img
-                    src={heroImage}
-                    alt={service.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                  {/* Elegant vignette shadow gradients */}
-                  <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-[#081C3A]/10 to-white md:to-white" />
-                  
-                  {/* Optional Hero Image Caption overlay */}
-                  {heroImageCaption && heroImageCaption.trim() !== '' && (
-                    <div className="absolute bottom-3 left-3 right-3 bg-slate-900/75 backdrop-blur-xs text-white text-[10px] font-medium py-1.5 px-3 rounded-lg border border-white/10 z-20">
-                      📸 {heroImageCaption}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          ) : null;
-
-          const introElement = (mConfig.show_introduction !== false) ? (
-            service.id === 'implants-srv' ? (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs space-y-8" id="dental-implants-treatment-overview">
-                <div className="space-y-3 max-w-3xl">
-                  {/* Small category tag or subtle text line to match style, e.g. Teal colored accent line or small text */}
-                  <span className="text-[#0D9488] font-sans font-extrabold text-xs tracking-wider uppercase">
-                    Treatment Overview
+            <div className="bg-white border border-slate-150 rounded-3xl overflow-hidden shadow-sm relative grid grid-cols-1 md:grid-cols-12" id="cms-section-hero">
+              {/* Hero Left Info Section */}
+              <div className="p-8 sm:p-12 md:col-span-7 flex flex-col justify-center space-y-6 relative z-10">
+                <div className="space-y-3">
+                  <span className="inline-flex items-center gap-1 bg-teal-50 text-[#0D9488] text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-teal-100/50">
+                    <Sparkles className="h-3 w-3 text-[#0D9488] animate-pulse" />
+                    Premium Care treatment
                   </span>
-                  
-                  {/* Section Heading */}
-                  <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : 'About the Treatment'}
-                  </h2>
-                  
-                  {/* Subtle divider line */}
-                  <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mt-4" />
+                  <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-tight">
+                    {service.hero_title && service.hero_title.trim() !== '' ? service.hero_title : service.title}
+                  </h1>
                 </div>
                 
-                {/* Treatment Overview Description */}
-                <div className="max-w-3xl text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-sans font-medium">
-                  {service.intro_description && service.intro_description.trim() !== '' ? service.intro_description : service.description}
+                <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
+                  {service.hero_description && service.hero_description.trim() !== '' ? service.hero_description : service.short_description}
+                </p>
+
+                {/* Quick trust bullet points */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 border-t border-slate-100 pt-5">
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                    <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                    FDA-Approved Standards
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                    <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                    Painless Sedation Therapy
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                    <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                    Top Panel Specialists
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                    <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                    Lifetime Work Warranty
+                  </div>
+                </div>
+
+                {/* Book Appointment & WhatsApp Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-3">
+                  {getCtaButtons().map((btn, index) => {
+                    const isPrimary = index === 0;
+                    const baseClass = isPrimary
+                      ? "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                      : "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
+
+                    let resolvedClass = baseClass;
+                    if (btn.isWhatsappSecondary && !isPrimary) {
+                      resolvedClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
+                    }
+
+                    return (
+                      <button key={btn.id} type="button" onClick={btn.onClick} className={resolvedClass}>
+                        {btn.icon}
+                        <span>{btn.text}</span>
+                        {btn.id === 'appointment' && isPrimary && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            ) : (
-              <div className="bg-white border border-[#e2e8f0] rounded-3xl p-6 sm:p-8 md:p-10 shadow-3xs space-y-6" id="cms-section-intro">
-                <div className="flex items-center gap-3 border-b border-[#e2e8f0] pb-4">
-                  <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                    <Heart className="h-4.5 w-4.5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                      Advanced Dental Care
-                    </h2>
-                    <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                      {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : 'About the Treatment'}
-                    </h3>
-                  </div>
-                </div>
+
+              {/* Hero Right Media Image Section */}
+              <div className="md:col-span-5 relative min-h-[300px] md:min-h-[450px] overflow-hidden bg-slate-100">
+                <img
+                  src={heroImage}
+                  alt={service.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+                {/* Elegant vignette shadow gradients */}
+                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-[#081C3A]/10 to-white md:to-white" />
                 
-                <div className="text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans font-medium">
-                  {service.intro_description && service.intro_description.trim() !== '' ? service.intro_description : service.description}
-                </div>
-  
-                {displayContentImages.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-[#e2e8f0]">
-                    {displayContentImages.map((img, idx) => (
-                      <div key={idx} className="space-y-2 group">
-                        <div className="rounded-2xl overflow-hidden aspect-[16/10] bg-slate-50 border border-[#e2e8f0] relative shadow-3xs">
-                          <img
-                            src={img.image_url}
-                            alt={img.alt_text || img.caption || 'Content Image'}
-                            className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
-                            referrerPolicy="no-referrer"
-                          />
-                        </div>
-                        {img.caption && img.caption.trim() !== '' && (
-                          <p className="text-slate-500 text-[11px] font-semibold text-center italic">
-                            📸 {img.caption}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                {/* Optional Hero Image Caption overlay */}
+                {heroImageCaption && heroImageCaption.trim() !== '' && (
+                  <div className="absolute bottom-3 left-3 right-3 bg-slate-900/75 backdrop-blur-xs text-white text-[10px] font-medium py-1.5 px-3 rounded-lg border border-white/10 z-20">
+                    📸 {heroImageCaption}
                   </div>
                 )}
               </div>
-            )
+            </div>
+          ) : null;
+
+          const introElement = (mConfig.show_introduction !== false) ? (
+            <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 md:p-10 shadow-3xs space-y-6" id="cms-section-intro">
+              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
+                  <Heart className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <h2 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
+                    Advanced Dental Care
+                  </h2>
+                  <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
+                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : 'About the Treatment'}
+                  </h3>
+                </div>
+              </div>
+              
+              <div className="text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans font-medium">
+                {service.intro_description && service.intro_description.trim() !== '' ? service.intro_description : service.description}
+              </div>
+
+              {displayContentImages.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-slate-100">
+                  {displayContentImages.map((img, idx) => (
+                    <div key={idx} className="space-y-2 group">
+                      <div className="rounded-2xl overflow-hidden aspect-[16/10] bg-slate-50 border border-slate-150 relative shadow-3xs">
+                        <img
+                          src={img.image_url}
+                          alt={img.alt_text || img.caption || 'Content Image'}
+                          className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      {img.caption && img.caption.trim() !== '' && (
+                        <p className="text-slate-500 text-[11px] font-semibold text-center italic">
+                          📸 {img.caption}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : null;
 
           const processElement = (mConfig.show_process !== false && displaySteps.length > 0) ? (
@@ -1715,150 +2698,6 @@ export default function ServiceDetail({
             }
           });
 
-          if (service.id === 'implants-srv') {
-            return (
-              <div className="space-y-10">
-                {heroElement}
-
-                {/* Section 3: How We Perform Dental Implants (Clinical Workflow Steps) */}
-                {displaySteps.length > 0 && (
-                  <div className="space-y-12" id="dental-implants-workflow">
-                    <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      {/* Section Heading dynamically from CMS */}
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                        {mConfig.process_section_title || 'How We Perform Dental Implants'}
-                      </h2>
-                      {/* Subtle divider line */}
-                      <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-7xl mx-auto">
-                      {displaySteps.map((step, idx) => (
-                        <div 
-                          key={step.id || idx} 
-                          className="bg-white border border-slate-150/80 rounded-2xl p-6 sm:p-8 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col h-full"
-                        >
-                          {/* Step Number inside the same card */}
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="font-mono text-3xl sm:text-4xl font-black text-[#0D9488]/30 leading-none">
-                              {String(idx + 1).padStart(2, '0')}
-                            </span>
-                            {step.phase && (
-                              <span className="inline-block text-[10px] font-bold text-[#0D9488] bg-teal-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">
-                                {step.phase}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Optional Step Title from CMS (if any) */}
-                          {step.title && step.title.trim() !== '' && (
-                            <h3 className="font-sans font-extrabold text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
-                              {step.title}
-                            </h3>
-                          )}
-
-                          {/* Step Description with comfortable line-height & paragraph width */}
-                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                            {step.description}
-                          </p>
-
-                          {/* Optional Step Image */}
-                          {step.image_url && step.image_url.trim() !== '' && (
-                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-3xs aspect-[16/10] mt-6">
-                              <img
-                                src={step.image_url}
-                                alt={step.title || `Step ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                                referrerPolicy="no-referrer"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Section 4: Why Our Method Is Superior (Dynamic Comparison Cards) */}
-                {mConfig.show_benefits !== false && displayFeatures.length > 0 && (
-                  <div className="space-y-12 pt-10 border-t border-slate-100" id="dental-implants-superior">
-                    <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      {/* Section Heading dynamically from CMS */}
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                        {mConfig.benefits_section_title || 'Why Our Method Is Superior'}
-                      </h2>
-                      {/* Subtle divider line */}
-                      <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-7xl mx-auto">
-                      {displayFeatures.map((card, idx) => (
-                        <div 
-                          key={card.id || idx} 
-                          className="bg-white border border-slate-150/80 rounded-2xl p-6 sm:p-8 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col h-full"
-                        >
-                          {/* Card Description / Doctor's Original Description */}
-                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                            {card.description}
-                          </p>
-
-                          {/* Optional Card Image (if available) */}
-                          {(card.image_url || card.image) && (card.image_url || card.image).trim() !== '' && (
-                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-3xs aspect-[16/10] mt-6">
-                              <img
-                                src={card.image_url || card.image}
-                                alt={`Method comparison detail ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                                referrerPolicy="no-referrer"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Section 8.7: Interactive Before & After Smile Transformations (100% CMS-driven) */}
-                {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-                  <div className="space-y-12 pt-10 border-t border-slate-100" id="before-after-gallery-section">
-                    <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full inline-block">
-                        Transformations
-                      </span>
-                      {mConfig.before_after_heading && (
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                          {mConfig.before_after_heading}
-                        </h2>
-                      )}
-                      {mConfig.before_after_description && (
-                        <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed">
-                          {mConfig.before_after_description}
-                        </p>
-                      )}
-                      <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start max-w-7xl mx-auto">
-                      {beforeAfterPairs.map((pair, pIdx) => (
-                        <div 
-                          key={pair.id || pIdx} 
-                          className="bg-white border border-slate-150 rounded-2xl p-4 shadow-xs hover:shadow-sm transition-all duration-300"
-                        >
-                          <BeforeAfterSlider
-                            beforeImage={pair.before_image}
-                            afterImage={pair.after_image}
-                            caption={pair.caption}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          }
-
           return (
             <div className="space-y-10">
               {/* Pre-Grid Outer Sections */}
@@ -2103,7 +2942,7 @@ export default function ServiceDetail({
         })()}
 
         {/* Dynamic Floating Mobile Contact Bar */}
-        {(mConfig.contact_bar_show && service.id !== 'implants-srv') && (
+        {mConfig.contact_bar_show && (
           <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden animate-fade-in-up" id="mobile-floating-contact-bar">
             <div className="bg-white/95 backdrop-blur-md border border-slate-200/85 rounded-2xl p-2.5 shadow-xl flex items-center gap-2 justify-around max-w-md mx-auto">
               {mConfig.contact_bar_call_enabled && (

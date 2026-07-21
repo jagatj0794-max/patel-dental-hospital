@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Service, ServiceGalleryItem, ServiceFaq } from '../types';
+import { Service, ServiceGalleryItem, ServiceFaq, MarketingConfig } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { TREATMENTS } from '../data/treatments';
 
@@ -20,8 +20,92 @@ export const DEFAULT_SERVICES: Service[] = [
     icon: 'Shield',
     display_order: 1,
     is_active: true,
+    process_steps: [
+      {
+        id: 'step-1',
+        title: '',
+        description: 'We take CBCT scan with in-house X-ray machine.',
+        display_order: 10
+      },
+      {
+        id: 'step-2',
+        title: '',
+        description: 'Dr. Vipul Patel will go through CBCT scan and do virtual planning of dental implant and prosthetic teeth.\n\nIn this planning implant are placed in most accurate favourable position corresponding to opposite arch teeth for better chewing efficiency and to enhance smile line for better look, with better cleans ability to increase life of implant supported fix teeth.',
+        display_order: 20
+      },
+      {
+        id: 'step-3',
+        title: '',
+        description: 'After planning, Dr. Vipul Patel executes same planning in your mouth and give your implant supported fix teeth in just one week.',
+        display_order: 30
+      }
+    ],
+    features: [
+      {
+        id: 'sup-1',
+        title: '',
+        description: 'The use of implants that are permanently attached to the bone and serve you life time for efficient chewing. Where in basal implant, they are just mechanically seated in the bone and is not permanently attached to the bone. So chances of failure are more in basal implant.',
+        display_order: 10
+      },
+      {
+        id: 'sup-2',
+        title: '',
+        description: 'In our method we use Ti retaining small screw for securing prosthetic teeth over dental implant so that when you want to remove your fixed teeth for cleaning, you can remove it with help of doctor in just five minutes.',
+        display_order: 20
+      },
+      {
+        id: 'sup-3',
+        title: '',
+        description: 'The doctor unscrews the Ti retaining screw from the teeth with a driver, lifts the teeth from the implant, cleans them, and fixes the same teeth again.',
+        display_order: 30
+      },
+      {
+        id: 'sup-4',
+        title: '',
+        description: 'This technique is a boon for Pan Masala chewer patients.',
+        display_order: 40
+      },
+      {
+        id: 'sup-5',
+        title: '',
+        description: 'Screw-on-screw is used to fix the tooth so that the life of the implant is increased. In the basal method, the tooth is attached with cement, and cement goes beneath the gums, reducing implant life and increasing the chances of loosening.',
+        display_order: 50
+      },
+      {
+        id: 'sup-6',
+        title: '',
+        description: 'More than 7000 implant placements and more than 350 full mouth rehabilitation cases done by Dr. Vipul Patel.',
+        display_order: 60
+      },
+      {
+        id: 'sup-7',
+        title: '',
+        description: 'After placement of fixed teeth, they are checked properly with in-house CBCT to enhance the life of the teeth.',
+        display_order: 70
+      },
+      {
+        id: 'sup-8',
+        title: '',
+        description: 'In patients with poor ridges and bone, we use ultra-modern bone grafts to generate new bone before placing implant-supported fixed teeth.',
+        display_order: 80
+      },
+      {
+        id: 'sup-9',
+        title: '',
+        description: 'Get to know the experience of our happy patients who have completed 2–5 years after fixing their teeth before making your decision.',
+        display_order: 90
+      },
+      {
+        id: 'sup-10',
+        title: '',
+        description: 'We use implant practices that meet international quality standards. At Patel Dental Hospital, we believe implants are not just about restoring teeth but about creating life-changing experiences for patients.',
+        display_order: 100
+      }
+    ],
     marketing_config: {
-      green_highlight_line: DEFAULT_GREEN_HIGHLIGHT_LINE
+      green_highlight_line: DEFAULT_GREEN_HIGHLIGHT_LINE,
+      process_section_title: 'How We Perform Dental Implants',
+      benefits_section_title: 'How our Ultra Modern Method is superior to basal implants or any other Implant?'
     }
   },
   {
@@ -146,13 +230,42 @@ export const serviceService = {
       if (stored) {
         try {
           const list = JSON.parse(stored) as Service[];
-          return list.map(svc => {
+          let updated = false;
+          const resultList = list.map(svc => {
+            if (svc.id === 'implants-srv') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'implants-srv');
+              const steps = Array.isArray(svc.process_steps) ? svc.process_steps : [];
+              const rawFeats = typeof svc.features === 'string'
+                ? JSON.parse(svc.features)
+                : (Array.isArray(svc.features) ? svc.features : []);
+              const mConfigObj = typeof svc.marketing_config === 'string'
+                ? JSON.parse(svc.marketing_config)
+                : (svc.marketing_config || {});
+              const isBenefitsTitleMissing = !mConfigObj.benefits_section_title;
+              if ((steps.length === 0 || rawFeats.length === 0 || isBenefitsTitleMissing) && defaultSvc) {
+                updated = true;
+                return {
+                  ...svc,
+                  process_steps: steps.length === 0 ? defaultSvc.process_steps : svc.process_steps,
+                  features: rawFeats.length === 0 ? defaultSvc.features : svc.features,
+                  marketing_config: {
+                    ...mConfigObj,
+                    process_section_title: mConfigObj.process_section_title || 'How We Perform Dental Implants',
+                    benefits_section_title: mConfigObj.benefits_section_title || (defaultSvc.marketing_config as MarketingConfig)?.benefits_section_title
+                  }
+                };
+              }
+            }
             const defaultSvc = DEFAULT_SERVICES.find(d => d.id === svc.id);
             if (defaultSvc && defaultSvc.marketing_config && !svc.marketing_config) {
               return { ...svc, marketing_config: defaultSvc.marketing_config };
             }
             return svc;
           });
+          if (updated) {
+            localStorage.setItem('hospital_services', JSON.stringify(resultList));
+          }
+          return resultList;
         } catch (e) {
           console.error('Failed to parse services from localStorage:', e);
         }
@@ -188,6 +301,7 @@ export const serviceService = {
           seo_description: s.seo_description || null,
           homepage_card_image: null,
           homepage_short_description: null,
+          features: s.features || null,
           marketing_config: s.marketing_config || null,
           updated_at: new Date().toISOString()
         }));
@@ -242,6 +356,7 @@ export const serviceService = {
             seo_description: s.seo_description || null,
             homepage_card_image: null,
             homepage_short_description: null,
+            features: s.features || null,
             marketing_config: s.marketing_config || null,
             updated_at: new Date().toISOString()
           }));
@@ -268,6 +383,43 @@ export const serviceService = {
               .order('display_order', { ascending: true });
             if (!refetchError && refetchedData) {
               return refetchedData;
+            }
+          }
+        }
+      }
+
+      if (data && data.length > 0) {
+        const implants = data.find(s => s.id === 'implants-srv');
+        if (implants) {
+          const steps = typeof implants.process_steps === 'string'
+            ? JSON.parse(implants.process_steps)
+            : (Array.isArray(implants.process_steps) ? implants.process_steps : []);
+          const rawFeats = typeof implants.features === 'string'
+            ? JSON.parse(implants.features)
+            : (Array.isArray(implants.features) ? implants.features : []);
+          const mConfig = typeof implants.marketing_config === 'string'
+            ? JSON.parse(implants.marketing_config)
+            : (implants.marketing_config || {});
+          const isBenefitsTitleMissing = !mConfig.benefits_section_title;
+          if (steps.length === 0 || rawFeats.length === 0 || isBenefitsTitleMissing) {
+            const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'implants-srv');
+            if (defaultSvc) {
+              const updatedImplants = {
+                ...implants,
+                process_steps: steps.length === 0 ? defaultSvc.process_steps : steps,
+                features: rawFeats.length === 0 ? defaultSvc.features : rawFeats,
+                marketing_config: {
+                  ...mConfig,
+                  process_section_title: mConfig.process_section_title || 'How We Perform Dental Implants',
+                  benefits_section_title: mConfig.benefits_section_title || (defaultSvc.marketing_config as MarketingConfig)?.benefits_section_title
+                }
+              };
+              await serviceService.saveService(updatedImplants);
+              const { data: refetched } = await supabase.client
+                .from('services')
+                .select('*')
+                .order('display_order', { ascending: true });
+              if (refetched) return refetched;
             }
           }
         }
@@ -326,7 +478,67 @@ export const serviceService = {
             .eq('slug', fallbackSlug)
             .maybeSingle();
           if (!fbError && fbData) {
+            // Check if this implants record needs auto-populate
+            if (fbData.id === 'implants-srv') {
+              const steps = typeof fbData.process_steps === 'string'
+                ? JSON.parse(fbData.process_steps)
+                : (Array.isArray(fbData.process_steps) ? fbData.process_steps : []);
+              const rawFeats = typeof fbData.features === 'string'
+                ? JSON.parse(fbData.features)
+                : (Array.isArray(fbData.features) ? fbData.features : []);
+              const mConfig = typeof fbData.marketing_config === 'string'
+                ? JSON.parse(fbData.marketing_config)
+                : (fbData.marketing_config || {});
+              const isBenefitsTitleMissing = !mConfig.benefits_section_title;
+              if (steps.length === 0 || rawFeats.length === 0 || isBenefitsTitleMissing) {
+                const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'implants-srv');
+                if (defaultSvc) {
+                  const updatedImplants = {
+                    ...fbData,
+                    process_steps: steps.length === 0 ? defaultSvc.process_steps : steps,
+                    features: rawFeats.length === 0 ? defaultSvc.features : rawFeats,
+                    marketing_config: {
+                      ...mConfig,
+                      process_section_title: mConfig.process_section_title || 'How We Perform Dental Implants',
+                      benefits_section_title: mConfig.benefits_section_title || (defaultSvc.marketing_config as MarketingConfig)?.benefits_section_title
+                    }
+                  };
+                  await serviceService.saveService(updatedImplants);
+                  return updatedImplants;
+                }
+              }
+            }
             return fbData;
+          }
+        }
+      }
+
+      if (data && data.id === 'implants-srv') {
+        const steps = typeof data.process_steps === 'string'
+          ? JSON.parse(data.process_steps)
+          : (Array.isArray(data.process_steps) ? data.process_steps : []);
+        const rawFeats = typeof data.features === 'string'
+          ? JSON.parse(data.features)
+          : (Array.isArray(data.features) ? data.features : []);
+        const mConfig = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        const isBenefitsTitleMissing = !mConfig.benefits_section_title;
+        if (steps.length === 0 || rawFeats.length === 0 || isBenefitsTitleMissing) {
+          const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'implants-srv');
+          if (defaultSvc) {
+            const updatedImplants = {
+              ...data,
+              process_steps: steps.length === 0 ? defaultSvc.process_steps : steps,
+              features: rawFeats.length === 0 ? defaultSvc.features : rawFeats,
+              marketing_config: {
+                ...mConfig,
+                process_section_title: mConfig.process_section_title || 'How We Perform Dental Implants',
+                benefits_section_title: mConfig.benefits_section_title || (defaultSvc.marketing_config as MarketingConfig)?.benefits_section_title
+              }
+            };
+            await serviceService.saveService(updatedImplants);
+            return updatedImplants;
           }
         }
       }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Undo, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart, Eye, EyeOff,
-  Stethoscope, Sparkles, MessageSquare, ArrowUp, ArrowDown, Info, Link
+  Stethoscope, Sparkles, MessageSquare, ArrowUp, ArrowDown, Info, Link, Upload
 } from 'lucide-react';
 import { Service } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
@@ -869,6 +869,57 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                               className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800 leading-normal"
                             />
                           </div>
+
+                          <div className="space-y-1.5 pt-1.5 border-t border-slate-100">
+                            <label className="text-[9px] font-bold text-[#081C3A] uppercase block">Step Image (Optional)</label>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={step.image_url || ''}
+                                onChange={(e) => updateStepField(idx, 'image_url', e.target.value)}
+                                className="flex-1 px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                                placeholder="e.g. https://images.unsplash.com/... or upload"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => document.getElementById(`step-image-file-${idx}`)?.click()}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[10px] font-black uppercase rounded-lg transition cursor-pointer shrink-0"
+                              >
+                                <Upload className="h-3 w-3" />
+                                <span>Upload</span>
+                              </button>
+                              <input
+                                type="file"
+                                id={`step-image-file-${idx}`}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const url = await handleFileUpload(file);
+                                    if (url) updateStepField(idx, 'image_url', url);
+                                  }
+                                }}
+                              />
+                            </div>
+                            {step.image_url && (
+                              <div className="mt-1.5 relative w-24 aspect-[4/3] rounded-lg overflow-hidden border border-slate-150 shadow-3xs group/img">
+                                <img
+                                  src={step.image_url}
+                                  alt="Step Preview"
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => updateStepField(idx, 'image_url', '')}
+                                  className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         <button
@@ -947,8 +998,8 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                 </div>
 
                 {cards.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    No custom comparison cards created. Page will show default 10 clinical cards fallback.
+                  <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200 font-medium">
+                    No custom comparison cards created. This section will not be displayed on the live page.
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -1728,7 +1779,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
 
                 {beforeAfterPairs.length === 0 ? (
                   <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    No transformation pairs added yet. Live page will fall back to default smile transformation pairs.
+                    No transformation pairs added yet. This section will be hidden on the live page unless pairs are added.
                   </p>
                 ) : (
                   <div className="space-y-4">

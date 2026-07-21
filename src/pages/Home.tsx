@@ -350,7 +350,7 @@ export default function Home({
     });
   }, []);
 
-  const getCardData = (defaultSlug: string, defaultTitle: string, defaultImage: string) => {
+  const getCardData = (defaultSlug: string, defaultTitle: string, defaultImage: string, id?: string) => {
     const lookupSlugs = [
       defaultSlug,
       defaultSlug.replace(/-and-/g, '-'),
@@ -362,6 +362,7 @@ export default function Home({
     ].filter(Boolean) as string[];
 
     const dbSvc = dbServices.find(s => 
+      (id && s.id === id) ||
       lookupSlugs.includes(s.slug) || 
       s.title.toLowerCase() === defaultTitle.toLowerCase()
     );
@@ -894,21 +895,21 @@ export default function Home({
             {/* Dynamic Services Cards from CMS */}
             {(() => {
               const SERVICES_CARDS_CONFIG = [
-                { slug: 'dental-implants', title: 'Dental Implants', defaultImg: fdaApprovedImplantImg, delay: 0 },
-                { slug: 'root-canal-treatment', title: 'Single Sitting Root Canal Treatment', defaultImg: rootCanalImg, delay: 0.05 },
-                { slug: 'full-mouth-rehabilitation', title: 'Full Mouth Rehabilitation', defaultImg: fullMouthRehabImg, delay: 0.1 },
-                { slug: 'invisible-aligners', title: 'Invisible Aligners', defaultImg: clearAlignersImg, delay: 0.15 },
-                { slug: 'smile-makeover', title: 'Smile Makeover', defaultImg: smileMakeoverImg, delay: 0.2 },
-                { slug: 'crowns-and-bridges', title: 'Crowns & Bridges', defaultImg: crownsBridgesImg, delay: 0.25 },
-                { slug: 'teeth-whitening', title: 'Teeth Whitening', defaultImg: teethCleaningImg, delay: 0.3 },
-                { slug: 'pediatric-dentistry', title: 'Pediatric Dentistry', defaultImg: kidsDentistryImg, delay: 0.35 },
-                { slug: 'braces-treatment', title: 'Braces Treatment', defaultImg: bracesImg, delay: 0.4 },
-                { slug: 'wisdom-tooth-surgery', title: 'Wisdom Tooth Surgery', defaultImg: wisdomToothImg, delay: 0.45 },
-                { slug: 'tooth-coloured-filling', title: 'Tooth Coloured Filling (Composite Filling)', defaultImg: compositeFillingImg, delay: 0.5 },
+                { id: 'implants-srv', slug: 'dental-implants', title: 'Dental Implants', defaultImg: fdaApprovedImplantImg, delay: 0 },
+                { id: 'rct', slug: 'root-canal-treatment', title: 'Single Sitting Root Canal Treatment', defaultImg: rootCanalImg, delay: 0.05 },
+                { id: 'fmr-srv', slug: 'full-mouth-rehabilitation', title: 'Full Mouth Rehabilitation', defaultImg: fullMouthRehabImg, delay: 0.1 },
+                { id: 'aligners-srv', slug: 'invisible-aligners', title: 'Invisible Aligners', defaultImg: clearAlignersImg, delay: 0.15 },
+                { id: 'smile-srv', slug: 'smile-makeover', title: 'Smile Makeover', defaultImg: smileMakeoverImg, delay: 0.2 },
+                { id: 'crowns', slug: 'crowns-and-bridges', title: 'Crowns & Bridges', defaultImg: crownsBridgesImg, delay: 0.25 },
+                { id: 'whitening-srv', slug: 'teeth-whitening', title: 'Teeth Whitening', defaultImg: teethCleaningImg, delay: 0.3 },
+                { id: 'kids', slug: 'pediatric-dentistry', title: 'Pediatric Dentistry', defaultImg: kidsDentistryImg, delay: 0.35 },
+                { id: 'braces-srv', slug: 'braces-treatment', title: 'Braces Treatment', defaultImg: bracesImg, delay: 0.4 },
+                { id: 'wisdom-srv', slug: 'wisdom-tooth-surgery', title: 'Wisdom Tooth Surgery', defaultImg: wisdomToothImg, delay: 0.45 },
+                { id: 'filling-srv', slug: 'tooth-coloured-filling', title: 'Tooth Coloured Filling (Composite Filling)', defaultImg: compositeFillingImg, delay: 0.5 },
               ];
 
               return SERVICES_CARDS_CONFIG.map((cfg) => {
-                const cardData = getCardData(cfg.slug, cfg.title, cfg.defaultImg);
+                const cardData = getCardData(cfg.slug, cfg.title, cfg.defaultImg, cfg.id);
                 if (!cardData.isActive) return null;
 
                 const mConfig = cardData.mConfig;
