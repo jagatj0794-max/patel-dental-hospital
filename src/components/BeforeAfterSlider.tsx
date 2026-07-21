@@ -1,146 +1,149 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye } from 'lucide-react';
+import { ChevronsLeftRight } from 'lucide-react';
 
 interface BeforeAfterSliderProps {
-  beforeImg: string;
-  afterImg: string;
-  beforeLabel?: string;
-  afterLabel?: string;
-  className?: string;
-  aspectRatioClassName?: string;
+  beforeImage: string;
+  afterImage: string;
+  caption?: string;
 }
 
-export default function BeforeAfterSlider({
-  beforeImg,
-  afterImg,
-  beforeLabel = 'Before Treatment',
-  afterLabel = 'Completed After',
-  className = '',
-  aspectRatioClassName = 'aspect-[4/3]',
-}: BeforeAfterSliderProps) {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
+export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
+  beforeImage,
+  afterImage,
+  caption
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(600);
+  const [sliderPosition, setSliderPosition] = useState(50); // Percentage 0 - 100
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
 
   const handleMove = (clientX: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
-    let position = (x / rect.width) * 100;
-    if (position < 0) position = 0;
-    if (position > 100) position = 100;
-    setSliderPosition(position);
+    let percentage = (x / rect.width) * 100;
+    if (percentage < 0) percentage = 0;
+    if (percentage > 100) percentage = 100;
+    setSliderPosition(percentage);
   };
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (!isDragging) return;
-    if (e.touches.length > 0) {
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && e.touches.length > 0) {
       handleMove(e.touches[0].clientX);
     }
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
-    handleMove(e.clientX);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      handleMove(e.clientX);
+    }
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
+  const handleStart = (clientX: number) => {
+    setIsDragging(true);
+    handleMove(clientX);
   };
 
   useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      setIsDragging(false);
+    };
+
     if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('touchmove', handleTouchMove, { passive: true });
-      window.addEventListener('touchend', handleMouseUp);
+      window.addEventListener('mouseup', handleGlobalMouseUp);
+      window.addEventListener('touchend', handleGlobalMouseUp);
     }
+
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleMouseUp);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+      window.removeEventListener('touchend', handleGlobalMouseUp);
     };
   }, [isDragging]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    if (e.touches.length > 0) {
-      handleMove(e.touches[0].clientX);
-    }
-  };
-
   return (
-    <div
-      ref={containerRef}
-      className={`relative overflow-hidden w-full rounded-2xl select-none group/slider border border-gray-150 ${aspectRatioClassName} ${className}`}
-    >
-      {/* Background Image: AFTER */}
-      <img
-        src={afterImg}
-        alt={afterLabel}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        referrerPolicy="no-referrer"
-      />
-      <div className="absolute top-3 right-3 bg-emerald-600/90 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
-        {afterLabel}
-      </div>
-
-      {/* Foreground Image Container with clip-path: BEFORE */}
+    <div className="space-y-3 w-full text-left" id="before-after-slider-container">
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        style={{
-          clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
+        ref={containerRef}
+        onMouseDown={(e) => handleStart(e.clientX)}
+        onMouseMove={handleMouseMove}
+        onTouchStart={(e) => {
+          if (e.touches.length > 0) {
+            handleStart(e.touches[0].clientX);
+          }
         }}
+        onTouchMove={handleTouchMove}
+        className="relative aspect-[4/3] w-full max-h-[320px] overflow-hidden rounded-2xl border border-slate-150 shadow-md select-none cursor-ew-resize group"
       >
+        {/* After Image (Background) */}
         <img
-          src={beforeImg}
-          alt={beforeLabel}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          src={afterImage}
+          alt="After Treatment"
+          className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute top-3 left-3 bg-rose-600/90 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider z-10 pointer-events-none">
-          {beforeLabel}
+
+        {/* Before Image (Overlay Container) */}
+        <div
+          className="absolute inset-y-0 left-0 overflow-hidden select-none pointer-events-none border-r border-white/20"
+          style={{ width: `${sliderPosition}%` }}
+        >
+          <img
+            src={beforeImage}
+            alt="Before Treatment"
+            style={{
+              width: containerWidth,
+              height: '100%',
+              objectFit: 'cover',
+              maxWidth: 'none'
+            }}
+            className="absolute inset-y-0 left-0 object-cover select-none pointer-events-none"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+
+        {/* Labels & Badges */}
+        <div className="absolute top-4 left-4 z-20 pointer-events-none">
+          <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-rose-600/90 border border-rose-500 px-3 py-1.5 rounded-xl shadow-md backdrop-blur-xs">
+            Before
+          </span>
+        </div>
+
+        <div className="absolute top-4 right-4 z-20 pointer-events-none">
+          <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-emerald-600/90 border border-emerald-500 px-3 py-1.5 rounded-xl shadow-md backdrop-blur-xs">
+            After
+          </span>
+        </div>
+
+        {/* Vertical Divider Drag Bar */}
+        <div
+          className="absolute top-0 bottom-0 z-30 w-[3px] bg-white cursor-ew-resize flex items-center justify-center transition-all duration-75"
+          style={{ left: `${sliderPosition}%` }}
+        >
+          {/* Centered Circular Handle */}
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border-2 border-teal-500 text-teal-600 shadow-xl flex items-center justify-center cursor-ew-resize z-30 group-hover:scale-110 group-active:scale-95 transition-transform duration-150">
+            <ChevronsLeftRight className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse" />
+          </div>
         </div>
       </div>
 
-      {/* Drag Divider Line and Handle */}
-      <div
-        className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize z-20"
-        style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-      >
-        {/* Grab Handle circle with premium arrows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white text-slate-800 shadow-xl border-2 border-brand-cyan/80 flex items-center justify-center cursor-ew-resize hover:scale-110 active:scale-110 duration-200">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="3.5"
-            stroke="currentColor"
-            className="w-4 h-4 text-brand-cyan animate-pulse"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" className="rotate-90 origin-center" />
-          </svg>
-        </div>
-      </div>
-
-      {/* Touch Instructions indicator overlay */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/75 backdrop-blur-xs text-[10px] text-white/90 font-medium px-3 py-1 rounded-full flex items-center space-x-1.5 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 pointer-events-none">
-        <Eye className="h-3 w-3 text-brand-cyan" />
-        <span>Drag center handle to compare</span>
-      </div>
+      {caption && (
+        <p className="text-xs sm:text-sm font-bold text-[#081C3A]/90 px-2 leading-relaxed">
+          {caption}
+        </p>
+      )}
     </div>
   );
-}
+};
+
+export default BeforeAfterSlider;

@@ -50,7 +50,7 @@ import { doctorService } from '../utils/doctorData';
 import { galleryService } from '../utils/galleryData';
 import { videoService } from '../utils/videoData';
 import { contactService } from '../utils/contactData';
-import { serviceService } from '../utils/serviceData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
 import DentalImplantsCms from '../components/DentalImplantsCms';
@@ -2645,11 +2645,13 @@ export default function Admin({
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'services', label: 'Services', icon: Stethoscope },
-    { id: 'implants-cms', label: 'Dental Implants', icon: ShieldCheck },
   ] as const;
 
   const handleLogout = async () => {
     try {
+      sessionStorage.removeItem('mock_admin_session');
+      localStorage.removeItem('mock_admin_session');
+      window.dispatchEvent(new Event('admin-auth-change'));
       await supabase.client.auth.signOut();
     } catch (err) {
       console.warn('Error signing out:', err);
@@ -5273,7 +5275,7 @@ export default function Admin({
       case 'appointments':
         return <Appointments />;
       case 'implants-cms':
-        return <DentalImplantsCms />;
+        return <DentalImplantsCms onSaveSuccess={loadServicesList} />;
       case 'services':
         return (
           <div className="space-y-6" id="admin-services-view">
@@ -5359,11 +5361,21 @@ export default function Admin({
                           className="hover:bg-slate-50/30 transition-all duration-150"
                           id={`service-row-${svc.id}`}
                         >
-                          {/* Display Order */}
-                          <td className="px-4 py-4 text-xs font-mono text-slate-600 font-medium">
-                            <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md">
-                              {svc.display_order}
-                            </span>
+                          {/* Display Order with Inline Editing */}
+                          <td className="px-4 py-4 text-xs font-mono">
+                            <input
+                              type="number"
+                              value={svc.display_order ?? 0}
+                              onChange={async (e) => {
+                                const newOrder = parseInt(e.target.value) || 0;
+                                const updatedSvc = { ...svc, display_order: newOrder };
+                                setServicesList(prev => prev.map(s => s.id === svc.id ? updatedSvc : s));
+                                await serviceService.saveService(updatedSvc);
+                              }}
+                              className="w-16 px-2.5 py-1.5 text-xs text-center border border-slate-200 rounded-lg focus:outline-none focus:border-[#0D9488] font-bold bg-white text-slate-800 shadow-3xs transition duration-150"
+                              title="Modify Display Order"
+                              min="0"
+                            />
                           </td>
 
                           {/* Hero Image Thumbnail */}
@@ -5389,88 +5401,94 @@ export default function Admin({
                             {svc.slug}
                           </td>
 
-                          {/* Active/Inactive Status */}
+                          {/* Active/Inactive Status with Inline Enable/Disable Toggle */}
                           <td className="px-4 py-4 text-xs">
-                            {svc.is_active ? (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                Active
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-500">
-                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                Inactive
-                              </span>
-                            )}
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const updatedSvc = { ...svc, is_active: !svc.is_active };
+                                setServicesList(prev => prev.map(s => s.id === svc.id ? updatedSvc : s));
+                                await serviceService.saveService(updatedSvc);
+                              }}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
+                                svc.is_active 
+                                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' 
+                                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
+                              }`}
+                              title={svc.is_active ? "Click to Disable Service" : "Click to Enable Service"}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${svc.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                              {svc.is_active ? 'Enabled' : 'Disabled'}
+                            </button>
                           </td>
 
                           {/* Actions */}
                           <td className="px-4 py-4 text-xs text-right pr-6 whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1.5">
-                              {/* Edit Action */}
+                              {/* Edit Action with Future-Proof CMS Architecture */}
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (svc.slug === 'dental-implants' || svc.id === 'implants-srv') {
-                                    setActiveTab('implants-cms');
-                                  } else {
-                                    setActiveServiceEditorTab('details');
-                                    setEditingService(svc);
-                                    setIsSlugTouched(true);
-                                    setServiceFormError(null);
-                                  }
+                                  setActiveServiceEditorTab('details');
+                                  setEditingService(svc);
+                                  setIsSlugTouched(true);
+                                  setServiceFormError(null);
                                 }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#0D9488] bg-[#F0FDFA] hover:bg-[#CCFBF1] rounded-lg transition cursor-pointer"
-                                title="Edit Service details"
+                                title={svc.slug === 'dental-implants' || svc.id === 'implants-srv' ? "Open Dental Implants CMS Editor" : "Edit Service details"}
                               >
                                 <Pencil className="h-3 w-3" />
                                 Edit
                               </button>
 
-                              {/* Gallery Action */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveServiceEditorTab('gallery');
-                                  setEditingService(svc);
-                                  setIsSlugTouched(true);
-                                  setServiceFormError(null);
-                                }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition cursor-pointer"
-                                title="Manage service gallery images"
-                              >
-                                <ImageIcon className="h-3 w-3" />
-                                Gallery
-                              </button>
+                              {svc.slug !== 'dental-implants' && svc.id !== 'implants-srv' && (
+                                <>
+                                  {/* Gallery Action */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveServiceEditorTab('gallery');
+                                      setEditingService(svc);
+                                      setIsSlugTouched(true);
+                                      setServiceFormError(null);
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition cursor-pointer"
+                                    title="Manage service gallery images"
+                                  >
+                                    <ImageIcon className="h-3 w-3" />
+                                    Gallery
+                                  </button>
 
-                              {/* FAQs Action */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveServiceEditorTab('faqs');
-                                  setEditingService(svc);
-                                  setIsSlugTouched(true);
-                                  setServiceFormError(null);
-                                }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition cursor-pointer"
-                                title="Manage service FAQs"
-                              >
-                                <MessageCircle className="h-3 w-3" />
-                                FAQs
-                              </button>
+                                  {/* FAQs Action */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveServiceEditorTab('faqs');
+                                      setEditingService(svc);
+                                      setIsSlugTouched(true);
+                                      setServiceFormError(null);
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition cursor-pointer"
+                                    title="Manage service FAQs"
+                                  >
+                                    <MessageCircle className="h-3 w-3" />
+                                    FAQs
+                                  </button>
 
-                              {/* Delete Action */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setServiceToDelete(svc.id);
-                                }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer"
-                                title="Delete service"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                Delete
-                              </button>
+                                  {/* Delete Action */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setServiceToDelete(svc.id);
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer"
+                                    title="Delete service"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                    Delete
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -6044,21 +6062,51 @@ export default function Admin({
         </div>
       )}
 
-      {/* 5. Service Edit Right Side Slide Drawer */}
+      {/* 5. Dedicated Service Editor Page */}
       {editingService && (
-        <div className="fixed inset-0 z-[150] flex justify-end" id="service-drawer-overlay">
-          {/* Backdrop overlay with fade */}
-          <div
-            className="fixed inset-0 bg-[#0B1B33]/55 backdrop-blur-xs transition-opacity duration-300"
-            onClick={() => setEditingService(null)}
-          />
+        <div className="fixed inset-0 z-[140] bg-slate-50 flex flex-col overflow-hidden animate-fade-in" id="service-editor-page">
+          {editingService.slug === 'dental-implants' || editingService.id === 'implants-srv' ? (
+            /* Custom Full-Scale CMS Editor for Dental Implants */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Dental Implants CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-          {/* Right Drawer Box */}
-          <div className={`relative bg-white h-full shadow-2xl flex flex-col z-110 border-l border-slate-100 animate-slide-in transition-all duration-300 ${
-            showLivePreview 
-              ? 'w-full lg:w-[95vw] xl:w-[1440px]' 
-              : 'w-full md:w-[750px]'
-          }`}>
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <DentalImplantsCms onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Main Full-Width Editor Box */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
             {/* Drawer Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
               <div className="flex items-center gap-3">
@@ -6377,22 +6425,43 @@ export default function Admin({
                   )}
                 </div>
 
-                {/* Home Page Short Description */}
+                 {/* Home Card Description */}
                 <div className="space-y-1.5 p-3.5 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Home Page Short Description</label>
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Home Card Description (Preserves Paragraphs)</label>
                     <span className="text-[9px] text-[#0D9488] font-bold uppercase tracking-widest bg-[#0D9488]/10 px-1.5 py-0.5 rounded">Home Only</span>
                   </div>
                   <textarea
-                    rows={2}
+                    rows={6}
                     value={editingService.homepage_short_description || ''}
                     onChange={(e) => setEditingService({ ...editingService, homepage_short_description: e.target.value })}
-                    placeholder="If empty, automatically falls back to the master Short Description..."
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                    placeholder="Enter description. Press Enter twice to create separate paragraphs with blank lines.&#10;&#10;e.g.&#10;Dental implant is an artificial tooth placed in your mouth...&#10;&#10;It is ideal for replacement of missing and loose teeth..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 leading-relaxed"
                   />
                   <p className="text-[9px] text-slate-400 font-medium leading-relaxed">
-                    Optional multiline description shown only on the Home Page Service Card.
+                    Dedicated description shown on the Home Page Service Card. Multiple paragraphs separated by blank lines are preserved.
                   </p>
+                </div>
+
+                {/* Green Highlight Line */}
+                <div className="space-y-1.5 p-3.5 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Homepage Card Green Highlight Line</label>
+                    <span className="text-[9px] text-[#0D9488] font-bold uppercase tracking-widest bg-[#0D9488]/10 px-1.5 py-0.5 rounded">Home Only</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={(() => {
+                      const m = typeof editingService.marketing_config === 'string'
+                        ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+                        : (editingService.marketing_config || {});
+                      return m.green_highlight_line || '';
+                    })()}
+                    onChange={(e) => updateMarketingConfig('green_highlight_line', e.target.value)}
+                    placeholder="e.g. Replace missing teeth with dental implants in just one week..."
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                  <p className="text-[9px] text-slate-400 mt-0.5">Displays directly below the image container on the Home Card.</p>
                 </div>
 
                 {/* Full Description */}
@@ -10862,6 +10931,7 @@ export default function Admin({
               </div> {/* Close Right Pane */}
             </div> {/* Close Split Panel Wrapper */}
           </div>
+          )}
         </div>
       )}
 

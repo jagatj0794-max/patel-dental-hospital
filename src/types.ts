@@ -217,6 +217,9 @@ export interface MarketingConfig {
   show_related_services?: boolean;
   show_bottom_cta?: boolean;
 
+  // Green Highlight Line
+  green_highlight_line?: string;
+
   // Custom Related Services List
   related_services?: { id: string; enabled: boolean }[];
 

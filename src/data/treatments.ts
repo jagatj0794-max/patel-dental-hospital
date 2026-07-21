@@ -25,8 +25,8 @@ export const TREATMENTS: Treatment[] = [
   {
     id: 'implants',
     title: 'Dental Implants',
-    shortDesc: 'Permanent and highly natural replacement for missing teeth using premium titanium anchors.',
-    longDesc: 'Dental implants are screw-like titanium posts placed surgically into the jawbone to act as artificial roots. Over time, they fuse seamlessly with your biological bone structure, providing a rock-solid foundation for permanent dental crowns or bridges that replicate the exact function, aesthetics, and structural support of your original tooth.',
+    shortDesc: 'Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and to enhance your smile and quality of life. It is ideal for replacing missing teeth and loose teeth due to pyorrhea.',
+    longDesc: 'Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and to enhance your smile and quality of life. It is ideal for replacing missing teeth and loose teeth due to pyorrhea. Patel Dental Hospital provides fixed teeth in just one week using advanced dental implant technology.',
     benefits: [
       'Feels, looks, and functions like natural teeth',
       'Prevents bone loss and preserves facial structure',

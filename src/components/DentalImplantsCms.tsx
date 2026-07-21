@@ -5,11 +5,15 @@ import {
   Stethoscope, Sparkles, MessageSquare, ArrowUp, ArrowDown, Info, Link
 } from 'lucide-react';
 import { Service } from '../types';
-import { serviceService } from '../utils/serviceData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
 
-export default function DentalImplantsCms() {
+interface DentalImplantsCmsProps {
+  onSaveSuccess?: () => void;
+}
+
+export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsProps = {}) {
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -179,6 +183,7 @@ export default function DentalImplantsCms() {
       if (result.success) {
         setSuccessMsg('Dental Implants configurations saved successfully! Changes are immediately live.');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        onSaveSuccess?.();
       } else {
         setErrorMsg(result.error || 'Failed to save Dental Implants configuration changes.');
       }
@@ -252,14 +257,14 @@ export default function DentalImplantsCms() {
 
   // Section 5: Clinical Case Gallery Items
   const galleryItems = Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : [];
-  const addGalleryItem = () => {
+  const addGalleryItem = (url?: string) => {
     const nextOrder = galleryItems.length > 0 ? Math.max(...galleryItems.map((g: any) => Number(g.display_order) || 0)) + 10 : 10;
     const newItem = {
       id: `gallery-item-${Date.now()}`,
-      image_url: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800',
+      image_url: url || 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800',
       category: 'single',
-      title: 'Precision Restoration',
-      caption: 'Single Tooth Implant with precision ceramic crown replacement',
+      title: '',
+      caption: '',
       display_order: nextOrder
     };
     updateMConfigField('gallery_items', [...galleryItems, newItem]);
@@ -344,6 +349,37 @@ export default function DentalImplantsCms() {
     updateServiceField('hospital_team_photos', updated);
   };
 
+  // Section 8.7: Before & After Gallery
+  const beforeAfterPairs = Array.isArray(mConfig.before_after_pairs) ? mConfig.before_after_pairs : [];
+  const addBeforeAfterPair = () => {
+    const nextOrder = beforeAfterPairs.length > 0 ? Math.max(...beforeAfterPairs.map((b: any) => Number(b.display_order) || 0)) + 10 : 10;
+    const newItem = {
+      id: `pair-${Date.now()}`,
+      before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+      after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+      caption: '',
+      display_order: nextOrder
+    };
+    updateMConfigField('before_after_pairs', [...beforeAfterPairs, newItem]);
+  };
+  const deleteBeforeAfterPair = (index: number) => {
+    updateMConfigField('before_after_pairs', beforeAfterPairs.filter((_, i) => i !== index));
+  };
+  const moveBeforeAfterPair = (index: number, direction: 'up' | 'down') => {
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= beforeAfterPairs.length) return;
+    const updated = [...beforeAfterPairs];
+    const temp = updated[index];
+    updated[index] = updated[targetIdx];
+    updated[targetIdx] = temp;
+    updateMConfigField('before_after_pairs', updated);
+  };
+  const updateBeforeAfterPairField = (index: number, key: string, val: any) => {
+    const updated = [...beforeAfterPairs];
+    updated[index] = { ...updated[index], [key]: val };
+    updateMConfigField('before_after_pairs', updated);
+  };
+
   return (
     <div className="space-y-6" id="dental-implants-cms-root">
       {/* CMS Header Bar */}
@@ -409,10 +445,111 @@ export default function DentalImplantsCms() {
           
           {expandedSections.hero && (
             <div className="p-6 border-t border-slate-100 space-y-5">
+              {/* --- GENERAL SERVICE SETTINGS --- */}
+              <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-150 space-y-4">
+                <span className="text-[10px] font-black text-[#0D9488] uppercase tracking-wider block">Service Core Settings</span>
+                
+                {/* Service Active Status */}
+                <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-bold text-slate-800 block">Service Status (Enable/Disable)</span>
+                    <span className="text-[9px] text-slate-400 font-medium">Toggle whether this service is enabled/active on the website</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={service.is_active !== false}
+                      onChange={(e) => updateServiceField('is_active', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                  </label>
+                </div>
+
+                {/* Service Slug */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Service Page Slug (URL path)</label>
+                  <input
+                    type="text"
+                    value={service.slug || ''}
+                    onChange={(e) => updateServiceField('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '-'))}
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-mono bg-white text-slate-800"
+                    placeholder="e.g. dental-implants"
+                  />
+                  <p className="text-[9px] text-slate-400 mt-0.5">Live page will be hosted on <span className="font-mono">/services/{service.slug}</span></p>
+                </div>
+
+                {/* Homepage Card Image / Featured Image */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Homepage Card Image (Featured Image)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={service.homepage_card_image || ''}
+                      onChange={(e) => updateServiceField('homepage_card_image', e.target.value)}
+                      className="flex-1 px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                      placeholder="e.g. https://images.unsplash.com/... or upload"
+                    />
+                    <div className="shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('homepage-card-file-input')?.click()}
+                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <ImageIcon className="h-3.5 w-3.5" />
+                        Browse
+                      </button>
+                      <input
+                        type="file"
+                        id="homepage-card-file-input"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            const url = await handleFileUpload(e.target.files[0]);
+                            if (url) updateServiceField('homepage_card_image', url);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {service.homepage_card_image && (
+                    <div className="mt-2 border border-slate-150 p-1 rounded-lg bg-slate-50 max-w-xs">
+                      <img src={service.homepage_card_image} alt="Card Preview" className="h-20 w-full object-cover rounded-md border border-slate-100 shadow-3xs" referrerPolicy="no-referrer" />
+                    </div>
+                  )}
+                </div>
+
+                 {/* Homepage Short Description */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Home Card Description (Preserves Paragraphs)</label>
+                  <textarea
+                    rows={6}
+                    value={service.homepage_short_description || ''}
+                    onChange={(e) => updateServiceField('homepage_short_description', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 leading-relaxed"
+                    placeholder="Enter description. Press Enter twice to create separate paragraphs with blank lines.&#10;&#10;e.g.&#10;Dental implant is an artificial tooth placed in your mouth...&#10;&#10;It is ideal for replacement of missing and loose teeth..."
+                  />
+                </div>
+
+                {/* Green Highlight Line */}
+                <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Homepage Card Green Highlight Line</label>
+                  <input
+                    type="text"
+                    value={mConfig.green_highlight_line || ''}
+                    onChange={(e) => updateMConfigField('green_highlight_line', e.target.value)}
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                    placeholder="Replace missing teeth with dental implants..."
+                  />
+                  <p className="text-[9px] text-slate-400 mt-0.5">The green highlight text displayed directly below the image in the home card.</p>
+                </div>
+              </div>
+              
               {/* Enable / Disable section toggle */}
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
                 <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
+                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Hero Section</span>
                   <span className="text-[9px] text-slate-400">Toggle whether the top Hero Header should be visible on the live page</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
@@ -905,7 +1042,7 @@ export default function DentalImplantsCms() {
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
                 <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Clinical Case Gallery</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section title, show/hide, and add/delete/reorder clinical gallery category items</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section show/hide and manage clinical gallery images</span>
               </div>
             </div>
             {expandedSections.gallery ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
@@ -929,34 +1066,9 @@ export default function DentalImplantsCms() {
                 </label>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
-                <input
-                  type="text"
-                  value={mConfig.gallery_section_title || 'Clinical Case Gallery'}
-                  onChange={(e) => updateMConfigField('gallery_section_title', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                />
-              </div>
-
-              <div className="space-y-1 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest block">Active Gallery Categories</span>
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Gallery filters will automatically categorize using: <strong>All Cases</strong>, <strong>Single Implant</strong>, <strong>Double Implant</strong>, <strong>Quadrant Cases</strong>, and <strong>Full Mouth Rehabilitation</strong>.
-                </p>
-              </div>
-
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Dynamic Gallery Items</h5>
-                  <button
-                    type="button"
-                    onClick={addGalleryItem}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 hover:text-teal-600 rounded-lg text-xs font-bold transition cursor-pointer text-slate-700"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    Add Gallery Image
-                  </button>
                 </div>
 
                 {galleryItems.length === 0 ? (
@@ -964,10 +1076,10 @@ export default function DentalImplantsCms() {
                     No custom gallery items uploaded. Page will render default 5 high-res clinical cases fallback.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {galleryItems.map((item: any, idx: number) => (
-                      <div key={item.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex flex-col md:flex-row gap-4 items-start relative shadow-3xs hover:border-slate-300 transition-colors">
-                        <div className="flex items-center gap-2 md:flex-col md:gap-1.5 shrink-0">
+                      <div key={item.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex items-center gap-4 relative shadow-3xs hover:border-slate-300 transition-colors">
+                        <div className="flex items-center gap-2 shrink-0">
                           <span className="h-7 w-7 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-300 shadow-xs">
                             {idx + 1}
                           </span>
@@ -994,64 +1106,29 @@ export default function DentalImplantsCms() {
                         </div>
 
                         {/* Image Preview & File Browser */}
-                        <div className="w-full md:w-32 space-y-1.5 shrink-0">
-                          <img src={item.image_url} alt="Gallery item" className="w-full h-20 object-cover rounded-xl border border-slate-200/60 shadow-3xs" referrerPolicy="no-referrer" />
-                          <button
-                            type="button"
-                            onClick={() => document.getElementById(`gallery-item-file-${idx}`)?.click()}
-                            className="w-full px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-[10px] font-bold text-slate-600 shadow-3xs transition cursor-pointer"
-                          >
-                            Replace Image
-                          </button>
-                          <input
-                            type="file"
-                            id={`gallery-item-file-${idx}`}
-                            accept="image/*"
-                            className="hidden"
-                            onChange={async (e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                const url = await handleFileUpload(e.target.files[0]);
-                                if (url) updateGalleryItemField(idx, 'image_url', url);
-                              }
-                            }}
-                          />
-                        </div>
-
-                        <div className="flex-1 space-y-3 w-full">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                              <label className="text-[9px] font-bold text-slate-500 uppercase">Category Tag</label>
-                              <select
-                                value={item.category || 'single'}
-                                onChange={(e) => updateGalleryItemField(idx, 'category', e.target.value)}
-                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800 font-bold"
-                              >
-                                <option value="single">Single Implant</option>
-                                <option value="double">Double Implant</option>
-                                <option value="quadrant">Quadrant Cases</option>
-                                <option value="fullmouth">Full Mouth Rehabilitation</option>
-                              </select>
-                            </div>
-                            <div className="space-y-1">
-                              <label className="text-[9px] font-bold text-slate-500 uppercase">Case Title / Alt Text</label>
-                              <input
-                                type="text"
-                                value={item.title || ''}
-                                onChange={(e) => updateGalleryItemField(idx, 'title', e.target.value)}
-                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800 font-medium"
-                                placeholder="e.g. Single Implant"
-                              />
-                            </div>
+                        <div className="flex items-center gap-3">
+                          <div className="relative h-16 w-24 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                            <img src={item.image_url} alt="Gallery item" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-bold text-slate-500 uppercase">Clinical Description / Caption</label>
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById(`gallery-item-file-${idx}`)?.click()}
+                              className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 hover:text-teal-600 rounded-lg text-xs font-bold text-slate-700 shadow-3xs transition cursor-pointer flex items-center gap-1.5"
+                            >
+                              Replace Image
+                            </button>
                             <input
-                              type="text"
-                              value={item.caption || ''}
-                              onChange={(e) => updateGalleryItemField(idx, 'caption', e.target.value)}
-                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
-                              placeholder="Describe the clinical result shown..."
+                              type="file"
+                              id={`gallery-item-file-${idx}`}
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const url = await handleFileUpload(e.target.files[0]);
+                                  if (url) updateGalleryItemField(idx, 'image_url', url);
+                                }
+                              }}
                             />
                           </div>
                         </div>
@@ -1059,7 +1136,7 @@ export default function DentalImplantsCms() {
                         <button
                           type="button"
                           onClick={() => deleteGalleryItem(idx)}
-                          className="absolute top-4 right-4 p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition duration-200"
+                          className="ml-auto p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition duration-200"
                           title="Delete Item"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1068,6 +1145,29 @@ export default function DentalImplantsCms() {
                     ))}
                   </div>
                 )}
+
+                <div className="pt-2 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('add-gallery-item-file')?.click()}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 rounded-xl text-xs font-black transition cursor-pointer shadow-3xs"
+                  >
+                    <Plus className="h-4 w-4 text-teal-600" />
+                    Add New Image
+                  </button>
+                  <input
+                    type="file"
+                    id="add-gallery-item-file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        const url = await handleFileUpload(e.target.files[0]);
+                        if (url) addGalleryItem(url);
+                      }
+                    }}
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -1119,13 +1219,13 @@ export default function DentalImplantsCms() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video URL (supports YouTube link or direct MP4 link)</label>
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Instagram Reel URL</label>
                 <input
                   type="text"
-                  value={service.procedure_video_url || 'https://www.youtube.com/embed/cbVcmy53KBs?rel=0&autoplay=0'}
+                  value={service.procedure_video_url || 'https://www.instagram.com/reel/C8qLd9MyWwG/'}
                   onChange={(e) => updateServiceField('procedure_video_url', e.target.value)}
                   className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                  placeholder="e.g. https://www.youtube.com/embed/..."
+                  placeholder="e.g. https://www.instagram.com/reel/..."
                 />
               </div>
 
@@ -1163,8 +1263,8 @@ export default function DentalImplantsCms() {
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Patient Testimonial Videos</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient video testimonial list, names, YouTube URLs, and sort order</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Patient Testimonial Reels</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient Reel testimonial list, names, Instagram Reel URLs, and sort order</span>
               </div>
             </div>
             {expandedSections.testimonials ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
@@ -1259,13 +1359,13 @@ export default function DentalImplantsCms() {
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <label className="text-[9px] font-bold text-slate-500 uppercase">Video URL (YouTube embed or video URL)</label>
+                              <label className="text-[9px] font-bold text-slate-500 uppercase">Instagram Reel URL</label>
                               <input
                                 type="text"
                                 value={testi.video_url || ''}
                                 onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)}
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
-                                placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                placeholder="e.g. https://www.instagram.com/reel/..."
                               />
                             </div>
                             <div className="space-y-1">
@@ -1275,7 +1375,7 @@ export default function DentalImplantsCms() {
                                 value={testi.thumbnail || ''}
                                 onChange={(e) => updateTestimonialItemField(idx, 'thumbnail', e.target.value)}
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
-                                placeholder="Leave blank to use auto YouTube thumbnail"
+                                placeholder="Provide a cover image URL for the Reel preview"
                               />
                             </div>
                           </div>
@@ -1447,6 +1547,314 @@ export default function DentalImplantsCms() {
           )}
         </div>
 
+        {/* COST OF DENTAL IMPLANTS */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('cost')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8.5 Cost of Dental Implants</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure premium cost display, saving highlight, call/WhatsApp numbers, and actions</span>
+              </div>
+            </div>
+            {expandedSections.cost ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+          
+          {expandedSections.cost && (
+            <div className="p-6 border-t border-slate-100 space-y-5">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
+                  <span className="text-[9px] text-slate-400">Toggle the entire pricing/cost CTA card active/inactive</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={mConfig.show_cost !== false}
+                    onChange={(e) => updateMConfigField('show_cost', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                </label>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
+                <input
+                  type="text"
+                  value={mConfig.cost_heading || 'Cost of Dental Implants'}
+                  onChange={(e) => updateMConfigField('cost_heading', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 font-display font-bold text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Highlight Text (Main Highlight)</label>
+                  <input
+                    type="text"
+                    value={mConfig.cost_highlight_text || 'Save up to 50%'}
+                    onChange={(e) => updateMConfigField('cost_highlight_text', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Highlight Subtext</label>
+                  <input
+                    type="text"
+                    value={mConfig.cost_highlight_sub || 'On Dental Implants'}
+                    onChange={(e) => updateMConfigField('cost_highlight_sub', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Contact Text / Prompt</label>
+                  <input
+                    type="text"
+                    value={mConfig.cost_contact_text || 'Contact now for more information.'}
+                    onChange={(e) => updateMConfigField('cost_contact_text', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Phone Number</label>
+                  <input
+                    type="text"
+                    value={mConfig.cost_phone_number || '+91 9510397046'}
+                    onChange={(e) => updateMConfigField('cost_phone_number', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Call Button Label</label>
+                  <input
+                    type="text"
+                    value={mConfig.cost_call_label || '📞 Call Now'}
+                    onChange={(e) => updateMConfigField('cost_call_label', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">WhatsApp Button Label</label>
+                  <input
+                    type="text"
+                    value={mConfig.cost_whatsapp_label || '💬 WhatsApp Now'}
+                    onChange={(e) => updateMConfigField('cost_whatsapp_label', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BEFORE & AFTER GALLERY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('beforeAfter')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8.7 Before & After Gallery</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure smile transformations, images before, images after, captions, and display order</span>
+              </div>
+            </div>
+            {expandedSections.beforeAfter ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+          
+          {expandedSections.beforeAfter && (
+            <div className="p-6 border-t border-slate-100 space-y-5">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
+                  <span className="text-[9px] text-slate-400">Toggle the entire Before & After Smile Transformation section</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={mConfig.show_before_after !== false}
+                    onChange={(e) => updateMConfigField('show_before_after', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                </label>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
+                <input
+                  type="text"
+                  value={mConfig.before_after_heading || 'Before & After Smile Transformations'}
+                  onChange={(e) => updateMConfigField('before_after_heading', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 font-display font-bold text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Description</label>
+                <input
+                  type="text"
+                  value={mConfig.before_after_description || 'See real smile transformations of our dental implant patients.'}
+                  onChange={(e) => updateMConfigField('before_after_description', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-4 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Before & After Smile Transformation Pairs</h5>
+                  <button
+                    type="button"
+                    onClick={addBeforeAfterPair}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 hover:text-teal-600 rounded-lg text-xs font-bold transition cursor-pointer text-slate-700"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add New Pair
+                  </button>
+                </div>
+
+                {beforeAfterPairs.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    No transformation pairs added yet. Live page will fall back to default smile transformation pairs.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {beforeAfterPairs.map((pair: any, idx: number) => (
+                      <div key={pair.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex flex-col md:flex-row gap-4 items-start relative shadow-3xs hover:border-slate-300 transition-colors">
+                        <div className="flex items-center gap-2 md:flex-col md:gap-1.5 shrink-0">
+                          <span className="h-7 w-7 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-300 shadow-xs">
+                            {idx + 1}
+                          </span>
+                          <div className="flex bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveBeforeAfterPair(idx, 'up')}
+                              className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 rounded transition"
+                              title="Move Up"
+                            >
+                              <ArrowUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === beforeAfterPairs.length - 1}
+                              onClick={() => moveBeforeAfterPair(idx, 'down')}
+                              className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 rounded transition"
+                              title="Move Down"
+                            >
+                              <ArrowDown className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Image Fields Grid */}
+                        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0 md:w-80">
+                          {/* Before Image */}
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-bold text-red-500 uppercase block">Before Image</label>
+                            <img src={pair.before_image} alt="Before" className="w-full h-20 object-cover rounded-xl border border-slate-200/60 shadow-3xs" referrerPolicy="no-referrer" />
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById(`before-image-file-${idx}`)?.click()}
+                              className="w-full px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-[10px] font-bold text-slate-600 shadow-3xs transition cursor-pointer"
+                            >
+                              Replace Before
+                            </button>
+                            <input
+                              type="file"
+                              id={`before-image-file-${idx}`}
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const url = await handleFileUpload(e.target.files[0]);
+                                  if (url) updateBeforeAfterPairField(idx, 'before_image', url);
+                                }
+                              }}
+                            />
+                          </div>
+
+                          {/* After Image */}
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-bold text-emerald-600 uppercase block">After Image</label>
+                            <img src={pair.after_image} alt="After" className="w-full h-20 object-cover rounded-xl border border-slate-200/60 shadow-3xs" referrerPolicy="no-referrer" />
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById(`after-image-file-${idx}`)?.click()}
+                              className="w-full px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-[10px] font-bold text-slate-600 shadow-3xs transition cursor-pointer"
+                            >
+                              Replace After
+                            </button>
+                            <input
+                              type="file"
+                              id={`after-image-file-${idx}`}
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const url = await handleFileUpload(e.target.files[0]);
+                                  if (url) updateBeforeAfterPairField(idx, 'after_image', url);
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Optional Caption & Display Order */}
+                        <div className="flex-1 space-y-3 w-full">
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase">Caption text (optional)</label>
+                            <input
+                              type="text"
+                              value={pair.caption || ''}
+                              onChange={(e) => updateBeforeAfterPairField(idx, 'caption', e.target.value)}
+                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              placeholder="Describe the smile reconstruction/treatment..."
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase">Display Order</label>
+                            <input
+                              type="number"
+                              value={pair.display_order || ''}
+                              onChange={(e) => updateBeforeAfterPairField(idx, 'display_order', Number(e.target.value))}
+                              className="w-24 px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              placeholder="10"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() => deleteBeforeAfterPair(idx)}
+                          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                          title="Delete Pair"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* 9. FINAL CTA */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
@@ -1455,7 +1863,7 @@ export default function DentalImplantsCms() {
             className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
           >
             <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Layout className="h-4 w-4" /></span>
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
               <div>
                 <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Final CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom action block, call numbers, WhatsApp prompts, and request callback triggers</span>

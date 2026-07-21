@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service } from '../types';
-import { serviceService } from '../utils/serviceData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 
 // Custom SVG Premium Dental-Specific Representation Icons
 const DentalImplantIcon = ({ className }: { className?: string }) => (
@@ -366,10 +366,52 @@ export default function Home({
       s.title.toLowerCase() === defaultTitle.toLowerCase()
     );
 
+    const mConfig = dbSvc ? (typeof dbSvc.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(dbSvc.marketing_config) } catch(e) { return {} } })()
+      : (dbSvc.marketing_config || {})
+    ) : {};
+
+    // Helper to extract first 2-3 sentences safely
+    const getSentenceFallback = (text: string | null | undefined): string | null => {
+      if (!text) return null;
+      // Strip common markdown elements
+      const cleanText = text
+        .replace(/[*#`_\-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!cleanText) return null;
+      
+      const sentences = cleanText
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+        
+      if (sentences.length === 0) return null;
+      return sentences.slice(0, 3).join(' ');
+    };
+
+    const isDentalImplants = defaultSlug === 'dental-implants' || dbSvc?.slug === 'dental-implants';
+
+    const homepageDesc = dbSvc?.homepage_short_description?.trim()
+      ? dbSvc.homepage_short_description.trim()
+      : (isDentalImplants
+          ? "Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and enhance patient's smile and life.\n\nIt is ideal for replacement of missing and loose teeth due to pyorrhea.\n\nPatel Dental Hospital provides fixed teeth in just one week with best dental implant."
+          : getSentenceFallback(dbSvc?.description || dbSvc?.short_description));
+
+    const greenHighlightLine = mConfig.green_highlight_line !== undefined 
+      ? mConfig.green_highlight_line 
+      : (isDentalImplants 
+          ? DEFAULT_GREEN_HIGHLIGHT_LINE 
+          : "");
+
     return {
+      title: dbSvc?.title || defaultTitle,
       image: dbSvc?.homepage_card_image || dbSvc?.hero_image || defaultImage,
-      shortDesc: dbSvc?.homepage_short_description || null,
-      slug: dbSvc?.slug || defaultSlug
+      shortDesc: homepageDesc,
+      slug: dbSvc?.slug || defaultSlug,
+      isActive: dbSvc ? dbSvc.is_active : true,
+      mConfig,
+      greenHighlightLine
     };
   };
 
@@ -849,911 +891,114 @@ export default function Home({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 xl:gap-12 max-w-full mx-auto items-stretch">
-            {/* CARD 1: Dental Implants */}
+            {/* Dynamic Services Cards from CMS */}
             {(() => {
-              const cardData = getCardData('dental-implants', 'Dental Implants', fdaApprovedImplantImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
+              const SERVICES_CARDS_CONFIG = [
+                { slug: 'dental-implants', title: 'Dental Implants', defaultImg: fdaApprovedImplantImg, delay: 0 },
+                { slug: 'root-canal-treatment', title: 'Single Sitting Root Canal Treatment', defaultImg: rootCanalImg, delay: 0.05 },
+                { slug: 'full-mouth-rehabilitation', title: 'Full Mouth Rehabilitation', defaultImg: fullMouthRehabImg, delay: 0.1 },
+                { slug: 'invisible-aligners', title: 'Invisible Aligners', defaultImg: clearAlignersImg, delay: 0.15 },
+                { slug: 'smile-makeover', title: 'Smile Makeover', defaultImg: smileMakeoverImg, delay: 0.2 },
+                { slug: 'crowns-and-bridges', title: 'Crowns & Bridges', defaultImg: crownsBridgesImg, delay: 0.25 },
+                { slug: 'teeth-whitening', title: 'Teeth Whitening', defaultImg: teethCleaningImg, delay: 0.3 },
+                { slug: 'pediatric-dentistry', title: 'Pediatric Dentistry', defaultImg: kidsDentistryImg, delay: 0.35 },
+                { slug: 'braces-treatment', title: 'Braces Treatment', defaultImg: bracesImg, delay: 0.4 },
+                { slug: 'wisdom-tooth-surgery', title: 'Wisdom Tooth Surgery', defaultImg: wisdomToothImg, delay: 0.45 },
+                { slug: 'tooth-coloured-filling', title: 'Tooth Coloured Filling (Composite Filling)', defaultImg: compositeFillingImg, delay: 0.5 },
+              ];
+
+              return SERVICES_CARDS_CONFIG.map((cfg) => {
+                const cardData = getCardData(cfg.slug, cfg.title, cfg.defaultImg);
+                if (!cardData.isActive) return null;
+
+                const mConfig = cardData.mConfig;
+                const appointmentText = mConfig.cta_appointment_text || 'Book Appointment';
+                const appointmentDest = mConfig.cta_appointment_dest || 'appointment';
+                const appointmentDestValue = mConfig.cta_appointment_dest_value || '';
+
+                const handleAppointmentClick = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  if (appointmentDest === 'appointment') {
+                    openAppointmentModal();
+                  } else if (appointmentDest === 'internal') {
+                    setCurrentPage(appointmentDestValue);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Dental Implants"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
+                  } else if (appointmentDest === 'external') {
+                    const url = appointmentDestValue.startsWith('http') ? appointmentDestValue : 'https://' + appointmentDestValue;
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                  }
+                };
 
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Replace missing teeth with dental implants in just one week with advanced technology.
-                    </p>
-                  </div>
+                return (
+                  <motion.div
+                    key={cfg.slug}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: cfg.delay }}
+                    className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
+                    onClick={() => {
+                      setCurrentPage(`services/${cardData.slug}`);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
+                    {/* Image Container */}
+                    <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
+                      <img
+                        src={cardData.image}
+                        alt={cardData.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
 
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Dental Implants
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
+                    {/* Green Highlight Line directly below the image */}
+                    {cardData.greenHighlightLine && (
+                      <div className="bg-[#14B8A6] text-white py-3 px-6 text-center text-xs sm:text-sm font-bold tracking-wide leading-relaxed border-b border-teal-600/10">
+                        {cardData.greenHighlightLine}
+                      </div>
+                    )}
+
+                    {/* Content Block */}
+                    <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
+                      <div className="space-y-5 text-left">
+                        <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
+                          {cardData.title}
+                        </h3>
+                        
                         <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and enhance patient's smile and life.
-                          </p>
-                          <p>
-                            It is ideal for replacement of missing and loose teeth due to pyorrhea.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            Patel Dental Hospital provides fixed teeth in just one week with the best dental implant.
-                          </p>
+                          {cardData.shortDesc ? cardData.shortDesc.split(/\r?\n/).map((p) => p.trim()).filter(Boolean).map((para, idx) => (
+                            <p key={idx}>{para}</p>
+                          )) : null}
                         </div>
-                      )}
+                      </div>
+
+                      {/* Buttons block */}
+                      <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
+                        {mConfig.cta_appointment_enabled !== false && (
+                          <button
+                            onClick={handleAppointmentClick}
+                            className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
+                          >
+                            {appointmentText}
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentPage(`services/${cardData.slug}`);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
+                        >
+                          Read More
+                        </button>
+                      </div>
                     </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 2: Single Sitting Root Canal Treatment */}
-            {(() => {
-              const cardData = getCardData('root-canal-treatment', 'Single Sitting Root Canal Treatment', rootCanalImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.15 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Single Sitting Root Canal Treatment"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Single Sitting Root Canal Treatment with Advanced Technology.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Single Sitting Root Canal Treatment
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            When decay reaches the nerve of the tooth, it causes severe pain. During Root Canal Treatment, the infected portion of the tooth is removed, the root canal is cleaned and disinfected, and then filled with biocompatible materials such as Gutta Percha and MTA.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            At Patel Dental Hospital, we complete Root Canal Treatment in just one visit using advanced technology such as an Apex Locator, Japanese Endo Motor, Digital X-ray, and Bioceramic MTA Sealer to provide excellent quality treatment at an affordable cost.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 3: Full Mouth Rehabilitation */}
-            {(() => {
-              const cardData = getCardData('full-mouth-rehabilitation', 'Full Mouth Rehabilitation', fullMouthRehabImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Full Mouth Rehabilitation"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Complete Full Mouth Rehabilitation with Advanced Multidisciplinary Dental Care.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Full Mouth Rehabilitation
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Full Mouth Rehabilitation is the process of rebuilding or restoring all teeth, gums, and the temporomandibular joint in both the upper and lower jaws.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            At Patel Dental Hospital, Dr. Vipul Patel and the team perform a complete clinical examination along with a full-mouth OPG X-ray. After careful evaluation, a personalized treatment plan is prepared to restore the form, function, and aesthetics of the teeth, gums, jaw, and smile using advanced multidisciplinary dental care.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 4: Invisible Aligners */}
-            {(() => {
-              const cardData = getCardData('invisible-aligners', 'Invisible Aligners', clearAlignersImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.45 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Invisible Aligners"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Straighten Your Teeth Comfortably with Virtually Invisible Aligners.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Invisible Aligners
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Invisible Aligners are a modern way to straighten and align your teeth using a custom-made series of aligners created with advanced digital planning.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            Our aligners are made from smooth, comfortable and virtually invisible material that gradually moves your teeth into the correct position without using wires or brackets.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 5: Smile Makeover */}
-            {(() => {
-              const cardData = getCardData('smile-makeover', 'Smile Makeover', smileMakeoverImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Smile Makeover"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Create a Beautiful, Confident Smile with Customized Smile Makeover Treatment.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Smile Makeover
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Smile Makeover is the process of enhancing the beauty of your smile using teeth whitening, veneers, composite restorations, or dental jewellery such as diamonds and crystals.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            At Patel Dental Hospital, we provide customized Smile Makeover treatments designed to create the ideal smile that perfectly matches your face, personality, and lifestyle.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 6: Crowns & Bridges */}
-            {(() => {
-              const cardData = getCardData('crowns-and-bridges', 'Crowns & Bridges', crownsBridgesImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.15 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Crowns & Bridges"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Restore Missing or Damaged Teeth with Natural-Looking Crowns & Bridges.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Crowns & Bridges
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Crowns and Bridges are fixed prosthetic restorations attached to your natural teeth or dental implants using resin cement.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            At Patel Dental Hospital, we provide high-quality Crowns and Bridges using advanced materials, including Metal-Free Zirconia, to restore the appearance, function, alignment, and strength of damaged or missing teeth.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 7: Teeth Whitening */}
-            {(() => {
-              const cardData = getCardData('teeth-whitening', 'Teeth Whitening', teethCleaningImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Teeth Whitening"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Get a Brighter, Whiter Smile with Safe Professional Teeth Whitening.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Teeth Whitening
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Teeth Whitening is a safe and effective treatment used to brighten your natural teeth. At Patel Dental Hospital, we offer professional teeth whitening using scaling, polishing, bleaching, and advanced ultraviolet light therapy.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            Our treatment provides a safe, comfortable, and affordable way to achieve a brighter, healthier smile.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 8: Pediatric Dentistry */}
-            {(() => {
-              const cardData = getCardData('pediatric-dentistry', 'Pediatric Dentistry', kidsDentistryImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.25 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Pediatric Dentistry"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Comfortable & Child-Friendly Dental Care for Every Smile.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Pediatric Dentistry
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Pediatric Dentistry focuses on maintaining children's oral health from infancy through adolescence. At Patel Dental Hospital, we provide a friendly, comfortable, and child-friendly environment to make every dental visit enjoyable and stress-free.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            Our experienced pediatric dental team offers preventive, restorative, and emergency dental care using advanced techniques while ensuring every child feels safe and confident.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 9: Braces Treatment */}
-            {(() => {
-              const cardData = getCardData('braces-treatment', 'Braces Treatment', bracesImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Braces Treatment"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Straighten Crooked Teeth with Advanced Braces Treatment.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Braces Treatment
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Braces Treatment is used to correct misaligned and crooked teeth. At Patel Dental Hospital, we provide advanced orthodontic treatment using modern metal and ceramic braces with personalized treatment planning for every patient.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            Our experienced orthodontic team carefully evaluates each case and provides comprehensive treatment to achieve a healthy, well-aligned, and confident smile.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 10: Wisdom Tooth Surgery */}
-            {(() => {
-              const cardData = getCardData('wisdom-tooth-surgery', 'Wisdom Tooth Surgery', wisdomToothImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.35 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Wisdom Tooth Surgery"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Safe & Painless Wisdom Tooth Removal with Advanced Surgical Care.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Wisdom Tooth Surgery
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Wisdom teeth are the four permanent molars located at the back of the mouth. When they do not have enough space to erupt properly, they may cause pain, swelling, infection, or difficulty in opening the mouth.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            At Patel Dental Hospital, we provide painless and advanced Wisdom Tooth Surgery using modern techniques and internationally trained specialists for safe and comfortable treatment.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-
-            {/* CARD 11: Tooth Coloured Filling (Composite Filling) */}
-            {(() => {
-              const cardData = getCardData('tooth-coloured-filling', 'Tooth Coloured Filling (Composite Filling)', compositeFillingImg);
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
-                  onClick={() => {
-                    setCurrentPage(`services/${cardData.slug}`);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  {/* Image Container with Absolute Icon */}
-                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={cardData.image}
-                      alt="Tooth Coloured Filling (Composite Filling)"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  {/* Caption Below Image */}
-                  <div className="bg-[#0D9488]/5 py-3.5 px-6 border-b border-[#0D9488]/10 text-center">
-                    <p className="text-[#0D9488] text-[13px] sm:text-[14px] font-bold leading-relaxed">
-                      Natural-Looking Tooth Coloured Fillings for a Healthy & Beautiful Smile.
-                    </p>
-                  </div>
-
-                  {/* Content Block */}
-                  <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
-                    <div className="space-y-5 text-left">
-                      <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight">
-                        Tooth Coloured Filling (Composite Filling)
-                      </h3>
-                      
-                      {cardData.shortDesc ? (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans whitespace-pre-wrap">
-                          <p>{cardData.shortDesc}</p>
-                        </div>
-                      ) : (
-                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans">
-                          <p>
-                            Composite Filling, also known as Tooth Coloured Filling, is a long-lasting and natural-looking restoration used to repair decayed, chipped, or broken teeth.
-                          </p>
-                          <p className="font-bold text-[#081C3A]">
-                            At Patel Dental Hospital, we use advanced USA-made composite materials that chemically bond to the tooth, providing durable, aesthetic, and high-quality restorations in a safe and comfortable environment.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Buttons block */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openAppointmentModal();
-                        }}
-                        className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center"
-                      >
-                        Book Appointment
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPage(`services/${cardData.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center"
-                      >
-                        Read More
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })()}
-          </div>
+                  </motion.div>
+                );
+              });
+            })()}          </div>
 
         </div>
       </section>

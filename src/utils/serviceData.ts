@@ -7,6 +7,8 @@ import { Service, ServiceGalleryItem, ServiceFaq } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { TREATMENTS } from '../data/treatments';
 
+export const DEFAULT_GREEN_HIGHLIGHT_LINE = "Replace missing teeth with dental implants in just one week with advance technology.";
+
 export const DEFAULT_SERVICES: Service[] = [
   {
     id: 'implants-srv',
@@ -17,7 +19,10 @@ export const DEFAULT_SERVICES: Service[] = [
     hero_image: TREATMENTS.find(t => t.id === 'implants')?.image || '',
     icon: 'Shield',
     display_order: 1,
-    is_active: true
+    is_active: true,
+    marketing_config: {
+      green_highlight_line: DEFAULT_GREEN_HIGHLIGHT_LINE
+    }
   },
   {
     id: 'rct',
@@ -140,7 +145,14 @@ export const serviceService = {
       const stored = localStorage.getItem('hospital_services');
       if (stored) {
         try {
-          return JSON.parse(stored);
+          const list = JSON.parse(stored) as Service[];
+          return list.map(svc => {
+            const defaultSvc = DEFAULT_SERVICES.find(d => d.id === svc.id);
+            if (defaultSvc && defaultSvc.marketing_config && !svc.marketing_config) {
+              return { ...svc, marketing_config: defaultSvc.marketing_config };
+            }
+            return svc;
+          });
         } catch (e) {
           console.error('Failed to parse services from localStorage:', e);
         }
@@ -176,6 +188,7 @@ export const serviceService = {
           seo_description: s.seo_description || null,
           homepage_card_image: null,
           homepage_short_description: null,
+          marketing_config: s.marketing_config || null,
           updated_at: new Date().toISOString()
         }));
 
@@ -229,6 +242,7 @@ export const serviceService = {
             seo_description: s.seo_description || null,
             homepage_card_image: null,
             homepage_short_description: null,
+            marketing_config: s.marketing_config || null,
             updated_at: new Date().toISOString()
           }));
 

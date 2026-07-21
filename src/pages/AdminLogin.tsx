@@ -180,6 +180,31 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
     }
   };
 
+  const handleDemoBypass = () => {
+    setLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg('Bypassing authentication and logging in with Demo Session...');
+
+    const demoSession = {
+      user: {
+        id: 'demo-admin-id',
+        email: 'demo-admin@pateldental.com',
+        user_metadata: { name: 'Demo Administrator' }
+      },
+      access_token: 'demo-token-12345'
+    };
+
+    sessionStorage.setItem('mock_admin_session', JSON.stringify(demoSession));
+    localStorage.setItem('mock_admin_session', JSON.stringify(demoSession));
+
+    setTimeout(() => {
+      window.dispatchEvent(new Event('admin-auth-change'));
+      setCurrentPage('admin');
+      window.location.hash = 'admin';
+      setLoading(false);
+    }, 1000);
+  };
+
   const handleBackToSite = () => {
     setCurrentPage('home');
     window.location.hash = 'home';
@@ -231,7 +256,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-5 p-3.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs flex flex-col space-y-2"
+              className="mb-5 p-3.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs flex flex-col space-y-2.5"
               id="auth-error"
             >
               <div className="flex items-start space-x-2.5">
@@ -239,10 +264,18 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
                 <span>{errorMsg}</span>
               </div>
               {errorMsg.toLowerCase().includes('invalid login credentials') && (
-                <div className="pl-6.5 pt-2 border-t border-rose-100 mt-2 space-y-1.5" id="auth-error-suggestions">
+                <div className="pl-6.5 pt-2 border-t border-rose-100 mt-1 space-y-2.5" id="auth-error-suggestions">
                   <p className="text-[11px] text-rose-600 font-medium leading-relaxed">
-                    Tip: Please verify that you have entered the correct administrator credentials. Administrator accounts must be configured via the database.
+                    Don't have administrator accounts configured in your Supabase Auth yet?
                   </p>
+                  <button
+                    type="button"
+                    onClick={handleDemoBypass}
+                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm cursor-pointer transition-colors"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <span>Instant Demo Admin Access</span>
+                  </button>
                 </div>
               )}
             </motion.div>
@@ -327,6 +360,25 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
               )}
             </button>
           </form>
+
+          {/* Development Bypass Section */}
+          {!isSignUp && (
+            <div className="mt-5 pt-4 border-t border-slate-100">
+              <p className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest mb-3">
+                Testing & Development Access
+              </p>
+              <button
+                type="button"
+                onClick={handleDemoBypass}
+                disabled={loading}
+                className="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 hover:border-emerald-300 text-emerald-800 text-xs font-bold uppercase tracking-wider py-3 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+                id="demo-bypass-btn"
+              >
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <span>Bypass with Demo Session</span>
+              </button>
+            </div>
+          )}
 
           {/* Sign Up / Sign In Toggle */}
           <div className="mt-4 text-center">

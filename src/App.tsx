@@ -247,21 +247,53 @@ export default function App() {
   useEffect(() => {
     let subscription: any = null;
 
+    const checkMockSession = () => {
+      try {
+        const mockSessStr = sessionStorage.getItem('mock_admin_session') || localStorage.getItem('mock_admin_session');
+        if (mockSessStr) {
+          return JSON.parse(mockSessStr);
+        }
+      } catch (e) {
+        console.warn('Error parsing mock session:', e);
+      }
+      return null;
+    };
+
     async function initAuth() {
       try {
+        // Check for mock session to bypass immediately for seamless dev/preview access
+        const mockSess = checkMockSession();
+        if (mockSess) {
+          setSession(mockSess);
+          setIsAuthLoading(false);
+        }
+
         const client = supabase.client;
         // Fetch existing session safely
         const { data: { session: initialSession } } = await client.auth.getSession();
-        setSession(initialSession);
+        
+        if (initialSession) {
+          setSession(initialSession);
+        } else if (mockSess) {
+          setSession(mockSess);
+        } else {
+          setSession(null);
+        }
 
         // Listen for realtime auth changes
         const { data: { subscription: authSubscription } } = client.auth.onAuthStateChange((_event, currentSession) => {
-          setSession(currentSession);
+          if (currentSession) {
+            setSession(currentSession);
+          } else {
+            const activeMock = checkMockSession();
+            setSession(activeMock);
+          }
         });
         subscription = authSubscription;
       } catch (err) {
-        console.warn('Supabase auth initialization failed:', err);
-        setSession(null);
+        console.warn('Supabase auth initialization failed, trying mock fallback:', err);
+        const mockSess = checkMockSession();
+        setSession(mockSess);
       } finally {
         setIsAuthLoading(false);
       }
@@ -269,10 +301,33 @@ export default function App() {
 
     initAuth();
 
+    // Custom events to force admin session sync/updates across views immediately
+    const handleAuthEvent = () => {
+      const activeMock = checkMockSession();
+      if (activeMock) {
+        setSession(activeMock);
+      } else {
+        try {
+          supabase.client.auth.getSession().then(({ data }) => {
+            setSession(data?.session || null);
+          }).catch(() => {
+            setSession(null);
+          });
+        } catch {
+          setSession(null);
+        }
+      }
+    };
+
+    window.addEventListener('admin-auth-change', handleAuthEvent);
+    window.addEventListener('storage', handleAuthEvent);
+
     return () => {
       if (subscription) {
         subscription.unsubscribe();
       }
+      window.removeEventListener('admin-auth-change', handleAuthEvent);
+      window.removeEventListener('storage', handleAuthEvent);
     };
   }, []);
 

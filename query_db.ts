@@ -7,22 +7,28 @@ console.log('Querying Supabase at:', url);
 
 async function run() {
   const supabase = createClient(url, key);
-  const { data, error } = await supabase
+  
+  console.log('--- Database Tables ---');
+  const { data: tables, error: tableError } = await supabase
     .from('services')
-    .select('*')
-    .order('display_order', { ascending: true });
+    .select('id')
+    .limit(1);
 
-  if (error) {
-    console.error('Error fetching services:', error);
-    return;
+  if (tableError) {
+    console.error('Error fetching services:', tableError);
+  } else {
+    console.log('Services table exists.');
   }
 
-  console.log('--- Database Services Count ---');
-  console.log(`Total count of services: ${data?.length}`);
-  console.log('--- List of Services in Database ---');
-  data?.forEach((s, idx) => {
-    console.log(`${idx + 1}. ID: "${s.id}" | Title: "${s.title}" | Slug: "${s.slug}" | Active: ${s.is_active} | Order: ${s.display_order}`);
-  });
+  // Probe other tables
+  for (const table of ['service_gallery', 'service_faqs', 'gallery']) {
+    const { error } = await supabase.from(table).select('id').limit(1);
+    if (error) {
+      console.log(`Table "${table}" might not exist or error:`, error.message);
+    } else {
+      console.log(`Table "${table}" exists.`);
+    }
+  }
 }
 
 run();
