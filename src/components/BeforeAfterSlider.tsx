@@ -71,6 +71,16 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
     };
   }, [isDragging]);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setSliderPosition(prev => Math.max(0, prev - 5));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setSliderPosition(prev => Math.min(100, prev + 5));
+    }
+  };
+
   return (
     <div className="space-y-3 w-full text-left" id="before-after-slider-container">
       <div
@@ -83,7 +93,14 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           }
         }}
         onTouchMove={handleTouchMove}
-        className="relative aspect-[4/3] w-full max-h-[320px] overflow-hidden rounded-2xl border border-slate-150 shadow-md select-none cursor-ew-resize group"
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="slider"
+        aria-valuenow={Math.round(sliderPosition)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Before and after treatment slider"
+        className="relative aspect-[4/3] w-full max-h-[320px] overflow-hidden rounded-2xl border border-slate-150 shadow-md select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
       >
         {/* After Image (Background) */}
         <img

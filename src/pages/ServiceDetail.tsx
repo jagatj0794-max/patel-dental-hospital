@@ -19,6 +19,7 @@ import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
 import { InstagramEmbed } from '../components/InstagramEmbed';
+import { GooglePatientReviews } from '../components/GooglePatientReviews';
 const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
 
 function getYouTubeEmbedUrl(url: string) {
@@ -85,6 +86,7 @@ export default function ServiceDetail({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>(null);
+  const [expandedImplantFaqId, setExpandedImplantFaqId] = useState<string | null>(null);
 
   // Lightbox modal state
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -181,20 +183,62 @@ export default function ServiceDetail({
   }, [service, fallback, mConfig]);
 
   const displayTeamPhotos = React.useMemo(() => {
-    if (!service) return [];
     let list: any[] = [];
-    if (Array.isArray(service.hospital_team_photos)) {
-      list = service.hospital_team_photos;
-    } else if (typeof service.hospital_team_photos === 'string') {
-      try {
-        list = JSON.parse(service.hospital_team_photos);
-      } catch (e) {}
+    if (service) {
+      if (Array.isArray(service.hospital_team_photos)) {
+        list = service.hospital_team_photos;
+      } else if (typeof service.hospital_team_photos === 'string') {
+        try {
+          list = JSON.parse(service.hospital_team_photos);
+        } catch (e) {}
+      }
     }
-    if (!list || list.length === 0) {
-      return fallback.hospital_team_photos;
+
+    // If list is empty, fall back to general mConfig.hospital_photos and mConfig.team_photos
+    if ((!list || list.length === 0) && mConfig) {
+      const hPhotos = Array.isArray(mConfig.hospital_photos) ? mConfig.hospital_photos : [];
+      const tPhotos = Array.isArray(mConfig.team_photos) ? mConfig.team_photos : [];
+      list = [...hPhotos, ...tPhotos];
     }
-    return [...list].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [service, fallback]);
+
+    // Filter out items that don't have a valid image_url or photo_url
+    // Do NOT display placeholder or default images
+    let cleanList = list.filter((item: any) => {
+      if (!item) return false;
+      const url = (item.image_url || item.photo_url || '').trim();
+      return url !== '' && !url.includes('placeholder') && !url.includes('example.com');
+    });
+
+    // CRITICAL FALLBACK: If we still have no photos (e.g. empty in database and mConfig),
+    // we MUST populate high-quality default hospital/team photos so that the Hospital & Team Gallery section is ALWAYS visible.
+    if (cleanList.length === 0) {
+      cleanList = [
+        {
+          id: 'default-h1',
+          type: 'hospital',
+          caption: 'Advanced Implantology Operatory Room',
+          image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800',
+          display_order: 10
+        },
+        {
+          id: 'default-h2',
+          type: 'hospital',
+          caption: 'State-of-the-Art Diagnostic Unit',
+          image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800',
+          display_order: 20
+        },
+        {
+          id: 'default-t1',
+          type: 'team',
+          caption: 'Specialist Implantologists & Surgical Staff',
+          image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800',
+          display_order: 30
+        }
+      ];
+    }
+
+    return [...cleanList].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+  }, [service, mConfig]);
 
   const videoUrl = service?.procedure_video_url || fallback.procedure_video_url;
   const videoTitle = service?.procedure_video_title || fallback.procedure_video_title;
@@ -1189,23 +1233,30 @@ export default function ServiceDetail({
 
           const defaultImplantsUrl = service?.id === 'implants-srv' ? 'https://www.instagram.com/reel/C8qLd9MyWwG/' : '';
           const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultImplantsUrl || '').trim();
-          const rawVideoTitle = service?.procedure_video_title || mConfig.procedure_video_title || mConfig.video_heading || '';
-          const effectiveVideoTitle = typeof rawVideoTitle === 'string' ? rawVideoTitle.trim() : '';
-          const rawVideoDesc = service?.procedure_video_description || mConfig.procedure_video_description || mConfig.video_description || '';
-          const effectiveVideoDesc = typeof rawVideoDesc === 'string' ? rawVideoDesc.trim() : '';
+          
+          let effectiveVideoTitle = '';
+          const pVideoTitleVal = service?.id === 'implants-srv'
+            ? (service?.procedure_video_title !== undefined ? service.procedure_video_title : mConfig.procedure_video_title)
+            : (service?.procedure_video_title || mConfig.procedure_video_title || mConfig.video_heading);
+
+          if (pVideoTitleVal === undefined || pVideoTitleVal === null) {
+            if (service?.id === 'implants-srv') {
+              effectiveVideoTitle = 'Screw Retained Prosthesis Procedure';
+            } else {
+              effectiveVideoTitle = fallback.procedure_video_title || '';
+            }
+          } else {
+            effectiveVideoTitle = typeof pVideoTitleVal === 'string' ? pVideoTitleVal.trim() : '';
+          }
 
           const videoElement = (mConfig.show_procedure_video !== false && effectiveVideoUrl) ? (
-            <div className="py-6 border-t border-slate-100 space-y-4 animate-fade-in" id="cms-section-video">
+            <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-video">
               {effectiveVideoTitle && (
                 <div className="text-center max-w-xl mx-auto px-4">
-                  <h2 className="font-sans font-black text-xl sm:text-2xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
                     {effectiveVideoTitle}
                   </h2>
-                  {effectiveVideoDesc && (
-                    <p className="text-slate-500 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed text-center mt-1">
-                      {effectiveVideoDesc}
-                    </p>
-                  )}
+                  <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
                 </div>
               )}
 
@@ -1218,55 +1269,62 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const renderSplitPhotos = (category) => {
-            const isHospital = category === 'hospital';
-            const showFlag = isHospital ? mConfig.show_hospital_photos !== false : mConfig.show_team_photos !== false;
-            
-            // Check if the actual photos are populated
-            const photos = isHospital ? (mConfig.hospital_photos || []) : (mConfig.team_photos || []);
-            if (!showFlag || !Array.isArray(photos) || photos.length === 0) return null;
+          const renderCombinedGallery = () => {
+            const isSectionEnabled = mConfig.show_hospital_photos !== false;
+            const hasCmsImages = displayTeamPhotos.length > 0;
+            const sectionTitle = (mConfig.hospital_team_title || mConfig.hospital_section_title || mConfig.hospital_photos_title || service?.hospital_team_title || '').trim();
+
+            console.log("==================================================");
+            console.log("CHECK 1 - Hospital & Team Gallery Debug Values:");
+            console.log("- mConfig.show_hospital_photos:", mConfig.show_hospital_photos);
+            console.log("- displayTeamPhotos.length:", displayTeamPhotos.length);
+            console.log("- displayTeamPhotos:", displayTeamPhotos);
+            console.log("- sectionTitle:", sectionTitle);
+            console.log("==================================================");
+
+            if (!isSectionEnabled || !hasCmsImages) return null;
 
             return (
-              <div className="py-12 border-t border-slate-100 space-y-8 animate-fade-in" key={category} id={`cms-section-${category}`}>
-                <div className="text-center max-w-xl mx-auto space-y-2">
-                  <span className="text-[10px] text-[#0D9488] font-black uppercase tracking-widest block">
-                    {isHospital ? "Our Infrastructure" : "Specialist Care"}
-                  </span>
-                  <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
-                    {isHospital ? "Clinic & Hospital Facilities" : "Specialist Panel & Doctors"}
-                  </h2>
-                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto">
-                    {isHospital 
-                      ? "Take a look at our state-of-the-art sterile clinics, advanced machinery, and comfortable patient wards."
-                      : "Meet our world-class specialist panels and qualified doctors dedicated to your high-end oral treatments."}
-                  </p>
-                  <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full mt-4" />
-                </div>
+              <div className="py-12 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-hospital-gallery">
+                {sectionTitle && (
+                  <div className="text-center max-w-xl mx-auto px-4">
+                    <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
+                      {sectionTitle}
+                    </h2>
+                    <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+                  </div>
+                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                  {photos.map((p, idx) => (
-                    <div key={idx} className="bg-white border border-slate-150 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-                      <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-                        <img
-                          src={p.image_url || p.photo_url}
-                          alt={p.title || p.name || 'Clinical / Doctor Photo'}
-                          className="w-full h-full object-cover hover:scale-[1.03] transition duration-500"
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <div className="p-4 bg-slate-50/50 space-y-1 border-t border-slate-100 text-center">
-                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                          {p.title || p.name || (isHospital ? 'Clinic Infrastructure' : 'Patel Dental Expert')}
-                        </h4>
-                        {(p.caption || p.designation) && (
-                          <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
-                            {p.caption || p.designation}
-                          </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+                  {displayTeamPhotos.map((p: any, idx: number) => {
+                    const imgUrl = (p.image_url || p.photo_url || '').trim();
+                    const titleText = (p.caption || p.title || p.name || '').trim();
+                    if (!imgUrl) return null;
+
+                    return (
+                      <div 
+                        key={p.id || idx} 
+                        className="group bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col"
+                      >
+                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
+                          <img
+                            src={imgUrl}
+                            alt={titleText || 'Hospital Gallery Photo'}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        {titleText && (
+                          <div className="p-4 bg-slate-50/50 border-t border-slate-100 text-center">
+                            <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
+                              {titleText}
+                            </h4>
+                          </div>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -1277,16 +1335,29 @@ export default function ServiceDetail({
             return url !== '';
           });
 
-          const rawTestimonialsTitle = service?.testimonials_title || mConfig.testimonials_section_title || mConfig.testimonial_section_title || '';
-          const testimonialsTitle = typeof rawTestimonialsTitle === 'string' ? rawTestimonialsTitle.trim() : '';
+          let testimonialsTitle = '';
+          const pTestimonialsTitleVal = service?.id === 'implants-srv'
+            ? (mConfig.testimonials_section_title !== undefined ? mConfig.testimonials_section_title : mConfig.testimonial_section_title)
+            : (mConfig.testimonials_section_title || mConfig.testimonial_section_title);
+
+          if (pTestimonialsTitleVal === undefined || pTestimonialsTitleVal === null) {
+            if (service?.id === 'implants-srv') {
+              testimonialsTitle = 'Patient Testimonial Reels';
+            } else {
+              testimonialsTitle = 'Patient Testimonial Videos';
+            }
+          } else {
+            testimonialsTitle = typeof pTestimonialsTitleVal === 'string' ? pTestimonialsTitleVal.trim() : '';
+          }
 
           const testimonialsElement = (mConfig.show_testimonials !== false && validTestimonialVideos.length > 0) ? (
-            <div className="py-8 border-t border-slate-100 space-y-6 animate-fade-in" id="cms-section-testimonials">
+            <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-testimonials">
               {testimonialsTitle && (
                 <div className="text-center max-w-xl mx-auto px-4">
-                  <h2 className="font-sans font-black text-xl sm:text-2xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
                     {testimonialsTitle}
                   </h2>
+                  <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
                 </div>
               )}
 
@@ -1503,9 +1574,9 @@ export default function ServiceDetail({
               case 'video':
                 return videoElement;
               case 'hospital_photos':
-                return renderSplitPhotos('hospital');
+                return renderCombinedGallery();
               case 'team_photos':
-                return renderSplitPhotos('team');
+                return null;
               case 'testimonials':
                 return testimonialsElement;
               case 'faq':
@@ -1716,6 +1787,226 @@ export default function ServiceDetail({
 
                 {/* Section 7: Patient Testimonial Reels */}
                 {testimonialsElement}
+
+                {/* Section 8: Hospital & Team Gallery */}
+                {renderCombinedGallery()}
+
+                {/* Section 9: Cost of Dental Implants (100% CMS-driven, Premium Two-column card) */}
+                {mConfig.show_cost !== false && (
+                  <div className="pt-10 border-t border-slate-100 space-y-8 animate-fade-in" id="dental-implants-cost">
+                    {/* Two-column responsive card wrapper */}
+                    <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-150 rounded-2xl p-6 sm:p-10 shadow-xs hover:shadow-sm transition-all duration-300 max-w-7xl mx-auto">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        
+                        {/* Left Column: Heading, Highlight, Subtext, Contact Text */}
+                        <div className="lg:col-span-7 space-y-4">
+                          {/* Optional Section Heading */}
+                          {mConfig.cost_heading && mConfig.cost_heading.trim() !== '' && (
+                            <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+                              {mConfig.cost_heading}
+                            </h2>
+                          )}
+
+                          {/* Optional Highlight text group */}
+                          {((mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '') || 
+                            (mConfig.cost_highlight_sub && mConfig.cost_highlight_sub.trim() !== '')) && (
+                            <div className="space-y-1.5 mt-2">
+                              {mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '' && (
+                                <div className="font-sans font-black text-3xl sm:text-4xl text-[#0D9488] tracking-tight">
+                                  {mConfig.cost_highlight_text}
+                                </div>
+                              )}
+                              {mConfig.cost_highlight_sub && mConfig.cost_highlight_sub.trim() !== '' && (
+                                <p className="text-[#081C3A] font-extrabold text-lg sm:text-xl tracking-tight">
+                                  {mConfig.cost_highlight_sub}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Optional Contact Prompt */}
+                          {mConfig.cost_contact_text && mConfig.cost_contact_text.trim() !== '' && (
+                            <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
+                              {mConfig.cost_contact_text}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Right Column: CTA Actions */}
+                        <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col gap-4 w-full sm:justify-start lg:justify-center items-stretch sm:items-center lg:items-stretch">
+                          {/* Call Button */}
+                          {mConfig.cost_phone_number && mConfig.cost_call_label && mConfig.cost_call_label.trim() !== '' && (
+                            <a
+                              href={`tel:${String(mConfig.cost_phone_number).replace(/[^\d+]/g, '')}`}
+                              className="px-6 py-4 bg-[#081C3A] hover:bg-[#0c2b59] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2"
+                            >
+                              <Phone className="h-4.5 w-4.5" />
+                              <span>{mConfig.cost_call_label}</span>
+                            </a>
+                          )}
+
+                          {/* WhatsApp Button */}
+                          {mConfig.cost_phone_number && mConfig.cost_whatsapp_label && mConfig.cost_whatsapp_label.trim() !== '' && (
+                            <a
+                              href={`https://wa.me/${String(mConfig.cost_phone_number).replace(/[^\d+]/g, '').replace('+', '')}`}
+                              target="_blank"
+                              referrerPolicy="no-referrer"
+                              className="px-6 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2"
+                            >
+                              <MessageCircle className="h-4.5 w-4.5" />
+                              <span>{mConfig.cost_whatsapp_label}</span>
+                            </a>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
+                {mConfig.show_google_reviews !== false && (
+                  <GooglePatientReviews
+                    heading={mConfig.google_reviews_heading}
+                    reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+                  />
+                )}
+
+                {/* Section 11: Bottom Call To Action (100% CMS-driven, Premium full-width block) */}
+                {mConfig.show_sec11_cta !== false && (
+                  <div className="pt-14 border-t border-slate-100 animate-fade-in" id="sec11-bottom-cta">
+                    <div 
+                      className={`relative overflow-hidden rounded-3xl py-12 px-6 sm:py-16 sm:px-12 max-w-7xl mx-auto border text-center flex flex-col items-center justify-center gap-6 ${
+                        mConfig.sec11_bg_image 
+                          ? 'border-transparent bg-cover bg-center' 
+                          : 'border-slate-150 bg-gradient-to-br from-slate-50 to-white shadow-3xs hover:shadow-2xs hover:border-slate-300 transition-all duration-300'
+                      }`}
+                      style={mConfig.sec11_bg_image ? { backgroundImage: `url(${mConfig.sec11_bg_image})` } : {}}
+                    >
+                      {/* Dark Overlay for background image readability */}
+                      {mConfig.sec11_bg_image && (
+                        <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xs z-0" />
+                      )}
+                      
+                      <div className="relative z-10 max-w-3xl space-y-4">
+                        {mConfig.sec11_heading && mConfig.sec11_heading.trim() !== '' && (
+                          <h2 className={`font-sans font-black text-2xl sm:text-4xl tracking-tight leading-tight ${
+                            mConfig.sec11_bg_image ? 'text-white' : 'text-[#081C3A]'
+                          }`}>
+                            {mConfig.sec11_heading}
+                          </h2>
+                        )}
+                        {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
+                          <p className={`text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto ${
+                            mConfig.sec11_bg_image ? 'text-slate-200' : 'text-slate-600'
+                          }`}>
+                            {mConfig.sec11_description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="relative z-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
+                        {mConfig.sec11_primary_label && mConfig.sec11_primary_label.trim() !== '' && (
+                          <button
+                            type="button"
+                            onClick={() => openAppointmentModal('Dental Implants')}
+                            className={`px-8 py-4 sm:py-3.5 font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2 text-sm cursor-pointer ${
+                              mConfig.sec11_bg_image 
+                                ? 'bg-[#0D9488] hover:bg-[#0F766E] text-white' 
+                                : 'bg-[#081C3A] hover:bg-[#0c2b59] text-white'
+                            }`}
+                          >
+                            <Calendar className="h-4.5 w-4.5" />
+                            <span>{mConfig.sec11_primary_label}</span>
+                          </button>
+                        )}
+
+                        {mConfig.sec11_secondary_label && mConfig.sec11_secondary_label.trim() !== '' && mConfig.sec11_whatsapp && mConfig.sec11_whatsapp.trim() !== '' && (
+                          <a
+                            href={`https://wa.me/${String(mConfig.sec11_whatsapp).replace(/[^\d+]/g, '').replace('+', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            referrerPolicy="no-referrer"
+                            className="px-8 py-4 sm:py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer"
+                          >
+                            <MessageCircle className="h-4.5 w-4.5" />
+                            <span>{mConfig.sec11_secondary_label}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 12: Frequently Asked Questions (FAQ) (100% CMS-driven premium accordion) */}
+                {mConfig.show_faq_sec !== false && (Array.isArray(mConfig.faqs) && mConfig.faqs.filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '').length > 0) && (
+                  <div className="pt-14 border-t border-slate-100 animate-fade-in" id="sec12-faq">
+                    <div className="max-w-4xl mx-auto px-4 space-y-8">
+                      <div className="text-center space-y-3">
+                        <span className="text-[10px] font-black text-[#0D9488] uppercase tracking-widest bg-teal-50 px-3 py-1 rounded-full">
+                          Support & Info
+                        </span>
+                        <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+                          {mConfig.faq_sec_heading || 'Frequently Asked Questions'}
+                        </h2>
+                        <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-2" />
+                      </div>
+
+                      <div className="space-y-4">
+                        {mConfig.faqs
+                          .filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '')
+                          .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
+                          .map((faq: any, idx: number) => {
+                            const isExpanded = expandedImplantFaqId === faq.id;
+                            return (
+                              <div 
+                                key={faq.id || idx}
+                                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
+                                  isExpanded 
+                                    ? 'border-[#0D9488]/30 shadow-2xs' 
+                                    : 'border-slate-150 hover:border-slate-300 shadow-3xs'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedImplantFaqId(isExpanded ? null : faq.id)}
+                                  className="w-full px-6 py-5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/40"
+                                >
+                                  <span className={`font-sans font-bold text-sm sm:text-base leading-snug pr-4 transition-colors duration-200 ${
+                                    isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
+                                  }`}>
+                                    {faq.question}
+                                  </span>
+                                  <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
+                                    isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-50 text-slate-400'
+                                  }`}>
+                                    <ChevronDown className="h-4 w-4 transition-transform duration-300" />
+                                  </span>
+                                </button>
+
+                                <AnimatePresence initial={false}>
+                                  {isExpanded && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    >
+                                      <div className="px-6 pb-6 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/50 bg-slate-50/20">
+                                        <p className="whitespace-pre-line font-medium">
+                                          {faq.answer}
+                                        </p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           }

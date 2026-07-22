@@ -480,7 +480,15 @@ export const serviceService = {
 
       if (error) {
         console.error('Error fetching service by slug:', error);
-        return null;
+        const services = await serviceService.getServices();
+        let found = services.find(s => s.slug === resolvedSlug);
+        if (!found && resolvedSlug === 'teeth-whitening') {
+          found = services.find(s => s.slug === 'laser-teeth-whitening');
+        }
+        if (!found && resolvedSlug === 'invisible-aligners') {
+          found = services.find(s => s.slug === 'clear-aligners');
+        }
+        return found || null;
       }
 
       if (!data) {
@@ -527,6 +535,17 @@ export const serviceService = {
             return fbData;
           }
         }
+
+        // If not found in database, fallback to DEFAULT_SERVICES
+        const services = await serviceService.getServices();
+        let found = services.find(s => s.slug === resolvedSlug);
+        if (!found && resolvedSlug === 'teeth-whitening') {
+          found = services.find(s => s.slug === 'laser-teeth-whitening');
+        }
+        if (!found && resolvedSlug === 'invisible-aligners') {
+          found = services.find(s => s.slug === 'clear-aligners');
+        }
+        return found || null;
       }
 
       if (data && data.id === 'implants-srv') {
@@ -562,7 +581,16 @@ export const serviceService = {
       return data;
     } catch (e) {
       console.error('Exception in getServiceBySlug:', e);
-      return null;
+      // Fallback on exception
+      const services = await serviceService.getServices();
+      let found = services.find(s => s.slug === resolvedSlug);
+      if (!found && resolvedSlug === 'teeth-whitening') {
+        found = services.find(s => s.slug === 'laser-teeth-whitening');
+      }
+      if (!found && resolvedSlug === 'invisible-aligners') {
+        found = services.find(s => s.slug === 'clear-aligners');
+      }
+      return found || null;
     }
   },
 
