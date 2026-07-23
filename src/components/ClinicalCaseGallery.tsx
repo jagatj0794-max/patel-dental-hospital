@@ -14,6 +14,7 @@ interface ClinicalCaseGalleryProps {
   heading?: string;
   description?: string;
   items: GalleryItem[];
+  singleGallery?: boolean;
 }
 
 const PREFERRED_CATEGORY_ORDER = [
@@ -46,6 +47,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
   heading = 'Clinical Case Gallery',
   description,
   items,
+  singleGallery = false,
 }) => {
   // Track window size for responsive 2-image desktop/tablet vs 1-image mobile layout
   const [isMobile, setIsMobile] = useState<boolean>(
@@ -60,7 +62,10 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Group items by category
+  // Lightbox state for zoomed view
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  // Group items by category (for multi-category mode)
   const groupedItems = React.useMemo(() => {
     const map: Record<string, GalleryItem[]> = {};
 
@@ -83,7 +88,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
     return map;
   }, [items]);
 
-  // Active categories with at least 1 image, sorted by preferred order then alphabetical
+  // Active categories with at least 1 image
   const activeCategories = React.useMemo(() => {
     const keys = Object.keys(groupedItems).filter((cat) => groupedItems[cat] && groupedItems[cat].length > 0);
     return keys.sort((a, b) => {
@@ -96,45 +101,104 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
     });
   }, [groupedItems]);
 
-  // Accordion state: open state for each category independently
+  // Accordion state
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     PREFERRED_CATEGORY_ORDER.forEach((cat) => {
-      initial[cat] = true; // default all active accordions to open
+      initial[cat] = true;
     });
     return initial;
   });
 
-  // Slider state: active start item index for each category independently
+  // Slider state
   const [slideIndices, setSlideIndices] = useState<Record<string, number>>({});
-
-  // Lightbox state for zoomed view
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Mouse & Touch drag coordinate state for sliding
   const [dragStartX, setDragStartX] = useState<number | null>(null);
 
-  if (activeCategories.length === 0) {
+  if (singleGallery) {
+    const validItems = Array.isArray(items)
+      ? items.filter((item) => item && item.image_url && item.image_url.trim() !== '')
+      : [];
+
     return (
-      <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="clinical-case-gallery">
+      <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-clinical-case-gallery">
+        {/* Section Header */}
         <div className="space-y-3 max-w-3xl mx-auto text-center">
           <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
             <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-            Clinical Excellence
+            Clinical Cases
           </span>
           <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
             {heading}
           </h2>
           {description && (
-            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium">
               {description}
             </p>
           )}
           <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
         </div>
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
-          Clinical case gallery images will be displayed here once uploaded in CMS.
-        </div>
+
+        {/* Flat Image Grid Gallery */}
+        {validItems.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
+            {validItems.map((item, idx) => (
+              <div
+                key={item.id || idx}
+                className="relative bg-white border border-slate-200/80 rounded-2xl p-2.5 flex flex-col items-center justify-center shadow-xs hover:shadow-md transition-all duration-300 hover:border-teal-400/60 group/img"
+              >
+                <div className="relative w-full overflow-hidden rounded-xl bg-slate-50">
+                  <img
+                    src={item.image_url}
+                    alt={item.caption || item.title || `Clinical Case ${idx + 1}`}
+                    draggable={false}
+                    className="max-h-[260px] sm:max-h-[300px] w-full object-cover mx-auto rounded-xl shadow-2xs cursor-zoom-in transition-transform duration-300 group-hover/img:scale-[1.02] select-none"
+                    onClick={() => setLightboxImage(item.image_url)}
+                    referrerPolicy="no-referrer"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImage(item.image_url)}
+                    className="absolute top-2.5 right-2.5 bg-white/90 hover:bg-[#0D9488] text-slate-700 hover:text-white p-2 rounded-full border border-slate-200 shadow-xs transition-all z-10 opacity-90 sm:opacity-0 group-hover/img:opacity-100"
+                    title="Expand Image"
+                  >
+                    <Maximize2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                {(item.caption || item.title) && (
+                  <p className="mt-2.5 text-xs font-bold text-slate-700 text-center px-1 truncate w-full font-sans">
+                    {item.caption || item.title}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Lightbox Modal */}
+        {lightboxImage && (
+          <div
+            className="fixed inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex items-center justify-center p-4"
+            onClick={() => setLightboxImage(null)}
+          >
+            <div className="relative max-w-5xl max-h-[90vh] w-full flex items-center justify-center">
+              <img
+                src={lightboxImage}
+                alt="Clinical Case Fullscreen"
+                className="max-h-[85vh] max-w-full object-contain rounded-2xl shadow-2xl border border-slate-800"
+                referrerPolicy="no-referrer"
+              />
+              <button
+                type="button"
+                onClick={() => setLightboxImage(null)}
+                className="absolute top-2 right-2 bg-slate-800/80 hover:bg-slate-700 text-white font-black h-10 w-10 rounded-full flex items-center justify-center text-xl border border-slate-600 transition-colors"
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

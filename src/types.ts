@@ -246,6 +246,9 @@ export interface MarketingConfig {
     after_image?: string;
     display_order: number;
   }[];
+  hospital_team_title?: string;
+  show_hospital_team_photos?: boolean;
+  [key: string]: any;
 }
 
 export interface Service {

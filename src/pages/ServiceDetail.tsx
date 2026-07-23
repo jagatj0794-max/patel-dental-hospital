@@ -41,16 +41,44 @@ function getFallbackMedia(slug: string, title: string) {
   let heroImg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
   let heroCap = 'State-of-the-art dental clinical care at Patel Dental Hospital.';
   
+  const isFullMouthSlug = slug === 'full-mouth-rehabilitation' || slug === 'fmr-srv' || slug === 'fullmouth';
+
   return {
     hero_image: heroImg,
     hero_image_caption: heroCap,
     content_images: [],
     gallery: [],
     procedure_video_url: '',
-    procedure_video_title: '',
+    procedure_video_title: isFullMouthSlug ? 'Full Mouth Rehabilitation Procedure' : '',
     procedure_video_description: '',
     procedure_video_thumbnail: '',
     patient_testimonials: [],
+    candidate_items: isFullMouthSlug ? [
+      {
+        id: 'cand-1',
+        title: '',
+        description: 'Worn out teeth due to Pan Masala chewing.',
+        display_order: 10
+      },
+      {
+        id: 'cand-2',
+        title: '',
+        description: 'Teeth lost due to trauma or accident.',
+        display_order: 20
+      },
+      {
+        id: 'cand-3',
+        title: '',
+        description: 'Sensitive eroded teeth due to prolonged acid erosion from meals, severe acidity, acid reflux disorder and excessive use of cold drinks and lemon juice.',
+        display_order: 30
+      },
+      {
+        id: 'cand-4',
+        title: '',
+        description: 'Temporomandibular joint disorder causing long-term headache, jaw muscle pain, joint pain, clicking sounds and ear pain due to improper traumatic bite.',
+        display_order: 40
+      }
+    ] : [],
     hospital_team_photos: [],
     process_steps: [],
     features: [],
@@ -109,9 +137,13 @@ export default function ServiceDetail({
     return service?.id === 'rct' || service?.id === 'rct-srv' || service?.slug === 'root-canal-treatment' || slug === 'root-canal-treatment';
   }, [service, slug]);
 
+  const isFullMouth = React.useMemo(() => {
+    return service?.id === 'fmr-srv' || service?.id === 'fullmouth' || service?.slug === 'full-mouth-rehabilitation' || slug === 'full-mouth-rehabilitation';
+  }, [service, slug]);
+
   const isNewArchitecture = React.useMemo(() => {
-    return isDentalImplants || isRootCanal;
-  }, [isDentalImplants, isRootCanal]);
+    return isDentalImplants || isRootCanal || isFullMouth;
+  }, [isDentalImplants, isRootCanal, isFullMouth]);
 
   const mConfig = React.useMemo(() => {
     if (!service || !service.marketing_config) return {};
@@ -159,6 +191,50 @@ export default function ServiceDetail({
     return fallback.gallery;
   }, [service, gallery, fallback, mConfig, isNewArchitecture]);
 
+  const displayCandidateItems = React.useMemo(() => {
+    if (Array.isArray(mConfig.candidate_items) && mConfig.candidate_items.length > 0) {
+      return mConfig.candidate_items;
+    }
+    if (service && Array.isArray((service as any).candidate_items) && (service as any).candidate_items.length > 0) {
+      return (service as any).candidate_items;
+    }
+    if (fallback?.marketing_config && Array.isArray(fallback.marketing_config.candidate_items) && fallback.marketing_config.candidate_items.length > 0) {
+      return fallback.marketing_config.candidate_items;
+    }
+    if (fallback && Array.isArray((fallback as any).candidate_items) && (fallback as any).candidate_items.length > 0) {
+      return (fallback as any).candidate_items;
+    }
+    if (isFullMouth) {
+      return [
+        {
+          id: 'cand-1',
+          title: '',
+          description: 'Worn out teeth due to Pan Masala chewing.',
+          display_order: 10
+        },
+        {
+          id: 'cand-2',
+          title: '',
+          description: 'Teeth lost due to trauma or accident.',
+          display_order: 20
+        },
+        {
+          id: 'cand-3',
+          title: '',
+          description: 'Sensitive eroded teeth due to prolonged acid erosion from meals, severe acidity, acid reflux disorder and excessive use of cold drinks and lemon juice.',
+          display_order: 30
+        },
+        {
+          id: 'cand-4',
+          title: '',
+          description: 'Temporomandibular joint disorder causing long-term headache, jaw muscle pain, joint pain, clicking sounds and ear pain due to improper traumatic bite.',
+          display_order: 40
+        }
+      ];
+    }
+    return [];
+  }, [mConfig, service, fallback, isFullMouth]);
+
   const displayTestimonials = React.useMemo(() => {
     if (!service) return [];
     let list: any[] = [];
@@ -179,23 +255,27 @@ export default function ServiceDetail({
       }
     }
     if (!list || list.length === 0) {
-      if (isDentalImplants) {
+      if (fallback && Array.isArray(fallback.patient_testimonials) && fallback.patient_testimonials.length > 0) {
+        return fallback.patient_testimonials;
+      }
+      if (fallback?.marketing_config && Array.isArray(fallback.marketing_config.patient_testimonials) && fallback.marketing_config.patient_testimonials.length > 0) {
+        return fallback.marketing_config.patient_testimonials;
+      }
+      if (isDentalImplants || isRootCanal || isFullMouth) {
         return [
           {
             id: 'testi-1',
-            patient_name: 'Patient Testimonial',
-            video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+            patient_name: isFullMouth ? 'Patient Full Mouth Journey' : 'Patient Testimonial',
+            video_url: isFullMouth ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+            treatment_name: service?.title || (isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Treatment'),
             display_order: 10
           }
         ];
       }
-      if (isRootCanal) {
-        return [];
-      }
-      return fallback.patient_testimonials || [];
+      return [];
     }
     return [...list].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [service, fallback, mConfig]);
+  }, [service, fallback, mConfig, isDentalImplants, isRootCanal, isFullMouth]);
 
   const displayTeamPhotos = React.useMemo(() => {
     let list: any[] = [];
@@ -529,11 +609,35 @@ export default function ServiceDetail({
   }, [service, fallback]);
 
   const beforeAfterPairs: any[] = React.useMemo(() => {
-    if (!mConfig || !Array.isArray(mConfig.before_after_pairs)) return [];
-    return [...mConfig.before_after_pairs]
+    let list: any[] = [];
+    if (mConfig && Array.isArray(mConfig.before_after_pairs) && mConfig.before_after_pairs.length > 0) {
+      list = mConfig.before_after_pairs;
+    } else if (service && Array.isArray((service as any).before_after_pairs) && (service as any).before_after_pairs.length > 0) {
+      list = (service as any).before_after_pairs;
+    } else if (fallback?.marketing_config && Array.isArray(fallback.marketing_config.before_after_pairs) && fallback.marketing_config.before_after_pairs.length > 0) {
+      list = fallback.marketing_config.before_after_pairs;
+    } else if (isFullMouth) {
+      list = [
+        {
+          id: 'fmr-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Full Mouth Reconstruction Case 1',
+          display_order: 10
+        },
+        {
+          id: 'fmr-ba-2',
+          before_image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=600',
+          caption: 'Full Mouth Reconstruction Case 2',
+          display_order: 20
+        }
+      ];
+    }
+    return [...list]
       .filter((p: any) => p && p.before_image && p.after_image)
       .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [mConfig]);
+  }, [mConfig, service, fallback, isFullMouth]);
 
   // If loading, display the skeleton state first
   if (isLoading) {
@@ -1248,21 +1352,25 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const defaultImplantsUrl = isDentalImplants ? 'https://www.instagram.com/reel/C8qLd9MyWwG/' : '';
-          const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultImplantsUrl || '').trim();
+          const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth) 
+            ? (isFullMouth ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
+            : (fallback?.procedure_video_url || fallback?.marketing_config?.procedure_video_url || '');
+          const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultVideoUrl || '').trim();
           
           let effectiveVideoTitle = '';
           const pVideoTitleVal = isNewArchitecture
-            ? (service?.procedure_video_title !== undefined ? service.procedure_video_title : mConfig.procedure_video_title)
+            ? (service?.procedure_video_title !== undefined && service?.procedure_video_title !== '' ? service.procedure_video_title : mConfig.procedure_video_title)
             : (service?.procedure_video_title || mConfig.procedure_video_title || mConfig.video_heading);
 
-          if (pVideoTitleVal === undefined || pVideoTitleVal === null) {
+          if (!pVideoTitleVal) {
             if (isDentalImplants) {
               effectiveVideoTitle = 'Screw Retained Prosthesis Procedure';
             } else if (isRootCanal) {
               effectiveVideoTitle = 'Single Sitting Root Canal Procedure';
+            } else if (isFullMouth) {
+              effectiveVideoTitle = 'Full Mouth Rehabilitation Procedure';
             } else {
-              effectiveVideoTitle = fallback.procedure_video_title || '';
+              effectiveVideoTitle = fallback.procedure_video_title || 'Procedure Video';
             }
           } else {
             effectiveVideoTitle = typeof pVideoTitleVal === 'string' ? pVideoTitleVal.trim() : '';
@@ -1279,27 +1387,31 @@ export default function ServiceDetail({
                 </div>
               )}
 
-              <div className="max-w-[440px] mx-auto w-full px-2 sm:px-0">
-                <InstagramEmbed
-                  url={effectiveVideoUrl}
-                  title={effectiveVideoTitle || 'Procedure Video'}
-                />
+              <div className="max-w-[640px] mx-auto w-full px-2 sm:px-0">
+                {isYouTubeUrl(effectiveVideoUrl) ? (
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
+                    <iframe
+                      src={getYouTubeEmbedUrl(effectiveVideoUrl)}
+                      title={effectiveVideoTitle || 'Procedure Video'}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <InstagramEmbed
+                    url={effectiveVideoUrl}
+                    title={effectiveVideoTitle || 'Procedure Video'}
+                  />
+                )}
               </div>
             </div>
           ) : null;
 
           const renderCombinedGallery = () => {
-            const isSectionEnabled = mConfig.show_hospital_photos !== false;
+            const isSectionEnabled = mConfig.show_hospital_photos !== false && mConfig.show_hospital_team_photos !== false;
             const hasCmsImages = displayTeamPhotos.length > 0;
-            const sectionTitle = (mConfig.hospital_team_title || mConfig.hospital_section_title || mConfig.hospital_photos_title || service?.hospital_team_title || '').trim();
-
-            console.log("==================================================");
-            console.log("CHECK 1 - Hospital & Team Gallery Debug Values:");
-            console.log("- mConfig.show_hospital_photos:", mConfig.show_hospital_photos);
-            console.log("- displayTeamPhotos.length:", displayTeamPhotos.length);
-            console.log("- displayTeamPhotos:", displayTeamPhotos);
-            console.log("- sectionTitle:", sectionTitle);
-            console.log("==================================================");
+            const sectionTitle = (mConfig.hospital_team_title || mConfig.hospital_section_title || mConfig.hospital_photos_title || service?.hospital_team_title || 'Hospital & Team Gallery').trim();
 
             if (!isSectionEnabled || !hasCmsImages) return null;
 
@@ -1386,10 +1498,22 @@ export default function ServiceDetail({
                   const patientName = typeof t.patient_name === 'string' ? t.patient_name.trim() : '';
                   return (
                     <div key={t.id || idx} className="flex flex-col items-center w-full">
-                      <InstagramEmbed
-                        url={reelUrl}
-                        title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
-                      />
+                      {isYouTubeUrl(reelUrl) ? (
+                        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
+                          <iframe
+                            src={getYouTubeEmbedUrl(reelUrl)}
+                            title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Video')}
+                            className="w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      ) : (
+                        <InstagramEmbed
+                          url={reelUrl}
+                          title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
+                        />
+                      )}
                       {patientName && patientName !== 'Patient Name' && (
                         <span className="text-xs font-bold text-slate-700 mt-2 text-center block">
                           {patientName}
@@ -1670,62 +1794,56 @@ export default function ServiceDetail({
                         Clinical Workflow
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.process_section_title || (isRootCanal ? 'How We Perform Single Sitting Root Canal' : 'How We Perform Dental Implants')}
+                        {mConfig.process_section_title || (isRootCanal ? 'How We Perform Single Sitting Root Canal' : isFullMouth ? 'How We Perform Full Mouth Rehabilitation' : 'How We Perform Dental Implants')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    {displaySteps.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
-                        {displaySteps.map((step, idx) => (
-                          <div 
-                            key={step.id || idx} 
-                            className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
-                          >
-                            {/* Step Number inside the same card */}
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="font-mono text-3xl sm:text-4xl font-black text-[#0D9488]/30 group-hover:text-[#0D9488]/60 transition-colors leading-none select-none">
-                                {String(idx + 1).padStart(2, '0')}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+                      {displaySteps.map((step, idx) => (
+                        <div 
+                          key={step.id || idx} 
+                          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                        >
+                          {/* Step Number inside the same card */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="font-mono text-3xl sm:text-4xl font-black text-[#0D9488]/30 group-hover:text-[#0D9488]/60 transition-colors leading-none select-none">
+                              {String(idx + 1).padStart(2, '0')}
+                            </span>
+                            {step.phase && (
+                              <span className="inline-block text-[11px] font-extrabold text-[#0D9488] bg-teal-50 px-3 py-1 rounded-full uppercase tracking-wider shrink-0 border border-teal-100/80">
+                                {step.phase}
                               </span>
-                              {step.phase && (
-                                <span className="inline-block text-[11px] font-extrabold text-[#0D9488] bg-teal-50 px-3 py-1 rounded-full uppercase tracking-wider shrink-0 border border-teal-100/80">
-                                  {step.phase}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Optional Step Title from CMS (if any) */}
-                            {step.title && step.title.trim() !== '' && (
-                              <h3 className="font-sans font-black text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
-                                {step.title}
-                              </h3>
-                            )}
-
-                            {/* Step Description */}
-                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                              {step.description}
-                            </p>
-
-                            {/* Optional Step Image */}
-                            {step.image_url && step.image_url.trim() !== '' && (
-                              <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
-                                <img
-                                  src={step.image_url}
-                                  alt={step.title || `Workflow step ${idx + 1}`}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  loading="lazy"
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
                             )}
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
-                        Clinical workflow steps will be displayed here once updated in CMS.
-                      </div>
-                    )}
+
+                          {/* Optional Step Title from CMS (if any) */}
+                          {step.title && step.title.trim() !== '' && (
+                            <h3 className="font-sans font-black text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
+                              {step.title}
+                            </h3>
+                          )}
+
+                          {/* Step Description */}
+                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
+                            {step.description}
+                          </p>
+
+                          {/* Optional Step Image */}
+                          {step.image_url && step.image_url.trim() !== '' && (
+                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
+                              <img
+                                src={step.image_url}
+                                alt={step.title || `Workflow step ${idx + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -1738,49 +1856,85 @@ export default function ServiceDetail({
                         Clinical Advantages
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.benefits_section_title || (isRootCanal ? 'Why Our Modern Root Canal Method is Superior' : 'Why Our Method Is Superior')}
+                        {mConfig.benefits_section_title || (isRootCanal ? 'Why Our Modern Root Canal Method is Superior' : isFullMouth ? 'Treatment Planning Includes' : 'Why Our Method Is Superior')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    {displayFeatures.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
-                        {displayFeatures.map((card, idx) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+                      {displayFeatures.map((card, idx) => (
+                        <div 
+                          key={card.id || idx} 
+                          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
+                              Benefit {idx + 1}
+                            </span>
+                          </div>
+                          {/* Card Description / Doctor's Original Description */}
+                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
+                            {card.description}
+                          </p>
+
+                          {/* Optional Card Image (if available) */}
+                          {(card.image_url || card.image) && (card.image_url || card.image).trim() !== '' && (
+                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
+                              <img
+                                src={card.image_url || card.image}
+                                alt={`Superiority feature ${idx + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 5: Who Is a Candidate for Full Mouth Rehabilitation */}
+                {(mConfig.show_candidate !== false && displayCandidateItems.length > 0) && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="candidate-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Users className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Candidate Profile
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        {mConfig.candidate_section_title || 'Who Is a Candidate for Full Mouth Rehabilitation'}
+                      </h2>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+                      {[...displayCandidateItems]
+                        .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
+                        .map((cand: any, idx: number) => (
                           <div 
-                            key={card.id || idx} 
+                            key={cand.id || idx} 
                             className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
                           >
                             <div className="flex items-center gap-2 mb-3">
                               <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0" />
                               <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                                Benefit {idx + 1}
+                                Indication {idx + 1}
                               </span>
                             </div>
-                            {/* Card Description / Doctor's Original Description */}
-                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                              {card.description}
-                            </p>
-
-                            {/* Optional Card Image (if available) */}
-                            {(card.image_url || card.image) && (card.image_url || card.image).trim() !== '' && (
-                              <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
-                                <img
-                                  src={card.image_url || card.image}
-                                  alt={`Superiority feature ${idx + 1}`}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  loading="lazy"
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
+                            {cand.title && cand.title.trim() !== '' && (
+                              <h3 className="font-sans font-black text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
+                                {cand.title}
+                              </h3>
                             )}
+                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
+                              {cand.description}
+                            </p>
                           </div>
                         ))}
-                      </div>
-                    ) : (
-                      <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
-                        Clinical advantages will be displayed here once updated in CMS.
-                      </div>
-                    )}
+                    </div>
                   </div>
                 )}
 
@@ -1796,7 +1950,7 @@ export default function ServiceDetail({
                         {mConfig.before_after_heading || 'Before & After Smile Transformations'}
                       </h2>
                       <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        {mConfig.before_after_description || 'See real smile transformations of our dental implant patients.'}
+                        {mConfig.before_after_description || (isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -1818,12 +1972,13 @@ export default function ServiceDetail({
                   </div>
                 )}
 
-                {/* Section 6: Clinical Case Gallery (CMS Category-based Accordion Sliders) */}
+                {/* Section 6: Clinical Case Gallery */}
                 {mConfig.show_gallery !== false && (
                   <ClinicalCaseGallery
                     heading={mConfig.gallery_heading || 'Clinical Case Gallery'}
                     description={mConfig.gallery_description}
                     items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
+                    singleGallery={isRootCanal || isFullMouth}
                   />
                 )}
 
@@ -1851,7 +2006,7 @@ export default function ServiceDetail({
                               Transparent Pricing
                             </span>
                             <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                              {mConfig.cost_heading || (isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : 'Cost of Dental Implants')}
+                              {mConfig.cost_heading || (isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
                             </h2>
                           </div>
 
@@ -1936,7 +2091,7 @@ export default function ServiceDetail({
                           Clinical Consultation
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                          {mConfig.sec11_heading || (isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : 'Book Your Dental Consultation')}
+                          {mConfig.sec11_heading || (isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
                         </h2>
                         {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
                           <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
@@ -1948,7 +2103,7 @@ export default function ServiceDetail({
                       <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
                         <button
                           type="button"
-                          onClick={() => openAppointmentModal(service?.title || 'Single Sitting Root Canal')}
+                          onClick={() => openAppointmentModal(service?.title || (isRootCanal ? 'Single Sitting Root Canal' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Implants'))}
                           className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                         >
                           <Calendar className="h-4.5 w-4.5 shrink-0" />
@@ -1986,65 +2141,59 @@ export default function ServiceDetail({
                         <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                       </div>
 
-                      {((Array.isArray(mConfig.faqs) && mConfig.faqs.length > 0 ? mConfig.faqs : faqs).filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '').length > 0) ? (
-                        <div className="space-y-3.5">
-                          {(Array.isArray(mConfig.faqs) && mConfig.faqs.length > 0 ? mConfig.faqs : faqs)
-                            .filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '')
-                            .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-                            .map((faq: any, idx: number) => {
-                              const isExpanded = expandedImplantFaqId === faq.id;
-                              return (
-                                <div 
-                                  key={faq.id || idx}
-                                  className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
-                                    isExpanded 
-                                      ? 'border-[#0D9488] shadow-xs' 
-                                      : 'border-slate-200/80 hover:border-slate-300 shadow-2xs'
-                                  }`}
+                      <div className="space-y-3.5">
+                        {(Array.isArray(mConfig.faqs) && mConfig.faqs.length > 0 ? mConfig.faqs : faqs)
+                          .filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '')
+                          .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
+                          .map((faq: any, idx: number) => {
+                            const isExpanded = expandedImplantFaqId === faq.id;
+                            return (
+                              <div 
+                                key={faq.id || idx}
+                                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
+                                  isExpanded 
+                                    ? 'border-[#0D9488] shadow-xs' 
+                                    : 'border-slate-200/80 hover:border-slate-300 shadow-2xs'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedImplantFaqId(isExpanded ? null : faq.id)}
+                                  aria-expanded={isExpanded}
+                                  className="w-full px-6 py-4.5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
                                 >
-                                  <button
-                                    type="button"
-                                    onClick={() => setExpandedImplantFaqId(isExpanded ? null : faq.id)}
-                                    aria-expanded={isExpanded}
-                                    className="w-full px-6 py-4.5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
-                                  >
-                                    <span className={`font-sans font-bold text-sm sm:text-base leading-snug pr-4 transition-colors duration-200 ${
-                                      isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
-                                    }`}>
-                                      {faq.question}
-                                    </span>
-                                    <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
-                                      isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-100 text-slate-500'
-                                    }`}>
-                                      <ChevronDown className="h-4 w-4" />
-                                    </span>
-                                  </button>
+                                  <span className={`font-sans font-bold text-sm sm:text-base leading-snug pr-4 transition-colors duration-200 ${
+                                    isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
+                                  }`}>
+                                    {faq.question}
+                                  </span>
+                                  <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
+                                    isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-100 text-slate-500'
+                                  }`}>
+                                    <ChevronDown className="h-4 w-4" />
+                                  </span>
+                                </button>
 
-                                  <AnimatePresence initial={false}>
-                                    {isExpanded && (
-                                      <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                      >
-                                        <div className="px-6 pb-5 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/80 bg-slate-50/40">
-                                          <p className="whitespace-pre-line font-medium font-sans">
-                                            {faq.answer}
-                                          </p>
-                                        </div>
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      ) : (
-                        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
-                          Frequently asked questions will be displayed here once updated in CMS.
-                        </div>
-                      )}
+                                <AnimatePresence initial={false}>
+                                  {isExpanded && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    >
+                                      <div className="px-6 pb-5 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/80 bg-slate-50/40">
+                                        <p className="whitespace-pre-line font-medium font-sans">
+                                          {faq.answer}
+                                        </p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            );
+                          })}
+                      </div>
                     </div>
                   </div>
                 )}

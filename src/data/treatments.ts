@@ -57,30 +57,31 @@ export const TREATMENTS: Treatment[] = [
   {
     id: 'fullmouth',
     title: 'Full Mouth Rehabilitation',
-    shortDesc: 'Comprehensive reconstruction of your entire bite, alignment, and aesthetic smile structure.',
-    longDesc: 'Full Mouth Rehabilitation is an advanced, highly customized combination of restorative, aesthetic, and neuromuscular dental procedures. It is specifically designed for patients with multiple missing teeth, severe structural wear, complex bite issues, or widespread breakdown. We rebuild your bite from the ground up for healthy muscle function and unmatched aesthetics.',
+    shortDesc: 'The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called Full Mouth Rehabilitation or Reconstruction or Restoration.',
+    longDesc: 'The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called as Full Mouth Rehabilitation or Reconstruction or Restoration.',
     benefits: [
-      'Corrects complex jaw alignments and chronic TMJ pain',
-      'Re-establishes a youthful, biochemically sound facial proportion',
-      'Combines crowns, bridges, and implants for unified structural strength',
-      'Fully customized to match your biological facial profile'
+      'Rebuilding or repairing all teeth, gums and temporomandibular joint',
+      'Establishing form, function and aesthetics of teeth, gums, joint and face',
+      'Customized treatment planning with multidisciplinary dental specialists'
     ],
-    duration: '2 - 3 Weeks (Phased planning)',
+    duration: '1 - 2 Weeks',
     image: imgFullmouth,
     popular: true
   },
   {
     id: 'rct',
-    title: 'Root Canal Treatment (RCT)',
-    shortDesc: 'Painless, highly advanced laser and rotary endodontics to save infected natural teeth.',
-    longDesc: 'We specialize in modern, painless micro-endodontics. Using premium digital apex locators, high-performance rotary instruments, and medical-grade laser sterilization, we extract infected pulp tissue, thoroughly sterilize the internal canal pathways, and seal them securely to comfortably preserve your natural dental structure for decades.',
+    title: 'Single Sitting Root Canal Treatment',
+    shortDesc: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient. In such conditions the dentist removes all decayed and infected portions of the tooth and cleans the root canal with files and medicine.',
+    longDesc: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient. In such conditions the dentist removes all decayed and infected portions of the tooth and cleans the root canal with files and medicine.\n\nAfter cleaning and disinfecting the root canal system, our dentist fills the canal with biocompatible materials like Gutta Percha and MTA.\n\nOur professionals top the tooth with a crown or permanent filling to add protection against decay.',
     benefits: [
-      'Virtually pain-free procedure under localized care',
-      'Saves your native tooth and avoids complex extractions',
-      'Prevents spreading infections to adjacent jawbone structures',
-      'Completed in single or dual sessions with minimal discomfort'
+      'No need for multiple visits.',
+      'Saves valuable time.',
+      'Only one local anesthesia injection.',
+      'Less medicine or no medicine after treatment in many cases.',
+      'Reduced chance of saliva cross infection compared to multiple sitting treatment.',
+      'Better long-term success of the saved tooth.'
     ],
-    duration: '1 - 2 Sessions',
+    duration: '1 Session (Single Sitting)',
     image: imgRct
   },
   {

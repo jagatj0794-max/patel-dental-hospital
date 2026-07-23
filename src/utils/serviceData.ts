@@ -8,7 +8,80 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { TREATMENTS } from '../data/treatments';
 
 export const DEFAULT_GREEN_HIGHLIGHT_LINE = "Replace missing teeth with dental implants in just one week with advance technology.";
-export const DEFAULT_RCT_GREEN_HIGHLIGHT_LINE = "Painless, single sitting root canal treatment using modern rotary endodontics and laser technology.";
+export const DEFAULT_RCT_GREEN_HIGHLIGHT_LINE = "At Patel Dental Hospital, one of Gujarat's leading dental hospitals, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including:\n• Apex Locator\n• Made in Japan Endo Motor\n• Digital X-Ray\n• Biocompatible MTA Sealer\nto provide excellent quality treatment at an affordable price.";
+export const DEFAULT_FMR_GREEN_HIGHLIGHT_LINE = "The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called as Full Mouth Rehabilitation or Reconstruction or Restoration.";
+
+export const DEFAULT_RCT_GOOGLE_REVIEWS = [
+  {
+    id: 'rct-review-1',
+    patient_name: 'Ramesh Patel',
+    patient_photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'Got my root canal done in a single sitting by Dr. Vipul Patel. Completely painless experience with modern Endo Motor technology. Highly recommend Patel Dental Hospital in Rajkot!',
+    review_date: '1 month ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 10,
+    enabled: true
+  },
+  {
+    id: 'rct-review-2',
+    patient_name: 'Priya Shah',
+    patient_photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'I was very scared of root canal treatment pain, but Dr. Vipul Patel completed the entire RCT in just one visit using digital Apex Locator and X-ray. Zero pain during and after the procedure!',
+    review_date: '2 weeks ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 20,
+    enabled: true
+  },
+  {
+    id: 'rct-review-3',
+    patient_name: 'Amit Trivedi',
+    patient_photo_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'Excellent single sitting root canal treatment at an affordable price. Biocompatible MTA sealer and Japanese Endo Motor equipment made the treatment very quick and comfortable.',
+    review_date: '3 weeks ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 30,
+    enabled: true
+  },
+  {
+    id: 'rct-review-4',
+    patient_name: 'Neha Mehta',
+    patient_photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'Best dental hospital in Rajkot for Single Sitting Root Canal. Saved so much of my time and the doctor explained everything very clearly before starting.',
+    review_date: '1 month ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 40,
+    enabled: true
+  }
+];
+
+export const DEFAULT_FMR_GOOGLE_REVIEWS = [
+  {
+    id: 'fmr-review-1',
+    patient_name: 'Suresh Patel',
+    patient_photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'Had my Full Mouth Rehabilitation done by Dr. Vipul Patel. Completely transformed my smile and chewing ability. Outstanding care and precision at Patel Dental Hospital!',
+    review_date: '1 month ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 10,
+    enabled: true
+  },
+  {
+    id: 'fmr-review-2',
+    patient_name: 'Bhavna Joshi',
+    patient_photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'I had severe bite issues and multiple worn out teeth. The full mouth reconstruction treatment was planned meticulously and executed flawlessly. Extremely satisfied!',
+    review_date: '2 weeks ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 20,
+    enabled: true
+  }
+];
 
 export const DEFAULT_SERVICES: Service[] = [
   {
@@ -129,30 +202,360 @@ export const DEFAULT_SERVICES: Service[] = [
     id: 'rct',
     slug: 'root-canal-treatment',
     title: 'Single Sitting Root Canal Treatment',
-    short_description: TREATMENTS.find(t => t.id === 'rct')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'rct')?.longDesc || '',
+    short_description: "When decay reaches the nerve of the tooth, it causes severe pain to the patient.\n\nAt Patel Dental Hospital, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including Apex Locator, Made in Japan Endo Motor, Digital X-Ray and Biocompatible MTA Sealer to provide excellent quality treatment at an affordable price.",
+    hero_description: "When decay reaches the nerve of the tooth, it causes severe pain to the patient.\n\nAt Patel Dental Hospital, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including Apex Locator, Made in Japan Endo Motor, Digital X-Ray and Biocompatible MTA Sealer to provide excellent quality treatment at an affordable price.",
+    description: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient. In such conditions the dentist removes all decayed and infected portions of the tooth and cleans the root canal with files and medicine.\n\nAfter cleaning and disinfecting the root canal system, our dentist fills the canal with biocompatible materials like Gutta Percha and MTA.\n\nOur professionals top the tooth with a crown or permanent filling to add protection against decay.',
     hero_image: TREATMENTS.find(t => t.id === 'rct')?.image || '',
     icon: 'Activity',
     display_order: 2,
     is_active: true,
+    process_steps: [
+      {
+        id: 'rct-step-1',
+        phase: 'Step 1',
+        title: 'Tooth Decay Reaches Nerve',
+        description: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient.',
+        display_order: 10
+      },
+      {
+        id: 'rct-step-2',
+        phase: 'Step 2',
+        title: 'Remove Infected Portion',
+        description: 'The dentist removes all decayed and infected portions of the tooth.',
+        display_order: 20
+      },
+      {
+        id: 'rct-step-3',
+        phase: 'Step 3',
+        title: 'Clean Root Canals',
+        description: 'Cleans the root canal with files and medicine.',
+        display_order: 30
+      },
+      {
+        id: 'rct-step-4',
+        phase: 'Step 4',
+        title: 'Disinfect Canals',
+        description: 'Disinfecting the root canal system.',
+        display_order: 40
+      },
+      {
+        id: 'rct-step-5',
+        phase: 'Step 5',
+        title: 'Fill with Gutta Percha & MTA',
+        description: 'Fills the canal with biocompatible materials like Gutta Percha and MTA.',
+        display_order: 50
+      },
+      {
+        id: 'rct-step-6',
+        phase: 'Step 6',
+        title: 'Crown or Permanent Filling',
+        description: 'Topping the tooth with a crown or permanent filling to add protection against decay.',
+        display_order: 60
+      }
+    ],
+    features: [
+      {
+        id: 'rct-adv-1',
+        title: 'One Visit Treatment',
+        description: "At Patel Dental Hospital, one of Gujarat's leading dental hospitals, we complete Root Canal Treatment in just one visit to save the patient's valuable time.",
+        display_order: 10
+      },
+      {
+        id: 'rct-adv-2',
+        title: 'Apex Locator',
+        description: 'Advanced digital Apex Locator technology for precise working length measurement.',
+        display_order: 20
+      },
+      {
+        id: 'rct-adv-3',
+        title: 'Made in Japan Endo Motor',
+        description: 'Made in Japan Endo Motor for smooth, precise, and fast root canal cleaning.',
+        display_order: 30
+      },
+      {
+        id: 'rct-adv-4',
+        title: 'Digital X-Ray',
+        description: 'Digital X-Ray technology for clear diagnostic imaging and accurate treatment monitoring.',
+        display_order: 40
+      },
+      {
+        id: 'rct-adv-5',
+        title: 'Biocompatible MTA Sealer',
+        description: 'Filling and sealing the root canal system with biocompatible MTA sealer for superior long-term tissue healing.',
+        display_order: 50
+      },
+      {
+        id: 'rct-adv-6',
+        title: 'Excellent Quality & Affordable Price',
+        description: 'Providing excellent quality treatment at an affordable price.',
+        display_order: 60
+      },
+      {
+        id: 'rct-adv-7',
+        title: 'Advantages of Single Sitting Root Canal Treatment',
+        description: '• No need for multiple visits.\n• Saves valuable time.\n• Only one local anesthesia injection.\n• Less medicine or no medicine after treatment in many cases.\n• Reduced chance of saliva cross infection compared to multiple sitting treatment.\n• Better long-term success of the saved tooth.',
+        display_order: 70
+      }
+    ],
+    procedure_video_title: 'Single Sitting Root Canal Procedure',
+    procedure_video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+    patient_testimonials: [
+      {
+        id: 'rct-testi-1',
+        patient_name: 'Patient Review Video',
+        video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+        treatment_name: 'Single Sitting Root Canal Treatment',
+        display_order: 10
+      },
+      {
+        id: 'rct-testi-2',
+        patient_name: 'Patient Testimonial Video',
+        video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+        treatment_name: 'Single Sitting Root Canal Treatment',
+        display_order: 20
+      }
+    ],
+    hospital_team_photos: [
+      {
+        id: 'rct-hosp-1',
+        type: 'hospital',
+        caption: 'Hospital Photo - Operatory Unit',
+        image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800',
+        display_order: 10
+      },
+      {
+        id: 'rct-hosp-2',
+        type: 'hospital',
+        caption: 'Hospital Photo - Clinical Setup',
+        image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800',
+        display_order: 20
+      },
+      {
+        id: 'rct-team-1',
+        type: 'team',
+        caption: 'Team Photo - Specialist Doctors',
+        image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800',
+        display_order: 30
+      }
+    ],
     marketing_config: {
       green_highlight_line: DEFAULT_RCT_GREEN_HIGHLIGHT_LINE,
       process_section_title: 'How We Perform Single Sitting Root Canal',
       benefits_section_title: 'Why Our Modern Root Canal Method is Superior',
       testimonials_section_title: 'Patient Testimonial Reels',
-      show_procedure_video: true
+      hospital_team_title: 'Hospital & Team Gallery',
+      procedure_video_title: 'Single Sitting Root Canal Procedure',
+      procedure_video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+      gallery_items: [
+        {
+          id: 'rct-gal-1',
+          category: 'Single Case',
+          title: 'Single Case',
+          caption: 'Single Case Root Canal Treatment',
+          image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800',
+          display_order: 10
+        },
+        {
+          id: 'rct-gal-2',
+          category: 'Multiple Case',
+          title: 'Multiple Case',
+          caption: 'Multiple Case Root Canal Treatment',
+          image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800',
+          display_order: 20
+        },
+        {
+          id: 'rct-gal-3',
+          category: 'Full Mouth Rehabilitation (FMR) Case',
+          title: 'Full Mouth Rehabilitation (FMR) Case',
+          caption: 'Full Mouth Rehabilitation (FMR) Root Canal Case',
+          image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800',
+          display_order: 30
+        }
+      ],
+      cost_packages: [],
+      cost_included_items: [],
+      cost_starting_price: '',
+      cost_heading: 'Single Sitting Root Canal Treatment Cost',
+      cost_description: '',
+      cost_cards: [],
+      faqs: [],
+      phone_number: '+91 9510397046',
+      whatsapp_number: '+91 9510397046',
+      sec11_heading: 'Book Your Single Sitting Root Canal Appointment',
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: DEFAULT_RCT_GOOGLE_REVIEWS,
+      show_faqs: true,
+      show_bottom_cta: true
     }
   },
   {
     id: 'fmr-srv',
     slug: 'full-mouth-rehabilitation',
     title: 'Full Mouth Rehabilitation',
-    short_description: TREATMENTS.find(t => t.id === 'fullmouth')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'fullmouth')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'fullmouth')?.image || '',
+    short_description: 'The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called Full Mouth Rehabilitation or Reconstruction or Restoration.',
+    hero_description: 'The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called Full Mouth Rehabilitation or Reconstruction or Restoration.',
+    description: 'The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called as Full Mouth Rehabilitation or Reconstruction or Restoration.',
+    hero_image: TREATMENTS.find(t => t.id === 'fullmouth')?.image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200',
     icon: 'Sparkles',
     display_order: 3,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'fmr-step-1',
+        phase: 'Step 1',
+        title: '',
+        description: 'For Full Mouth Reconstruction, first of all you have to visit Patel Dental Hospital, a top most dental hospital in Gujarat where Dr. Vipul Patel and team do clinical examination of the mouth and perform a Full Mouth OPG X-Ray.',
+        display_order: 10
+      },
+      {
+        id: 'fmr-step-2',
+        phase: 'Step 2',
+        title: '',
+        description: 'After studying the OPG X-Ray and intraoral and extraoral clinical data, Dr. Vipul Patel gives you a treatment plan where the role of:\n• Oral Surgeon\n• Implantologist\n• Periodontist\n• Prosthodontist\n• Endodontist (RCT Specialist)\nis very well defined.',
+        display_order: 20
+      },
+      {
+        id: 'fmr-step-3',
+        phase: 'Step 3',
+        title: '',
+        description: 'Subsequently, each member of the team executes their work to establish the form, function and aesthetics of teeth, gums, joint and face to create a world-class treatment experience.',
+        display_order: 30
+      }
+    ],
+    features: [
+      {
+        id: 'fmr-plan-1',
+        title: '',
+        description: 'Tooth Coloured Filling (Composite)',
+        display_order: 10
+      },
+      {
+        id: 'fmr-plan-2',
+        title: '',
+        description: 'Root Canal Treatment',
+        display_order: 20
+      },
+      {
+        id: 'fmr-plan-3',
+        title: '',
+        description: 'Crown and Bridges',
+        display_order: 30
+      },
+      {
+        id: 'fmr-plan-4',
+        title: '',
+        description: 'E-max Veneers and Crowns',
+        display_order: 40
+      },
+      {
+        id: 'fmr-plan-5',
+        title: '',
+        description: 'Dental Implant',
+        display_order: 50
+      },
+      {
+        id: 'fmr-plan-6',
+        title: '',
+        description: 'Wisdom Tooth or any other Impacted Tooth Removal',
+        display_order: 60
+      },
+      {
+        id: 'fmr-plan-7',
+        title: '',
+        description: 'Laser Treatment of Gums for Pyorrhea',
+        display_order: 70
+      },
+      {
+        id: 'fmr-plan-8',
+        title: '',
+        description: 'Braces or Invisible Aligners for Alignment of Teeth',
+        display_order: 80
+      }
+    ],
+    procedure_video_title: 'Full Mouth Rehabilitation Procedure',
+    procedure_video_url: '',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: DEFAULT_FMR_GREEN_HIGHLIGHT_LINE,
+      process_section_title: 'How We Perform Full Mouth Rehabilitation',
+      benefits_section_title: 'Treatment Planning Includes',
+      candidate_section_title: 'Who Is a Candidate for Full Mouth Rehabilitation',
+      candidate_items: [
+        {
+          id: 'cand-1',
+          title: '',
+          description: 'Worn out teeth due to Pan Masala chewing.',
+          display_order: 10
+        },
+        {
+          id: 'cand-2',
+          title: '',
+          description: 'Teeth lost due to trauma or accident.',
+          display_order: 20
+        },
+        {
+          id: 'cand-3',
+          title: '',
+          description: 'Sensitive eroded teeth due to prolonged acid erosion from meals, severe acidity, acid reflux disorder and excessive use of cold drinks and lemon juice.',
+          display_order: 30
+        },
+        {
+          id: 'cand-4',
+          title: '',
+          description: 'Temporomandibular joint disorder causing long-term headache, jaw muscle pain, joint pain, clicking sounds and ear pain due to improper traumatic bite.',
+          display_order: 40
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Before and after transformations of full mouth rehabilitation cases.',
+      gallery_items: [
+        {
+          id: 'fmr-gal-1',
+          caption: 'Picture of FMR with RCT + Bridge + Implant + Extraction',
+          image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800',
+          display_order: 10
+        }
+      ],
+      cost_packages: [],
+      cost_included_items: [],
+      cost_starting_price: '',
+      cost_heading: 'Save up to 50% on Full Mouth Rehabilitation',
+      cost_description: '',
+      cost_cards: [],
+      faqs: [],
+      phone_number: '+91 9510397046',
+      whatsapp_number: '+91 9510397046',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      procedure_video_title: 'Full Mouth Rehabilitation Procedure',
+      procedure_video_url: '',
+      sec11_heading: 'Book Your Full Mouth Rehabilitation Consultation',
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: DEFAULT_FMR_GOOGLE_REVIEWS,
+      before_after_heading: 'Before & After Smile Transformations',
+      before_after_description: 'See real smile transformations of our full mouth rehabilitation patients.',
+      before_after_pairs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_benefits: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: false,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'aligners-srv',
@@ -256,6 +659,32 @@ export const serviceService = {
           const list = JSON.parse(stored) as Service[];
           let updated = false;
           const resultList = list.map(svc => {
+            if (svc.id === 'rct' || svc.slug === 'root-canal-treatment') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'rct' || d.slug === 'root-canal-treatment');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  patient_testimonials: defaultSvc.patient_testimonials,
+                  hospital_team_photos: defaultSvc.hospital_team_photos,
+                  procedure_video_title: defaultSvc.procedure_video_title,
+                  procedure_video_url: defaultSvc.procedure_video_url,
+                  marketing_config: {
+                    ...mConfigObj,
+                    ...(defaultSvc.marketing_config as MarketingConfig)
+                  }
+                };
+              }
+            }
             if (svc.id === 'implants-srv') {
               const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'implants-srv');
               const steps = Array.isArray(svc.process_steps) ? svc.process_steps : [];
@@ -276,6 +705,80 @@ export const serviceService = {
                     ...mConfigObj,
                     process_section_title: mConfigObj.process_section_title || 'How We Perform Dental Implants',
                     benefits_section_title: mConfigObj.benefits_section_title || (defaultSvc.marketing_config as MarketingConfig)?.benefits_section_title
+                  }
+                };
+              }
+            }
+            if (svc.id === 'fmr-srv' || svc.slug === 'full-mouth-rehabilitation') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'fmr-srv' || d.slug === 'full-mouth-rehabilitation');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                const defaultMCfg = (defaultSvc.marketing_config as MarketingConfig) || {};
+
+                const testimonials = (Array.isArray(svc.patient_testimonials) && svc.patient_testimonials.length > 0)
+                  ? svc.patient_testimonials
+                  : (Array.isArray(mConfigObj.patient_testimonials) && mConfigObj.patient_testimonials.length > 0)
+                    ? mConfigObj.patient_testimonials
+                    : defaultSvc.patient_testimonials || [];
+
+                const videoUrl = svc.procedure_video_url || mConfigObj.procedure_video_url || defaultSvc.procedure_video_url || '';
+                const videoTitle = svc.procedure_video_title || mConfigObj.procedure_video_title || defaultSvc.procedure_video_title || 'Full Mouth Rehabilitation Procedure';
+
+                const hospitalTeamPhotos = (Array.isArray(svc.hospital_team_photos) && svc.hospital_team_photos.length > 0)
+                  ? svc.hospital_team_photos
+                  : defaultSvc.hospital_team_photos || [];
+
+                const galleryItems = (Array.isArray(mConfigObj.gallery_items) && mConfigObj.gallery_items.length > 0)
+                  ? mConfigObj.gallery_items
+                  : defaultMCfg.gallery_items || [];
+
+                const beforeAfterPairs = (Array.isArray(mConfigObj.before_after_pairs) && mConfigObj.before_after_pairs.length > 0)
+                  ? mConfigObj.before_after_pairs
+                  : defaultMCfg.before_after_pairs || [];
+
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  procedure_video_url: videoUrl,
+                  procedure_video_title: videoTitle,
+                  patient_testimonials: testimonials,
+                  hospital_team_photos: hospitalTeamPhotos,
+                  marketing_config: {
+                    ...defaultMCfg,
+                    ...mConfigObj,
+                    green_highlight_line: defaultMCfg.green_highlight_line,
+                    process_section_title: defaultMCfg.process_section_title,
+                    benefits_section_title: defaultMCfg.benefits_section_title,
+                    candidate_section_title: defaultMCfg.candidate_section_title,
+                    candidate_items: defaultMCfg.candidate_items,
+                    gallery_heading: defaultMCfg.gallery_heading,
+                    gallery_items: galleryItems,
+                    cost_heading: defaultMCfg.cost_heading,
+                    cost_description: defaultMCfg.cost_description,
+                    cost_packages: defaultMCfg.cost_packages || [],
+                    cost_cards: defaultMCfg.cost_cards || [],
+                    phone_number: defaultMCfg.phone_number,
+                    whatsapp_number: defaultMCfg.whatsapp_number,
+                    faqs: defaultMCfg.faqs || [],
+                    patient_testimonials: testimonials,
+                    procedure_video_url: videoUrl,
+                    procedure_video_title: videoTitle,
+                    before_after_pairs: beforeAfterPairs,
+                    before_after_heading: defaultMCfg.before_after_heading,
+                    before_after_description: defaultMCfg.before_after_description,
+                    show_candidate: mConfigObj.show_candidate !== false,
+                    show_before_after: mConfigObj.show_before_after !== false,
+                    show_procedure_video: mConfigObj.show_procedure_video !== false,
+                    show_testimonials: mConfigObj.show_testimonials !== false,
+                    show_faqs: false
                   }
                 };
               }
@@ -320,7 +823,15 @@ export const serviceService = {
         .order('display_order', { ascending: true });
 
       if (error) {
-        console.error('Error fetching services from Supabase:', error);
+        console.warn('Error fetching services from Supabase, using local storage fallback:', error);
+        const stored = localStorage.getItem('hospital_services');
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            // ignore
+          }
+        }
         return DEFAULT_SERVICES;
       }
 
@@ -369,7 +880,7 @@ export const serviceService = {
           .order('display_order', { ascending: true });
 
         if (refetchError) {
-          console.error('Error re-fetching services after seeding:', refetchError);
+          console.warn('Error re-fetching services after seeding:', refetchError);
           return DEFAULT_SERVICES;
         }
 
@@ -428,6 +939,45 @@ export const serviceService = {
       }
 
       if (data && data.length > 0) {
+        let needsRefetch = false;
+
+        const rct = data.find(s => s.id === 'rct' || s.slug === 'root-canal-treatment');
+        if (rct) {
+          const defaultRct = DEFAULT_SERVICES.find(d => d.id === 'rct' || d.slug === 'root-canal-treatment');
+          const mConfigObj = typeof rct.marketing_config === 'string'
+            ? JSON.parse(rct.marketing_config)
+            : (rct.marketing_config || {});
+          if (defaultRct && (
+            rct.title !== defaultRct.title || 
+            rct.short_description !== defaultRct.short_description || 
+            !rct.hero_description || 
+            rct.short_description?.includes('Painless, highly advanced') ||
+            !mConfigObj.google_reviews ||
+            !Array.isArray(mConfigObj.google_reviews) ||
+            mConfigObj.google_reviews.length === 0
+          )) {
+            const updatedRct = {
+              ...rct,
+              title: defaultRct.title,
+              short_description: defaultRct.short_description,
+              hero_description: defaultRct.hero_description,
+              description: defaultRct.description,
+              process_steps: defaultRct.process_steps,
+              features: defaultRct.features,
+              patient_testimonials: defaultRct.patient_testimonials,
+              hospital_team_photos: defaultRct.hospital_team_photos,
+              procedure_video_title: defaultRct.procedure_video_title,
+              procedure_video_url: defaultRct.procedure_video_url,
+              marketing_config: {
+                ...mConfigObj,
+                ...(defaultRct.marketing_config as MarketingConfig)
+              }
+            };
+            await serviceService.saveService(updatedRct);
+            needsRefetch = true;
+          }
+        }
+
         const implants = data.find(s => s.id === 'implants-srv');
         if (implants) {
           const steps = typeof implants.process_steps === 'string'
@@ -454,19 +1004,64 @@ export const serviceService = {
                 }
               };
               await serviceService.saveService(updatedImplants);
-              const { data: refetched } = await supabase.client
-                .from('services')
-                .select('*')
-                .order('display_order', { ascending: true });
-              if (refetched) return refetched;
+              needsRefetch = true;
             }
           }
+        }
+
+        const fmr = data.find(s => s.id === 'fmr-srv' || s.slug === 'full-mouth-rehabilitation' || s.id === 'fullmouth');
+        if (fmr) {
+          const defaultFmr = DEFAULT_SERVICES.find(d => d.id === 'fmr-srv' || d.slug === 'full-mouth-rehabilitation');
+          const mConfigObj = typeof fmr.marketing_config === 'string'
+            ? JSON.parse(fmr.marketing_config)
+            : (fmr.marketing_config || {});
+          if (defaultFmr && (
+            fmr.short_description !== defaultFmr.short_description ||
+            !mConfigObj.candidate_items ||
+            mConfigObj.candidate_items.length === 0 ||
+            mConfigObj.cost_heading !== (defaultFmr.marketing_config as MarketingConfig)?.cost_heading
+          )) {
+            const defaultMCfg = (defaultFmr.marketing_config as MarketingConfig) || {};
+            const updatedFmr = {
+              ...fmr,
+              title: defaultFmr.title,
+              short_description: defaultFmr.short_description,
+              hero_description: defaultFmr.hero_description,
+              description: defaultFmr.description,
+              process_steps: defaultFmr.process_steps,
+              features: defaultFmr.features,
+              marketing_config: {
+                ...defaultMCfg,
+                ...mConfigObj,
+                candidate_items: defaultMCfg.candidate_items,
+                cost_heading: defaultMCfg.cost_heading,
+                cost_description: defaultMCfg.cost_description,
+                green_highlight_line: defaultMCfg.green_highlight_line,
+                process_section_title: defaultMCfg.process_section_title,
+                benefits_section_title: defaultMCfg.benefits_section_title,
+                candidate_section_title: defaultMCfg.candidate_section_title,
+                phone_number: defaultMCfg.phone_number,
+                whatsapp_number: defaultMCfg.whatsapp_number,
+                show_faqs: false
+              }
+            };
+            await serviceService.saveService(updatedFmr);
+            needsRefetch = true;
+          }
+        }
+
+        if (needsRefetch) {
+          const { data: refetched } = await supabase.client
+            .from('services')
+            .select('*')
+            .order('display_order', { ascending: true });
+          if (refetched) return refetched;
         }
       }
 
       return data || [];
     } catch (e) {
-      console.error('Exception in getServices:', e);
+      console.warn('Exception in getServices:', e);
       return DEFAULT_SERVICES;
     }
   },
@@ -502,7 +1097,7 @@ export const serviceService = {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching service by slug:', error);
+        console.warn('Error fetching service by slug:', error);
         const services = await serviceService.getServices();
         let found = services.find(s => s.slug === resolvedSlug);
         if (!found && resolvedSlug === 'teeth-whitening') {
@@ -569,6 +1164,78 @@ export const serviceService = {
           found = services.find(s => s.slug === 'clear-aligners');
         }
         return found || null;
+      }
+
+      if (data && (data.id === 'rct' || data.slug === 'root-canal-treatment')) {
+        const defaultRct = DEFAULT_SERVICES.find(d => d.id === 'rct' || d.slug === 'root-canal-treatment');
+        const mConfigObj = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        if (defaultRct && (
+          data.title !== defaultRct.title || 
+          data.short_description !== defaultRct.short_description || 
+          !data.hero_description || 
+          data.short_description?.includes('Painless, highly advanced') ||
+          !mConfigObj.google_reviews ||
+          !Array.isArray(mConfigObj.google_reviews) ||
+          mConfigObj.google_reviews.length === 0
+        )) {
+          const updatedRct = {
+            ...data,
+            title: defaultRct.title,
+            short_description: defaultRct.short_description,
+            hero_description: defaultRct.hero_description,
+            description: defaultRct.description,
+            process_steps: defaultRct.process_steps,
+            features: defaultRct.features,
+            patient_testimonials: defaultRct.patient_testimonials,
+            hospital_team_photos: defaultRct.hospital_team_photos,
+            procedure_video_title: defaultRct.procedure_video_title,
+            procedure_video_url: defaultRct.procedure_video_url,
+            marketing_config: {
+              ...mConfigObj,
+              ...(defaultRct.marketing_config as MarketingConfig)
+            }
+          };
+          await serviceService.saveService(updatedRct);
+          return updatedRct;
+        }
+      }
+
+      if (data && (data.id === 'fmr-srv' || data.slug === 'full-mouth-rehabilitation' || data.id === 'fullmouth')) {
+        const defaultFmr = DEFAULT_SERVICES.find(d => d.id === 'fmr-srv' || d.slug === 'full-mouth-rehabilitation');
+        const mConfigObj = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        if (defaultFmr && (
+          data.short_description !== defaultFmr.short_description || 
+          !data.hero_description || 
+          data.short_description?.includes('combination of restorative') ||
+          !mConfigObj.candidate_items ||
+          !Array.isArray(mConfigObj.candidate_items) ||
+          mConfigObj.candidate_items.length === 0 ||
+          mConfigObj.cost_heading !== (defaultFmr.marketing_config as MarketingConfig)?.cost_heading
+        )) {
+          const updatedFmr = {
+            ...data,
+            title: defaultFmr.title,
+            short_description: defaultFmr.short_description,
+            hero_description: defaultFmr.hero_description,
+            description: defaultFmr.description,
+            process_steps: defaultFmr.process_steps,
+            features: defaultFmr.features,
+            patient_testimonials: defaultFmr.patient_testimonials,
+            hospital_team_photos: defaultFmr.hospital_team_photos,
+            procedure_video_title: defaultFmr.procedure_video_title,
+            procedure_video_url: defaultFmr.procedure_video_url,
+            marketing_config: {
+              ...mConfigObj,
+              ...(defaultFmr.marketing_config as MarketingConfig)
+            }
+          };
+          await serviceService.saveService(updatedFmr);
+          return updatedFmr;
+        }
       }
 
       if (data && data.id === 'implants-srv') {

@@ -5,7 +5,7 @@ import {
   Sparkles, MessageSquare, ArrowUp, ArrowDown, Info, Upload, Star, HelpCircle, Stethoscope
 } from 'lucide-react';
 import { Service } from '../types';
-import { serviceService } from '../utils/serviceData';
+import { serviceService, DEFAULT_RCT_GOOGLE_REVIEWS } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
 
@@ -72,59 +72,180 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             id: 'rct',
             slug: 'root-canal-treatment',
             title: 'Single Sitting Root Canal Treatment',
-            short_description: 'Pain-free, advanced single sitting root canal therapy in 30 minutes.',
-            description: 'Get your root canal done in a single sitting with painless laser and rotary endodontic treatment.',
+            short_description: "When decay reaches the nerve of the tooth, it causes severe pain to the patient.\n\nAt Patel Dental Hospital, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including Apex Locator, Made in Japan Endo Motor, Digital X-Ray and Biocompatible MTA Sealer to provide excellent quality treatment at an affordable price.",
+            hero_description: "When decay reaches the nerve of the tooth, it causes severe pain to the patient.\n\nAt Patel Dental Hospital, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including Apex Locator, Made in Japan Endo Motor, Digital X-Ray and Biocompatible MTA Sealer to provide excellent quality treatment at an affordable price.",
+            description: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient. In such conditions the dentist removes all decayed and infected portions of the tooth and cleans the root canal with files and medicine.\n\nAfter cleaning and disinfecting the root canal system, our dentist fills the canal with biocompatible materials like Gutta Percha and MTA.\n\nOur professionals top the tooth with a crown or permanent filling to add protection against decay.',
             hero_image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200',
             icon: 'Activity',
             display_order: 2,
             is_active: true,
             process_steps: [
               {
-                id: 'step-1',
-                title: '3D CBCT & Digital X-Ray Diagnosis',
-                description: 'In-depth digital scanning to pinpoint root canals with 3D precision.',
+                id: 'rct-step-1',
+                phase: 'Step 1',
+                title: 'Tooth Decay Reaches Nerve',
+                description: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient.',
                 display_order: 10
               },
               {
-                id: 'step-2',
-                title: 'Painless Local Anesthesia & Cleaning',
-                description: 'Complete numbing followed by rotary canal shaping and bio-sanitization.',
+                id: 'rct-step-2',
+                phase: 'Step 2',
+                title: 'Remove Infected Portion',
+                description: 'The dentist removes all decayed and infected portions of the tooth.',
                 display_order: 20
               },
               {
-                id: 'step-3',
-                title: 'Laser Sterilization & Biocompatible Filling',
-                description: 'Laser disinfection and 3D gutta-percha canal sealing completed in one visit.',
+                id: 'rct-step-3',
+                phase: 'Step 3',
+                title: 'Clean Root Canals',
+                description: 'Cleans the root canal with files and medicine.',
                 display_order: 30
+              },
+              {
+                id: 'rct-step-4',
+                phase: 'Step 4',
+                title: 'Disinfect Canals',
+                description: 'Disinfecting the root canal system.',
+                display_order: 40
+              },
+              {
+                id: 'rct-step-5',
+                phase: 'Step 5',
+                title: 'Fill with Gutta Percha & MTA',
+                description: 'Fills the canal with biocompatible materials like Gutta Percha and MTA.',
+                display_order: 50
+              },
+              {
+                id: 'rct-step-6',
+                phase: 'Step 6',
+                title: 'Crown or Permanent Filling',
+                description: 'Topping the tooth with a crown or permanent filling to add protection against decay.',
+                display_order: 60
               }
             ],
             features: [
               {
-                id: 'sup-1',
-                title: 'Pain-Free Anesthesia Protocol',
-                description: 'Advanced computerized local numbing ensures zero discomfort during treatment.',
+                id: 'rct-adv-1',
+                title: 'One Visit Treatment',
+                description: "At Patel Dental Hospital, one of Gujarat's leading dental hospitals, we complete Root Canal Treatment in just one visit to save the patient's valuable time.",
                 display_order: 10
               },
               {
-                id: 'sup-2',
-                title: 'Single Sitting Completion',
-                description: 'Complete treatment in 30 to 45 minutes without requiring multiple painful visits.',
+                id: 'rct-adv-2',
+                title: 'Apex Locator',
+                description: 'Advanced digital Apex Locator technology for precise working length measurement.',
                 display_order: 20
               },
               {
-                id: 'sup-3',
-                title: '3D Rotary & Laser Endodontics',
-                description: 'Microscopic precision canal cleaning preventing secondary infection risks.',
+                id: 'rct-adv-3',
+                title: 'Made in Japan Endo Motor',
+                description: 'Made in Japan Endo Motor for smooth, precise, and fast root canal cleaning.',
+                display_order: 30
+              },
+              {
+                id: 'rct-adv-4',
+                title: 'Digital X-Ray',
+                description: 'Digital X-Ray technology for clear diagnostic imaging and accurate treatment monitoring.',
+                display_order: 40
+              },
+              {
+                id: 'rct-adv-5',
+                title: 'Biocompatible MTA Sealer',
+                description: 'Filling and sealing the root canal system with biocompatible MTA sealer for superior long-term tissue healing.',
+                display_order: 50
+              },
+              {
+                id: 'rct-adv-6',
+                title: 'Excellent Quality & Affordable Price',
+                description: 'Providing excellent quality treatment at an affordable price.',
+                display_order: 60
+              },
+              {
+                id: 'rct-adv-7',
+                title: 'Advantages of Single Sitting Root Canal Treatment',
+                description: '• No need for multiple visits.\n• Saves valuable time.\n• Only one local anesthesia injection.\n• Less medicine or no medicine after treatment in many cases.\n• Reduced chance of saliva cross infection compared to multiple sitting treatment.\n• Better long-term success of the saved tooth.',
+                display_order: 70
+              }
+            ],
+            procedure_video_title: 'Single Sitting Root Canal Procedure',
+            procedure_video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+            patient_testimonials: [
+              {
+                id: 'rct-testi-1',
+                patient_name: 'Patient Review Video',
+                video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+                treatment_name: 'Single Sitting Root Canal Treatment',
+                display_order: 10
+              },
+              {
+                id: 'rct-testi-2',
+                patient_name: 'Patient Testimonial Video',
+                video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+                treatment_name: 'Single Sitting Root Canal Treatment',
+                display_order: 20
+              }
+            ],
+            hospital_team_photos: [
+              {
+                id: 'rct-hosp-1',
+                type: 'hospital',
+                caption: 'Hospital Photo - Operatory Unit',
+                image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800',
+                display_order: 10
+              },
+              {
+                id: 'rct-hosp-2',
+                type: 'hospital',
+                caption: 'Hospital Photo - Clinical Setup',
+                image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800',
+                display_order: 20
+              },
+              {
+                id: 'rct-team-1',
+                type: 'team',
+                caption: 'Team Photo - Specialist Doctors',
+                image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800',
                 display_order: 30
               }
             ],
-            patient_testimonials: [],
-            hospital_team_photos: [],
             marketing_config: {
-              green_highlight_line: 'Painless, single sitting root canal treatment using modern rotary endodontics and laser technology.',
+              green_highlight_line: "At Patel Dental Hospital, one of Gujarat's leading dental hospitals, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including:\n• Apex Locator\n• Made in Japan Endo Motor\n• Digital X-Ray\n• Biocompatible MTA Sealer\nto provide excellent quality treatment at an affordable price.",
               process_section_title: 'How We Perform Single Sitting Root Canal',
               benefits_section_title: 'Why Our Modern Root Canal Method is Superior',
               testimonials_section_title: 'Patient Testimonial Reels',
+              hospital_team_title: 'Hospital & Team Gallery',
+              procedure_video_title: 'Single Sitting Root Canal Procedure',
+              procedure_video_url: 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+              gallery_items: [
+                {
+                  id: 'rct-gal-1',
+                  caption: 'Single Sitting Root Canal Case 1',
+                  image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800',
+                  display_order: 10
+                },
+                {
+                  id: 'rct-gal-2',
+                  caption: 'Single Sitting Root Canal Case 2',
+                  image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800',
+                  display_order: 20
+                },
+                {
+                  id: 'rct-gal-3',
+                  caption: 'Single Sitting Root Canal Case 3',
+                  image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800',
+                  display_order: 30
+                }
+              ],
+              cost_packages: [],
+              cost_included_items: [],
+              cost_starting_price: '',
+              cost_heading: 'Single Sitting Root Canal Treatment Cost',
+              cost_description: '',
+              cost_cards: [],
+              faqs: [],
+              phone_number: '+91 9510397046',
+              whatsapp_number: '+91 9510397046',
+              sec11_heading: 'Book Your Single Sitting Root Canal Appointment',
               show_hero: true,
               show_introduction: true,
               show_process: true,
@@ -132,9 +253,12 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
               show_gallery: true,
               show_procedure_video: true,
               show_testimonials: true,
+              show_hospital_photos: true,
               show_before_after: true,
               show_cost: true,
               show_google_reviews: true,
+              google_reviews_heading: 'Google Patient Reviews',
+              google_reviews: DEFAULT_RCT_GOOGLE_REVIEWS,
               show_faqs: true,
               show_bottom_cta: true,
             }
@@ -152,6 +276,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
         }
         if (!normalized.marketing_config) {
           normalized.marketing_config = {};
+        }
+        const mCfg = normalized.marketing_config as any;
+        if (!mCfg.google_reviews || !Array.isArray(mCfg.google_reviews) || mCfg.google_reviews.length === 0) {
+          mCfg.google_reviews = DEFAULT_RCT_GOOGLE_REVIEWS;
         }
         if (typeof normalized.process_steps === 'string') {
           try {
@@ -331,7 +459,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
     const newItem = {
       id: `gallery-item-${Date.now()}`,
       image_url: url || '',
-      category: 'Root Canal Case',
+      caption: '',
       display_order: nextOrder
     };
     updateMConfigField('gallery_items', [...galleryItems, newItem]);
@@ -1045,34 +1173,74 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
               </div>
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
-                {galleryItems.map((item: any, idx: number) => (
-                  <div key={item.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex items-center gap-4">
-                    <img src={item.image_url} alt="Gallery" className="h-16 w-24 object-cover rounded-xl border" referrerPolicy="no-referrer" />
-                    <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-bold text-slate-500 uppercase">Category</label>
-                      <input type="text" value={item.category || ''} onChange={(e) => updateGalleryItemField(idx, 'category', e.target.value)} className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white" />
+                {galleryItems.length === 0 ? (
+                  <p className="text-center text-xs text-slate-400 py-4">No gallery images added yet.</p>
+                ) : (
+                  galleryItems.map((item: any, idx: number) => (
+                    <div key={item.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex items-center gap-4">
+                      <img src={item.image_url} alt="Gallery" className="h-16 w-24 object-cover rounded-xl border shrink-0 bg-white" referrerPolicy="no-referrer" />
+                      <div className="flex-1 space-y-1 min-w-0">
+                        <label className="text-[9px] font-bold text-slate-500 uppercase block">Caption / Title (Optional)</label>
+                        <input
+                          type="text"
+                          value={item.caption || item.title || ''}
+                          onChange={(e) => updateGalleryItemField(idx, 'caption', e.target.value)}
+                          placeholder="e.g. Single Sitting Root Canal Case"
+                          className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-[#0D9488]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => moveGalleryItem(idx, 'up')}
+                          className="p-1 text-slate-500 hover:bg-slate-200 rounded disabled:opacity-30"
+                          title="Move Up"
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === galleryItems.length - 1}
+                          onClick={() => moveGalleryItem(idx, 'down')}
+                          className="p-1 text-slate-500 hover:bg-slate-200 rounded disabled:opacity-30"
+                          title="Move Down"
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => deleteGalleryItem(idx)}
+                        className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete Image"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
-                    <button type="button" onClick={() => deleteGalleryItem(idx)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="h-4 w-4" /></button>
-                  </div>
-                ))}
+                  ))
+                )}
 
                 <div className="pt-2 flex justify-center">
                   <button
                     type="button"
                     onClick={() => document.getElementById('rct-add-gallery-file')?.click()}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 rounded-xl text-xs font-black"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 rounded-xl text-xs font-black transition-colors"
                   >
-                    <Plus className="h-4 w-4" /> Add Gallery Image
+                    <Plus className="h-4 w-4" /> Upload Gallery Images
                   </button>
                   <input
                     type="file"
                     id="rct-add-gallery-file"
                     accept="image/*"
+                    multiple
                     className="hidden"
                     onChange={async (e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        const url = await handleFileUpload(e.target.files[0]);
-                        if (url) addGalleryItem(url);
+                      if (e.target.files && e.target.files.length > 0) {
+                        for (let i = 0; i < e.target.files.length; i++) {
+                          const url = await handleFileUpload(e.target.files[i]);
+                          if (url) addGalleryItem(url);
+                        }
                       }
                     }}
                   />
