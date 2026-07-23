@@ -214,6 +214,7 @@ export interface MarketingConfig {
   show_process?: boolean;
   show_benefits?: boolean;
   show_gallery?: boolean;
+  show_before_after?: boolean;
   show_procedure_video?: boolean;
   procedure_video_title?: string;
   procedure_video_description?: string;
@@ -221,7 +222,10 @@ export interface MarketingConfig {
   show_hospital_photos?: boolean;
   show_team_photos?: boolean;
   show_testimonials?: boolean;
+  show_cost?: boolean;
+  show_google_reviews?: boolean;
   show_faq?: boolean;
+  show_faqs?: boolean;
   show_related_services?: boolean;
   show_bottom_cta?: boolean;
 

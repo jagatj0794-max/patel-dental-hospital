@@ -16,23 +16,30 @@ interface ClinicalCaseGalleryProps {
   items: GalleryItem[];
 }
 
-const CATEGORY_ORDER = [
+const PREFERRED_CATEGORY_ORDER = [
+  'Single Case',
   'Single Implant',
+  'Multiple Case',
   'Double Implant',
   'Quadrant',
+  'FMR Case',
   'Full Mouth Rehabilitation (FMR)',
 ];
 
 function normalizeCategory(cat?: string): string {
-  if (!cat) return 'Single Implant';
-  const lower = cat.toLowerCase().trim();
-  if (lower.includes('single')) return 'Single Implant';
-  if (lower.includes('double')) return 'Double Implant';
-  if (lower.includes('quadrant')) return 'Quadrant';
-  if (lower.includes('fmr') || lower.includes('full mouth') || lower.includes('full_mouth')) {
-    return 'Full Mouth Rehabilitation (FMR)';
-  }
-  return cat;
+  if (!cat || cat.trim() === '') return 'Single Case';
+  const trimmed = cat.trim();
+  const lower = trimmed.toLowerCase();
+  
+  if (lower === 'single case' || lower === 'single implant') return trimmed;
+  if (lower === 'multiple case' || lower === 'double implant' || lower === 'quadrant') return trimmed;
+  if (lower === 'fmr case' || lower === 'full mouth rehabilitation (fmr)') return trimmed;
+
+  if (lower.includes('single')) return 'Single Case';
+  if (lower.includes('multiple') || lower.includes('double') || lower.includes('quadrant')) return 'Multiple Case';
+  if (lower.includes('fmr') || lower.includes('full mouth')) return 'FMR Case';
+  
+  return trimmed;
 }
 
 export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
@@ -55,12 +62,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
 
   // Group items by category
   const groupedItems = React.useMemo(() => {
-    const map: Record<string, GalleryItem[]> = {
-      'Single Implant': [],
-      'Double Implant': [],
-      'Quadrant': [],
-      'Full Mouth Rehabilitation (FMR)': [],
-    };
+    const map: Record<string, GalleryItem[]> = {};
 
     if (Array.isArray(items)) {
       items.forEach((item) => {
@@ -81,15 +83,23 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
     return map;
   }, [items]);
 
-  // Active categories with at least 1 image
+  // Active categories with at least 1 image, sorted by preferred order then alphabetical
   const activeCategories = React.useMemo(() => {
-    return CATEGORY_ORDER.filter((cat) => groupedItems[cat] && groupedItems[cat].length > 0);
+    const keys = Object.keys(groupedItems).filter((cat) => groupedItems[cat] && groupedItems[cat].length > 0);
+    return keys.sort((a, b) => {
+      const idxA = PREFERRED_CATEGORY_ORDER.indexOf(a);
+      const idxB = PREFERRED_CATEGORY_ORDER.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
   }, [groupedItems]);
 
   // Accordion state: open state for each category independently
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
-    CATEGORY_ORDER.forEach((cat) => {
+    PREFERRED_CATEGORY_ORDER.forEach((cat) => {
       initial[cat] = true; // default all active accordions to open
     });
     return initial;
@@ -105,7 +115,28 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
   const [dragStartX, setDragStartX] = useState<number | null>(null);
 
   if (activeCategories.length === 0) {
-    return null; // Hide entire section if no categories have images
+    return (
+      <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="clinical-case-gallery">
+        <div className="space-y-3 max-w-3xl mx-auto text-center">
+          <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+            <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+            Clinical Excellence
+          </span>
+          <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+            {heading}
+          </h2>
+          {description && (
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+              {description}
+            </p>
+          )}
+          <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+        </div>
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
+          Clinical case gallery images will be displayed here once uploaded in CMS.
+        </div>
+      </div>
+    );
   }
 
   const toggleCategory = (cat: string) => {
@@ -149,22 +180,22 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
   };
 
   return (
-    <div className="space-y-10 pt-10 border-t border-slate-100" id="dental-implants-clinical-case-gallery">
+    <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-clinical-case-gallery">
       {/* Section Header */}
       <div className="space-y-3 max-w-3xl mx-auto text-center">
-        <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full inline-flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5 text-[#0D9488]" />
+        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+          <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
           Clinical Cases
         </span>
-        <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
+        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
           {heading}
         </h2>
         {description && (
-          <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed text-center font-medium">
+          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium">
             {description}
           </p>
         )}
-        <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
       </div>
 
       {/* Categories Accordion Group */}
@@ -189,13 +220,14 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
           return (
             <div
               key={cat}
-              className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden transition-all duration-300"
+              className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden transition-all duration-300"
             >
               {/* Accordion Header */}
               <button
                 type="button"
                 onClick={() => toggleCategory(cat)}
-                className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 transition-colors flex items-center justify-between gap-4 text-left border-b border-slate-100"
+                aria-expanded={isOpen}
+                className="w-full px-5 sm:px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 transition-colors flex items-center justify-between gap-4 text-left border-b border-slate-200/60 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
               >
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-[#081C3A] text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -230,7 +262,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
                 <div className="p-3 sm:p-5 space-y-4 bg-slate-50/50">
                   {/* Slider Frame */}
                   <div
-                    className="relative bg-white sm:bg-slate-50/80 rounded-2xl p-3 sm:p-5 flex flex-col justify-center min-h-[320px] sm:min-h-[400px] overflow-hidden group border border-slate-200/90 shadow-xs select-none"
+                    className="relative bg-white sm:bg-slate-50/80 rounded-2xl p-3 sm:p-5 flex flex-col justify-center min-h-0 overflow-hidden group border border-slate-200/90 shadow-xs select-none"
                     onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
                     onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientX, cat, totalItems)}
                     onMouseDown={(e) => handleDragStart(e.clientX)}
@@ -246,7 +278,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
 
                     {/* Images Container (2 images on Desktop/Tablet moving 1 at a time, 1 on Mobile) */}
                     <div
-                      className={`w-full grid gap-3 sm:gap-5 my-auto pt-10 sm:pt-11 pb-1 ${
+                      className={`w-full grid gap-3 sm:gap-5 my-auto pt-8 sm:pt-9 pb-0 ${
                         visibleItems.length === 1 && !isMobile
                           ? 'grid-cols-1 max-w-xl mx-auto'
                           : 'grid-cols-1 md:grid-cols-2'
@@ -255,13 +287,13 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
                       {visibleItems.map(({ item, actualIndex }) => (
                         <div
                           key={item.id || `${item.image_url}-${actualIndex}`}
-                          className="relative bg-white rounded-2xl p-2 sm:p-3 flex flex-col items-center justify-center h-[300px] sm:h-[360px] md:h-[400px] border border-slate-200/90 shadow-xs hover:shadow-md group/img transition-all duration-300 hover:border-teal-400/60"
+                          className="relative bg-white rounded-2xl p-2 sm:p-2.5 flex flex-col items-center justify-center h-auto border border-slate-200/90 shadow-xs hover:shadow-md group/img transition-all duration-300 hover:border-teal-400/60"
                         >
                           <img
                             src={item.image_url}
                             alt={`${cat} Case ${actualIndex + 1}`}
                             draggable={false}
-                            className="max-h-full max-w-full w-auto h-auto object-contain mx-auto rounded-xl shadow-2xs cursor-zoom-in transition-transform duration-300 group-hover/img:scale-[1.015] select-none"
+                            className="max-h-[240px] sm:max-h-[300px] md:max-h-[340px] max-w-full w-auto h-auto object-contain mx-auto rounded-xl shadow-2xs cursor-zoom-in transition-transform duration-300 group-hover/img:scale-[1.015] select-none"
                             onClick={() => setLightboxImage(item.image_url)}
                             referrerPolicy="no-referrer"
                           />
@@ -286,10 +318,10 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
                             e.stopPropagation();
                             handlePrev(cat, totalItems);
                           }}
-                          className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white/95 hover:bg-[#0D9488] text-slate-800 hover:text-white flex items-center justify-center border border-slate-200/90 transition-all shadow-md hover:shadow-lg active:scale-95"
+                          className="absolute left-3 sm:left-6 md:left-8 top-1/2 -translate-y-1/2 z-20 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-white/95 backdrop-blur-xs hover:bg-[#0D9488] text-slate-800 hover:text-white flex items-center justify-center border border-slate-200/90 transition-all shadow-lg hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
                           title="Previous Case"
                         >
-                          <ChevronLeft className="h-6 w-6" />
+                          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
                         </button>
                         <button
                           type="button"
@@ -297,10 +329,10 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
                             e.stopPropagation();
                             handleNext(cat, totalItems);
                           }}
-                          className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white/95 hover:bg-[#0D9488] text-slate-800 hover:text-white flex items-center justify-center border border-slate-200/90 transition-all shadow-md hover:shadow-lg active:scale-95"
+                          className="absolute right-3 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 z-20 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-white/95 backdrop-blur-xs hover:bg-[#0D9488] text-slate-800 hover:text-white flex items-center justify-center border border-slate-200/90 transition-all shadow-lg hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
                           title="Next Case"
                         >
-                          <ChevronRight className="h-6 w-6" />
+                          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
                         </button>
                       </>
                     )}

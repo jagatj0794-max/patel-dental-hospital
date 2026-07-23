@@ -99,25 +99,26 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         aria-valuenow={Math.round(sliderPosition)}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Before and after treatment slider"
-        className="relative aspect-[4/3] w-full max-h-[320px] overflow-hidden rounded-2xl border border-slate-150 shadow-md select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
+        aria-label={`Before and after treatment slider${caption ? `: ${caption}` : ''}`}
+        className="relative aspect-[4/3] w-full max-h-[340px] overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/60 focus:ring-offset-2 transition-shadow"
       >
         {/* After Image (Background) */}
         <img
           src={afterImage}
-          alt="After Treatment"
+          alt="After Treatment Result"
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+          loading="lazy"
           referrerPolicy="no-referrer"
         />
 
         {/* Before Image (Overlay Container) */}
         <div
-          className="absolute inset-y-0 left-0 overflow-hidden select-none pointer-events-none border-r border-white/20"
+          className="absolute inset-y-0 left-0 overflow-hidden select-none pointer-events-none border-r border-white/40"
           style={{ width: `${sliderPosition}%` }}
         >
           <img
             src={beforeImage}
-            alt="Before Treatment"
+            alt="Before Treatment Condition"
             style={{
               width: containerWidth,
               height: '100%',
@@ -125,37 +126,38 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
               maxWidth: 'none'
             }}
             className="absolute inset-y-0 left-0 object-cover select-none pointer-events-none"
+            loading="lazy"
             referrerPolicy="no-referrer"
           />
         </div>
 
         {/* Labels & Badges */}
-        <div className="absolute top-4 left-4 z-20 pointer-events-none">
-          <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-rose-600/90 border border-rose-500 px-3 py-1.5 rounded-xl shadow-md backdrop-blur-xs">
+        <div className="absolute top-3 left-3 z-20 pointer-events-none">
+          <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-rose-600/90 border border-rose-400 px-3 py-1 rounded-xl shadow-md backdrop-blur-xs">
             Before
           </span>
         </div>
 
-        <div className="absolute top-4 right-4 z-20 pointer-events-none">
-          <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-emerald-600/90 border border-emerald-500 px-3 py-1.5 rounded-xl shadow-md backdrop-blur-xs">
+        <div className="absolute top-3 right-3 z-20 pointer-events-none">
+          <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-emerald-600/90 border border-emerald-400 px-3 py-1 rounded-xl shadow-md backdrop-blur-xs">
             After
           </span>
         </div>
 
         {/* Vertical Divider Drag Bar */}
         <div
-          className="absolute top-0 bottom-0 z-30 w-[3px] bg-white cursor-ew-resize flex items-center justify-center transition-all duration-75"
+          className="absolute top-0 bottom-0 z-30 w-[3px] bg-white cursor-ew-resize flex items-center justify-center transition-all duration-75 shadow-lg"
           style={{ left: `${sliderPosition}%` }}
         >
           {/* Centered Circular Handle */}
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border-2 border-teal-500 text-teal-600 shadow-xl flex items-center justify-center cursor-ew-resize z-30 group-hover:scale-110 group-active:scale-95 transition-transform duration-150">
-            <ChevronsLeftRight className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse" />
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border-2 border-[#0D9488] text-[#0D9488] shadow-xl flex items-center justify-center cursor-ew-resize z-30 group-hover:scale-110 group-active:scale-95 transition-transform duration-200">
+            <ChevronsLeftRight className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
         </div>
       </div>
 
       {caption && (
-        <p className="text-xs sm:text-sm font-bold text-[#081C3A]/90 px-2 leading-relaxed">
+        <p className="text-xs sm:text-sm font-bold text-[#081C3A] px-1 leading-relaxed">
           {caption}
         </p>
       )}

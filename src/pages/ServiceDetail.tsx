@@ -101,6 +101,18 @@ export default function ServiceDetail({
   const [implantCategory, setImplantCategory] = useState<string>('all');
   const [implantLightboxIndex, setImplantLightboxIndex] = useState<number | null>(null);
 
+  const isDentalImplants = React.useMemo(() => {
+    return service?.id === 'implants-srv' || service?.slug === 'dental-implants' || slug === 'dental-implants';
+  }, [service, slug]);
+
+  const isRootCanal = React.useMemo(() => {
+    return service?.id === 'rct' || service?.id === 'rct-srv' || service?.slug === 'root-canal-treatment' || slug === 'root-canal-treatment';
+  }, [service, slug]);
+
+  const isNewArchitecture = React.useMemo(() => {
+    return isDentalImplants || isRootCanal;
+  }, [isDentalImplants, isRootCanal]);
+
   const mConfig = React.useMemo(() => {
     if (!service || !service.marketing_config) return {};
     if (typeof service.marketing_config === 'string') {
@@ -137,7 +149,7 @@ export default function ServiceDetail({
   }, [service, fallback]);
 
   const displayGallery = React.useMemo(() => {
-    if (service?.id === 'implants-srv') {
+    if (isNewArchitecture) {
       const raw = Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : [];
       return [...raw].sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
     }
@@ -145,7 +157,7 @@ export default function ServiceDetail({
       return gallery;
     }
     return fallback.gallery;
-  }, [service, gallery, fallback, mConfig]);
+  }, [service, gallery, fallback, mConfig, isNewArchitecture]);
 
   const displayTestimonials = React.useMemo(() => {
     if (!service) return [];
@@ -167,7 +179,7 @@ export default function ServiceDetail({
       }
     }
     if (!list || list.length === 0) {
-      if (service.id === 'implants-srv') {
+      if (isDentalImplants) {
         return [
           {
             id: 'testi-1',
@@ -176,6 +188,9 @@ export default function ServiceDetail({
             display_order: 10
           }
         ];
+      }
+      if (isRootCanal) {
+        return [];
       }
       return fallback.patient_testimonials || [];
     }
@@ -344,6 +359,14 @@ export default function ServiceDetail({
     };
   }, [slug, previewService, previewGallery, previewFaqs, previewRelatedServices]);
 
+  // Always scroll window to top instantly on initial mount, when slug changes, or when service data finishes loading
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, [slug, isLoading]);
+
   // Check if we have any custom text fields or media fields populated
   const hasCustomContent = React.useMemo(() => {
     if (!service) return false;
@@ -466,7 +489,7 @@ export default function ServiceDetail({
         rawSteps = [];
       }
     }
-    if (service.id === 'implants-srv') {
+    if (isNewArchitecture) {
       return Array.isArray(rawSteps)
         ? [...rawSteps].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
         : [];
@@ -491,8 +514,8 @@ export default function ServiceDetail({
         rawFeatures = [];
       }
     }
-    if (service.id === 'implants-srv') {
-      // For Dental Implants, we do NOT load any fallback features
+    if (isNewArchitecture) {
+      // For Dental Implants & Root Canal, we do NOT load any fallback features
       return Array.isArray(rawFeatures)
         ? [...rawFeatures].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
         : [];
@@ -802,28 +825,28 @@ export default function ServiceDetail({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 selection:bg-[#0D9488]/20 selection:text-[#081C3A]">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <div className="min-h-screen bg-slate-50 py-5 sm:py-12 px-4 sm:px-6 lg:px-8 selection:bg-[#0D9488]/20 selection:text-[#081C3A]">
+      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-16 lg:space-y-20">
         
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <button
             onClick={handleBackToServices}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#0D9488] transition-colors py-2 px-4 bg-white border border-slate-150 rounded-xl shadow-3xs cursor-pointer group"
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-[#0D9488] transition-colors py-2 px-4 bg-white border border-slate-200/80 rounded-xl shadow-2xs hover:shadow-xs cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
           >
             <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Back to Treatments
           </button>
           
           <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-            <span className="cursor-pointer hover:text-slate-600" onClick={handleBackToServices}>Treatments</span>
+            <span className="cursor-pointer hover:text-slate-600 transition-colors" onClick={handleBackToServices}>Treatments</span>
             <span>/</span>
             <span className="text-[#0D9488] font-black">{service.title}</span>
           </div>
         </div>
 
         {/* Dynamic Offer Banner (Promotional Section) */}
-        {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false && service.id !== 'implants-srv') && (
+        {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false && !isNewArchitecture) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -869,7 +892,7 @@ export default function ServiceDetail({
                     openAppointmentModal(`${service.title} - Promo Offer Claim`);
                   }
                 }}
-                className="w-full md:w-auto px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-[#081C3A] text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full md:w-auto px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-[#081C3A] text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
               >
                 <Sparkles className="h-4 w-4 shrink-0" />
                 <span>{mConfig.offer_button_text || "Claim Offer Now"}</span>
@@ -885,15 +908,15 @@ export default function ServiceDetail({
 
           // Helper definitions for the 12 CMS sections
           const heroElement = (mConfig.show_hero !== false) ? (
-            service.id === 'implants-srv' ? (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs relative overflow-hidden" id="dental-implants-hero-section">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            isNewArchitecture ? (
+              <div className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-14 shadow-xs hover:shadow-sm transition-shadow duration-300 relative overflow-hidden" id="service-hero-section">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
                   
                   {/* LEFT SIDE: Content */}
-                  <div className="lg:col-span-7 space-y-6 md:space-y-8 order-2 lg:order-1 text-left">
+                  <div className="lg:col-span-7 space-y-4 sm:space-y-6 md:space-y-8 order-2 lg:order-1 text-left">
                     <div className="space-y-3">
                       {/* Hero Title */}
-                      <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-[1.15]">
+                      <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
                         {service.title}
                       </h1>
                       
@@ -906,7 +929,7 @@ export default function ServiceDetail({
                     </div>
 
                     {/* Hero Description */}
-                    <p className="text-slate-600 text-xs sm:text-sm md:text-base font-medium leading-relaxed whitespace-pre-line">
+                    <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed whitespace-pre-line">
                       {service.hero_description && service.hero_description.trim() !== '' ? service.hero_description : service.short_description}
                     </p>
 
@@ -921,9 +944,9 @@ export default function ServiceDetail({
 
                         let btnClass = "";
                         if (isAppointment) {
-                          btnClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group";
+                          btnClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50";
                         } else {
-                          btnClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#081C3A] hover:bg-[#112C55] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer";
+                          btnClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#081C3A] hover:bg-[#112C55] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#081C3A]/50";
                         }
 
                         return (
@@ -939,12 +962,13 @@ export default function ServiceDetail({
 
                   {/* RIGHT SIDE: Large Hero Image */}
                   <div className="lg:col-span-5 order-1 lg:order-2">
-                    <div className="relative aspect-[4/3] sm:aspect-[1.5] lg:aspect-[4/5] xl:aspect-square w-full bg-slate-50 rounded-2xl overflow-hidden shadow-md">
+                    <div className="relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/5] xl:aspect-square w-full bg-slate-50 rounded-2xl overflow-hidden shadow-md border border-slate-200/60 group">
                       <img
                         src={heroImage}
-                        alt={service.title}
-                        className="w-full h-full object-cover"
+                        alt={service.title || "Dental Implants Care"}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
+                        loading="eager"
                       />
                     </div>
                   </div>
@@ -1023,21 +1047,14 @@ export default function ServiceDetail({
                   />
                   {/* Elegant vignette shadow gradients */}
                   <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-[#081C3A]/10 to-white md:to-white" />
-                  
-                  {/* Optional Hero Image Caption overlay */}
-                  {heroImageCaption && heroImageCaption.trim() !== '' && (
-                    <div className="absolute bottom-3 left-3 right-3 bg-slate-900/75 backdrop-blur-xs text-white text-[10px] font-medium py-1.5 px-3 rounded-lg border border-white/10 z-20">
-                      📸 {heroImageCaption}
-                    </div>
-                  )}
                 </div>
               </div>
             )
           ) : null;
 
           const introElement = (mConfig.show_introduction !== false) ? (
-            service.id === 'implants-srv' ? (
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs space-y-8" id="dental-implants-treatment-overview">
+            isNewArchitecture ? (
+              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs space-y-8" id="service-treatment-overview">
                 <div className="space-y-3 max-w-3xl">
                   {/* Small category tag or subtle text line to match style, e.g. Teal colored accent line or small text */}
                   <span className="text-[#0D9488] font-sans font-extrabold text-xs tracking-wider uppercase">
@@ -1231,17 +1248,19 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const defaultImplantsUrl = service?.id === 'implants-srv' ? 'https://www.instagram.com/reel/C8qLd9MyWwG/' : '';
+          const defaultImplantsUrl = isDentalImplants ? 'https://www.instagram.com/reel/C8qLd9MyWwG/' : '';
           const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultImplantsUrl || '').trim();
           
           let effectiveVideoTitle = '';
-          const pVideoTitleVal = service?.id === 'implants-srv'
+          const pVideoTitleVal = isNewArchitecture
             ? (service?.procedure_video_title !== undefined ? service.procedure_video_title : mConfig.procedure_video_title)
             : (service?.procedure_video_title || mConfig.procedure_video_title || mConfig.video_heading);
 
           if (pVideoTitleVal === undefined || pVideoTitleVal === null) {
-            if (service?.id === 'implants-srv') {
+            if (isDentalImplants) {
               effectiveVideoTitle = 'Screw Retained Prosthesis Procedure';
+            } else if (isRootCanal) {
+              effectiveVideoTitle = 'Single Sitting Root Canal Procedure';
             } else {
               effectiveVideoTitle = fallback.procedure_video_title || '';
             }
@@ -1336,12 +1355,12 @@ export default function ServiceDetail({
           });
 
           let testimonialsTitle = '';
-          const pTestimonialsTitleVal = service?.id === 'implants-srv'
+          const pTestimonialsTitleVal = isNewArchitecture
             ? (mConfig.testimonials_section_title !== undefined ? mConfig.testimonials_section_title : mConfig.testimonial_section_title)
             : (mConfig.testimonials_section_title || mConfig.testimonial_section_title);
 
           if (pTestimonialsTitleVal === undefined || pTestimonialsTitleVal === null) {
-            if (service?.id === 'implants-srv') {
+            if (isNewArchitecture) {
               testimonialsTitle = 'Patient Testimonial Reels';
             } else {
               testimonialsTitle = 'Patient Testimonial Videos';
@@ -1636,131 +1655,157 @@ export default function ServiceDetail({
             }
           });
 
-          if (service.id === 'implants-srv') {
+          if (isNewArchitecture) {
             return (
-              <div className="space-y-10">
+              <div className="space-y-8 sm:space-y-16 lg:space-y-20">
                 {heroElement}
+                {introElement}
 
-                {/* Section 3: How We Perform Dental Implants (Clinical Workflow Steps) */}
-                {displaySteps.length > 0 && (
-                  <div className="space-y-12" id="dental-implants-workflow">
+                {/* Section 3: How We Perform Treatment (Clinical Workflow Steps) */}
+                {mConfig.show_process !== false && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="service-workflow">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      {/* Section Heading dynamically from CMS */}
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                        {mConfig.process_section_title || 'How We Perform Dental Implants'}
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Activity className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Clinical Workflow
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        {mConfig.process_section_title || (isRootCanal ? 'How We Perform Single Sitting Root Canal' : 'How We Perform Dental Implants')}
                       </h2>
-                      {/* Subtle divider line */}
-                      <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-7xl mx-auto">
-                      {displaySteps.map((step, idx) => (
-                        <div 
-                          key={step.id || idx} 
-                          className="bg-white border border-slate-150/80 rounded-2xl p-6 sm:p-8 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col h-full"
-                        >
-                          {/* Step Number inside the same card */}
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="font-mono text-3xl sm:text-4xl font-black text-[#0D9488]/30 leading-none">
-                              {String(idx + 1).padStart(2, '0')}
-                            </span>
-                            {step.phase && (
-                              <span className="inline-block text-[10px] font-bold text-[#0D9488] bg-teal-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">
-                                {step.phase}
+                    {displaySteps.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+                        {displaySteps.map((step, idx) => (
+                          <div 
+                            key={step.id || idx} 
+                            className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                          >
+                            {/* Step Number inside the same card */}
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="font-mono text-3xl sm:text-4xl font-black text-[#0D9488]/30 group-hover:text-[#0D9488]/60 transition-colors leading-none select-none">
+                                {String(idx + 1).padStart(2, '0')}
                               </span>
+                              {step.phase && (
+                                <span className="inline-block text-[11px] font-extrabold text-[#0D9488] bg-teal-50 px-3 py-1 rounded-full uppercase tracking-wider shrink-0 border border-teal-100/80">
+                                  {step.phase}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Optional Step Title from CMS (if any) */}
+                            {step.title && step.title.trim() !== '' && (
+                              <h3 className="font-sans font-black text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
+                                {step.title}
+                              </h3>
+                            )}
+
+                            {/* Step Description */}
+                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
+                              {step.description}
+                            </p>
+
+                            {/* Optional Step Image */}
+                            {step.image_url && step.image_url.trim() !== '' && (
+                              <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
+                                <img
+                                  src={step.image_url}
+                                  alt={step.title || `Workflow step ${idx + 1}`}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </div>
                             )}
                           </div>
-
-                          {/* Optional Step Title from CMS (if any) */}
-                          {step.title && step.title.trim() !== '' && (
-                            <h3 className="font-sans font-extrabold text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
-                              {step.title}
-                            </h3>
-                          )}
-
-                          {/* Step Description with comfortable line-height & paragraph width */}
-                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                            {step.description}
-                          </p>
-
-                          {/* Optional Step Image */}
-                          {step.image_url && step.image_url.trim() !== '' && (
-                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-3xs aspect-[16/10] mt-6">
-                              <img
-                                src={step.image_url}
-                                alt={step.title || `Step ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                                referrerPolicy="no-referrer"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
+                        Clinical workflow steps will be displayed here once updated in CMS.
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {/* Section 4: Why Our Method Is Superior (Dynamic Comparison Cards) */}
-                {mConfig.show_benefits !== false && displayFeatures.length > 0 && (
-                  <div className="space-y-12 pt-10 border-t border-slate-100" id="dental-implants-superior">
+                {mConfig.show_benefits !== false && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-superior">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      {/* Section Heading dynamically from CMS */}
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                        {mConfig.benefits_section_title || 'Why Our Method Is Superior'}
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Award className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Clinical Advantages
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        {mConfig.benefits_section_title || (isRootCanal ? 'Why Our Modern Root Canal Method is Superior' : 'Why Our Method Is Superior')}
                       </h2>
-                      {/* Subtle divider line */}
-                      <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-7xl mx-auto">
-                      {displayFeatures.map((card, idx) => (
-                        <div 
-                          key={card.id || idx} 
-                          className="bg-white border border-slate-150/80 rounded-2xl p-6 sm:p-8 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col h-full"
-                        >
-                          {/* Card Description / Doctor's Original Description */}
-                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                            {card.description}
-                          </p>
-
-                          {/* Optional Card Image (if available) */}
-                          {(card.image_url || card.image) && (card.image_url || card.image).trim() !== '' && (
-                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-3xs aspect-[16/10] mt-6">
-                              <img
-                                src={card.image_url || card.image}
-                                alt={`Method comparison detail ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                                referrerPolicy="no-referrer"
-                              />
+                    {displayFeatures.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+                        {displayFeatures.map((card, idx) => (
+                          <div 
+                            key={card.id || idx} 
+                            className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                          >
+                            <div className="flex items-center gap-2 mb-3">
+                              <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
+                                Benefit {idx + 1}
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                            {/* Card Description / Doctor's Original Description */}
+                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
+                              {card.description}
+                            </p>
+
+                            {/* Optional Card Image (if available) */}
+                            {(card.image_url || card.image) && (card.image_url || card.image).trim() !== '' && (
+                              <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
+                                <img
+                                  src={card.image_url || card.image}
+                                  alt={`Superiority feature ${idx + 1}`}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
+                        Clinical advantages will be displayed here once updated in CMS.
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* Section 5: Interactive Before & After Smile Transformations (100% CMS-driven) */}
+                {/* Section 5: Interactive Before & After Smile Transformations */}
                 {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-                  <div className="space-y-12 pt-10 border-t border-slate-100" id="before-after-gallery-section">
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full inline-block">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
                         Transformations
                       </span>
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
                         {mConfig.before_after_heading || 'Before & After Smile Transformations'}
                       </h2>
-                      <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed text-center">
+                      <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
                         {mConfig.before_after_description || 'See real smile transformations of our dental implant patients.'}
                       </p>
-                      <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
                       {beforeAfterPairs.map((pair, pIdx) => (
                         <div 
                           key={pair.id || pIdx} 
-                          className="bg-white border border-slate-150 rounded-2xl p-4 shadow-xs hover:shadow-sm transition-all duration-300"
+                          className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-all duration-300 hover:border-slate-300"
                         >
                           <BeforeAfterSlider
                             beforeImage={pair.before_image}
@@ -1791,26 +1836,28 @@ export default function ServiceDetail({
                 {/* Section 8: Hospital & Team Gallery */}
                 {renderCombinedGallery()}
 
-                {/* Section 9: Cost of Dental Implants (100% CMS-driven, Premium Two-column card) */}
+                {/* Section 9: Cost Section (100% CMS-driven, Premium Two-column card) */}
                 {mConfig.show_cost !== false && (
-                  <div className="pt-10 border-t border-slate-100 space-y-8 animate-fade-in" id="dental-implants-cost">
+                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 space-y-5 sm:space-y-8 animate-fade-in" id="dental-implants-cost">
                     {/* Two-column responsive card wrapper */}
-                    <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-150 rounded-2xl p-6 sm:p-10 shadow-xs hover:shadow-sm transition-all duration-300 max-w-7xl mx-auto">
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    <div className="bg-gradient-to-br from-slate-50 via-white to-teal-50/20 border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-12 shadow-sm hover:shadow-md transition-all duration-300 max-w-7xl mx-auto">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
                         
                         {/* Left Column: Heading, Highlight, Subtext, Contact Text */}
-                        <div className="lg:col-span-7 space-y-4">
-                          {/* Optional Section Heading */}
-                          {mConfig.cost_heading && mConfig.cost_heading.trim() !== '' && (
-                            <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                              {mConfig.cost_heading}
+                        <div className="lg:col-span-7 space-y-3 sm:space-y-4">
+                          <div className="space-y-2">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                              <FileText className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                              Transparent Pricing
+                            </span>
+                            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
+                              {mConfig.cost_heading || (isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : 'Cost of Dental Implants')}
                             </h2>
-                          )}
+                          </div>
 
-                          {/* Optional Highlight text group */}
                           {((mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '') || 
                             (mConfig.cost_highlight_sub && mConfig.cost_highlight_sub.trim() !== '')) && (
-                            <div className="space-y-1.5 mt-2">
+                            <div className="space-y-1.5 mt-2 bg-white/80 p-4 sm:p-5 rounded-2xl border border-teal-100/80 shadow-2xs">
                               {mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '' && (
                                 <div className="font-sans font-black text-3xl sm:text-4xl text-[#0D9488] tracking-tight">
                                   {mConfig.cost_highlight_text}
@@ -1824,39 +1871,34 @@ export default function ServiceDetail({
                             </div>
                           )}
 
-                          {/* Optional Contact Prompt */}
-                          {mConfig.cost_contact_text && mConfig.cost_contact_text.trim() !== '' && (
-                            <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
-                              {mConfig.cost_contact_text}
-                            </p>
-                          )}
+                          <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
+                            {mConfig.cost_contact_text && mConfig.cost_contact_text.trim() !== ''
+                              ? mConfig.cost_contact_text
+                              : 'Contact our clinical team for precise fee estimates after an initial diagnostic evaluation.'
+                            }
+                          </p>
                         </div>
 
                         {/* Right Column: CTA Actions */}
-                        <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col gap-4 w-full sm:justify-start lg:justify-center items-stretch sm:items-center lg:items-stretch">
-                          {/* Call Button */}
-                          {mConfig.cost_phone_number && mConfig.cost_call_label && mConfig.cost_call_label.trim() !== '' && (
-                            <a
-                              href={`tel:${String(mConfig.cost_phone_number).replace(/[^\d+]/g, '')}`}
-                              className="px-6 py-4 bg-[#081C3A] hover:bg-[#0c2b59] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2"
-                            >
-                              <Phone className="h-4.5 w-4.5" />
-                              <span>{mConfig.cost_call_label}</span>
-                            </a>
-                          )}
+                        <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col gap-3.5 w-full justify-center">
+                          <a
+                            href={`tel:${String(mConfig.cost_phone_number || contactInfo?.phone || DEFAULT_CONTACT_INFO.phone).replace(/[^\d+]/g, '')}`}
+                            className="px-7 py-4 bg-[#081C3A] hover:bg-[#0c2b59] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#081C3A]/50"
+                          >
+                            <Phone className="h-4.5 w-4.5 shrink-0" />
+                            <span>{mConfig.cost_call_label || 'Call For Details'}</span>
+                          </a>
 
-                          {/* WhatsApp Button */}
-                          {mConfig.cost_phone_number && mConfig.cost_whatsapp_label && mConfig.cost_whatsapp_label.trim() !== '' && (
-                            <a
-                              href={`https://wa.me/${String(mConfig.cost_phone_number).replace(/[^\d+]/g, '').replace('+', '')}`}
-                              target="_blank"
-                              referrerPolicy="no-referrer"
-                              className="px-6 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2"
-                            >
-                              <MessageCircle className="h-4.5 w-4.5" />
-                              <span>{mConfig.cost_whatsapp_label}</span>
-                            </a>
-                          )}
+                          <a
+                            href={`https://wa.me/${String(mConfig.cost_phone_number || contactInfo?.whatsapp || DEFAULT_CONTACT_INFO.whatsapp).replace(/[^\d+]/g, '').replace('+', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            referrerPolicy="no-referrer"
+                            className="px-7 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
+                          >
+                            <MessageCircle className="h-4.5 w-4.5 shrink-0" />
+                            <span>{mConfig.cost_whatsapp_label || 'WhatsApp Us'}</span>
+                          </a>
                         </div>
 
                       </div>
@@ -1867,19 +1909,19 @@ export default function ServiceDetail({
                 {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
                 {mConfig.show_google_reviews !== false && (
                   <GooglePatientReviews
-                    heading={mConfig.google_reviews_heading}
+                    heading={mConfig.google_reviews_heading || 'Google Patient Reviews'}
                     reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
                   />
                 )}
 
                 {/* Section 11: Bottom Call To Action (100% CMS-driven, Premium full-width block) */}
                 {mConfig.show_sec11_cta !== false && (
-                  <div className="pt-14 border-t border-slate-100 animate-fade-in" id="sec11-bottom-cta">
+                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="sec11-bottom-cta">
                     <div 
-                      className={`relative overflow-hidden rounded-3xl py-12 px-6 sm:py-16 sm:px-12 max-w-7xl mx-auto border text-center flex flex-col items-center justify-center gap-6 ${
+                      className={`relative overflow-hidden rounded-3xl py-8 px-5 sm:py-16 sm:px-12 max-w-7xl mx-auto border text-center flex flex-col items-center justify-center gap-4 sm:gap-6 ${
                         mConfig.sec11_bg_image 
                           ? 'border-transparent bg-cover bg-center' 
-                          : 'border-slate-150 bg-gradient-to-br from-slate-50 to-white shadow-3xs hover:shadow-2xs hover:border-slate-300 transition-all duration-300'
+                          : 'border-slate-200/80 bg-gradient-to-br from-slate-900 via-[#081C3A] to-slate-900 text-white shadow-md'
                       }`}
                       style={mConfig.sec11_bg_image ? { backgroundImage: `url(${mConfig.sec11_bg_image})` } : {}}
                     >
@@ -1889,121 +1931,120 @@ export default function ServiceDetail({
                       )}
                       
                       <div className="relative z-10 max-w-3xl space-y-4">
-                        {mConfig.sec11_heading && mConfig.sec11_heading.trim() !== '' && (
-                          <h2 className={`font-sans font-black text-2xl sm:text-4xl tracking-tight leading-tight ${
-                            mConfig.sec11_bg_image ? 'text-white' : 'text-[#081C3A]'
-                          }`}>
-                            {mConfig.sec11_heading}
-                          </h2>
-                        )}
+                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-teal-300 uppercase tracking-widest px-3.5 py-1 bg-teal-500/20 rounded-full border border-teal-400/30">
+                          <Sparkles className="h-3.5 w-3.5 text-teal-300 shrink-0" />
+                          Clinical Consultation
+                        </span>
+                        <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
+                          {mConfig.sec11_heading || (isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : 'Book Your Dental Consultation')}
+                        </h2>
                         {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
-                          <p className={`text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto ${
-                            mConfig.sec11_bg_image ? 'text-slate-200' : 'text-slate-600'
-                          }`}>
+                          <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
                             {mConfig.sec11_description}
                           </p>
                         )}
                       </div>
 
-                      <div className="relative z-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
-                        {mConfig.sec11_primary_label && mConfig.sec11_primary_label.trim() !== '' && (
-                          <button
-                            type="button"
-                            onClick={() => openAppointmentModal('Dental Implants')}
-                            className={`px-8 py-4 sm:py-3.5 font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2 text-sm cursor-pointer ${
-                              mConfig.sec11_bg_image 
-                                ? 'bg-[#0D9488] hover:bg-[#0F766E] text-white' 
-                                : 'bg-[#081C3A] hover:bg-[#0c2b59] text-white'
-                            }`}
-                          >
-                            <Calendar className="h-4.5 w-4.5" />
-                            <span>{mConfig.sec11_primary_label}</span>
-                          </button>
-                        )}
+                      <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
+                        <button
+                          type="button"
+                          onClick={() => openAppointmentModal(service?.title || 'Single Sitting Root Canal')}
+                          className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                        >
+                          <Calendar className="h-4.5 w-4.5 shrink-0" />
+                          <span>{mConfig.sec11_primary_label || 'Book Appointment'}</span>
+                          <ArrowRight className="h-4 w-4 shrink-0" />
+                        </button>
 
-                        {mConfig.sec11_secondary_label && mConfig.sec11_secondary_label.trim() !== '' && mConfig.sec11_whatsapp && mConfig.sec11_whatsapp.trim() !== '' && (
-                          <a
-                            href={`https://wa.me/${String(mConfig.sec11_whatsapp).replace(/[^\d+]/g, '').replace('+', '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            referrerPolicy="no-referrer"
-                            className="px-8 py-4 sm:py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer"
-                          >
-                            <MessageCircle className="h-4.5 w-4.5" />
-                            <span>{mConfig.sec11_secondary_label}</span>
-                          </a>
-                        )}
+                        <a
+                          href={`https://wa.me/${String(mConfig.sec11_whatsapp || contactInfo?.whatsapp || DEFAULT_CONTACT_INFO.whatsapp).replace(/[^\d+]/g, '').replace('+', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          referrerPolicy="no-referrer"
+                          className="px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
+                        >
+                          <MessageCircle className="h-4.5 w-4.5 shrink-0" />
+                          <span>{mConfig.sec11_secondary_label || 'Chat on WhatsApp'}</span>
+                        </a>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Section 12: Frequently Asked Questions (FAQ) (100% CMS-driven premium accordion) */}
-                {mConfig.show_faq_sec !== false && (Array.isArray(mConfig.faqs) && mConfig.faqs.filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '').length > 0) && (
-                  <div className="pt-14 border-t border-slate-100 animate-fade-in" id="sec12-faq">
-                    <div className="max-w-4xl mx-auto px-4 space-y-8">
+                {mConfig.show_faq_sec !== false && (
+                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="sec12-faq">
+                    <div className="max-w-4xl mx-auto px-2 sm:px-4 space-y-5 sm:space-y-8">
                       <div className="text-center space-y-3">
-                        <span className="text-[10px] font-black text-[#0D9488] uppercase tracking-widest bg-teal-50 px-3 py-1 rounded-full">
-                          Support & Info
+                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                          <HelpCircle className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                          Patient Support & Info
                         </span>
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
                           {mConfig.faq_sec_heading || 'Frequently Asked Questions'}
                         </h2>
-                        <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-2" />
+                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                       </div>
 
-                      <div className="space-y-4">
-                        {mConfig.faqs
-                          .filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '')
-                          .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-                          .map((faq: any, idx: number) => {
-                            const isExpanded = expandedImplantFaqId === faq.id;
-                            return (
-                              <div 
-                                key={faq.id || idx}
-                                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
-                                  isExpanded 
-                                    ? 'border-[#0D9488]/30 shadow-2xs' 
-                                    : 'border-slate-150 hover:border-slate-300 shadow-3xs'
-                                }`}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedImplantFaqId(isExpanded ? null : faq.id)}
-                                  className="w-full px-6 py-5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/40"
+                      {((Array.isArray(mConfig.faqs) && mConfig.faqs.length > 0 ? mConfig.faqs : faqs).filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '').length > 0) ? (
+                        <div className="space-y-3.5">
+                          {(Array.isArray(mConfig.faqs) && mConfig.faqs.length > 0 ? mConfig.faqs : faqs)
+                            .filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '')
+                            .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
+                            .map((faq: any, idx: number) => {
+                              const isExpanded = expandedImplantFaqId === faq.id;
+                              return (
+                                <div 
+                                  key={faq.id || idx}
+                                  className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
+                                    isExpanded 
+                                      ? 'border-[#0D9488] shadow-xs' 
+                                      : 'border-slate-200/80 hover:border-slate-300 shadow-2xs'
+                                  }`}
                                 >
-                                  <span className={`font-sans font-bold text-sm sm:text-base leading-snug pr-4 transition-colors duration-200 ${
-                                    isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
-                                  }`}>
-                                    {faq.question}
-                                  </span>
-                                  <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
-                                    isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-50 text-slate-400'
-                                  }`}>
-                                    <ChevronDown className="h-4 w-4 transition-transform duration-300" />
-                                  </span>
-                                </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setExpandedImplantFaqId(isExpanded ? null : faq.id)}
+                                    aria-expanded={isExpanded}
+                                    className="w-full px-6 py-4.5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
+                                  >
+                                    <span className={`font-sans font-bold text-sm sm:text-base leading-snug pr-4 transition-colors duration-200 ${
+                                      isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
+                                    }`}>
+                                      {faq.question}
+                                    </span>
+                                    <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
+                                      isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-100 text-slate-500'
+                                    }`}>
+                                      <ChevronDown className="h-4 w-4" />
+                                    </span>
+                                  </button>
 
-                                <AnimatePresence initial={false}>
-                                  {isExpanded && (
-                                    <motion.div
-                                      initial={{ height: 0, opacity: 0 }}
-                                      animate={{ height: 'auto', opacity: 1 }}
-                                      exit={{ height: 0, opacity: 0 }}
-                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                    >
-                                      <div className="px-6 pb-6 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/50 bg-slate-50/20">
-                                        <p className="whitespace-pre-line font-medium">
-                                          {faq.answer}
-                                        </p>
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            );
-                          })}
-                      </div>
+                                  <AnimatePresence initial={false}>
+                                    {isExpanded && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                      >
+                                        <div className="px-6 pb-5 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/80 bg-slate-50/40">
+                                          <p className="whitespace-pre-line font-medium font-sans">
+                                            {faq.answer}
+                                          </p>
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      ) : (
+                        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
+                          Frequently asked questions will be displayed here once updated in CMS.
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -2255,7 +2296,7 @@ export default function ServiceDetail({
         })()}
 
         {/* Dynamic Floating Mobile Contact Bar */}
-        {(mConfig.contact_bar_show && service.id !== 'implants-srv') && (
+        {(mConfig.contact_bar_show && !isNewArchitecture) && (
           <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden animate-fade-in-up" id="mobile-floating-contact-bar">
             <div className="bg-white/95 backdrop-blur-md border border-slate-200/85 rounded-2xl p-2.5 shadow-xl flex items-center gap-2 justify-around max-w-md mx-auto">
               {mConfig.contact_bar_call_enabled && (

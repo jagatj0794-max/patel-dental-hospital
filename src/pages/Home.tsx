@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service } from '../types';
-import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 
 // Custom SVG Premium Dental-Specific Representation Icons
 const DentalImplantIcon = ({ className }: { className?: string }) => (
@@ -392,6 +392,7 @@ export default function Home({
     };
 
     const isDentalImplants = defaultSlug === 'dental-implants' || dbSvc?.slug === 'dental-implants';
+    const isRootCanal = defaultSlug === 'root-canal-treatment' || dbSvc?.slug === 'root-canal-treatment';
 
     const homepageDesc = dbSvc?.homepage_short_description?.trim()
       ? dbSvc.homepage_short_description.trim()
@@ -403,7 +404,7 @@ export default function Home({
       ? mConfig.green_highlight_line 
       : (isDentalImplants 
           ? DEFAULT_GREEN_HIGHLIGHT_LINE 
-          : "");
+          : (isRootCanal ? DEFAULT_RCT_GREEN_HIGHLIGHT_LINE : ""));
 
     return {
       title: dbSvc?.title || defaultTitle,

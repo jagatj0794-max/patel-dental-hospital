@@ -8,6 +8,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { TREATMENTS } from '../data/treatments';
 
 export const DEFAULT_GREEN_HIGHLIGHT_LINE = "Replace missing teeth with dental implants in just one week with advance technology.";
+export const DEFAULT_RCT_GREEN_HIGHLIGHT_LINE = "Painless, single sitting root canal treatment using modern rotary endodontics and laser technology.";
 
 export const DEFAULT_SERVICES: Service[] = [
   {
@@ -133,7 +134,14 @@ export const DEFAULT_SERVICES: Service[] = [
     hero_image: TREATMENTS.find(t => t.id === 'rct')?.image || '',
     icon: 'Activity',
     display_order: 2,
-    is_active: true
+    is_active: true,
+    marketing_config: {
+      green_highlight_line: DEFAULT_RCT_GREEN_HIGHLIGHT_LINE,
+      process_section_title: 'How We Perform Single Sitting Root Canal',
+      benefits_section_title: 'Why Our Modern Root Canal Method is Superior',
+      testimonials_section_title: 'Patient Testimonial Reels',
+      show_procedure_video: true
+    }
   },
   {
     id: 'fmr-srv',
@@ -273,8 +281,23 @@ export const serviceService = {
               }
             }
             const defaultSvc = DEFAULT_SERVICES.find(d => d.id === svc.id);
-            if (defaultSvc && defaultSvc.marketing_config && !svc.marketing_config) {
-              return { ...svc, marketing_config: defaultSvc.marketing_config };
+            if (defaultSvc && defaultSvc.marketing_config) {
+              if (!svc.marketing_config) {
+                return { ...svc, marketing_config: defaultSvc.marketing_config };
+              } else {
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                if (mConfigObj.green_highlight_line === undefined && (defaultSvc.marketing_config as MarketingConfig)?.green_highlight_line) {
+                  return {
+                    ...svc,
+                    marketing_config: {
+                      ...mConfigObj,
+                      green_highlight_line: (defaultSvc.marketing_config as MarketingConfig).green_highlight_line
+                    }
+                  };
+                }
+              }
             }
             return svc;
           });

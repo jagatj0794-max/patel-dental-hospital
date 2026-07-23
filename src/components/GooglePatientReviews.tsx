@@ -24,10 +24,32 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
     .filter(r => r.enabled !== false && r.patient_name?.trim() !== '')
     .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
 
-  if (activeReviews.length === 0) return null;
+  if (activeReviews.length === 0) {
+    return (
+      <div className="pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="google-patient-reviews">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-6">
+          <div className="text-center space-y-3">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+              <Star className="h-3.5 w-3.5 text-[#0D9488] shrink-0 fill-[#0D9488]" />
+              Verified Patient Feedback
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
+              {heading || 'Google Patient Reviews'}
+            </h2>
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+          </div>
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-500 text-sm max-w-4xl mx-auto shadow-2xs">
+            Google patient reviews will be displayed here once added in CMS.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const isFirstRender = useRef(true);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % activeReviews.length);
@@ -37,54 +59,61 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
     setCurrentIndex((prev) => (prev - 1 + activeReviews.length) % activeReviews.length);
   };
 
-  // Synchronize scroll on slide change
+  // Synchronize horizontal slider container scroll on slide change
   const scrollToReview = (index: number) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const cards = container.querySelectorAll('.review-card-item');
       if (cards[index]) {
-        (cards[index] as HTMLElement).scrollIntoView({
+        const cardEl = cards[index] as HTMLElement;
+        container.scrollTo({
+          left: cardEl.offsetLeft - container.offsetLeft,
           behavior: 'smooth',
-          block: 'nearest',
-          inline: 'start',
         });
       }
     }
   };
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToReview(currentIndex);
   }, [currentIndex]);
 
   return (
-    <div className="space-y-12 pt-14 border-t border-slate-100 animate-fade-in" id="google-patient-reviews-section">
+    <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="google-patient-reviews-section">
       {/* Header and Slider Controls */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 max-w-7xl mx-auto">
         <div className="space-y-3 text-center sm:text-left">
-          <span className="text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full inline-block">
+          <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+            <Star className="h-3.5 w-3.5 text-[#0D9488] fill-[#0D9488] shrink-0" />
             Google Reviews
           </span>
           {heading && heading.trim() !== '' && (
-            <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
               {heading}
             </h2>
           )}
-          <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto sm:mx-0 mt-3" />
+          <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto sm:mx-0 mt-3" />
         </div>
 
         {activeReviews.length > 1 && (
           <div className="flex items-center justify-center gap-2.5">
             <button
               onClick={prevSlide}
-              className="p-3 rounded-full border border-slate-200 hover:border-[#0D9488]/30 bg-white text-slate-700 hover:text-[#0D9488] hover:bg-teal-50/20 shadow-3xs transition-all duration-300 cursor-pointer active:scale-95"
+              className="p-3 rounded-full border border-slate-200/80 hover:border-[#0D9488] bg-white text-slate-700 hover:text-[#0D9488] hover:bg-teal-50/30 shadow-xs transition-all duration-300 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
               aria-label="Previous Review"
+              title="Previous Review"
             >
               <ChevronLeft className="h-4.5 w-4.5" />
             </button>
             <button
               onClick={nextSlide}
-              className="p-3 rounded-full border border-slate-200 hover:border-[#0D9488]/30 bg-white text-slate-700 hover:text-[#0D9488] hover:bg-teal-50/20 shadow-3xs transition-all duration-300 cursor-pointer active:scale-95"
+              className="p-3 rounded-full border border-slate-200/80 hover:border-[#0D9488] bg-white text-slate-700 hover:text-[#0D9488] hover:bg-teal-50/30 shadow-xs transition-all duration-300 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
               aria-label="Next Review"
+              title="Next Review"
             >
               <ChevronRight className="h-4.5 w-4.5" />
             </button>
@@ -104,7 +133,7 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
               key={review.id || idx}
               className="review-card-item shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] snap-start"
             >
-              <div className="bg-gradient-to-br from-slate-50/40 to-white border border-slate-150 rounded-2xl p-6 sm:p-8 h-full flex flex-col justify-between shadow-3xs hover:shadow-2xs hover:border-slate-300 transition-all duration-300">
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 h-full flex flex-col justify-between shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300">
                 <div className="space-y-4">
                   {/* Rating & Date */}
                   <div className="flex items-center justify-between">

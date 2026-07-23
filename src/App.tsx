@@ -395,6 +395,11 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Ensure window is always scrolled to top instantly whenever page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [currentPage]);
+
   const openAppointmentModal = (preselectedTreatment?: any) => {
     if (preselectedTreatment && typeof preselectedTreatment === 'string') {
       setAppointmentTreatment(preselectedTreatment);
