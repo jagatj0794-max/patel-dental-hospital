@@ -9,7 +9,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
 export const DEFAULT_VIDEOS: DentalVideo[] = [
   { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants' },
   { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab' },
-  { id: '2okui6RFf_k', title: 'Life-changing Clear Aligners Transformation', treatment: 'Clear Aligners' },
+  { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners' },
   { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care' },
   { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover' },
   { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry' }

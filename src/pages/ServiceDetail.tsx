@@ -141,9 +141,17 @@ export default function ServiceDetail({
     return service?.id === 'fmr-srv' || service?.id === 'fullmouth' || service?.slug === 'full-mouth-rehabilitation' || slug === 'full-mouth-rehabilitation';
   }, [service, slug]);
 
+  const isInvisibleAligners = React.useMemo(() => {
+    return service?.id === 'aligners-srv' || service?.id === 'aligners' || service?.slug === 'invisible-aligners' || service?.slug === 'clear-aligners' || slug === 'invisible-aligners' || slug === 'clear-aligners';
+  }, [service, slug]);
+
+  const isSmileMakeover = React.useMemo(() => {
+    return service?.id === 'smile-srv' || service?.id === 'smile' || service?.slug === 'smile-makeover' || slug === 'smile-makeover';
+  }, [service, slug]);
+
   const isNewArchitecture = React.useMemo(() => {
-    return isDentalImplants || isRootCanal || isFullMouth;
-  }, [isDentalImplants, isRootCanal, isFullMouth]);
+    return isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover;
+  }, [isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover]);
 
   const mConfig = React.useMemo(() => {
     if (!service || !service.marketing_config) return {};
@@ -232,8 +240,36 @@ export default function ServiceDetail({
         }
       ];
     }
+    if (isSmileMakeover) {
+      return [
+        {
+          id: 'cand-1',
+          title: 'Composite Smile Correction',
+          description: 'Quick, minimally invasive tooth-colored resin sculpting for small gaps, chips, and minor misalignment.',
+          display_order: 10
+        },
+        {
+          id: 'cand-2',
+          title: 'Porcelain Veneers (Hollywood Smile)',
+          description: 'Ultra-thin custom porcelain shells placed over front teeth for durable, stain-resistant, flawless aesthetics.',
+          display_order: 20
+        },
+        {
+          id: 'cand-3',
+          title: 'Braces / Invisible Aligners',
+          description: 'Orthodontic solutions to straighten misaligned or crowded teeth discreetly and comfortably.',
+          display_order: 30
+        },
+        {
+          id: 'cand-4',
+          title: 'Teeth Whitening',
+          description: 'Advanced clinical bleaching to remove deep stains and dramatically brighten your natural smile.',
+          display_order: 40
+        }
+      ];
+    }
     return [];
-  }, [mConfig, service, fallback, isFullMouth]);
+  }, [mConfig, service, fallback, isFullMouth, isSmileMakeover]);
 
   const displayTestimonials = React.useMemo(() => {
     if (!service) return [];
@@ -261,13 +297,13 @@ export default function ServiceDetail({
       if (fallback?.marketing_config && Array.isArray(fallback.marketing_config.patient_testimonials) && fallback.marketing_config.patient_testimonials.length > 0) {
         return fallback.marketing_config.patient_testimonials;
       }
-      if (isDentalImplants || isRootCanal || isFullMouth) {
+      if (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover) {
         return [
           {
             id: 'testi-1',
-            patient_name: isFullMouth ? 'Patient Full Mouth Journey' : 'Patient Testimonial',
-            video_url: isFullMouth ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/',
-            treatment_name: service?.title || (isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Treatment'),
+            patient_name: isSmileMakeover ? 'Patient Smile Makeover Journey' : isInvisibleAligners ? 'Patient Invisible Aligners Journey' : isFullMouth ? 'Patient Full Mouth Journey' : 'Patient Testimonial',
+            video_url: (isFullMouth || isInvisibleAligners || isSmileMakeover) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+            treatment_name: service?.title || (isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Treatment'),
             display_order: 10
           }
         ];
@@ -275,7 +311,7 @@ export default function ServiceDetail({
       return [];
     }
     return [...list].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [service, fallback, mConfig, isDentalImplants, isRootCanal, isFullMouth]);
+  }, [service, fallback, mConfig, isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover]);
 
   const displayTeamPhotos = React.useMemo(() => {
     let list: any[] = [];
@@ -633,11 +669,31 @@ export default function ServiceDetail({
           display_order: 20
         }
       ];
+    } else if (isInvisibleAligners) {
+      list = [
+        {
+          id: 'aligners-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Invisible Aligners Transformation 1',
+          display_order: 10
+        }
+      ];
+    } else if (isSmileMakeover) {
+      list = [
+        {
+          id: 'smile-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Smile Makeover Transformation 1',
+          display_order: 10
+        }
+      ];
     }
     return [...list]
       .filter((p: any) => p && p.before_image && p.after_image)
       .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [mConfig, service, fallback, isFullMouth]);
+  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover]);
 
   // If loading, display the skeleton state first
   if (isLoading) {
@@ -1167,7 +1223,7 @@ export default function ServiceDetail({
                   
                   {/* Section Heading */}
                   <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : 'About the Treatment'}
+                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : (isInvisibleAligners ? 'What is Invisible Aligners?' : isRootCanal ? 'What is Single Sitting Root Canal?' : isFullMouth ? 'What is Full Mouth Rehabilitation?' : 'About the Treatment')}
                   </h2>
                   
                   {/* Subtle divider line */}
@@ -1352,8 +1408,8 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth) 
-            ? (isFullMouth ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
+          const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover) 
+            ? ((isFullMouth || isInvisibleAligners || isSmileMakeover) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
             : (fallback?.procedure_video_url || fallback?.marketing_config?.procedure_video_url || '');
           const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultVideoUrl || '').trim();
           
@@ -1369,6 +1425,10 @@ export default function ServiceDetail({
               effectiveVideoTitle = 'Single Sitting Root Canal Procedure';
             } else if (isFullMouth) {
               effectiveVideoTitle = 'Full Mouth Rehabilitation Procedure';
+            } else if (isInvisibleAligners) {
+              effectiveVideoTitle = 'Invisible Aligners Procedure';
+            } else if (isSmileMakeover) {
+              effectiveVideoTitle = 'Smile Makeover Procedure';
             } else {
               effectiveVideoTitle = fallback.procedure_video_title || 'Procedure Video';
             }
@@ -1794,7 +1854,7 @@ export default function ServiceDetail({
                         Clinical Workflow
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.process_section_title || (isRootCanal ? 'How We Perform Single Sitting Root Canal' : isFullMouth ? 'How We Perform Full Mouth Rehabilitation' : 'How We Perform Dental Implants')}
+                        {mConfig.process_section_title || (isSmileMakeover ? 'Smile Makeover Treatment Planning' : isInvisibleAligners ? 'Invisible Aligners Treatment Planning' : isRootCanal ? 'How We Perform Single Sitting Root Canal' : isFullMouth ? 'How We Perform Full Mouth Rehabilitation' : 'How We Perform Dental Implants')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -1848,7 +1908,7 @@ export default function ServiceDetail({
                 )}
 
                 {/* Section 4: Why Our Method Is Superior (Dynamic Comparison Cards) */}
-                {mConfig.show_benefits !== false && (
+                {(mConfig.show_benefits !== false && !isInvisibleAligners && !isSmileMakeover) && (
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-superior">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
@@ -1856,7 +1916,7 @@ export default function ServiceDetail({
                         Clinical Advantages
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.benefits_section_title || (isRootCanal ? 'Why Our Modern Root Canal Method is Superior' : isFullMouth ? 'Treatment Planning Includes' : 'Why Our Method Is Superior')}
+                        {mConfig.benefits_section_title || (isInvisibleAligners ? 'Why Choose Our Invisible Aligners' : isRootCanal ? 'Why Our Modern Root Canal Method is Superior' : isFullMouth ? 'Treatment Planning Includes' : 'Why Our Method Is Superior')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -1905,7 +1965,7 @@ export default function ServiceDetail({
                         Candidate Profile
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.candidate_section_title || 'Who Is a Candidate for Full Mouth Rehabilitation'}
+                        {mConfig.candidate_section_title || (isSmileMakeover ? 'Smile Makeover Options' : isFullMouth ? 'Who Is a Candidate for Full Mouth Rehabilitation' : 'Options & Candidates')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -1950,7 +2010,7 @@ export default function ServiceDetail({
                         {mConfig.before_after_heading || 'Before & After Smile Transformations'}
                       </h2>
                       <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        {mConfig.before_after_description || (isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
+                        {mConfig.before_after_description || (isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -1978,7 +2038,7 @@ export default function ServiceDetail({
                     heading={mConfig.gallery_heading || 'Clinical Case Gallery'}
                     description={mConfig.gallery_description}
                     items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
-                    singleGallery={isRootCanal || isFullMouth}
+                    singleGallery={isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover}
                   />
                 )}
 
@@ -2006,7 +2066,7 @@ export default function ServiceDetail({
                               Transparent Pricing
                             </span>
                             <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                              {mConfig.cost_heading || (isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
+                              {mConfig.cost_heading || (isSmileMakeover ? 'Smile Makeover Consultation' : isInvisibleAligners ? 'Invisible Aligners Treatment Cost & Offer' : isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
                             </h2>
                           </div>
 
@@ -2091,7 +2151,7 @@ export default function ServiceDetail({
                           Clinical Consultation
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                          {mConfig.sec11_heading || (isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
+                          {mConfig.sec11_heading || (isSmileMakeover ? 'Book Your Smile Makeover Consultation' : isInvisibleAligners ? 'Book Your Invisible Aligners Consultation' : isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
                         </h2>
                         {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
                           <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
@@ -2103,7 +2163,7 @@ export default function ServiceDetail({
                       <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
                         <button
                           type="button"
-                          onClick={() => openAppointmentModal(service?.title || (isRootCanal ? 'Single Sitting Root Canal' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Implants'))}
+                          onClick={() => openAppointmentModal(service?.title || (isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isRootCanal ? 'Single Sitting Root Canal' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Implants'))}
                           className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                         >
                           <Calendar className="h-4.5 w-4.5 shrink-0" />

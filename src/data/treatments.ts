@@ -100,9 +100,9 @@ export const TREATMENTS: Treatment[] = [
   },
   {
     id: 'aligners',
-    title: 'Clear Aligners',
+    title: 'Invisible Aligners',
     shortDesc: 'Invisible, removable custom aligners that subtly straighten your smile with maximum lifestyle freedom.',
-    longDesc: 'Welcome to the future of orthodontics. Clear Aligners are series of virtually invisible, medical-grade polyurethane trays custom-scanned and manufactured to incrementally reposition your teeth. They can be safely popped out during meals, important meetings, and daily cleaning, making them the ultimate lifestyle-friendly aesthetic solution.',
+    longDesc: 'Welcome to the future of orthodontics. Invisible Aligners are series of virtually invisible, medical-grade polyurethane trays custom-scanned and manufactured to incrementally reposition your teeth. They can be safely popped out during meals, important meetings, and daily cleaning, making them the ultimate lifestyle-friendly aesthetic solution.',
     benefits: [
       'Completely invisible for absolute social and workplace confidence',
       'Easily removable to maintain perfect native flossing and brushing',

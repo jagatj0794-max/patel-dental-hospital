@@ -612,6 +612,16 @@ export default function App() {
             setCurrentPage={setCurrentPage}
           />
         );
+      case 'aligners':
+      case 'invisible-aligners':
+      case 'clear-aligners':
+        return (
+          <ServiceDetail
+            slug="invisible-aligners"
+            openAppointmentModal={openAppointmentModal}
+            setCurrentPage={setCurrentPage}
+          />
+        );
       case 'gallery':
         return (
           <SmileGallery

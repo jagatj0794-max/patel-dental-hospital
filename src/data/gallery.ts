@@ -86,8 +86,8 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   {
     id: 'case-aligners-6',
     category: 'ortho',
-    title: 'Clear Aligner Treatment',
-    description: 'Corrected moderate dental overcrowding. Implemented a series of transparent, removable medical-grade clear aligners to align teeth seamlessly with zero wires or metal brackets.',
+    title: 'Invisible Aligner Treatment',
+    description: 'Corrected moderate dental overcrowding. Implemented a series of transparent, removable medical-grade invisible aligners to align teeth seamlessly with zero wires or metal brackets.',
     beforeImg: imgAlignersBefore,
     afterImg: imgAlignersAfter,
     layoutType: 'cosmetic-makeover',

@@ -10,6 +10,21 @@ import { TREATMENTS } from '../data/treatments';
 export const DEFAULT_GREEN_HIGHLIGHT_LINE = "Replace missing teeth with dental implants in just one week with advance technology.";
 export const DEFAULT_RCT_GREEN_HIGHLIGHT_LINE = "At Patel Dental Hospital, one of Gujarat's leading dental hospitals, we complete Root Canal Treatment in just one visit to save the patient's valuable time.\n\nWe use advanced technology including:\n• Apex Locator\n• Made in Japan Endo Motor\n• Digital X-Ray\n• Biocompatible MTA Sealer\nto provide excellent quality treatment at an affordable price.";
 export const DEFAULT_FMR_GREEN_HIGHLIGHT_LINE = "The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called as Full Mouth Rehabilitation or Reconstruction or Restoration.";
+export const DEFAULT_ALIGNERS_GREEN_HIGHLIGHT_LINE = "A modern approach to straighten and align your teeth with the help of Custom made series of aligners created for you with help of expert and advanced software.";
+
+export const DEFAULT_ALIGNERS_GOOGLE_REVIEWS = [
+  {
+    id: 'aligners-review-1',
+    patient_name: 'Patient Transformation Review',
+    patient_photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    rating: 5,
+    review_text: 'I was highly conscious of my crowded teeth, but I didn\'t want to wear metal braces at my job. Dr. Kinjal Patel designed a set of completely invisible aligners for me. I wore them easily every day, and within 10 months my smile became perfectly straight! Highly recommended.',
+    review_date: '1 month ago',
+    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    display_order: 10,
+    enabled: true
+  }
+];
 
 export const DEFAULT_RCT_GOOGLE_REVIEWS = [
   {
@@ -561,23 +576,239 @@ export const DEFAULT_SERVICES: Service[] = [
     id: 'aligners-srv',
     slug: 'invisible-aligners',
     title: 'Invisible Aligners',
-    short_description: TREATMENTS.find(t => t.id === 'aligners')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'aligners')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'aligners')?.image || '',
+    short_description: 'A modern approach to straighten and align your teeth with the help of custom-made series of aligners created for you using expert planning and advanced software.',
+    hero_description: 'A modern approach to straighten and align your teeth with the help of custom-made series of aligners created for you using expert planning and advanced software.',
+    description: 'A modern approach to straighten and align your teeth with the help of Custom made series of aligners created for you with help of expert and advanced software.\n\nOur aligner trays are made up of smooth, comfortable and virtually invisible plastic that you simply wear over your teeth.\n\nOur Invisible Aligners gradually and gently move your teeth into the correct position without the use of wires or brackets.',
+    intro_title: 'What is Invisible Aligners?',
+    hero_image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp',
     icon: 'EyeOff',
     display_order: 4,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'aligners-step-1',
+        phase: 'Step 1',
+        title: 'Comprehensive Examination & Scans',
+        description: 'When you visit Patel Dental Hospital, one of the best dental hospitals in Rajkot, Gujarat, our team examines you and performs:\n• CBCT Scan\n• Intraoral Scan\n• Clinical Examination\n• DSLR Face & Teeth Photography',
+        display_order: 10
+      },
+      {
+        id: 'aligners-step-2',
+        phase: 'Step 2',
+        title: 'Advanced Treatment Planning Software',
+        description: 'After collecting all records, our experts combine the data using advanced treatment planning software to fabricate your custom Invisible Aligners.',
+        display_order: 20
+      },
+      {
+        id: 'aligners-step-3',
+        phase: 'Step 3',
+        title: 'Custom Aligners Fabrication & Progress',
+        description: 'Patients simply change to a new set of aligners approximately every two weeks until treatment is completed and a confident smile is achieved.',
+        display_order: 30
+      }
+    ],
+    features: [
+      {
+        id: 'aligners-feat-1',
+        title: 'Virtually Invisible Appearance',
+        description: 'Invisible Aligners made at Patel Dental Hospital are so discreet that most people will not even notice you are wearing them.',
+        display_order: 10
+      },
+      {
+        id: 'aligners-feat-2',
+        title: 'Comfortable Fit & Removable',
+        description: 'Made up of smooth, comfortable and virtually invisible plastic without the use of wires or brackets.',
+        display_order: 20
+      },
+      {
+        id: 'aligners-feat-3',
+        title: 'Convenience & Confidence',
+        description: 'Provides convenience, confidence, and a better smile throughout your orthodontic transformation.',
+        display_order: 30
+      }
+    ],
+    procedure_video_title: 'Invisible Aligners Procedure',
+    procedure_video_url: '',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: DEFAULT_ALIGNERS_GREEN_HIGHLIGHT_LINE,
+      process_section_title: 'Invisible Aligners Treatment Planning',
+      benefits_section_title: 'Why Choose Our Invisible Aligners',
+      candidate_section_title: 'Why Choose Our Invisible Aligners',
+      candidate_items: [
+        {
+          id: 'cand-1',
+          title: 'Virtually Invisible Appearance',
+          description: 'Invisible Aligners made at Patel Dental Hospital are so invisible that most people will not even notice you are wearing them.',
+          display_order: 10
+        },
+        {
+          id: 'cand-2',
+          title: 'Comfortable & No Wires / Brackets',
+          description: 'Our aligner trays are made up of smooth, comfortable and virtually invisible plastic without the use of wires or brackets.',
+          display_order: 20
+        },
+        {
+          id: 'cand-3',
+          title: 'Comfort, Convenience & Confidence',
+          description: 'Provides comfort, convenience and confidence while helping you achieve a better smile.',
+          display_order: 30
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case transformations of invisible aligners cases.',
+      gallery_items: [],
+      cost_packages: [],
+      cost_included_items: [],
+      cost_starting_price: '',
+      cost_heading: 'Save up to 50% on Invisible Aligners',
+      cost_description: '',
+      cost_cards: [],
+      faqs: [],
+      phone_number: '+91 9510397046',
+      whatsapp_number: '+91 9510397046',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      procedure_video_title: 'Invisible Aligners Procedure',
+      procedure_video_url: '',
+      sec11_heading: 'Book Your Invisible Aligners Consultation',
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: DEFAULT_ALIGNERS_GOOGLE_REVIEWS,
+      before_after_heading: 'Before & After Smile Transformations',
+      before_after_description: 'See real smile transformations of our invisible aligners patients.',
+      before_after_pairs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_benefits: false,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: false,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'smile-srv',
     slug: 'smile-makeover',
     title: 'Smile Makeover',
-    short_description: TREATMENTS.find(t => t.id === 'smilemakeover')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'smilemakeover')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'smilemakeover')?.image || '',
-    icon: 'Heart',
+    short_description: 'Transform your smile with custom aesthetic procedures combining technology and dental artistry.',
+    hero_description: 'Transform your smile with custom aesthetic procedures combining technology and dental artistry.',
+    description: 'A Smile Makeover is a comprehensive cosmetic dental treatment tailored to improve your teeth appearance, symmetry, and overall facial aesthetics.',
+    intro_title: 'What is Smile Makeover?',
+    hero_image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1200',
+    icon: 'Sparkles',
     display_order: 5,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'smile-step-1',
+        phase: 'Step 1',
+        title: 'Comprehensive Smile Analysis & Scans',
+        description: 'Detailed clinical assessment, digital imaging, DSLR photography, and face shape evaluation.',
+        display_order: 10
+      },
+      {
+        id: 'smile-step-2',
+        phase: 'Step 2',
+        title: 'Digital Smile Design & Trial',
+        description: 'Customizing your smile makeover plan with virtual preview and mock-up fitting.',
+        display_order: 20
+      },
+      {
+        id: 'smile-step-3',
+        phase: 'Step 3',
+        title: 'Treatment Execution & Final Reveal',
+        description: 'Precise application of chosen aesthetic solutions for a radiant and natural smile.',
+        display_order: 30
+      }
+    ],
+    features: [
+      {
+        id: 'smile-feat-1',
+        title: 'Personalized Facial Aesthetics',
+        description: 'Customized to align with your facial symmetry, lip line, and skin tone.',
+        display_order: 10
+      }
+    ],
+    procedure_video_title: 'Smile Makeover Procedure',
+    procedure_video_url: '',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: 'Enhance your confidence and aesthetics with personalized Smile Makeover treatments.',
+      process_section_title: 'Smile Makeover Treatment Planning',
+      benefits_section_title: 'Smile Makeover Options',
+      candidate_section_title: 'Smile Makeover Options',
+      candidate_items: [
+        {
+          id: 'cand-1',
+          title: 'Composite Smile Correction',
+          description: 'Quick, minimally invasive tooth-colored resin sculpting for small gaps, chips, and minor misalignment.',
+          display_order: 10
+        },
+        {
+          id: 'cand-2',
+          title: 'Porcelain Veneers (Hollywood Smile)',
+          description: 'Ultra-thin custom porcelain shells placed over front teeth for durable, stain-resistant, flawless aesthetics.',
+          display_order: 20
+        },
+        {
+          id: 'cand-3',
+          title: 'Braces / Invisible Aligners',
+          description: 'Orthodontic solutions to straighten misaligned or crowded teeth discreetly and comfortably.',
+          display_order: 30
+        },
+        {
+          id: 'cand-4',
+          title: 'Teeth Whitening',
+          description: 'Advanced clinical bleaching to remove deep stains and dramatically brighten your natural smile.',
+          display_order: 40
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case transformations of smile makeover patients.',
+      gallery_items: [],
+      cost_packages: [],
+      cost_included_items: [],
+      cost_starting_price: '',
+      cost_heading: 'Smile Makeover Consultation',
+      cost_description: '',
+      cost_cards: [],
+      faqs: [],
+      phone_number: '+91 9510397046',
+      whatsapp_number: '+91 9510397046',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      procedure_video_title: 'Smile Makeover Procedure',
+      procedure_video_url: '',
+      sec11_heading: 'Book Your Smile Makeover Consultation',
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      before_after_heading: 'Before & After Smile Transformations',
+      before_after_description: 'See real smile transformations of our smile makeover patients.',
+      before_after_pairs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_benefits: false,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: true,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'crowns',
@@ -778,6 +1009,80 @@ export const serviceService = {
                     show_before_after: mConfigObj.show_before_after !== false,
                     show_procedure_video: mConfigObj.show_procedure_video !== false,
                     show_testimonials: mConfigObj.show_testimonials !== false,
+                    show_faqs: false
+                  }
+                };
+              }
+            }
+            if (svc.id === 'smile-srv' || svc.id === 'smile' || svc.slug === 'smile-makeover') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'smile-srv' || d.slug === 'smile-makeover');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                const defaultMCfg = (defaultSvc.marketing_config as MarketingConfig) || {};
+
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  slug: defaultSvc.slug,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  intro_title: defaultSvc.intro_title,
+                  process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  marketing_config: {
+                    ...defaultMCfg,
+                    ...mConfigObj,
+                    green_highlight_line: defaultMCfg.green_highlight_line,
+                    process_section_title: defaultMCfg.process_section_title,
+                    benefits_section_title: defaultMCfg.benefits_section_title,
+                    candidate_section_title: defaultMCfg.candidate_section_title,
+                    candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+                    cost_heading: defaultMCfg.cost_heading,
+                    phone_number: defaultMCfg.phone_number,
+                    whatsapp_number: defaultMCfg.whatsapp_number,
+                    show_benefits: false,
+                    show_candidate: true
+                  }
+                };
+              }
+            }
+            if (svc.id === 'aligners-srv' || svc.slug === 'invisible-aligners' || svc.slug === 'clear-aligners') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'aligners-srv' || d.slug === 'invisible-aligners');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                const defaultMCfg = (defaultSvc.marketing_config as MarketingConfig) || {};
+
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  slug: defaultSvc.slug,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  intro_title: defaultSvc.intro_title,
+                  process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  marketing_config: {
+                    ...defaultMCfg,
+                    ...mConfigObj,
+                    green_highlight_line: defaultMCfg.green_highlight_line,
+                    process_section_title: defaultMCfg.process_section_title,
+                    benefits_section_title: defaultMCfg.benefits_section_title,
+                    candidate_section_title: defaultMCfg.candidate_section_title,
+                    candidate_items: defaultMCfg.candidate_items,
+                    cost_heading: defaultMCfg.cost_heading,
+                    cost_description: defaultMCfg.cost_description,
+                    phone_number: defaultMCfg.phone_number,
+                    whatsapp_number: defaultMCfg.whatsapp_number,
+                    show_benefits: false,
+                    show_candidate: true,
                     show_faqs: false
                   }
                 };
@@ -1050,16 +1355,66 @@ export const serviceService = {
           }
         }
 
+        const aligners = data.find(s => s.id === 'aligners-srv' || s.slug === 'invisible-aligners' || s.slug === 'clear-aligners' || s.title === 'Clear Aligners' || s.title === 'Invisible Aligners');
+        if (aligners) {
+          const defaultAligners = DEFAULT_SERVICES.find(d => d.id === 'aligners-srv' || d.slug === 'invisible-aligners');
+          const mConfigObj = typeof aligners.marketing_config === 'string'
+            ? JSON.parse(aligners.marketing_config)
+            : (aligners.marketing_config || {});
+          if (defaultAligners && (
+            aligners.title !== defaultAligners.title ||
+            aligners.slug !== defaultAligners.slug ||
+            aligners.short_description !== defaultAligners.short_description ||
+            !mConfigObj.candidate_items ||
+            !Array.isArray(mConfigObj.candidate_items) ||
+            mConfigObj.candidate_items.length === 0 ||
+            mConfigObj.cost_heading !== (defaultAligners.marketing_config as MarketingConfig)?.cost_heading
+          )) {
+            const defaultMCfg = (defaultAligners.marketing_config as MarketingConfig) || {};
+            const updatedAligners = {
+              ...aligners,
+              title: defaultAligners.title,
+              slug: defaultAligners.slug,
+              short_description: defaultAligners.short_description,
+              hero_description: defaultAligners.hero_description,
+              description: defaultAligners.description,
+              intro_title: defaultAligners.intro_title,
+              process_steps: defaultAligners.process_steps,
+              features: defaultAligners.features,
+              marketing_config: {
+                ...defaultMCfg,
+                ...mConfigObj,
+                candidate_items: defaultMCfg.candidate_items,
+                cost_heading: defaultMCfg.cost_heading,
+                cost_description: defaultMCfg.cost_description,
+                green_highlight_line: defaultMCfg.green_highlight_line,
+                process_section_title: defaultMCfg.process_section_title,
+                benefits_section_title: defaultMCfg.benefits_section_title,
+                candidate_section_title: defaultMCfg.candidate_section_title,
+                phone_number: defaultMCfg.phone_number,
+                whatsapp_number: defaultMCfg.whatsapp_number,
+                show_benefits: false,
+                show_candidate: true,
+                show_faqs: false
+              }
+            };
+            await serviceService.saveService(updatedAligners);
+            needsRefetch = true;
+          }
+        }
+
         if (needsRefetch) {
           const { data: refetched } = await supabase.client
             .from('services')
             .select('*')
             .order('display_order', { ascending: true });
-          if (refetched) return refetched;
+          if (refetched) {
+            return refetched.map(s => s.title === 'Clear Aligners' ? { ...s, title: 'Invisible Aligners', slug: 'invisible-aligners' } : s);
+          }
         }
       }
 
-      return data || [];
+      return (data || []).map(s => s.title === 'Clear Aligners' ? { ...s, title: 'Invisible Aligners', slug: 'invisible-aligners' } : s);
     } catch (e) {
       console.warn('Exception in getServices:', e);
       return DEFAULT_SERVICES;
@@ -1265,6 +1620,98 @@ export const serviceService = {
             await serviceService.saveService(updatedImplants);
             return updatedImplants;
           }
+        }
+      }
+
+      if (data && (data.id === 'aligners-srv' || data.slug === 'invisible-aligners' || data.slug === 'clear-aligners' || data.title === 'Clear Aligners' || data.title === 'Invisible Aligners')) {
+        const defaultAligners = DEFAULT_SERVICES.find(d => d.id === 'aligners-srv' || d.slug === 'invisible-aligners');
+        const mConfigObj = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        if (defaultAligners && (
+          data.title !== defaultAligners.title ||
+          data.slug !== defaultAligners.slug ||
+          data.short_description !== defaultAligners.short_description ||
+          !mConfigObj.candidate_items ||
+          !Array.isArray(mConfigObj.candidate_items) ||
+          mConfigObj.candidate_items.length === 0 ||
+          mConfigObj.cost_heading !== (defaultAligners.marketing_config as MarketingConfig)?.cost_heading
+        )) {
+          const defaultMCfg = (defaultAligners.marketing_config as MarketingConfig) || {};
+          const updatedAligners = {
+            ...data,
+            title: defaultAligners.title,
+            slug: defaultAligners.slug,
+            short_description: defaultAligners.short_description,
+            hero_description: defaultAligners.hero_description,
+            description: defaultAligners.description,
+            intro_title: defaultAligners.intro_title,
+            process_steps: defaultAligners.process_steps,
+            features: defaultAligners.features,
+            marketing_config: {
+              ...defaultMCfg,
+              ...mConfigObj,
+              candidate_items: defaultMCfg.candidate_items,
+              cost_heading: defaultMCfg.cost_heading,
+              cost_description: defaultMCfg.cost_description,
+              green_highlight_line: defaultMCfg.green_highlight_line,
+              process_section_title: defaultMCfg.process_section_title,
+              benefits_section_title: defaultMCfg.benefits_section_title,
+              candidate_section_title: defaultMCfg.candidate_section_title,
+              phone_number: defaultMCfg.phone_number,
+              whatsapp_number: defaultMCfg.whatsapp_number,
+              show_benefits: false,
+              show_candidate: true,
+              show_faqs: false
+            }
+          };
+          await serviceService.saveService(updatedAligners);
+          return updatedAligners;
+        }
+      }
+
+      if (data && (data.id === 'smile-srv' || data.id === 'smile' || data.slug === 'smile-makeover' || data.title === 'Smile Makeover')) {
+        const defaultSmile = DEFAULT_SERVICES.find(d => d.id === 'smile-srv' || d.slug === 'smile-makeover');
+        const mConfigObj = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        if (defaultSmile && (
+          data.title !== defaultSmile.title ||
+          data.slug !== defaultSmile.slug ||
+          data.short_description !== defaultSmile.short_description ||
+          !mConfigObj.candidate_items ||
+          !Array.isArray(mConfigObj.candidate_items) ||
+          mConfigObj.candidate_items.length === 0 ||
+          mConfigObj.cost_heading !== (defaultSmile.marketing_config as MarketingConfig)?.cost_heading
+        )) {
+          const defaultMCfg = (defaultSmile.marketing_config as MarketingConfig) || {};
+          const updatedSmile = {
+            ...data,
+            title: defaultSmile.title,
+            slug: defaultSmile.slug,
+            short_description: defaultSmile.short_description,
+            hero_description: defaultSmile.hero_description,
+            description: defaultSmile.description,
+            intro_title: defaultSmile.intro_title,
+            process_steps: defaultSmile.process_steps,
+            features: defaultSmile.features,
+            marketing_config: {
+              ...defaultMCfg,
+              ...mConfigObj,
+              candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+              cost_heading: defaultMCfg.cost_heading,
+              green_highlight_line: defaultMCfg.green_highlight_line,
+              process_section_title: defaultMCfg.process_section_title,
+              benefits_section_title: defaultMCfg.benefits_section_title,
+              candidate_section_title: defaultMCfg.candidate_section_title,
+              phone_number: defaultMCfg.phone_number,
+              whatsapp_number: defaultMCfg.whatsapp_number,
+              show_benefits: false,
+              show_candidate: true
+            }
+          };
+          await serviceService.saveService(updatedSmile);
+          return updatedSmile;
         }
       }
 
@@ -1908,13 +2355,13 @@ export const DEFAULT_SERVICE_GALLERY: ServiceGalleryItem[] = [
     display_order: 2
   },
 
-  // Clear Aligners
+  // Invisible Aligners
   {
     id: 'gal-aligners-1',
     service_id: 'aligners-srv',
     image_url: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=600',
-    caption: 'Premium custom orthodontic clear aligner trays',
-    alt_text: 'Clear aligner trays',
+    caption: 'Premium custom orthodontic invisible aligner trays',
+    alt_text: 'Invisible aligner trays',
     display_order: 1
   },
   {
@@ -2039,18 +2486,18 @@ export const DEFAULT_SERVICE_FAQS: ServiceFaq[] = [
     display_order: 2
   },
 
-  // Clear Aligners
+  // Invisible Aligners
   {
     id: 'faq-aligners-1',
     service_id: 'aligners-srv',
-    question: 'How many hours a day must I wear my clear aligners?',
-    answer: 'For optimal results, you must wear your clear aligners for 20 to 22 hours every day. You should only remove them when eating, drinking anything other than water, brushing, and flossing.',
+    question: 'How many hours a day must I wear my invisible aligners?',
+    answer: 'For optimal results, you must wear your invisible aligners for 20 to 22 hours every day. You should only remove them when eating, drinking anything other than water, brushing, and flossing.',
     display_order: 1
   },
   {
     id: 'faq-aligners-2',
     service_id: 'aligners-srv',
-    question: 'Are clear aligners really invisible?',
+    question: 'Are invisible aligners really invisible?',
     answer: 'Yes! They are made of medical-grade transparent polyurethane plastic. Once they are fitted over your teeth, they are virtually unnoticeable to others, making them an excellent choice for professionals.',
     display_order: 2
   },
@@ -2076,7 +2523,7 @@ export const DEFAULT_SERVICE_FAQS: ServiceFaq[] = [
     id: 'faq-smile-1',
     service_id: 'smile-srv',
     question: 'What treatments are included in a Smile Makeover?',
-    answer: 'A smile makeover is tailored to your unique goals. It can include teeth whitening, porcelain veneers, cosmetic bonding, clear aligners, and laser gum contouring to achieve the perfect balance and symmetry.',
+    answer: 'A smile makeover is tailored to your unique goals. It can include teeth whitening, porcelain veneers, cosmetic bonding, invisible aligners, and laser gum contouring to achieve the perfect balance and symmetry.',
     display_order: 1
   },
   {

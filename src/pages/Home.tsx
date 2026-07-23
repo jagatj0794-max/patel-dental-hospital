@@ -269,8 +269,8 @@ const faqData = [
     answer: "Full Mouth Rehabilitation is a comprehensive treatment that restores function, appearance and health of the entire mouth."
   },
   {
-    question: "Are Clear Aligners better than traditional braces?",
-    answer: "Clear aligners are nearly invisible, removable and comfortable, making them a popular alternative for many patients."
+    question: "Are Invisible Aligners better than traditional braces?",
+    answer: "Invisible aligners are nearly invisible, removable and comfortable, making them a popular alternative for many patients."
   },
   {
     question: "Do you provide CBCT scanning?",
@@ -316,7 +316,7 @@ export default function Home({
   const videosToRender = videosList && videosList.length > 0 ? videosList : [
     { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants' },
     { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab' },
-    { id: '2okui6RFf_k', title: 'Life-changing Clear Aligners Transformation', treatment: 'Clear Aligners' },
+    { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners' },
     { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care' },
     { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover' },
     { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry' }
@@ -713,7 +713,7 @@ export default function Home({
               </div>
               <div className="flex flex-col justify-center">
                 <span className="font-bold text-[#081C3A] text-[14px] lg:text-[15px] xl:text-[16px] leading-tight mb-1">
-                  Clear Aligner Experts
+                  Invisible Aligner Experts
                 </span>
                 <span className="text-[12px] sm:text-[13px] text-slate-500 font-medium tracking-wide leading-normal">
                   Modern Invisible Orthodontics
@@ -1674,7 +1674,7 @@ export default function Home({
                 <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mb-6 rounded-full" />
 
                 <p className="text-slate-550 text-[14px] sm:text-[15px] font-medium leading-relaxed mb-8">
-                  Take the first step towards a confident smile with Patel Dental Hospital's advanced Implant, Full Mouth Rehabilitation and Clear Aligner treatments.
+                  Take the first step towards a confident smile with Patel Dental Hospital's advanced Implant, Full Mouth Rehabilitation and Invisible Aligner treatments.
                 </p>
 
                 {/* Key Highlights list */}
@@ -1682,7 +1682,7 @@ export default function Home({
                   {[
                     "Implant Specialists",
                     "Full Mouth Rehabilitation Experts",
-                    "Clear Aligner Solutions",
+                    "Invisible Aligner Solutions",
                     "In-house CBCT Technology"
                   ].map((highlight, index) => (
                     <div key={index} className="flex items-center space-x-2.5">
@@ -1874,7 +1874,7 @@ export default function Home({
 
               <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4">
                 <p>
-                  At Patel Dental Hospital, we combine advanced dental technology with personalized care to deliver long-lasting treatment results. Our expertise includes Dental Implants, Full Mouth Rehabilitation, Clear Aligners, Root Canal Treatments and Cosmetic Dentistry.
+                  At Patel Dental Hospital, we combine advanced dental technology with personalized care to deliver long-lasting treatment results. Our expertise includes Dental Implants, Full Mouth Rehabilitation, Invisible Aligners, Root Canal Treatments and Cosmetic Dentistry.
                 </p>
                 <p>
                   Our focus is not only on treating dental problems but also on improving confidence, comfort and overall oral health through modern, patient-centered care.
