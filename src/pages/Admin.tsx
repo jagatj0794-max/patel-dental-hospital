@@ -6464,6 +6464,45 @@ export default function Admin({
                 </div>
               </div>
             </div>
+          ) : editingService.slug === 'tooth-coloured-filling' || editingService.slug === 'composite-filling' || editingService.id === 'filling-srv' || editingService.id === 'filling' || editingService.title?.toLowerCase().includes('filling') || editingService.title?.toLowerCase().includes('tooth coloured') ? (
+            /* Custom Full-Scale CMS Editor for Tooth Coloured Filling */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Tooth Coloured Filling CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <BracesTreatmentCms serviceSlug="tooth-coloured-filling" onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
           ) : (
             /* Main Full-Width Editor Box */
             <div className="relative bg-white flex-grow flex flex-col w-full h-full">

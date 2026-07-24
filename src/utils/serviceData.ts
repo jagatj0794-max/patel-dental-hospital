@@ -1307,23 +1307,239 @@ export const DEFAULT_SERVICES: Service[] = [
     id: 'wisdom-srv',
     slug: 'wisdom-tooth-surgery',
     title: 'Wisdom Tooth Surgery',
-    short_description: TREATMENTS.find(t => t.id === 'wisdom')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'wisdom')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'wisdom')?.image || '',
+    short_description: 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+    description: 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+    hero_title: 'Wisdom Tooth Surgery',
+    hero_description: 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+    intro_title: 'What is a Wisdom Tooth?',
+    intro_description: 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+    hero_image: TREATMENTS.find(t => t.id === 'wisdom')?.image || 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=1200',
     icon: 'Scissors',
     display_order: 10,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'wisdom-step-1',
+        phase: 'Stage 1',
+        title: 'Diagnosis',
+        description: 'First, our expert takes an OPG X-ray to evaluate the position of the wisdom tooth in relation to the adjacent teeth, nerves, and other vital structures so that proper care can be taken during surgery.',
+        display_order: 10
+      },
+      {
+        id: 'wisdom-step-2',
+        phase: 'Stage 2',
+        title: 'Numbing',
+        description: 'The oral surgeon administers local anesthesia to numb the wisdom tooth and the surrounding area.\n\nWe then wait for approximately 15 minutes until complete numbness is achieved.',
+        display_order: 20
+      },
+      {
+        id: 'wisdom-step-3',
+        phase: 'Stage 3',
+        title: 'Tooth Removal',
+        description: 'The oral surgeon removes the wisdom tooth using special instruments within a few minutes without causing pain.\n\nStitches are then placed for better healing of the tissues.',
+        display_order: 30
+      }
+    ],
+    procedure_video_title: 'Wisdom Tooth Removal Video Animation',
+    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    patient_testimonials: [
+      {
+        id: 'testi-1',
+        patient_name: 'Patient Wisdom Tooth Surgery Journey',
+        video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+        treatment_name: 'Wisdom Tooth Surgery',
+        display_order: 10
+      }
+    ],
+    marketing_config: {
+      green_highlight_line: 'Painless and Quick Wisdom Tooth Removal Surgery',
+      process_section_title: 'Wisdom Tooth Surgery Treatment Planning',
+      candidate_section_title: 'Advanced Surgical Technology',
+      candidate_items: [
+        {
+          id: 'wisdom-tech-1',
+          title: 'Piezoelectric Device',
+          description: 'If the wisdom tooth is very close to a nerve, our oral surgeon uses a piezoelectric device to remove the tooth without damaging the nerve.\n\nThis facility is available at Patel Dental Hospital, one of the leading dental hospitals in Rajkot, Gujarat.',
+          display_order: 10
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case photographs of Wisdom Tooth Surgery.',
+      gallery_items: [],
+      before_after_heading: 'Before & After Gallery',
+      before_after_description: 'See real transformations of our wisdom tooth surgery patients.',
+      before_after_pairs: [
+        {
+          id: 'wisdom-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Wisdom Tooth Surgery Extraction',
+          display_order: 10
+        }
+      ],
+      procedure_video_title: 'Wisdom Tooth Removal Video Animation',
+      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      testimonials_section_title: 'Patient Testimonials',
+      patient_testimonials: [
+        {
+          id: 'testi-1',
+          patient_name: 'Patient Wisdom Tooth Surgery Journey',
+          video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+          treatment_name: 'Wisdom Tooth Surgery',
+          display_order: 10
+        }
+      ],
+      hospital_team_title: 'Hospital & Team Gallery',
+      cost_heading: 'Wisdom Tooth Surgery Cost & Offers',
+      cost_description: 'Call or WhatsApp: 9510397046',
+      cost_starting_price: '',
+      cost_cards: [],
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      sec11_heading: 'Patel Dental Hospital',
+      sec11_sub: 'Call or WhatsApp: 9510397046 | Follow Us on Social Media',
+      phone_number: '9510397046',
+      whatsapp_number: '9510397046',
+      faqs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: false,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'filling-srv',
     slug: 'tooth-coloured-filling',
-    title: 'Tooth Coloured Filling (Composite Filling)',
-    short_description: 'Composite Filling, also known as Tooth Coloured Filling, is a long-lasting and natural-looking restoration used to repair decayed, chipped or broken teeth.',
-    description: 'Composite fillings are made from advanced ceramic and resin materials that chemically bond to the natural tooth, restoring both function and aesthetics.',
+    title: 'Tooth Coloured Filling',
+    short_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.',
+    hero_title: 'Tooth Coloured Filling',
+    hero_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.',
+    description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.',
+    intro_title: 'What is Tooth Coloured Filling?',
+    intro_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.\n\nComposite fillings are made of ceramic and resin materials that bond chemically to the tooth. They can be used to repair chipped or broken teeth as well as to fill decayed areas of the teeth.\n\nBroken teeth, stained teeth, black gums, hideous gaps, or crooked teeth—our cosmetic dentistry can fix them all in a flash.',
     hero_image: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=600',
-    icon: 'CheckCircle',
+    icon: 'Shield',
     display_order: 11,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'fill-step-1',
+        phase: 'Card 1',
+        title: 'Comfortable Treatment Experience',
+        description: 'We know that getting a cavity filled can be a stressful experience for many adults and children, but we do our best to provide a safe, friendly, and comfortable atmosphere.\n\nAt Patel Dental Hospital, we have many options available to treat anxious patients.',
+        display_order: 10
+      },
+      {
+        id: 'fill-step-2',
+        phase: 'Card 2',
+        title: 'Advanced Filling Materials',
+        description: 'You can rely on our professionals and advanced materials made in the USA for an effective and long-lasting filling.',
+        display_order: 20
+      },
+      {
+        id: 'fill-step-3',
+        phase: 'Card 3',
+        title: 'State-of-the-Art Equipment',
+        description: 'We use the most advanced state-of-the-art equipment and materials, so your teeth receive the highest quality care they deserve.',
+        display_order: 30
+      }
+    ],
+    procedure_video_title: 'Composite Filling Video Animation',
+    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    patient_testimonials: [
+      {
+        id: 'fill-testi-1',
+        patient_name: 'Patient Tooth Coloured Filling Journey',
+        video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+        treatment_name: 'Tooth Coloured Filling',
+        display_order: 10
+      }
+    ],
+    marketing_config: {
+      green_highlight_line: 'Natural-Looking Composite Restorations',
+      process_section_title: 'Composite Filling Treatment Planning',
+      candidate_section_title: 'Benefits of Composite Filling',
+      candidate_items: [
+        {
+          id: 'fill-cand-1',
+          title: 'Natural Looking',
+          description: 'Composite filling is a cavity filling intended to be long-lasting and natural-looking.',
+          display_order: 10
+        },
+        {
+          id: 'fill-cand-2',
+          title: 'Repairs Chipped & Broken Teeth',
+          description: 'Composite fillings can be used to repair chipped or broken teeth as well as to fill decayed areas of the teeth.',
+          display_order: 20
+        },
+        {
+          id: 'fill-cand-3',
+          title: 'Long-lasting Restoration',
+          description: 'Composite fillings are made of ceramic and resin materials that bond chemically to the tooth for an effective and long-lasting restoration.',
+          display_order: 30
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case photographs of Tooth Coloured Filling.',
+      gallery_items: [],
+      before_after_heading: 'Before & After Gallery',
+      before_after_description: 'See Tooth Coloured Filling before & after photographs.',
+      before_after_pairs: [
+        {
+          id: 'fill-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Tooth Coloured Filling Restoration',
+          display_order: 10
+        }
+      ],
+      procedure_video_title: 'Composite Filling Video Animation',
+      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      testimonials_section_title: 'Patient Testimonials',
+      patient_testimonials: [
+        {
+          id: 'fill-testi-1',
+          patient_name: 'Patient Tooth Coloured Filling Journey',
+          video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+          treatment_name: 'Tooth Coloured Filling',
+          display_order: 10
+        }
+      ],
+      hospital_team_title: 'Hospital & Team Gallery',
+      cost_heading: 'Tooth Coloured Filling Cost & Offers',
+      cost_description: 'Call or WhatsApp: 9510397046',
+      cost_starting_price: '',
+      cost_cards: [],
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      sec11_heading: 'Patel Dental Hospital',
+      sec11_sub: 'Call or WhatsApp: 9510397046 | Follow Us on Social Media',
+      phone_number: '9510397046',
+      whatsapp_number: '9510397046',
+      faqs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: false,
+      show_bottom_cta: true
+    }
   }
 ];
 
@@ -1673,6 +1889,41 @@ export const serviceService = {
                   description: defaultSvc.description,
                   intro_title: defaultSvc.intro_title,
                   process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  marketing_config: {
+                    ...defaultMCfg,
+                    ...mConfigObj,
+                    green_highlight_line: defaultMCfg.green_highlight_line,
+                    process_section_title: defaultMCfg.process_section_title,
+                    candidate_section_title: defaultMCfg.candidate_section_title,
+                    candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+                    cost_heading: defaultMCfg.cost_heading,
+                    cost_description: defaultMCfg.cost_description,
+                    phone_number: defaultMCfg.phone_number,
+                    whatsapp_number: defaultMCfg.whatsapp_number,
+                    show_candidate: true
+                  }
+                };
+              }
+            }
+            if (svc.id === 'wisdom-srv' || svc.slug === 'wisdom-tooth-surgery' || svc.slug === 'wisdom-teeth-surgery' || svc.slug === 'wisdom') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'wisdom-srv' || d.slug === 'wisdom-tooth-surgery');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                const defaultMCfg = (defaultSvc.marketing_config as MarketingConfig) || {};
+
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  slug: defaultSvc.slug,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  intro_title: defaultSvc.intro_title,
+                  process_steps: (Array.isArray(svc.process_steps) && svc.process_steps.length > 0) ? svc.process_steps : defaultSvc.process_steps,
                   features: defaultSvc.features,
                   marketing_config: {
                     ...defaultMCfg,
@@ -2088,6 +2339,52 @@ export const serviceService = {
               }
             };
             await serviceService.saveService(updatedPediatric);
+            needsRefetch = true;
+          }
+        }
+
+        const wisdom = data.find(s => s.id === 'wisdom-srv' || s.slug === 'wisdom-tooth-surgery' || s.slug === 'wisdom-teeth-surgery' || s.slug === 'wisdom');
+        if (wisdom) {
+          const defaultWisdom = DEFAULT_SERVICES.find(d => d.id === 'wisdom-srv' || d.slug === 'wisdom-tooth-surgery');
+          const mConfigObj = typeof wisdom.marketing_config === 'string'
+            ? JSON.parse(wisdom.marketing_config)
+            : (wisdom.marketing_config || {});
+          if (defaultWisdom && (
+            wisdom.short_description !== defaultWisdom.short_description ||
+            !wisdom.intro_title ||
+            !wisdom.process_steps ||
+            !Array.isArray(wisdom.process_steps) ||
+            wisdom.process_steps.length === 0 ||
+            !mConfigObj.candidate_items ||
+            !Array.isArray(mConfigObj.candidate_items) ||
+            mConfigObj.candidate_items.length === 0
+          )) {
+            const defaultMCfg = (defaultWisdom.marketing_config as MarketingConfig) || {};
+            const updatedWisdom = {
+              ...wisdom,
+              title: defaultWisdom.title,
+              slug: defaultWisdom.slug,
+              short_description: defaultWisdom.short_description,
+              hero_description: defaultWisdom.hero_description,
+              description: defaultWisdom.description,
+              intro_title: defaultWisdom.intro_title,
+              process_steps: defaultWisdom.process_steps,
+              features: defaultWisdom.features,
+              marketing_config: {
+                ...defaultMCfg,
+                ...mConfigObj,
+                candidate_items: defaultMCfg.candidate_items,
+                cost_heading: defaultMCfg.cost_heading,
+                cost_description: defaultMCfg.cost_description,
+                green_highlight_line: defaultMCfg.green_highlight_line,
+                process_section_title: defaultMCfg.process_section_title,
+                candidate_section_title: defaultMCfg.candidate_section_title,
+                phone_number: defaultMCfg.phone_number,
+                whatsapp_number: defaultMCfg.whatsapp_number,
+                show_candidate: true
+              }
+            };
+            await serviceService.saveService(updatedWisdom);
             needsRefetch = true;
           }
         }

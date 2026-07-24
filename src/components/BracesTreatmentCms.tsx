@@ -11,9 +11,10 @@ import { isSupabaseConfigured } from '../utils/supabase';
 
 interface BracesTreatmentCmsProps {
   onSaveSuccess?: () => void;
+  serviceSlug?: string;
 }
 
-export default function BracesTreatmentCms({ onSaveSuccess }: BracesTreatmentCmsProps = {}) {
+export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'braces-treatment' }: BracesTreatmentCmsProps = {}) {
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -100,88 +101,164 @@ export default function BracesTreatmentCms({ onSaveSuccess }: BracesTreatmentCms
     { id: 'braces-plan-6', title: 'Payment Plan Options', description: 'Payment Plan Options', display_order: 60 }
   ];
 
-  // Fetch Braces Treatment service on load
+  // Fetch service on load
   useEffect(() => {
     async function loadService() {
       setLoading(true);
       try {
         const services = await serviceService.getServices();
+        const targetSlug = serviceSlug || 'braces-treatment';
+        const isFilling = targetSlug.includes('filling') || targetSlug.includes('tooth-coloured');
+        
         let found = services.find(s => 
-          s.slug === 'braces-treatment' || 
-          s.slug === 'braces' || 
-          s.id === 'braces-srv' || 
-          s.id === 'braces' || 
-          s.title?.toLowerCase().includes('braces')
+          s.slug === targetSlug || 
+          (!isFilling && (s.slug === 'braces' || s.id === 'braces-srv' || s.id === 'braces' || s.title?.toLowerCase().includes('braces'))) ||
+          (isFilling && (s.slug === 'composite-filling' || s.id === 'filling-srv' || s.id === 'filling' || s.title?.toLowerCase().includes('filling') || s.title?.toLowerCase().includes('tooth coloured')))
         );
         
         if (!found) {
           // Fallback initial state if record is missing
-          found = {
-            id: 'braces-srv',
-            slug: 'braces-treatment',
-            title: 'Braces Treatment',
-            short_description: 'Braces treatment corrects crooked, misaligned, or crowded teeth at Patel Dental Hospital. Get a beautiful, straight smile with advanced metal, ceramic, and aligner options.',
-            hero_description: 'Braces treatment corrects crooked, misaligned, or crowded teeth at Patel Dental Hospital. Get a beautiful, straight smile with advanced metal, ceramic, and aligner options.',
-            description: 'Braces treatment corrects crooked, misaligned, or crowded teeth at Patel Dental Hospital. Get a beautiful, straight smile with advanced metal, ceramic, and aligner options.',
-            intro_title: 'What is Braces Treatment?',
-            hero_image: 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=1200',
-            icon: 'Grid',
-            display_order: 9,
-            is_active: true,
-            process_steps: DEFAULT_BRACES_PROCESS_STEPS,
-            features: [],
-            procedure_video_title: 'Braces Treatment Procedure Video',
-            procedure_video_url: '',
-            patient_testimonials: [],
-            hospital_team_photos: [],
-            marketing_config: {
-              green_highlight_line: 'Get Up to 30% Off on Braces & Aligners',
-              process_section_title: 'Braces Treatment Planning',
-              candidate_section_title: 'Treatment Planning Includes',
-              candidate_items: DEFAULT_BRACES_CANDIDATE_ITEMS,
-              gallery_heading: 'Clinical Case Gallery',
-              gallery_description: 'Clinical case study transformations of Braces treatments.',
-              gallery_items: [],
-              before_after_heading: 'Before & After Gallery',
-              before_after_description: 'See real braces smile transformations.',
-              before_after_pairs: [],
+          if (isFilling) {
+            found = {
+              id: 'filling-srv',
+              slug: 'tooth-coloured-filling',
+              title: 'Tooth Coloured Filling',
+              short_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.',
+              hero_title: 'Tooth Coloured Filling',
+              hero_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.',
+              description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.',
+              intro_title: 'What is Tooth Coloured Filling?',
+              intro_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.\n\nComposite fillings are made of ceramic and resin materials that bond chemically to the tooth. They can be used to repair chipped or broken teeth as well as to fill decayed areas of the teeth.\n\nBroken teeth, stained teeth, black gums, hideous gaps, or crooked teeth—our cosmetic dentistry can fix them all in a flash.',
+              hero_image: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=600',
+              icon: 'Shield',
+              display_order: 10,
+              is_active: true,
+              process_steps: [
+                { id: 'fill-step-1', phase: 'Card 1', title: 'Comfortable Treatment Experience', description: 'We know that getting a cavity filled can be a stressful experience for many adults and children, but we do our best to provide a safe, friendly, and comfortable atmosphere.\n\nAt Patel Dental Hospital, we have many options available to treat anxious patients.', display_order: 10 },
+                { id: 'fill-step-2', phase: 'Card 2', title: 'Advanced Filling Materials', description: 'You can rely on our professionals and advanced materials made in the USA for an effective and long-lasting filling.', display_order: 20 },
+                { id: 'fill-step-3', phase: 'Card 3', title: 'State-of-the-Art Equipment', description: 'We use the most advanced state-of-the-art equipment and materials, so your teeth receive the highest quality care they deserve.', display_order: 30 }
+              ],
+              features: [],
+              procedure_video_title: 'Composite Filling Video Animation',
+              procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+              patient_testimonials: [
+                { id: 'fill-testi-1', patient_name: 'Patient Tooth Coloured Filling Journey', video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew', treatment_name: 'Tooth Coloured Filling', display_order: 10 }
+              ],
+              hospital_team_photos: [],
+              marketing_config: {
+                green_highlight_line: 'Natural-Looking Composite Restorations',
+                process_section_title: 'Composite Filling Treatment Planning',
+                candidate_section_title: 'Benefits of Composite Filling',
+                candidate_items: [
+                  { id: 'fill-cand-1', title: 'Natural Looking', description: 'Composite filling is a cavity filling intended to be long-lasting and natural-looking.', display_order: 10 },
+                  { id: 'fill-cand-2', title: 'Repairs Chipped & Broken Teeth', description: 'Composite fillings can be used to repair chipped or broken teeth as well as to fill decayed areas of the teeth.', display_order: 20 },
+                  { id: 'fill-cand-3', title: 'Long-lasting Restoration', description: 'Composite fillings are made of ceramic and resin materials that bond chemically to the tooth for an effective and long-lasting restoration.', display_order: 30 }
+                ],
+                gallery_heading: 'Clinical Case Gallery',
+                gallery_description: 'Clinical case photographs of Tooth Coloured Filling.',
+                gallery_items: [],
+                before_after_heading: 'Before & After Gallery',
+                before_after_description: 'See Tooth Coloured Filling before & after photographs.',
+                before_after_pairs: [
+                  { id: 'fill-ba-1', before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600', after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600', caption: 'Tooth Coloured Filling Restoration', display_order: 10 }
+                ],
+                procedure_video_title: 'Composite Filling Video Animation',
+                procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+                testimonials_section_title: 'Patient Testimonials',
+                patient_testimonials: [
+                  { id: 'fill-testi-1', patient_name: 'Patient Tooth Coloured Filling Journey', video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew', treatment_name: 'Tooth Coloured Filling', display_order: 10 }
+                ],
+                hospital_team_title: 'Hospital & Team Gallery',
+                cost_heading: 'Tooth Coloured Filling Cost & Offers',
+                cost_description: 'Call or WhatsApp: 9510397046',
+                cost_starting_price: '',
+                cost_cards: [],
+                google_reviews_heading: 'Google Patient Reviews',
+                google_reviews: [],
+                sec11_heading: 'Patel Dental Hospital',
+                sec11_sub: 'Call or WhatsApp: 9510397046 | Follow Us on Social Media',
+                phone_number: '9510397046',
+                whatsapp_number: '9510397046',
+                faqs: [],
+                show_hero: true
+              }
+            };
+          } else {
+            found = {
+              id: 'braces-srv',
+              slug: 'braces-treatment',
+              title: 'Braces Treatment',
+              short_description: 'Braces treatment corrects crooked, misaligned, or crowded teeth at Patel Dental Hospital. Get a beautiful, straight smile with advanced metal, ceramic, and aligner options.',
+              hero_description: 'Braces treatment corrects crooked, misaligned, or crowded teeth at Patel Dental Hospital. Get a beautiful, straight smile with advanced metal, ceramic, and aligner options.',
+              description: 'Braces treatment corrects crooked, misaligned, or crowded teeth at Patel Dental Hospital. Get a beautiful, straight smile with advanced metal, ceramic, and aligner options.',
+              intro_title: 'What is Braces Treatment?',
+              hero_image: 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=1200',
+              icon: 'Grid',
+              display_order: 9,
+              is_active: true,
+              process_steps: DEFAULT_BRACES_PROCESS_STEPS,
+              features: [],
               procedure_video_title: 'Braces Treatment Procedure Video',
               procedure_video_url: '',
-              testimonials_section_title: 'Patient Testimonials',
-              hospital_team_title: 'Hospital & Team Gallery',
-              cost_heading: 'Braces Treatment Cost & Offers',
-              cost_description: 'Transparent pricing & flexible installment plans available. Call: 9510397046',
-              cost_starting_price: '',
-              cost_cards: [],
-              google_reviews_heading: 'Google Patient Reviews',
-              google_reviews: [],
-              sec11_heading: 'Patel Dental Hospital',
-              phone_number: '9510397046',
-              whatsapp_number: '9510397046',
-              faqs: [],
-              show_hero: true
-            }
-          };
+              patient_testimonials: [],
+              hospital_team_photos: [],
+              marketing_config: {
+                green_highlight_line: 'Get Up to 30% Off on Braces & Aligners',
+                process_section_title: 'Braces Treatment Planning',
+                candidate_section_title: 'Treatment Planning Includes',
+                candidate_items: DEFAULT_BRACES_CANDIDATE_ITEMS,
+                gallery_heading: 'Clinical Case Gallery',
+                gallery_description: 'Clinical case study transformations of Braces treatments.',
+                gallery_items: [],
+                before_after_heading: 'Before & After Gallery',
+                before_after_description: 'See real braces smile transformations.',
+                before_after_pairs: [],
+                procedure_video_title: 'Braces Treatment Procedure Video',
+                procedure_video_url: '',
+                testimonials_section_title: 'Patient Testimonials',
+                hospital_team_title: 'Hospital & Team Gallery',
+                cost_heading: 'Braces Treatment Cost & Offers',
+                cost_description: 'Transparent pricing & flexible installment plans available. Call: 9510397046',
+                cost_starting_price: '',
+                cost_cards: [],
+                google_reviews_heading: 'Google Patient Reviews',
+                google_reviews: [],
+                sec11_heading: 'Patel Dental Hospital',
+                phone_number: '9510397046',
+                whatsapp_number: '9510397046',
+                faqs: [],
+                show_hero: true
+              }
+            };
+          }
         } else {
           const curMConfig = (found.marketing_config || {}) as any;
           const candidateItems = Array.isArray(curMConfig.candidate_items) ? curMConfig.candidate_items : [];
           
           let updatedCandidateItems = [...candidateItems];
           if (updatedCandidateItems.length === 0) {
-            updatedCandidateItems = DEFAULT_BRACES_CANDIDATE_ITEMS;
+            updatedCandidateItems = isFilling ? [
+              { id: 'fill-cand-1', title: 'Natural Looking', description: 'Composite filling is a cavity filling intended to be long-lasting and natural-looking.', display_order: 10 },
+              { id: 'fill-cand-2', title: 'Repairs Chipped & Broken Teeth', description: 'Composite fillings can be used to repair chipped or broken teeth as well as to fill decayed areas of the teeth.', display_order: 20 },
+              { id: 'fill-cand-3', title: 'Long-lasting Restoration', description: 'Composite fillings are made of ceramic and resin materials that bond chemically to the tooth for an effective and long-lasting restoration.', display_order: 30 }
+            ] : DEFAULT_BRACES_CANDIDATE_ITEMS;
           }
 
           let updatedProcessSteps = Array.isArray(found.process_steps) && found.process_steps.length > 0 
             ? found.process_steps 
-            : DEFAULT_BRACES_PROCESS_STEPS;
+            : (isFilling ? [
+                { id: 'fill-step-1', phase: 'Card 1', title: 'Comfortable Treatment Experience', description: 'We know that getting a cavity filled can be a stressful experience for many adults and children, but we do our best to provide a safe, friendly, and comfortable atmosphere.\n\nAt Patel Dental Hospital, we have many options available to treat anxious patients.', display_order: 10 },
+                { id: 'fill-step-2', phase: 'Card 2', title: 'Advanced Filling Materials', description: 'You can rely on our professionals and advanced materials made in the USA for an effective and long-lasting filling.', display_order: 20 },
+                { id: 'fill-step-3', phase: 'Card 3', title: 'State-of-the-Art Equipment', description: 'We use the most advanced state-of-the-art equipment and materials, so your teeth receive the highest quality care they deserve.', display_order: 30 }
+              ] : DEFAULT_BRACES_PROCESS_STEPS);
 
           found = {
             ...found,
             process_steps: updatedProcessSteps,
             marketing_config: {
               ...curMConfig,
-              process_section_title: curMConfig.process_section_title || 'Braces Treatment Planning',
-              candidate_section_title: curMConfig.candidate_section_title || 'Treatment Planning Includes',
+              process_section_title: curMConfig.process_section_title || (isFilling ? 'Composite Filling Treatment Planning' : 'Braces Treatment Planning'),
+              candidate_section_title: curMConfig.candidate_section_title || (isFilling ? 'Benefits of Composite Filling' : 'Treatment Planning Includes'),
               candidate_items: updatedCandidateItems
             }
           };
@@ -189,15 +266,15 @@ export default function BracesTreatmentCms({ onSaveSuccess }: BracesTreatmentCms
 
         setService(found);
       } catch (err: any) {
-        console.error('Error loading Braces Treatment service:', err);
-        setErrorMsg('Failed to load Braces Treatment data.');
+        console.error('Error loading service:', err);
+        setErrorMsg('Failed to load service data.');
       } finally {
         setLoading(false);
       }
     }
 
     loadService();
-  }, []);
+  }, [serviceSlug]);
 
   if (loading) {
     return (
@@ -557,14 +634,14 @@ export default function BracesTreatmentCms({ onSaveSuccess }: BracesTreatmentCms
               Universal CMS
             </span>
             <span className="text-slate-400 text-xs">•</span>
-            <span className="text-slate-500 text-xs font-mono">braces-treatment</span>
+            <span className="text-slate-500 text-xs font-mono">{service?.slug || serviceSlug}</span>
           </div>
           <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900 mt-1 flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-[#0D9488]" />
-            Braces Treatment CMS
+            {service?.title || 'Braces Treatment'} CMS
           </h1>
           <p className="text-slate-500 text-xs md:text-sm mt-1">
-            Manage all 13 sections for Braces Treatment with live preview and instant persistence.
+            Manage all 13 sections for {service?.title || 'Braces Treatment'} with live preview and instant persistence.
           </p>
         </div>
 

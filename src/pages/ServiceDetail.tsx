@@ -165,9 +165,17 @@ export default function ServiceDetail({
     return service?.id === 'braces-srv' || service?.id === 'braces' || service?.slug === 'braces-treatment' || service?.slug === 'braces' || slug === 'braces-treatment' || slug === 'braces' || (service?.title ? service.title.toLowerCase().includes('braces') : false);
   }, [service, slug]);
 
+  const isWisdomToothSurgery = React.useMemo(() => {
+    return service?.id === 'wisdom-srv' || service?.id === 'wisdom' || service?.slug === 'wisdom-tooth-surgery' || service?.slug === 'wisdom-teeth-surgery' || service?.slug === 'wisdom' || slug === 'wisdom-tooth-surgery' || slug === 'wisdom-teeth-surgery' || slug === 'wisdom' || (service?.title ? service.title.toLowerCase().includes('wisdom') : false);
+  }, [service, slug]);
+
+  const isToothColouredFilling = React.useMemo(() => {
+    return service?.id === 'filling-srv' || service?.id === 'filling' || service?.slug === 'tooth-coloured-filling' || service?.slug === 'composite-filling' || slug === 'tooth-coloured-filling' || slug === 'composite-filling' || (service?.title ? service.title.toLowerCase().includes('filling') || service.title.toLowerCase().includes('tooth coloured') : false);
+  }, [service, slug]);
+
   const isNewArchitecture = React.useMemo(() => {
-    return isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment;
-  }, [isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment]);
+    return isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling;
+  }, [isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
 
   const mConfig = React.useMemo(() => {
     if (!service || !service.marketing_config) return {};
@@ -356,8 +364,40 @@ export default function ServiceDetail({
         }
       ];
     }
+    if (isWisdomToothSurgery) {
+      return [
+        {
+          id: 'wisdom-tech-1',
+          title: 'Piezoelectric Device',
+          description: '',
+          display_order: 10
+        }
+      ];
+    }
+    if (isToothColouredFilling) {
+      return [
+        {
+          id: 'fill-cand-1',
+          title: 'Natural Looking',
+          description: 'Restorations blend seamlessly with your surrounding natural tooth structure.',
+          display_order: 10
+        },
+        {
+          id: 'fill-cand-2',
+          title: 'Repairs Chipped & Broken Teeth',
+          description: 'Restores structural integrity and aesthetics to damaged or decayed teeth.',
+          display_order: 20
+        },
+        {
+          id: 'fill-cand-3',
+          title: 'Long-lasting Restoration',
+          description: 'High-strength composite resin provides durable and resilient function.',
+          display_order: 30
+        }
+      ];
+    }
     return [];
-  }, [mConfig, service, fallback, isFullMouth, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry]);
+  }, [mConfig, service, fallback, isFullMouth, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isWisdomToothSurgery, isToothColouredFilling]);
 
   const displayTestimonials = React.useMemo(() => {
     if (!service) return [];
@@ -385,13 +425,13 @@ export default function ServiceDetail({
       if (fallback?.marketing_config && Array.isArray(fallback.marketing_config.patient_testimonials) && fallback.marketing_config.patient_testimonials.length > 0) {
         return fallback.marketing_config.patient_testimonials;
       }
-      if (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment) {
+      if (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) {
         return [
           {
             id: 'testi-1',
-            patient_name: isBracesTreatment ? 'Patient Braces Treatment Journey' : isPediatricDentistry ? 'Child & Parent Care Journey' : isTeethWhitening ? 'Patient Teeth Whitening Journey' : isCrownsAndBridges ? 'Patient Crown & Bridges Journey' : isSmileMakeover ? 'Patient Smile Makeover Journey' : isInvisibleAligners ? 'Patient Invisible Aligners Journey' : isFullMouth ? 'Patient Full Mouth Journey' : 'Patient Testimonial',
-            video_url: (isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/',
-            treatment_name: service?.title || (isBracesTreatment ? 'Braces Treatment' : isPediatricDentistry ? 'Pediatric Dentistry' : isTeethWhitening ? 'Teeth Whitening' : isCrownsAndBridges ? 'Crowns & Bridges' : isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Treatment'),
+            patient_name: isToothColouredFilling ? 'Patient Tooth Coloured Filling Journey' : isWisdomToothSurgery ? 'Patient Wisdom Tooth Surgery Journey' : isBracesTreatment ? 'Patient Braces Treatment Journey' : isPediatricDentistry ? 'Child & Parent Care Journey' : isTeethWhitening ? 'Patient Teeth Whitening Journey' : isCrownsAndBridges ? 'Patient Crown & Bridges Journey' : isSmileMakeover ? 'Patient Smile Makeover Journey' : isInvisibleAligners ? 'Patient Invisible Aligners Journey' : isFullMouth ? 'Patient Full Mouth Journey' : 'Patient Testimonial',
+            video_url: (isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/',
+            treatment_name: service?.title || (isToothColouredFilling ? 'Tooth Coloured Filling' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery' : isBracesTreatment ? 'Braces Treatment' : isPediatricDentistry ? 'Pediatric Dentistry' : isTeethWhitening ? 'Teeth Whitening' : isCrownsAndBridges ? 'Crowns & Bridges' : isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Treatment'),
             display_order: 10
           }
         ];
@@ -399,7 +439,7 @@ export default function ServiceDetail({
       return [];
     }
     return [...list].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [service, fallback, mConfig, isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment]);
+  }, [service, fallback, mConfig, isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
 
   const displayTeamPhotos = React.useMemo(() => {
     let list: any[] = [];
@@ -694,6 +734,13 @@ export default function ServiceDetail({
       }
     }
     if (isNewArchitecture) {
+      if (isToothColouredFilling && rawSteps.length === 0) {
+        return [
+          { id: 'fill-step-1', phase: 'Card 1', title: 'Comfortable Treatment Experience', description: 'We know that getting a cavity filled can be a stressful experience for many adults and children, but we do our best to provide a safe, friendly, and comfortable atmosphere.\n\nAt Patel Dental Hospital, we have many options available to treat anxious patients.', display_order: 10 },
+          { id: 'fill-step-2', phase: 'Card 2', title: 'Advanced Filling Materials', description: 'You can rely on our professionals and advanced materials made in the USA for an effective and long-lasting filling.', display_order: 20 },
+          { id: 'fill-step-3', phase: 'Card 3', title: 'State-of-the-Art Equipment', description: 'We use the most advanced state-of-the-art equipment and materials, so your teeth receive the highest quality care they deserve.', display_order: 30 }
+        ];
+      }
       return Array.isArray(rawSteps)
         ? [...rawSteps].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
         : [];
@@ -817,11 +864,31 @@ export default function ServiceDetail({
           display_order: 10
         }
       ];
+    } else if (isWisdomToothSurgery) {
+      list = [
+        {
+          id: 'wisdom-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Wisdom Tooth Surgery Extraction',
+          display_order: 10
+        }
+      ];
+    } else if (isToothColouredFilling) {
+      list = [
+        {
+          id: 'fill-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Composite Filling Tooth Restoration',
+          display_order: 10
+        }
+      ];
     }
     return [...list]
       .filter((p: any) => p && p.before_image && p.after_image)
       .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment]);
+  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
 
   // If loading, display the skeleton state first
   if (isLoading) {
@@ -1351,7 +1418,7 @@ export default function ServiceDetail({
                   
                   {/* Section Heading */}
                   <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : (isBracesTreatment ? 'What is Braces Treatment?' : isInvisibleAligners ? 'What is Invisible Aligners?' : isRootCanal ? 'What is Single Sitting Root Canal?' : isFullMouth ? 'What is Full Mouth Rehabilitation?' : 'About the Treatment')}
+                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : (isToothColouredFilling ? 'What is Tooth Coloured Filling?' : isWisdomToothSurgery ? 'What is Wisdom Tooth Surgery?' : isBracesTreatment ? 'What is Braces Treatment?' : isInvisibleAligners ? 'What is Invisible Aligners?' : isRootCanal ? 'What is Single Sitting Root Canal?' : isFullMouth ? 'What is Full Mouth Rehabilitation?' : 'About the Treatment')}
                   </h2>
                   
                   {/* Subtle divider line */}
@@ -1536,8 +1603,8 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment) 
-            ? ((isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
+          const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) 
+            ? ((isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
             : (fallback?.procedure_video_url || fallback?.marketing_config?.procedure_video_url || '');
           const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultVideoUrl || '').trim();
           
@@ -1565,6 +1632,10 @@ export default function ServiceDetail({
               effectiveVideoTitle = 'Pediatric Dentistry Procedure Video';
             } else if (isBracesTreatment) {
               effectiveVideoTitle = 'Braces Treatment Procedure Video';
+            } else if (isWisdomToothSurgery) {
+              effectiveVideoTitle = 'Wisdom Tooth Surgery Procedure Video';
+            } else if (isToothColouredFilling) {
+              effectiveVideoTitle = 'Tooth Coloured Filling Procedure Video';
             } else {
               effectiveVideoTitle = fallback.procedure_video_title || 'Procedure Video';
             }
@@ -1990,7 +2061,7 @@ export default function ServiceDetail({
                         Clinical Workflow
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.process_section_title || (isBracesTreatment ? 'Braces Treatment Planning' : isPediatricDentistry ? 'Pediatric Dentistry Treatment Planning' : isTeethWhitening ? 'Teeth Whitening Treatment Planning' : isCrownsAndBridges ? 'Crown & Bridges Treatment Planning' : isSmileMakeover ? 'Smile Makeover Treatment Planning' : isInvisibleAligners ? 'Invisible Aligners Treatment Planning' : isRootCanal ? 'How We Perform Single Sitting Root Canal' : isFullMouth ? 'How We Perform Full Mouth Rehabilitation' : 'How We Perform Dental Implants')}
+                        {mConfig.process_section_title || (isToothColouredFilling ? 'Composite Filling Treatment Planning' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Treatment Planning' : isBracesTreatment ? 'Braces Treatment Planning' : isPediatricDentistry ? 'Pediatric Dentistry Treatment Planning' : isTeethWhitening ? 'Teeth Whitening Treatment Planning' : isCrownsAndBridges ? 'Crown & Bridges Treatment Planning' : isSmileMakeover ? 'Smile Makeover Treatment Planning' : isInvisibleAligners ? 'Invisible Aligners Treatment Planning' : isRootCanal ? 'How We Perform Single Sitting Root Canal' : isFullMouth ? 'How We Perform Full Mouth Rehabilitation' : 'How We Perform Dental Implants')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -2044,7 +2115,7 @@ export default function ServiceDetail({
                 )}
 
                 {/* Section 4: Why Our Method Is Superior (Dynamic Comparison Cards) */}
-                {(mConfig.show_benefits !== false && !isInvisibleAligners && !isSmileMakeover && !isCrownsAndBridges && !isTeethWhitening && !isPediatricDentistry && !isBracesTreatment) && (
+                {(mConfig.show_benefits !== false && !isInvisibleAligners && !isSmileMakeover && !isCrownsAndBridges && !isTeethWhitening && !isPediatricDentistry && !isBracesTreatment && !isWisdomToothSurgery && !isToothColouredFilling) && (
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-superior">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
@@ -2098,10 +2169,10 @@ export default function ServiceDetail({
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <Users className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        {isBracesTreatment ? 'Treatment Planning' : isPediatricDentistry ? 'Pediatric Services' : isTeethWhitening ? 'Whitening Methods' : isCrownsAndBridges ? 'Materials & Options' : 'Candidate Profile'}
+                        {isToothColouredFilling ? 'Clinical Benefits' : isBracesTreatment ? 'Treatment Planning' : isWisdomToothSurgery ? 'Surgical Technology' : isPediatricDentistry ? 'Pediatric Services' : isTeethWhitening ? 'Whitening Methods' : isCrownsAndBridges ? 'Materials & Options' : 'Candidate Profile'}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.candidate_section_title || (isBracesTreatment ? 'Treatment Planning Includes' : isPediatricDentistry ? 'Pediatric Dental Services' : isTeethWhitening ? 'Teeth Whitening Methods' : isCrownsAndBridges ? 'Crown & Bridge Materials' : isSmileMakeover ? 'Smile Makeover Options' : isFullMouth ? 'Who Is a Candidate for Full Mouth Rehabilitation' : 'Options & Candidates')}
+                        {mConfig.candidate_section_title || (isToothColouredFilling ? 'Benefits of Composite Filling' : isWisdomToothSurgery ? 'Advanced Surgical Technology' : isBracesTreatment ? 'Treatment Planning Includes' : isPediatricDentistry ? 'Pediatric Dental Services' : isTeethWhitening ? 'Teeth Whitening Methods' : isCrownsAndBridges ? 'Crown & Bridge Materials' : isSmileMakeover ? 'Smile Makeover Options' : isFullMouth ? 'Who Is a Candidate for Full Mouth Rehabilitation' : 'Options & Candidates')}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -2117,7 +2188,7 @@ export default function ServiceDetail({
                             <div className="flex items-center gap-2 mb-3">
                               <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0" />
                               <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                                {isBracesTreatment ? `Item ${idx + 1}` : isPediatricDentistry ? `Service ${idx + 1}` : isTeethWhitening ? `Method ${idx + 1}` : isCrownsAndBridges ? `Material ${idx + 1}` : `Indication ${idx + 1}`}
+                                {isToothColouredFilling ? `Benefit ${idx + 1}` : isBracesTreatment ? `Item ${idx + 1}` : isPediatricDentistry ? `Service ${idx + 1}` : isTeethWhitening ? `Method ${idx + 1}` : isCrownsAndBridges ? `Material ${idx + 1}` : `Indication ${idx + 1}`}
                               </span>
                             </div>
                             {cand.title && cand.title.trim() !== '' && (
@@ -2146,7 +2217,7 @@ export default function ServiceDetail({
                         {mConfig.before_after_heading || 'Before & After Smile Transformations'}
                       </h2>
                       <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        {mConfig.before_after_description || (isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
+                        {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -2174,7 +2245,7 @@ export default function ServiceDetail({
                     heading={mConfig.gallery_heading || 'Clinical Case Gallery'}
                     description={mConfig.gallery_description}
                     items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
-                    singleGallery={isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment}
+                    singleGallery={isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling}
                   />
                 )}
 
@@ -2202,7 +2273,7 @@ export default function ServiceDetail({
                               Transparent Pricing
                             </span>
                             <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                              {mConfig.cost_heading || (isBracesTreatment ? 'Braces Treatment Cost & Offers' : isPediatricDentistry ? 'Pediatric Dentistry Cost / Offer' : isTeethWhitening ? 'Teeth Whitening Cost & Offer' : isCrownsAndBridges ? 'Crown & Bridges Cost & Offer' : isSmileMakeover ? 'Smile Makeover Consultation' : isInvisibleAligners ? 'Invisible Aligners Treatment Cost & Offer' : isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
+                              {mConfig.cost_heading || (isToothColouredFilling ? 'Tooth Coloured Filling Cost & Offers' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Cost & Offers' : isBracesTreatment ? 'Braces Treatment Cost & Offers' : isPediatricDentistry ? 'Pediatric Dentistry Cost / Offer' : isTeethWhitening ? 'Teeth Whitening Cost & Offer' : isCrownsAndBridges ? 'Crown & Bridges Cost & Offer' : isSmileMakeover ? 'Smile Makeover Consultation' : isInvisibleAligners ? 'Invisible Aligners Treatment Cost & Offer' : isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
                             </h2>
                           </div>
 
@@ -2287,7 +2358,7 @@ export default function ServiceDetail({
                           Clinical Consultation
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                          {mConfig.sec11_heading || (isBracesTreatment ? 'Book Your Braces Treatment Consultation' : isPediatricDentistry ? 'Book Your Pediatric Dentistry Consultation' : isTeethWhitening ? 'Book Your Teeth Whitening Consultation' : isCrownsAndBridges ? 'Book Your Crown & Bridges Consultation' : isSmileMakeover ? 'Book Your Smile Makeover Consultation' : isInvisibleAligners ? 'Book Your Invisible Aligners Consultation' : isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
+                          {mConfig.sec11_heading || (isToothColouredFilling ? 'Book Your Tooth Coloured Filling Consultation' : isWisdomToothSurgery ? 'Book Your Wisdom Tooth Surgery Consultation' : isBracesTreatment ? 'Book Your Braces Treatment Consultation' : isPediatricDentistry ? 'Book Your Pediatric Dentistry Consultation' : isTeethWhitening ? 'Book Your Teeth Whitening Consultation' : isCrownsAndBridges ? 'Book Your Crown & Bridges Consultation' : isSmileMakeover ? 'Book Your Smile Makeover Consultation' : isInvisibleAligners ? 'Book Your Invisible Aligners Consultation' : isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
                         </h2>
                         {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
                           <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
@@ -2299,7 +2370,7 @@ export default function ServiceDetail({
                       <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
                         <button
                           type="button"
-                          onClick={() => openAppointmentModal(service?.title || (isBracesTreatment ? 'Braces Treatment' : isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isRootCanal ? 'Single Sitting Root Canal' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Implants'))}
+                          onClick={() => openAppointmentModal(service?.title || (isToothColouredFilling ? 'Tooth Coloured Filling' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery' : isBracesTreatment ? 'Braces Treatment' : isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isRootCanal ? 'Single Sitting Root Canal' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Implants'))}
                           className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                         >
                           <Calendar className="h-4.5 w-4.5 shrink-0" />

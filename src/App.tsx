@@ -64,7 +64,7 @@ export default function App() {
   useEffect(() => {
     const loadMyAppointments = async () => {
       try {
-        const bookedIds = JSON.parse(sessionStorage.getItem('my_booked_ids') || '[]');
+        const bookedIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
         if (bookedIds.length === 0) return;
 
         const { data, error } = await supabase.client
@@ -249,7 +249,7 @@ export default function App() {
 
     const checkMockSession = () => {
       try {
-        const mockSessStr = sessionStorage.getItem('mock_admin_session') || localStorage.getItem('mock_admin_session');
+        const mockSessStr = safeStorage.getSessionItem('mock_admin_session') || safeStorage.getItem('mock_admin_session');
         if (mockSessStr) {
           return JSON.parse(mockSessStr);
         }
@@ -466,8 +466,8 @@ export default function App() {
         };
         setAppointments(prev => [patientFormat, ...prev]);
         
-        const existingSessionIds = JSON.parse(sessionStorage.getItem('my_booked_ids') || '[]');
-        sessionStorage.setItem('my_booked_ids', JSON.stringify([newId, ...existingSessionIds]));
+        const existingSessionIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
+        safeStorage.setSessionItem('my_booked_ids', JSON.stringify([newId, ...existingSessionIds]));
         return true;
       }
     } catch (e) {
@@ -487,9 +487,9 @@ export default function App() {
         console.error('Error cancelling appointment on Supabase:', error);
       } else {
         setAppointments(prev => prev.filter((apt) => apt.id !== id));
-        const bookedIds = JSON.parse(sessionStorage.getItem('my_booked_ids') || '[]');
+        const bookedIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
         const updatedIds = bookedIds.filter((bid: string) => bid !== id);
-        sessionStorage.setItem('my_booked_ids', JSON.stringify(updatedIds));
+        safeStorage.setSessionItem('my_booked_ids', JSON.stringify(updatedIds));
       }
     } catch (e) {
       console.error('Exception cancelling appointment:', e);

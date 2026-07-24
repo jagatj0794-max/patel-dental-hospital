@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck, Lock, Mail, ArrowLeft, AlertCircle, CheckCircle2, Loader2, Eye, EyeOff } from 'lucide-react';
 import { PageId } from '../types';
+import { safeStorage } from '../utils/storage';
 import { supabase, isSupabaseConfigured, sanitizeEnvValue, getSupabaseConfigError } from '../utils/supabase';
 
 interface AdminLoginProps {
@@ -194,8 +195,8 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
       access_token: 'demo-token-12345'
     };
 
-    sessionStorage.setItem('mock_admin_session', JSON.stringify(demoSession));
-    localStorage.setItem('mock_admin_session', JSON.stringify(demoSession));
+    safeStorage.setSessionItem('mock_admin_session', JSON.stringify(demoSession));
+    safeStorage.setItem('mock_admin_session', JSON.stringify(demoSession));
 
     setTimeout(() => {
       window.dispatchEvent(new Event('admin-auth-change'));

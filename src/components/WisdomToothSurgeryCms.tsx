@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart,
-  Sparkles, MessageSquare, ArrowUp, ArrowDown, Info, Upload, Star, HelpCircle, Stethoscope, Users, Layers, DollarSign, Phone
+  Sparkles, MessageSquare, ArrowUp, ArrowDown, Info, Upload, Star, HelpCircle, Stethoscope, Users, Layers, DollarSign, Phone, Activity
 } from 'lucide-react';
 import { Service } from '../types';
 import { serviceService } from '../utils/serviceData';
@@ -64,21 +64,21 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
       id: 'wisdom-step-1',
       phase: 'Stage 1',
       title: 'Diagnosis',
-      description: '',
+      description: 'First, our expert takes an OPG X-ray to evaluate the position of the wisdom tooth in relation to the adjacent teeth, nerves, and other vital structures so that proper care can be taken during surgery.',
       display_order: 10
     },
     {
       id: 'wisdom-step-2',
       phase: 'Stage 2',
       title: 'Numbing',
-      description: '',
+      description: 'The oral surgeon administers local anesthesia to numb the wisdom tooth and the surrounding area.\n\nWe then wait for approximately 15 minutes until complete numbness is achieved.',
       display_order: 20
     },
     {
       id: 'wisdom-step-3',
       phase: 'Stage 3',
       title: 'Tooth Removal',
-      description: '',
+      description: 'The oral surgeon removes the wisdom tooth using special instruments within a few minutes without causing pain.\n\nStitches are then placed for better healing of the tissues.',
       display_order: 30
     }
   ];
@@ -88,7 +88,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
     {
       id: 'wisdom-tech-1',
       title: 'Piezoelectric Device',
-      description: '',
+      description: 'If the wisdom tooth is very close to a nerve, our oral surgeon uses a piezoelectric device to remove the tooth without damaging the nerve.\n\nThis facility is available at Patel Dental Hospital, one of the leading dental hospitals in Rajkot, Gujarat.',
       display_order: 10
     }
   ];
@@ -114,69 +114,95 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             id: 'wisdom-srv',
             slug: 'wisdom-tooth-surgery',
             title: 'Wisdom Tooth Surgery',
-            short_description: '',
-            hero_description: '',
-            description: '',
-            intro_title: 'What is Wisdom Tooth Surgery?',
+            short_description: 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            hero_description: 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            description: 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            intro_title: 'What is a Wisdom Tooth?',
+            intro_description: 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
             hero_image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=1200',
             icon: 'Activity',
             display_order: 10,
             is_active: true,
             process_steps: DEFAULT_WISDOM_PROCESS_STEPS,
             features: [],
-            procedure_video_title: 'Wisdom Tooth Surgery Procedure Video',
-            procedure_video_url: '',
-            patient_testimonials: [],
+            procedure_video_title: 'Wisdom Tooth Removal Video Animation',
+            procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+            patient_testimonials: [
+              {
+                id: 'testi-1',
+                patient_name: 'Patient Wisdom Tooth Surgery Journey',
+                video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+                treatment_name: 'Wisdom Tooth Surgery',
+                display_order: 10
+              }
+            ],
             hospital_team_photos: [],
             marketing_config: {
-              green_highlight_line: '',
+              green_highlight_line: 'Painless and Quick Wisdom Tooth Removal Surgery',
               process_section_title: 'Wisdom Tooth Surgery Treatment Planning',
               candidate_section_title: 'Advanced Surgical Technology',
               candidate_items: DEFAULT_WISDOM_CANDIDATE_ITEMS,
               gallery_heading: 'Clinical Case Gallery',
-              gallery_description: '',
+              gallery_description: 'Clinical case photographs of Wisdom Tooth Surgery.',
               gallery_items: [],
               before_after_heading: 'Before & After Gallery',
-              before_after_description: '',
+              before_after_description: 'See real transformations of our wisdom tooth surgery patients.',
               before_after_pairs: [],
-              procedure_video_title: 'Wisdom Tooth Surgery Procedure Video',
-              procedure_video_url: '',
+              procedure_video_title: 'Wisdom Tooth Removal Video Animation',
+              procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
               testimonials_section_title: 'Patient Testimonials',
               hospital_team_title: 'Hospital & Team Gallery',
               cost_heading: 'Wisdom Tooth Surgery Cost & Offers',
-              cost_description: '',
+              cost_description: 'Call or WhatsApp: 9510397046',
               cost_starting_price: '',
               cost_cards: [],
               google_reviews_heading: 'Google Patient Reviews',
               google_reviews: [],
               sec11_heading: 'Patel Dental Hospital',
+              sec11_sub: 'Call or WhatsApp: 9510397046 | Follow Us on Social Media',
               phone_number: '9510397046',
               whatsapp_number: '9510397046',
               faqs: [],
-              show_hero: true
+              show_hero: true,
+              show_introduction: true,
+              show_process: true,
+              show_candidate: true,
+              show_before_after: true,
+              show_gallery: true,
+              show_procedure_video: true,
+              show_testimonials: true,
+              show_hospital_photos: true,
+              show_cost: true,
+              show_google_reviews: true,
+              show_faqs: false,
+              show_bottom_cta: true
             }
           };
         } else {
           const curMConfig = (found.marketing_config || {}) as any;
-          const candidateItems = Array.isArray(curMConfig.candidate_items) ? curMConfig.candidate_items : [];
-          
-          let updatedCandidateItems = [...candidateItems];
-          if (updatedCandidateItems.length === 0) {
-            updatedCandidateItems = DEFAULT_WISDOM_CANDIDATE_ITEMS;
-          }
-
-          let updatedProcessSteps = Array.isArray(found.process_steps) && found.process_steps.length > 0 
-            ? found.process_steps 
-            : DEFAULT_WISDOM_PROCESS_STEPS;
+          const candidateItems = Array.isArray(curMConfig.candidate_items) && curMConfig.candidate_items.length > 0 ? curMConfig.candidate_items : DEFAULT_WISDOM_CANDIDATE_ITEMS;
+          const updatedProcessSteps = Array.isArray(found.process_steps) && found.process_steps.length > 0 ? found.process_steps : DEFAULT_WISDOM_PROCESS_STEPS;
 
           found = {
             ...found,
+            short_description: found.short_description || 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            hero_description: found.hero_description || 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            description: found.description || 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            intro_title: found.intro_title || 'What is a Wisdom Tooth?',
+            intro_description: found.intro_description || 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
+            procedure_video_title: found.procedure_video_title || 'Wisdom Tooth Removal Video Animation',
             process_steps: updatedProcessSteps,
             marketing_config: {
               ...curMConfig,
               process_section_title: curMConfig.process_section_title || 'Wisdom Tooth Surgery Treatment Planning',
               candidate_section_title: curMConfig.candidate_section_title || 'Advanced Surgical Technology',
-              candidate_items: updatedCandidateItems
+              candidate_items: candidateItems,
+              cost_heading: curMConfig.cost_heading || 'Wisdom Tooth Surgery Cost & Offers',
+              cost_description: curMConfig.cost_description || 'Call or WhatsApp: 9510397046',
+              phone_number: curMConfig.phone_number || '9510397046',
+              whatsapp_number: curMConfig.whatsapp_number || '9510397046',
+              sec11_heading: curMConfig.sec11_heading || 'Patel Dental Hospital',
+              sec11_sub: curMConfig.sec11_sub || 'Call or WhatsApp: 9510397046 | Follow Us on Social Media'
             }
           };
         }
@@ -508,35 +534,41 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800">
-      {/* Header Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-3xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="space-y-6">
+      {/* Top Banner & Header */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-150 shadow-3xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 bg-teal-50 text-[#0D9488] text-[10px] font-extrabold uppercase tracking-wider rounded-lg border border-teal-100">
-              Universal Service CMS
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-50 text-teal-700 border border-teal-200">
+              Universal CMS
             </span>
-            <span className="text-xs text-slate-400 font-mono">wisdom-tooth-surgery</span>
+            <span className="text-slate-400 text-xs">•</span>
+            <span className="text-slate-500 text-xs font-mono">wisdom-tooth-surgery</span>
           </div>
-          <h2 className="text-xl font-extrabold text-[#081C3A] mt-1">Wisdom Tooth Surgery CMS Manager</h2>
-          <p className="text-xs text-slate-500 font-medium">Manage all 13 content sections for Wisdom Tooth Surgery service page.</p>
+          <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900 mt-1 flex items-center gap-2">
+            <Activity className="h-6 w-6 text-[#0D9488]" />
+            Wisdom Tooth Surgery CMS
+          </h1>
+          <p className="text-slate-500 text-xs md:text-sm mt-1">
+            Manage all 13 sections for Wisdom Tooth Surgery with live preview and instant persistence.
+          </p>
         </div>
 
         <button
           type="button"
           onClick={() => handleSaveAll()}
           disabled={saving}
-          className="px-6 py-2.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0D9488] hover:bg-[#0B7A70] text-white rounded-xl text-xs font-extrabold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer disabled:opacity-50 shrink-0"
         >
           {saving ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-              <span>Saving...</span>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+              <span>Saving Changes...</span>
             </>
           ) : (
             <>
               <Save className="h-4 w-4" />
-              <span>Save All Changes</span>
+              <span>Save AI Configurations</span>
             </>
           )}
         </button>
@@ -544,1025 +576,1141 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
       {/* Notifications */}
       {successMsg && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl flex items-center justify-between animate-fade-in">
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-emerald-600" />
-            <span>{successMsg}</span>
-          </div>
-          <button onClick={() => setSuccessMsg(null)} className="text-emerald-600 hover:text-emerald-900 text-xs font-bold">Dismiss</button>
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold flex items-center gap-2 shadow-3xs">
+          <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+          <span>{successMsg}</span>
         </div>
       )}
-
       {errorMsg && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-xl flex items-center justify-between animate-fade-in">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-semibold flex items-center gap-2 shadow-3xs">
+          <Info className="h-4 w-4 text-rose-600 shrink-0" />
           <span>{errorMsg}</span>
-          <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-900 text-xs font-bold">Dismiss</button>
         </div>
       )}
 
-      {/* 13 CMS SECTIONS */}
+      {/* 13 CMS Sections Accordion Container */}
+      <div className="space-y-4">
 
-      {/* SECTION 1: HERO */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('hero')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-teal-50 text-[#0D9488] rounded-xl">
-              <Sparkles className="h-4 w-4" />
+        {/* 1. HERO SECTION */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('hero')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">1. Hero Section</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure main title, hero description, and hero banner image</span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 1: Hero Banner</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Title, Description and Hero Background Image</p>
-            </div>
-          </div>
-          {expandedSections.hero ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+            {expandedSections.hero ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
 
-        {expandedSections.hero && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Hero Title *</label>
-              <input
-                type="text"
-                value={service.title || ''}
-                onChange={(e) => updateServiceField('title', e.target.value)}
-                placeholder="Wisdom Tooth Surgery"
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Hero Description *</label>
-              <textarea
-                rows={3}
-                value={service.hero_description || service.short_description || ''}
-                onChange={(e) => {
-                  updateServiceField('hero_description', e.target.value);
-                  updateServiceField('short_description', e.target.value);
-                }}
-                placeholder="Enter hero description..."
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 leading-relaxed font-medium"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Hero Background Image URL</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={service.hero_image || ''}
-                  onChange={(e) => updateServiceField('hero_image', e.target.value)}
-                  placeholder="https://images.unsplash.com/photo-..."
-                  className="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white font-mono text-slate-700"
-                />
-                <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer transition flex items-center gap-1">
-                  <Upload className="h-3.5 w-3.5" />
-                  <span>Upload</span>
+          {expandedSections.hero && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
+                  <span className="text-[10px] text-slate-400">Toggle Hero block visible/hidden on frontend</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={async (e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        const url = await handleFileUpload(e.target.files[0]);
-                        if (url) updateServiceField('hero_image', url);
-                      }
-                    }}
+                    type="checkbox"
+                    checked={mConfig.show_hero !== false}
+                    onChange={(e) => updateMConfigField('show_hero', e.target.checked)}
+                    className="sr-only peer"
                   />
+                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
                 </label>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* SECTION 2: WHAT IS WISDOM TOOTH SURGERY */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('whatis')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
-              <Info className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 2: What is Wisdom Tooth Surgery?</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Introductory Title & Full Description Paragraphs</p>
-            </div>
-          </div>
-          {expandedSections.whatis ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-
-        {expandedSections.whatis && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Section Title</label>
-              <input
-                type="text"
-                value={service.intro_title || 'What is Wisdom Tooth Surgery?'}
-                onChange={(e) => updateServiceField('intro_title', e.target.value)}
-                placeholder="What is Wisdom Tooth Surgery?"
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Full Detailed Description</label>
-              <textarea
-                rows={6}
-                value={service.description || ''}
-                onChange={(e) => updateServiceField('description', e.target.value)}
-                placeholder="Enter full description..."
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 leading-relaxed font-medium"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 3: TREATMENT PLANNING (STAGES) */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('planning')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
-              <Layers className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 3: Wisdom Tooth Surgery Treatment Planning</h3>
-              <p className="text-[11px] text-slate-400 font-medium">3 Treatment Stages (Diagnosis, Numbing, Tooth Removal)</p>
-            </div>
-          </div>
-          {expandedSections.planning ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-
-        {expandedSections.planning && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Process Section Title</label>
-              <input
-                type="text"
-                value={mConfig.process_section_title || 'Wisdom Tooth Surgery Treatment Planning'}
-                onChange={(e) => updateMConfigField('process_section_title', e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Treatment Stages ({steps.length})</span>
-                <button
-                  type="button"
-                  onClick={addStep}
-                  className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Stage</span>
-                </button>
-              </div>
-
-              {steps.map((st: any, idx: number) => (
-                <div key={st.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-1">
-                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-[10px] font-extrabold rounded">
-                        #{idx + 1}
-                      </span>
-                      <input
-                        type="text"
-                        value={st.phase || ''}
-                        onChange={(e) => updateStepField(idx, 'phase', e.target.value)}
-                        placeholder="Stage 1"
-                        className="w-28 px-2 py-1 text-xs border border-slate-200 rounded-lg bg-white font-bold"
-                      />
-                      <input
-                        type="text"
-                        value={st.title || ''}
-                        onChange={(e) => updateStepField(idx, 'title', e.target.value)}
-                        placeholder="Stage Title (e.g. Diagnosis)"
-                        className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-semibold"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => moveStep(idx, 'up')}
-                        disabled={idx === 0}
-                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"
-                      >
-                        <ArrowUp className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveStep(idx, 'down')}
-                        disabled={idx === steps.length - 1}
-                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"
-                      >
-                        <ArrowDown className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteStep(idx)}
-                        className="p-1 text-rose-500 hover:text-rose-700"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <textarea
-                      rows={2}
-                      value={st.description || ''}
-                      onChange={(e) => updateStepField(idx, 'description', e.target.value)}
-                      placeholder="Stage description..."
-                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-700 leading-relaxed font-medium"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 4: ADVANCED SURGICAL TECHNOLOGY */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('tech')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
-              <Sliders className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 4: Advanced Surgical Technology</h3>
-              <p className="text-[11px] text-slate-400 font-medium">1 Card (Piezoelectric Device)</p>
-            </div>
-          </div>
-          {expandedSections.tech ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-
-        {expandedSections.tech && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Section Title</label>
-              <input
-                type="text"
-                value={mConfig.candidate_section_title || 'Advanced Surgical Technology'}
-                onChange={(e) => updateMConfigField('candidate_section_title', e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Technology Cards ({candidateItems.length})</span>
-                <button
-                  type="button"
-                  onClick={addCandidateItem}
-                  className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Card</span>
-                </button>
-              </div>
-
-              {candidateItems.map((item: any, idx: number) => (
-                <div key={item.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-1">
-                      <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-extrabold rounded">
-                        #{idx + 1}
-                      </span>
-                      <input
-                        type="text"
-                        value={item.title || ''}
-                        onChange={(e) => updateCandidateItemField(idx, 'title', e.target.value)}
-                        placeholder="Piezoelectric Device"
-                        className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-bold text-slate-800"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => moveCandidateItem(idx, 'up')}
-                        disabled={idx === 0}
-                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"
-                      >
-                        <ArrowUp className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveCandidateItem(idx, 'down')}
-                        disabled={idx === candidateItems.length - 1}
-                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"
-                      >
-                        <ArrowDown className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteCandidateItem(idx)}
-                        className="p-1 text-rose-500 hover:text-rose-700"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <textarea
-                      rows={2}
-                      value={item.description || ''}
-                      onChange={(e) => updateCandidateItemField(idx, 'description', e.target.value)}
-                      placeholder="Card description..."
-                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-700 leading-relaxed font-medium"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 5: BEFORE & AFTER GALLERY */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('beforeAfter')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-              <ImageIcon className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 5: Before & After Gallery</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Before/After Image Pairs & Captions</p>
-            </div>
-          </div>
-          {expandedSections.beforeAfter ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-
-        {expandedSections.beforeAfter && (
-          <div className="p-6 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Section Heading</label>
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Service Title</label>
                 <input
                   type="text"
-                  value={mConfig.before_after_heading || 'Before & After Gallery'}
-                  onChange={(e) => updateMConfigField('before_after_heading', e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
+                  value={service.title || 'Wisdom Tooth Surgery'}
+                  onChange={(e) => updateServiceField('title', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-bold text-slate-800"
                 />
               </div>
+
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Section Subtitle</label>
-                <input
-                  type="text"
-                  value={mConfig.before_after_description || ''}
-                  onChange={(e) => updateMConfigField('before_after_description', e.target.value)}
-                  placeholder="Before and after transformation cases"
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-medium"
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Hero Description</label>
+                <textarea
+                  rows={3}
+                  value={service.hero_description || service.short_description || ''}
+                  onChange={(e) => {
+                    updateServiceField('hero_description', e.target.value);
+                    updateServiceField('short_description', e.target.value);
+                  }}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
                 />
               </div>
-            </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Before / After Pairs ({beforeAfterPairs.length})</span>
-                <button
-                  type="button"
-                  onClick={addBeforeAfterPair}
-                  className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Pair</span>
-                </button>
-              </div>
-
-              {beforeAfterPairs.map((pair: any, idx: number) => (
-                <div key={pair.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-800">Pair #{idx + 1}</span>
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => moveBeforeAfterPair(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowUp className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => moveBeforeAfterPair(idx, 'down')} disabled={idx === beforeAfterPairs.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowDown className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => deleteBeforeAfterPair(idx)} className="p-1 text-rose-500 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Before Image URL</label>
-                      <input
-                        type="text"
-                        value={pair.before_image || ''}
-                        onChange={(e) => updateBeforeAfterPairField(idx, 'before_image', e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">After Image URL</label>
-                      <input
-                        type="text"
-                        value={pair.after_image || ''}
-                        onChange={(e) => updateBeforeAfterPairField(idx, 'after_image', e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Caption</label>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Hero Banner Image URL / Upload</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={service.hero_image || ''}
+                    onChange={(e) => updateServiceField('hero_image', e.target.value)}
+                    placeholder="https://images.unsplash.com/..."
+                    className="flex-1 px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-mono"
+                  />
+                  <label className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Upload</span>
                     <input
-                      type="text"
-                      value={pair.caption || ''}
-                      onChange={(e) => updateBeforeAfterPairField(idx, 'caption', e.target.value)}
-                      placeholder="e.g. Impacted Wisdom Tooth Extraction Transformation"
-                      className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const url = await handleFileUpload(e.target.files[0]);
+                          if (url) updateServiceField('hero_image', url);
+                        }
+                      }}
                     />
-                  </div>
+                  </label>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+              </div>
 
-      {/* SECTION 6: CLINICAL CASE GALLERY */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('gallery')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-              <ImageIcon className="h-4 w-4" />
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Green Highlight Banner Text</label>
+                <input
+                  type="text"
+                  value={mConfig.green_highlight_line || ''}
+                  onChange={(e) => updateMConfigField('green_highlight_line', e.target.value)}
+                  placeholder="e.g. Painless Surgical Extraction by Experienced Maxillofacial Surgeons"
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                />
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 6: Clinical Case Gallery</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Surgical Case Photographs</p>
-            </div>
-          </div>
-          {expandedSections.gallery ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+          )}
+        </div>
 
-        {expandedSections.gallery && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-3">
+        {/* 2. WHAT IS WISDOM TOOTH SURGERY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('whatIs')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. What is Wisdom Tooth Surgery?</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introductory section title and full procedure details</span>
+              </div>
+            </div>
+            {expandedSections.whatIs ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.whatIs && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Title</label>
+                <input
+                  type="text"
+                  value={service.intro_title || 'What is Wisdom Tooth Surgery?'}
+                  onChange={(e) => updateServiceField('intro_title', e.target.value)}
+                  placeholder="What is Wisdom Tooth Surgery?"
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-bold"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Full Detailed Description</label>
+                <textarea
+                  rows={6}
+                  value={service.description || ''}
+                  onChange={(e) => updateServiceField('description', e.target.value)}
+                  placeholder="Enter full description..."
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white leading-relaxed"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 3. WISDOM TOOTH SURGERY TREATMENT PLANNING */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('planning')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Layers className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Wisdom Tooth Surgery Treatment Planning</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure treatment procedure stages and step descriptions</span>
+              </div>
+            </div>
+            {expandedSections.planning ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.planning && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Process Section Title</label>
+                <input
+                  type="text"
+                  value={mConfig.process_section_title || 'Wisdom Tooth Surgery Treatment Planning'}
+                  onChange={(e) => updateMConfigField('process_section_title', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-bold"
+                />
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Treatment Stages ({steps.length})</span>
+                  <button
+                    type="button"
+                    onClick={addStep}
+                    className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add Stage</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {steps.map((st: any, idx: number) => (
+                    <div key={st.id || idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="px-2 py-0.5 bg-teal-100 text-teal-800 text-[10px] font-extrabold rounded">
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            value={st.phase || ''}
+                            onChange={(e) => updateStepField(idx, 'phase', e.target.value)}
+                            placeholder="Stage 1"
+                            className="w-28 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-bold"
+                          />
+                          <input
+                            type="text"
+                            value={st.title || ''}
+                            onChange={(e) => updateStepField(idx, 'title', e.target.value)}
+                            placeholder="Stage Title (e.g. Diagnosis)"
+                            className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-semibold"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveStep(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"
+                          >
+                            <ArrowUp className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveStep(idx, 'down')}
+                            disabled={idx === steps.length - 1}
+                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"
+                          >
+                            <ArrowDown className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteStep(idx)}
+                            className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <textarea
+                        rows={2}
+                        value={st.description || ''}
+                        onChange={(e) => updateStepField(idx, 'description', e.target.value)}
+                        placeholder="Stage description..."
+                        className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-700 leading-relaxed font-medium"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 4. ADVANCED SURGICAL TECHNOLOGY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('methods')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Advanced Surgical Technology</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure surgical devices and technology cards</span>
+              </div>
+            </div>
+            {expandedSections.methods ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.methods && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Title</label>
+                <input
+                  type="text"
+                  value={mConfig.candidate_section_title || 'Advanced Surgical Technology'}
+                  onChange={(e) => updateMConfigField('candidate_section_title', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-bold"
+                />
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Technology Cards ({candidateItems.length})</span>
+                  <button
+                    type="button"
+                    onClick={addCandidateItem}
+                    className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add Card</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {candidateItems.map((item: any, idx: number) => (
+                    <div key={item.id || idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="px-2 py-0.5 bg-teal-100 text-teal-800 text-[10px] font-extrabold rounded">
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            value={item.title || ''}
+                            onChange={(e) => updateCandidateItemField(idx, 'title', e.target.value)}
+                            placeholder="Piezoelectric Device"
+                            className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-bold text-slate-800"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveCandidateItem(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"
+                          >
+                            <ArrowUp className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveCandidateItem(idx, 'down')}
+                            disabled={idx === candidateItems.length - 1}
+                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"
+                          >
+                            <ArrowDown className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteCandidateItem(idx)}
+                            className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <textarea
+                        rows={2}
+                        value={item.description || ''}
+                        onChange={(e) => updateCandidateItemField(idx, 'description', e.target.value)}
+                        placeholder="Card description..."
+                        className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-700 leading-relaxed font-medium"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 5. BEFORE & AFTER GALLERY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('beforeAfter')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Before & After Gallery</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure before/after comparison photo pairs and captions</span>
+              </div>
+            </div>
+            {expandedSections.beforeAfter ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.beforeAfter && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Heading</label>
+                  <input
+                    type="text"
+                    value={mConfig.before_after_heading || 'Before & After Gallery'}
+                    onChange={(e) => updateMConfigField('before_after_heading', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-bold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Subtitle</label>
+                  <input
+                    type="text"
+                    value={mConfig.before_after_description || ''}
+                    onChange={(e) => updateMConfigField('before_after_description', e.target.value)}
+                    placeholder="Before and after transformation cases"
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Before / After Pairs ({beforeAfterPairs.length})</span>
+                  <button
+                    type="button"
+                    onClick={addBeforeAfterPair}
+                    className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add Pair</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {beforeAfterPairs.map((pair: any, idx: number) => (
+                    <div key={pair.id || idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-[#081C3A]">Pair #{idx + 1}</span>
+                        <div className="flex items-center gap-1">
+                          <button type="button" onClick={() => moveBeforeAfterPair(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowUp className="h-3.5 w-3.5" /></button>
+                          <button type="button" onClick={() => moveBeforeAfterPair(idx, 'down')} disabled={idx === beforeAfterPairs.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowDown className="h-3.5 w-3.5" /></button>
+                          <button type="button" onClick={() => deleteBeforeAfterPair(idx)} className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase">Before Image URL</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={pair.before_image || ''}
+                              onChange={(e) => updateBeforeAfterPairField(idx, 'before_image', e.target.value)}
+                              className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                            />
+                            <label className="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1">
+                              <Upload className="h-3 w-3" />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    const url = await handleFileUpload(e.target.files[0]);
+                                    if (url) updateBeforeAfterPairField(idx, 'before_image', url);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase">After Image URL</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={pair.after_image || ''}
+                              onChange={(e) => updateBeforeAfterPairField(idx, 'after_image', e.target.value)}
+                              className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                            />
+                            <label className="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1">
+                              <Upload className="h-3 w-3" />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    const url = await handleFileUpload(e.target.files[0]);
+                                    if (url) updateBeforeAfterPairField(idx, 'after_image', url);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <input
+                        type="text"
+                        value={pair.caption || ''}
+                        onChange={(e) => updateBeforeAfterPairField(idx, 'caption', e.target.value)}
+                        placeholder="Caption..."
+                        className="w-full px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 6. CLINICAL CASE GALLERY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('clinicalGallery')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure surgical case gallery photos and descriptions</span>
+              </div>
+            </div>
+            {expandedSections.clinicalGallery ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.clinicalGallery && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Clinical Case Images ({galleryItems.length})</span>
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Clinical Case Images ({galleryItems.length})</span>
                 <button
                   type="button"
                   onClick={addGalleryItem}
-                  className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Case Image</span>
                 </button>
               </div>
 
-              {galleryItems.map((item: any, idx: number) => (
-                <div key={item.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-800">Case Image #{idx + 1}</span>
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => moveGalleryItem(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowUp className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => moveGalleryItem(idx, 'down')} disabled={idx === galleryItems.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowDown className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => deleteGalleryItem(idx)} className="p-1 text-rose-500 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {galleryItems.map((item: any, idx: number) => (
+                  <div key={item.id || idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-500">Case Image #{idx + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => moveGalleryItem(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowUp className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => moveGalleryItem(idx, 'down')} disabled={idx === galleryItems.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowDown className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => deleteGalleryItem(idx)} className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Image URL</label>
+                    <div className="flex gap-2">
                       <input
                         type="text"
                         value={item.image_url || ''}
                         onChange={(e) => updateGalleryItemField(idx, 'image_url', e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                        placeholder="Image URL..."
+                        className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-mono"
                       />
+                      <label className="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1">
+                        <Upload className="h-3 w-3" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              const url = await handleFileUpload(e.target.files[0]);
+                              if (url) updateGalleryItemField(idx, 'image_url', url);
+                            }
+                          }}
+                        />
+                      </label>
                     </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Caption</label>
-                      <input
-                        type="text"
-                        value={item.caption || ''}
-                        onChange={(e) => updateGalleryItemField(idx, 'caption', e.target.value)}
-                        placeholder="Clinical Case Description"
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
-                      />
-                    </div>
+
+                    <input
+                      type="text"
+                      value={item.caption || ''}
+                      onChange={(e) => updateGalleryItemField(idx, 'caption', e.target.value)}
+                      placeholder="Caption..."
+                      className="w-full px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white"
+                    />
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 7. PROCEDURE VIDEO */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('procedureVideo')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure walkthrough video link and thumbnail</span>
+              </div>
+            </div>
+            {expandedSections.procedureVideo ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.procedureVideo && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Section Title</label>
+                <input
+                  type="text"
+                  value={service.procedure_video_title || mConfig.procedure_video_title || 'Wisdom Tooth Surgery Procedure Video'}
+                  onChange={(e) => {
+                    updateServiceField('procedure_video_title', e.target.value);
+                    updateMConfigField('procedure_video_title', e.target.value);
+                  }}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video URL (YouTube/MP4)</label>
+                <input
+                  type="text"
+                  value={service.procedure_video_url || mConfig.procedure_video_url || ''}
+                  onChange={(e) => {
+                    updateServiceField('procedure_video_url', e.target.value);
+                    updateMConfigField('procedure_video_url', e.target.value);
+                  }}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Description</label>
+                <textarea
+                  rows={2}
+                  value={service.procedure_video_description || ''}
+                  onChange={(e) => updateServiceField('procedure_video_description', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Custom Thumbnail Image URL</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={service.procedure_video_thumbnail || ''}
+                    onChange={(e) => updateServiceField('procedure_video_thumbnail', e.target.value)}
+                    placeholder="https://..."
+                    className="flex-1 px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                  />
+                  <label className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1">
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Upload</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const url = await handleFileUpload(e.target.files[0]);
+                          if (url) updateServiceField('procedure_video_thumbnail', url);
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* SECTION 7: PROCEDURE VIDEO */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('video')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-50 text-red-600 rounded-xl">
-              <Video className="h-4 w-4" />
+        {/* 8. PATIENT TESTIMONIALS */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('testimonials')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient experience stories and video reviews</span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 7: Procedure Video</h3>
-              <p className="text-[11px] text-slate-400 font-medium">YouTube / Video URL and Section Title</p>
-            </div>
-          </div>
-          {expandedSections.video ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+            {expandedSections.testimonials ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
 
-        {expandedSections.video && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Video Title</label>
-              <input
-                type="text"
-                value={service.procedure_video_title || mConfig.procedure_video_title || 'Wisdom Tooth Surgery Procedure Video'}
-                onChange={(e) => {
-                  updateServiceField('procedure_video_title', e.target.value);
-                  updateMConfigField('procedure_video_title', e.target.value);
-                }}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Procedure Video URL (YouTube or Direct URL)</label>
-              <input
-                type="text"
-                value={service.procedure_video_url || mConfig.procedure_video_url || ''}
-                onChange={(e) => {
-                  updateServiceField('procedure_video_url', e.target.value);
-                  updateMConfigField('procedure_video_url', e.target.value);
-                }}
-                placeholder="https://www.youtube.com/watch?v=..."
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white font-mono text-slate-800"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 8: PATIENT TESTIMONIALS */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('testimonials')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-pink-50 text-pink-600 rounded-xl">
-              <MessageSquare className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 8: Patient Testimonials</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Video Reviews & Patient Experience Stories</p>
-            </div>
-          </div>
-          {expandedSections.testimonials ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-
-        {expandedSections.testimonials && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-3">
+          {expandedSections.testimonials && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Testimonial Videos ({testimonials.length})</span>
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Testimonials ({testimonials.length})</span>
                 <button
                   type="button"
                   onClick={addTestimonialItem}
-                  className="px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Testimonial</span>
                 </button>
               </div>
 
-              {testimonials.map((t: any, idx: number) => (
-                <div key={t.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-pink-800">Testimonial #{idx + 1}</span>
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => moveTestimonialItem(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowUp className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => moveTestimonialItem(idx, 'down')} disabled={idx === testimonials.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowDown className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => deleteTestimonialItem(idx)} className="p-1 text-rose-500 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+              <div className="space-y-3">
+                {testimonials.map((t: any, idx: number) => (
+                  <div key={t.id || idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#081C3A]">Testimonial #{idx + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => moveTestimonialItem(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowUp className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => moveTestimonialItem(idx, 'down')} disabled={idx === testimonials.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowDown className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => deleteTestimonialItem(idx)} className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Patient / Title</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <input
                         type="text"
                         value={t.patient_name || ''}
                         onChange={(e) => updateTestimonialItemField(idx, 'patient_name', e.target.value)}
-                        placeholder="Patient Name / Journey Title"
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
+                        placeholder="Patient Name..."
+                        className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white"
                       />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Video URL</label>
                       <input
                         type="text"
                         value={t.video_url || ''}
                         onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                        placeholder="Video URL (optional)..."
+                        className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
                       />
                     </div>
+
+                    <textarea
+                      rows={2}
+                      value={t.review_text || ''}
+                      onChange={(e) => updateTestimonialItemField(idx, 'review_text', e.target.value)}
+                      placeholder="Review text..."
+                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white"
+                    />
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* SECTION 9: HOSPITAL & TEAM GALLERY */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('hospital')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-cyan-50 text-cyan-600 rounded-xl">
-              <Users className="h-4 w-4" />
+        {/* 9. HOSPITAL & TEAM GALLERY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('hospitalTeam')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure facility, infrastructure, and specialist doctor photos</span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 9: Hospital & Team Gallery</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Clinic Environment & Dental Team Photos</p>
-            </div>
-          </div>
-          {expandedSections.hospital ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+            {expandedSections.hospitalTeam ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
 
-        {expandedSections.hospital && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-3">
+          {expandedSections.hospitalTeam && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Clinic & Team Photos ({hostPhotos.length})</span>
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Hospital & Team Photos ({hostPhotos.length})</span>
                 <button
                   type="button"
                   onClick={addHostPhotoItem}
-                  className="px-3 py-1.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Photo</span>
                 </button>
               </div>
 
-              {hostPhotos.map((h: any, idx: number) => (
-                <div key={h.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-cyan-800">Photo #{idx + 1}</span>
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => moveHostPhotoItem(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowUp className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => moveHostPhotoItem(idx, 'down')} disabled={idx === hostPhotos.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowDown className="h-3.5 w-3.5" /></button>
-                      <button type="button" onClick={() => deleteHostPhotoItem(idx)} className="p-1 text-rose-500 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {hostPhotos.map((h: any, idx: number) => (
+                  <div key={h.id || idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-500">Photo #{idx + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => moveHostPhotoItem(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowUp className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => moveHostPhotoItem(idx, 'down')} disabled={idx === hostPhotos.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"><ArrowDown className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => deleteHostPhotoItem(idx)} className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Image URL</label>
+                    <div className="flex gap-2">
                       <input
                         type="text"
                         value={h.image_url || ''}
                         onChange={(e) => updateHostPhotoItemField(idx, 'image_url', e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                        placeholder="Image URL..."
+                        className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white"
                       />
+                      <label className="px-2 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg cursor-pointer flex items-center gap-1">
+                        <Upload className="h-3 w-3" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              const url = await handleFileUpload(e.target.files[0]);
+                              if (url) updateHostPhotoItemField(idx, 'image_url', url);
+                            }
+                          }}
+                        />
+                      </label>
                     </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Caption</label>
-                      <input
-                        type="text"
-                        value={h.caption || ''}
-                        onChange={(e) => updateHostPhotoItemField(idx, 'caption', e.target.value)}
-                        placeholder="Patel Dental Hospital Clinic Room"
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
-                      />
-                    </div>
+
+                    <input
+                      type="text"
+                      value={h.caption || ''}
+                      onChange={(e) => updateHostPhotoItemField(idx, 'caption', e.target.value)}
+                      placeholder="Photo Caption..."
+                      className="w-full px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white"
+                    />
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 10. COST / OFFER */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('costOffer')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><DollarSign className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure transparency pricing, discounts, and consultation offers</span>
+              </div>
+            </div>
+            {expandedSections.costOffer ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.costOffer && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Cost Section Heading</label>
+                <input
+                  type="text"
+                  value={mConfig.cost_heading || 'Wisdom Tooth Surgery Cost & Special Offers'}
+                  onChange={(e) => updateMConfigField('cost_heading', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Cost Description</label>
+                <textarea
+                  rows={2}
+                  value={mConfig.cost_description || ''}
+                  onChange={(e) => updateMConfigField('cost_description', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Phone Number (Call)</label>
+                  <input
+                    type="text"
+                    value={mConfig.phone_number || '9510397046'}
+                    onChange={(e) => updateMConfigField('phone_number', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-semibold"
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 10: COST / OFFER */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('cost')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#0D9488]/10 text-[#0D9488] rounded-xl">
-              <DollarSign className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 10: Cost & Call Offer</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Pricing, Consultation Info & Contact Phone Number</p>
-            </div>
-          </div>
-          {expandedSections.cost ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-
-        {expandedSections.cost && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Cost Section Title</label>
-              <input
-                type="text"
-                value={mConfig.cost_heading || 'Wisdom Tooth Surgery Cost & Offers'}
-                onChange={(e) => updateMConfigField('cost_heading', e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Cost Subtitle / Offer Text</label>
-              <textarea
-                rows={2}
-                value={mConfig.cost_description || ''}
-                onChange={(e) => updateMConfigField('cost_description', e.target.value)}
-                placeholder="Call: 9510397046"
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 leading-relaxed font-medium"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Phone Number (Call)</label>
-                <input
-                  type="text"
-                  value={mConfig.phone_number || '9510397046'}
-                  onChange={(e) => updateMConfigField('phone_number', e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">WhatsApp Number</label>
-                <input
-                  type="text"
-                  value={mConfig.whatsapp_number || '9510397046'}
-                  onChange={(e) => updateMConfigField('whatsapp_number', e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-                />
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">WhatsApp Number</label>
+                  <input
+                    type="text"
+                    value={mConfig.whatsapp_number || '9510397046'}
+                    onChange={(e) => updateMConfigField('whatsapp_number', e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-semibold"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* SECTION 11: GOOGLE PATIENT REVIEWS */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('reviews')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-50 text-yellow-600 rounded-xl">
-              <Star className="h-4 w-4" />
+        {/* 11. GOOGLE PATIENT REVIEWS */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('googleReviews')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure authentic Google patient star ratings and feedback</span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 11: Google Patient Reviews</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Google Star Ratings & Written Review Quotes</p>
-            </div>
-          </div>
-          {expandedSections.reviews ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+            {expandedSections.googleReviews ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
 
-        {expandedSections.reviews && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-3">
+          {expandedSections.googleReviews && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Google Patient Reviews ({googleReviews.length})</span>
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Google Reviews ({googleReviews.length})</span>
                 <button
                   type="button"
                   onClick={addGoogleReview}
-                  className="px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Review</span>
                 </button>
               </div>
 
-              {googleReviews.map((rev: any, idx: number) => (
-                <div key={rev.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-yellow-800">Review #{idx + 1}</span>
-                    <button type="button" onClick={() => deleteGoogleReview(idx)} className="p-1 text-rose-500 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
-                  </div>
+              <div className="space-y-3">
+                {googleReviews.map((r: any, idx: number) => (
+                  <div key={r.id || idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#081C3A]">Review #{idx + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => deleteGoogleReview(idx)}
+                        className="text-rose-500 hover:text-rose-700 cursor-pointer"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Author Name</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <input
                         type="text"
-                        value={rev.author || ''}
-                        onChange={(e) => updateGoogleReviewField(idx, 'author', e.target.value)}
-                        placeholder="Patient Name"
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
+                        value={r.patient_name || r.author || ''}
+                        onChange={(e) => {
+                          updateGoogleReviewField(idx, 'patient_name', e.target.value);
+                          updateGoogleReviewField(idx, 'author', e.target.value);
+                        }}
+                        placeholder="Patient Name..."
+                        className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-bold"
                       />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Date Text</label>
                       <input
-                        type="text"
-                        value={rev.dateText || ''}
-                        onChange={(e) => updateGoogleReviewField(idx, 'dateText', e.target.value)}
-                        placeholder="Recently"
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
+                        type="number"
+                        min={1}
+                        max={5}
+                        value={r.rating || 5}
+                        onChange={(e) => updateGoogleReviewField(idx, 'rating', Number(e.target.value))}
+                        placeholder="Rating (1-5)..."
+                        className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white"
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Review Comment</label>
                     <textarea
                       rows={2}
-                      value={rev.reviewText || ''}
-                      onChange={(e) => updateGoogleReviewField(idx, 'reviewText', e.target.value)}
-                      placeholder="Patient review quote..."
-                      className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium"
+                      value={r.review_text || r.reviewText || ''}
+                      onChange={(e) => {
+                        updateGoogleReviewField(idx, 'review_text', e.target.value);
+                        updateGoogleReviewField(idx, 'reviewText', e.target.value);
+                      }}
+                      placeholder="Google Review text..."
+                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white"
                     />
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 12. BOTTOM CTA */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('bottomCta')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Phone className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure footer conversion banner buttons and contact channels</span>
+              </div>
+            </div>
+            {expandedSections.bottomCta ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+
+          {expandedSections.bottomCta && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Phone Number</label>
+                  <input
+                    type="text"
+                    value={mConfig.phone_number || ''}
+                    onChange={(e) => updateMConfigField('phone_number', e.target.value)}
+                    placeholder="+91 95103..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* SECTION 12: BOTTOM CTA */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('cta')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-slate-100 text-slate-700 rounded-xl">
-              <Phone className="h-4 w-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 12: Bottom Call To Action</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Patel Dental Hospital Contact & Booking Information</p>
-            </div>
-          </div>
-          {expandedSections.cta ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">WhatsApp Number</label>
+                  <input
+                    type="text"
+                    value={mConfig.whatsapp_number || ''}
+                    onChange={(e) => updateMConfigField('whatsapp_number', e.target.value)}
+                    placeholder="+91 95103..."
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                  />
+                </div>
+              </div>
 
-        {expandedSections.cta && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Clinic Name / CTA Heading</label>
-              <input
-                type="text"
-                value={mConfig.sec11_heading || 'Patel Dental Hospital'}
-                onChange={(e) => updateMConfigField('sec11_heading', e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
-            </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">CTA Banner Heading</label>
+                <input
+                  type="text"
+                  value={mConfig.cta_heading || mConfig.sec11_heading || 'Patel Dental Hospital'}
+                  onChange={(e) => {
+                    updateMConfigField('cta_heading', e.target.value);
+                    updateMConfigField('sec11_heading', e.target.value);
+                  }}
+                  placeholder="Ready for Pain-Free Wisdom Tooth Surgery?"
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-bold"
+                />
+              </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Call Phone Number</label>
-              <input
-                type="text"
-                value={mConfig.phone_number || '9510397946'}
-                onChange={(e) => updateMConfigField('phone_number', e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-slate-800 font-semibold"
-              />
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">CTA Banner Subtitle</label>
+                <input
+                  type="text"
+                  value={mConfig.cta_description || ''}
+                  onChange={(e) => updateMConfigField('cta_description', e.target.value)}
+                  placeholder="Book your expert consultation at Patel Dental Hospital."
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
+                />
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* SECTION 13: FAQ */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-3xs">
-        <button
-          type="button"
-          onClick={() => toggleSection('faqs')}
-          className="w-full px-6 py-4 bg-slate-50/80 hover:bg-slate-100/80 flex items-center justify-between text-left transition border-b border-slate-100"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-              <HelpCircle className="h-4 w-4" />
+        {/* 13. FAQ */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('faq')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. FAQ Section</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient questions and detailed answers accordion</span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#081C3A]">Section 13: Frequently Asked Questions</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Add or edit FAQs for Wisdom Tooth Surgery</p>
-            </div>
-          </div>
-          {expandedSections.faqs ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
+            {expandedSections.faq ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
 
-        {expandedSections.faqs && (
-          <div className="p-6 space-y-4">
-            <div className="space-y-3">
+          {expandedSections.faq && (
+            <div className="p-6 border-t border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">FAQs ({faqs.length})</span>
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Frequently Asked Questions ({faqs.length})</span>
                 <button
                   type="button"
                   onClick={addFaq}
-                  className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0D9488] text-xs font-bold rounded-lg border border-teal-200 flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add FAQ</span>
                 </button>
               </div>
 
-              {faqs.length === 0 ? (
-                <p className="text-xs text-slate-400 italic">No FAQs added.</p>
-              ) : (
-                faqs.map((f: any, idx: number) => (
-                  <div key={f.id || idx} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3">
+              <div className="space-y-3">
+                {faqs.map((f: any, idx: number) => (
+                  <div key={f.id || idx} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-emerald-800">FAQ #{idx + 1}</span>
+                      <span className="text-xs font-bold text-[#081C3A]">FAQ #{idx + 1}</span>
                       <div className="flex items-center gap-1">
-                        <button type="button" onClick={() => moveFaq(idx, 'up')} disabled={idx === 0} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowUp className="h-3.5 w-3.5" /></button>
-                        <button type="button" onClick={() => moveFaq(idx, 'down')} disabled={idx === faqs.length - 1} className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"><ArrowDown className="h-3.5 w-3.5" /></button>
-                        <button type="button" onClick={() => deleteFaq(idx)} className="p-1 text-rose-500 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+                        <button
+                          type="button"
+                          onClick={() => moveFaq(idx, 'up')}
+                          disabled={idx === 0}
+                          className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveFaq(idx, 'down')}
+                          disabled={idx === faqs.length - 1}
+                          className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 cursor-pointer"
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteFaq(idx)}
+                          className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </div>
 
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Question</label>
-                      <input
-                        type="text"
-                        value={f.question || ''}
-                        onChange={(e) => updateFaqField(idx, 'question', e.target.value)}
-                        placeholder="e.g. Is wisdom tooth extraction painful?"
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium text-slate-800"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={f.question || ''}
+                      onChange={(e) => updateFaqField(idx, 'question', e.target.value)}
+                      placeholder="Question..."
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800 font-bold focus:outline-none focus:border-[#0D9488]"
+                    />
 
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Answer</label>
-                      <textarea
-                        rows={2}
-                        value={f.answer || ''}
-                        onChange={(e) => updateFaqField(idx, 'answer', e.target.value)}
-                        placeholder="Answer details..."
-                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-medium text-slate-700"
-                      />
-                    </div>
+                    <textarea
+                      rows={3}
+                      value={f.answer || ''}
+                      onChange={(e) => updateFaqField(idx, 'answer', e.target.value)}
+                      placeholder="Detailed Answer..."
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-800 font-medium focus:outline-none focus:border-[#0D9488]"
+                    />
                   </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Save Button Bottom */}
-      <div className="flex justify-end pt-4">
-        <button
-          type="button"
-          onClick={() => handleSaveAll()}
-          disabled={saving}
-          className="px-8 py-3 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
-        >
-          {saving ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-              <span>Saving Configurations...</span>
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4" />
-              <span>Save All Wisdom Tooth Surgery Changes</span>
-            </>
           )}
-        </button>
+        </div>
+
       </div>
     </div>
   );
 }
+
+
+
+
+
+
