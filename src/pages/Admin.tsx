@@ -58,6 +58,11 @@ import RootCanalCms from '../components/RootCanalCms';
 import FullMouthRehabCms from '../components/FullMouthRehabCms';
 import InvisibleAlignersCms from '../components/InvisibleAlignersCms';
 import SmileMakeoverCms from '../components/SmileMakeoverCms';
+import CrownAndBridgesCms from '../components/CrownAndBridgesCms';
+import TeethWhiteningCms from '../components/TeethWhiteningCms';
+import PediatricDentistryCms from '../components/PediatricDentistryCms';
+import BracesTreatmentCms from '../components/BracesTreatmentCms';
+import WisdomToothSurgeryCms from '../components/WisdomToothSurgeryCms';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -6261,6 +6266,201 @@ export default function Admin({
               <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
                 <div className="max-w-6xl mx-auto pb-12">
                   <SmileMakeoverCms onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
+          ) : editingService.slug === 'crowns-bridges' || editingService.slug === 'crown-and-bridges' || editingService.slug === 'crowns-and-bridges' || editingService.id === 'crowns' || editingService.id === 'crowns-srv' ? (
+            /* Custom Full-Scale CMS Editor for Crown and Bridges */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Crown & Bridges CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <CrownAndBridgesCms onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
+          ) : editingService.slug === 'teeth-whitening' || editingService.slug === 'laser-teeth-whitening' || editingService.id === 'whitening-srv' || editingService.id === 'whitening' || editingService.title?.toLowerCase().includes('whitening') ? (
+            /* Custom Full-Scale CMS Editor for Teeth Whitening */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Teeth Whitening CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <TeethWhiteningCms onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
+          ) : editingService.slug === 'pediatric-dentistry' || editingService.slug === 'pediatric' || editingService.id === 'pediatric-srv' || editingService.id === 'pediatric' || editingService.title?.toLowerCase().includes('pediatric') ? (
+            /* Custom Full-Scale CMS Editor for Pediatric Dentistry */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Pediatric Dentistry CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <PediatricDentistryCms onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
+          ) : editingService.slug === 'braces-treatment' || editingService.slug === 'braces' || editingService.id === 'braces-srv' || editingService.id === 'braces' || editingService.title?.toLowerCase().includes('braces') ? (
+            /* Custom Full-Scale CMS Editor for Braces Treatment */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Braces Treatment CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <BracesTreatmentCms onSaveSuccess={loadServicesList} />
+                </div>
+              </div>
+            </div>
+          ) : editingService.slug === 'wisdom-tooth-surgery' || editingService.slug === 'wisdom-teeth-surgery' || editingService.slug === 'wisdom' || editingService.slug === 'painless-wisdom-tooth-surgery' || editingService.id === 'wisdom-srv' || editingService.id === 'wisdom' || editingService.title?.toLowerCase().includes('wisdom') ? (
+            /* Custom Full-Scale CMS Editor for Wisdom Tooth Surgery */
+            <div className="relative bg-white flex-grow flex flex-col w-full h-full">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingService(null)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                    <span>← Back to Services</span>
+                  </button>
+                  <div className="min-w-0 hidden sm:block">
+                    <h3 className="font-display font-extrabold text-[#081C3A] text-xs leading-tight">
+                      Edit Wisdom Tooth Surgery CMS
+                    </h3>
+                    <p className="text-slate-500 text-[10px] font-medium mt-0.5 truncate flex items-center gap-1">
+                      <span className="font-mono text-slate-700">{editingService.id}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingService(null)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Content area */}
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                <div className="max-w-6xl mx-auto pb-12">
+                  <WisdomToothSurgeryCms onSaveSuccess={loadServicesList} />
                 </div>
               </div>
             </div>

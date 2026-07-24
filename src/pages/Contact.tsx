@@ -34,7 +34,7 @@ export default function Contact({
     name: '',
     phone: '',
     treatment: preselectedTreatment,
-    branch: 'Gayatrinagar Branch',
+    branch: 'Amin Marg Branch',
     date: '',
     timeSlot: '09:00 AM - 10:00 AM',
     message: '',
@@ -237,8 +237,8 @@ export default function Contact({
                           onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
                           className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         >
+                          <option value="Amin Marg Branch">Amin Marg Branch (Main Branch)</option>
                           <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                          <option value="Amin Marg Branch">Amin Marg Branch</option>
                         </select>
                       </div>
                     </div>
@@ -320,7 +320,7 @@ export default function Contact({
                         Appointment Booking Request Received!
                       </h3>
                       <p className="text-gray-500 text-xs sm:text-sm font-sans max-w-sm mx-auto leading-relaxed">
-                        Thank you, <span className="font-semibold text-brand-navy">{formData.name}</span>! Dr. Kinjal Patel's clinic secretary has registered your ticket for <span className="font-semibold text-brand-cyan">{formData.treatment}</span> on <span className="font-semibold">{formData.date}</span>.
+                        Thank you, <span className="font-semibold text-brand-navy">{formData.name}</span>! Dr. Vipul Patel's clinic secretary has registered your ticket for <span className="font-semibold text-brand-cyan">{formData.treatment}</span> on <span className="font-semibold">{formData.date}</span>.
                       </p>
                     </div>
 
@@ -344,7 +344,7 @@ export default function Contact({
                             name: '',
                             phone: '',
                             treatment: preselectedTreatment,
-                            branch: 'Gayatrinagar Branch',
+                            branch: 'Amin Marg Branch',
                             date: '',
                             timeSlot: '09:00 AM - 10:00 AM',
                             message: '',
@@ -388,16 +388,16 @@ export default function Contact({
               {/* Branch 1 details */}
               <div className="bg-white rounded-2xl p-6.5 border border-gray-150 shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-brand-cyan tracking-wider block mb-1">
-                  MAIN SPECIALTY BRANCH
+                  MAIN BRANCH (PRIMARY)
                 </span>
                 <h3 className="font-display font-bold text-brand-navy text-lg mb-2">
-                  Gayatrinagar Branch
+                  Amin Marg Branch
                 </h3>
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
                     <MapPin className="h-5 w-5 text-brand-teal mr-2 shrink-0 mt-0.5" />
                     <p className="leading-relaxed">
-                      {contactInfo?.address || 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot'}
+                      {contactInfo?.address || '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001'}
                     </p>
                   </div>
                   <div className="flex items-center">
@@ -412,16 +412,16 @@ export default function Contact({
               {/* Branch 2 details */}
               <div className="bg-white rounded-2xl p-6.5 border border-gray-150 shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-brand-cyan tracking-wider block mb-1">
-                  RECOVERY & IMPLANT CENTER
+                  SECOND BRANCH
                 </span>
                 <h3 className="font-display font-bold text-brand-navy text-lg mb-2">
-                  Amin Marg Branch
+                  Gayatrinagar Branch
                 </h3>
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
                     <MapPin className="h-5 w-5 text-brand-teal mr-2 shrink-0 mt-0.5" />
                     <p className="leading-relaxed">
-                      Business Centrum Complex, 1st Floor, Near Golden Super Market, Opp Fitness Hospital, Mavdi Main Road, Rajkot
+                      1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot
                     </p>
                   </div>
                   <div className="flex items-center">
@@ -457,20 +457,20 @@ export default function Contact({
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <a
-                  href={contactInfo?.mapsLink || "https://maps.google.com/?q=Rameshwar+Complex+Gayatrinagar+Main+Road+Rajkot"}
+                  href={contactInfo?.mapsLink || "https://share.google/JKMC3jmTqdylcXUJn"}
                   target="_blank"
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-brand-navy hover:bg-brand-cyan text-white text-xs font-bold rounded-xl transition shadow"
                 >
-                  Gayatrinagar Branch Map
+                  Amin Marg Branch Map
                 </a>
                 <a
-                  href="https://maps.google.com/?q=Business+Centrum+Mavdi+Main+Road+Rajkot"
+                  href="https://share.google/Gsdeg6MvRtha7sREX"
                   target="_blank"
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow"
                 >
-                  Amin Marg Branch Map
+                  Gayatrinagar Branch Map
                 </a>
               </div>
             </div>

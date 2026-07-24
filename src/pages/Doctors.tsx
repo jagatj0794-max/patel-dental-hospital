@@ -15,6 +15,7 @@ const drKinjalPatelImg = '/Dr kinjal patel 2.png';
 const drVipulPatelImg = '/dr. patel.png';
 
 import { Doctor } from '../types';
+import { DoctorBioRenderer } from '../components/DoctorBioRenderer';
 
 interface DoctorsProps {
   openAppointmentModal: () => void;
@@ -24,14 +25,23 @@ interface DoctorsProps {
 export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsProps) {
   const [activeDoctor, setActiveDoctor] = useState<Doctor | null>(null);
 
-  const doctorsData = doctorsList;
+  // Ensure Dr. Vipul Patel appears first, followed by Dr. Kinjal Patel, then any other doctors
+  const doctorsData = [...doctorsList].sort((a, b) => {
+    const nameA = (a.name || '').toLowerCase();
+    const nameB = (b.name || '').toLowerCase();
+    if (nameA.includes('vipul')) return -1;
+    if (nameB.includes('vipul')) return 1;
+    if (nameA.includes('kinjal')) return -1;
+    if (nameB.includes('kinjal')) return 1;
+    return 0;
+  });
 
   return (
     <div id="doctors-page-view" className="relative pt-[72px] bg-slate-50/50 min-h-screen">
       
       {/* 1. Header Hero Banner */}
-      <section className="bg-gradient-to-b from-[#0ea5e9]/10 via-[#0D9488]/5 to-transparent py-16 md:py-24 text-center">
-        <div className="max-w-4xl mx-auto px-4 space-y-4">
+      <section className="bg-gradient-to-b from-[#0ea5e9]/10 via-[#0D9488]/5 to-transparent py-12 md:py-20 text-center">
+        <div className="max-w-4xl mx-auto px-4 space-y-3">
           <span className="text-xs font-black text-[#0ea5e9] tracking-widest uppercase block">
             Meet Our Senior Expert Clinicians
           </span>
@@ -45,74 +55,148 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
         </div>
       </section>
 
-      {/* 2. Doctor Grid Section */}
-      <section className="pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {doctorsData.map((doctor) => (
-            <div 
-              key={doctor.id}
-              className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-lg transition-all duration-300 flex flex-col h-full overflow-hidden group p-5 sm:p-7 relative"
-            >
-              {/* Image Container with identical aspect ratios and custom styling */}
-              <div className="relative rounded-2xl overflow-hidden aspect-[4/5] sm:aspect-[4/4.5] bg-slate-100 w-full mb-6 shrink-0 border border-slate-100">
-                <img
-                  src={doctor.img}
-                  alt={doctor.name}
-                  className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                  referrerPolicy="no-referrer"
-                />
-                
-                {/* Specialist Indicator Badge */}
-                <span className="absolute top-4 left-4 bg-[#0B1B33]/95 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-sm border border-white/10 tracking-wider">
-                  <Award className="h-3.5 w-3.5 text-[#00E5FF]" />
-                  <span>SENIOR SPECIALIST</span>
-                </span>
-                
-                <span className="absolute bottom-4 right-4 bg-[#0B1B33]/85 backdrop-blur-md text-[#00E5FF] text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-[#00E5FF]/20">
-                  Degree: {doctor.titles}
-                </span>
+      {/* 2. Full-Width Doctor Sections */}
+      <section className="pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-12 sm:space-y-16 -mt-4">
+        {doctorsData.map((doctor, index) => (
+          <motion.div 
+            key={doctor.id || index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+            className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-10 relative overflow-hidden group"
+          >
+            {/* Top Header Area: Desktop (Image left 35-40%, Info right 60-65%), Mobile (Stacked) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+              
+              {/* Doctor Image Column (Desktop: 35-40% / 4-5 cols out of 12) */}
+              <div className="lg:col-span-5 xl:col-span-4 w-full">
+                <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-100 w-full border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow">
+                  <img
+                    src={doctor.img}
+                    alt={doctor.name}
+                    className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                  
+                  {doctor.titles && (
+                    <span className="absolute bottom-4 right-4 bg-[#0B1B33]/85 backdrop-blur-md text-[#00E5FF] text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-[#00E5FF]/20">
+                      Degree: {doctor.titles}
+                    </span>
+                  )}
 
-                {doctor.branch && (
-                  <span className="absolute bottom-4 left-4 bg-emerald-900/90 backdrop-blur-md text-white text-[10.5px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-emerald-500/20">
-                    📍 {doctor.branch}
-                  </span>
-                )}
+                  {doctor.branch && (
+                    <span className="absolute bottom-4 left-4 bg-emerald-900/90 backdrop-blur-md text-white text-[10.5px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-emerald-500/20">
+                      📍 {doctor.branch}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Title & Info Block */}
-              <div className="flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-black text-[#0D9488] tracking-widest uppercase block leading-none">
-                    {doctor.designation}
-                  </span>
-                  <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#0B1B33] tracking-tight">
+              {/* Doctor Info Column (Desktop: 60-65% / 7-8 cols out of 12) */}
+              <div className="lg:col-span-7 xl:col-span-8 flex flex-col justify-between space-y-5">
+                
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-black text-[#0D9488] tracking-widest uppercase block leading-none">
+                      {doctor.designation}
+                    </span>
+                    {doctor.experience && (
+                      <span className="text-[10px] bg-sky-50 text-sky-700 border border-sky-100 px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider">
+                        {doctor.experience}+ Years Exp.
+                      </span>
+                    )}
+                  </div>
+
+                  <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1B33] tracking-tight">
                     {doctor.name}
                   </h2>
-                  <div className="h-1 w-12 bg-[#0ea5e9]/80 rounded-full mt-2" />
-                  
-                  <p className="text-gray-500 font-sans text-xs sm:text-sm leading-relaxed pt-2">
-                    {doctor.briefIntro}
-                  </p>
+                  <div className="h-1.5 w-16 bg-gradient-to-r from-[#0ea5e9] to-[#0D9488] rounded-full mt-2" />
+
+                  {/* Highlights & Qualifications */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    {doctor.bdsInstitution && (
+                      <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100 flex items-start space-x-2.5">
+                        <GraduationCap className="h-4.5 w-4.5 text-[#0ea5e9] shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[11px] font-extrabold text-[#0B1B33]">Qualification</p>
+                          <p className="text-xs text-gray-500 font-sans">{doctor.titles} ({doctor.bdsInstitution})</p>
+                        </div>
+                      </div>
+                    )}
+                    {doctor.branch && (
+                      <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100 flex items-start space-x-2.5">
+                        <ShieldCheck className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[11px] font-extrabold text-[#0B1B33]">Hospital Branch</p>
+                          <p className="text-xs text-gray-500 font-sans">{doctor.branch}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quick Stats Grid */}
+                  {doctor.stats && doctor.stats.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                      {doctor.stats.map((stat, i) => (
+                        <div key={i} className="p-3 bg-slate-50/80 rounded-xl text-center border border-slate-100">
+                          <span className="block font-display font-black text-lg sm:text-xl text-[#0B1B33]">
+                            {stat.value}
+                          </span>
+                          <span className="block text-[9px] text-gray-400 font-black uppercase tracking-wider mt-1 leading-none">
+                            {stat.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-                  <button
-                    onClick={() => setActiveDoctor(doctor)}
-                    className="flex-1 bg-[#0ea5e9] hover:bg-[#0284c7] text-white text-xs font-extrabold py-3.5 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center"
-                  >
-                    View Full Profile
-                  </button>
+                {/* Action Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                   <button
                     onClick={openAppointmentModal}
-                    className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-[#0B1B33] text-xs font-extrabold py-3.5 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center"
+                    className="flex-1 bg-[#0ea5e9] hover:bg-[#0284c7] text-white text-xs font-extrabold py-3.5 px-6 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center shadow-sm hover:shadow-md"
                   >
                     Book Consultation
                   </button>
+                  <button
+                    onClick={() => setActiveDoctor(doctor)}
+                    className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-[#0B1B33] text-xs font-extrabold py-3.5 px-6 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center"
+                  >
+                    View Full Profile Modal
+                  </button>
                 </div>
+
               </div>
             </div>
-          ))}
-        </div>
+
+            {/* Full Biography Below Header Area Across Full Width */}
+            <div className="mt-8 pt-8 border-t border-slate-150">
+              <DoctorBioRenderer bioText={doctor.briefIntro} doctorName={doctor.name} />
+
+              {/* Clinical Specializations & Expertises */}
+              {doctor.expertises && doctor.expertises.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-slate-100">
+                  <h4 className="font-display font-extrabold text-xs uppercase tracking-wider text-slate-400 mb-3">
+                    Specialized Procedures & Clinical Expertise
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {doctor.expertises.map((exp, idx) => (
+                      <div key={idx} className="bg-slate-50/70 p-3.5 rounded-xl border border-slate-100 flex items-start space-x-3">
+                        <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                        <div>
+                          <h5 className="font-display font-bold text-xs text-[#0B1B33]">{exp.title}</h5>
+                          <p className="text-gray-500 text-[11px] font-sans mt-0.5 leading-normal">{exp.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </motion.div>
+        ))}
       </section>
 
       {/* 3. Detailed Full Profile Modal with AnimatePresence */}
@@ -189,21 +273,8 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                   {/* Body Content */}
                   <div className="p-6 sm:p-10 space-y-8">
                     
-                    {/* Brief Intro & Quote */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                      <div className="md:col-span-7 space-y-4">
-                        <h4 className="font-display font-extrabold text-base uppercase tracking-wider text-slate-400 text-xs">Clinical Profile</h4>
-                        <p className="text-gray-600 font-sans text-xs sm:text-sm leading-relaxed">
-                          {activeDoctor.briefIntro}
-                        </p>
-                      </div>
-                      <div className="md:col-span-5 bg-[#F0F9FF] border border-[#0ea5e9]/10 p-5 rounded-2xl">
-                        <Quote className="h-5 w-5 text-[#0ea5e9] mb-2 scale-x-[-1]" />
-                        <p className="text-gray-650 font-sans text-xs sm:text-sm leading-relaxed italic">
-                          "{activeDoctor.quote}"
-                        </p>
-                      </div>
-                    </div>
+                    {/* Clinical Biography */}
+                    <DoctorBioRenderer bioText={activeDoctor.briefIntro} doctorName={activeDoctor.name} />
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100">

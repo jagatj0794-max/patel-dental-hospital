@@ -33,7 +33,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
   const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
   const [expandedFaqId, setExpandedFaqId] = useState<number | null>(0);
   const [relatedServices, setRelatedServices] = useState<any[]>([]);
-  const [activeMapBranch, setActiveMapBranch] = useState<'gayatrinagar' | 'mavdi'>('gayatrinagar');
+  const [activeMapBranch, setActiveMapBranch] = useState<'amin_marg' | 'gayatrinagar'>('amin_marg');
 
   const phoneRaw = "+919510397046";
   const displayPhone = "+91 95103 97046";
@@ -811,6 +811,17 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                 <div className="flex bg-slate-50 p-1.5 rounded-xl border border-slate-100 gap-1.5">
                   <button
                     type="button"
+                    onClick={() => setActiveMapBranch('amin_marg')}
+                    className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
+                      activeMapBranch === 'amin_marg'
+                        ? 'bg-white shadow-[0_4px_12px_rgba(8,28,58,0.04)] text-[#0D9488] border border-slate-100'
+                        : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                  >
+                    Amin Marg Branch (Main)
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setActiveMapBranch('gayatrinagar')}
                     className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
                       activeMapBranch === 'gayatrinagar'
@@ -818,18 +829,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                         : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
-                    Gayatrinagar HQ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveMapBranch('mavdi')}
-                    className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
-                      activeMapBranch === 'mavdi'
-                        ? 'bg-white shadow-[0_4px_12px_rgba(8,28,58,0.04)] text-[#0D9488] border border-slate-100'
-                        : 'text-slate-400 hover:text-slate-600'
-                    }`}
-                  >
-                    Amin Marg Branch
+                    Gayatrinagar Branch
                   </button>
                 </div>
 
@@ -842,7 +842,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                         HOSPITAL NAME
                       </span>
                       <h3 className="font-display font-[900] text-[#081C3A] text-lg">
-                        Patel Dental Hospital {activeMapBranch === 'gayatrinagar' ? '(Gayatrinagar Main Branch)' : '(Amin Marg Branch)'}
+                        Patel Dental Hospital {activeMapBranch === 'amin_marg' ? '(Amin Marg Main Branch)' : '(Gayatrinagar Branch)'}
                       </h3>
                     </div>
 
@@ -854,9 +854,9 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                           ADDRESS
                         </span>
                         <p className="text-slate-600 font-semibold text-[13px] leading-relaxed">
-                          {activeMapBranch === 'gayatrinagar' 
-                            ? 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot, Gujarat 360002' 
-                            : 'Business Centrum Complex, 1st Floor, Near Golden Super Market, Opp Fitness Hospital, Mavdi Main Road, Rajkot, Gujarat 360004'}
+                          {activeMapBranch === 'amin_marg' 
+                            ? '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001' 
+                            : '1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot'}
                         </p>
                       </div>
                     </div>
@@ -915,9 +915,9 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
               {/* Lower Buttons row */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
                 <a
-                  href={activeMapBranch === 'gayatrinagar' 
-                    ? 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot' 
-                    : 'https://maps.google.com/?q=Patel+Dental+Hospital+Mavdi+Rajkot'}
+                  href={activeMapBranch === 'amin_marg' 
+                    ? 'https://share.google/JKMC3jmTqdylcXUJn' 
+                    : 'https://share.google/Gsdeg6MvRtha7sREX'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center text-[13px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-5 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:shadow-md cursor-pointer transition-all duration-300 text-center"
@@ -958,13 +958,23 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                     </span>
                   </div>
                   <span className="text-[10px] bg-slate-200/70 text-slate-600 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                    {activeMapBranch === 'gayatrinagar' ? 'Gayatrinagar Main HQ' : 'Mavdi Center'}
+                    {activeMapBranch === 'amin_marg' ? 'Amin Marg Main Branch' : 'Gayatrinagar Branch'}
                   </span>
                 </div>
 
                 {/* Map iframe wrapper */}
                 <div className="relative flex-1 min-h-[350px]">
-                  {activeMapBranch === 'gayatrinagar' ? (
+                  {activeMapBranch === 'amin_marg' ? (
+                    <iframe
+                      id="google-map-iframe-amin-marg"
+                      className="w-full h-full border-0 absolute inset-0 z-10 animate-fade-in"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.7483428104!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca223cfb8bdb%3A0xc6cb1c7caef1eb15!2sPatel%20Dental%20Hospital%20-%20Mavdi%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Patel Dental Hospital Amin Marg Main Branch"
+                    ></iframe>
+                  ) : (
                     <iframe
                       id="google-map-iframe-gayatrinagar"
                       className="w-full h-full border-0 absolute inset-0 z-10 animate-fade-in"
@@ -972,17 +982,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      title="Patel Dental Hospital Gayatrinagar HQ Branch"
-                    ></iframe>
-                  ) : (
-                    <iframe
-                      id="google-map-iframe-mavdi"
-                      className="w-full h-full border-0 absolute inset-0 z-10 animate-fade-in"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.7483428104!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca223cfb8bdb%3A0xc6cb1c7caef1eb15!2sPatel%20Dental%20Hospital%20-%20Mavdi%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Patel Dental Hospital Mavdi/Amin Marg Branch"
+                      title="Patel Dental Hospital Gayatrinagar Branch"
                     ></iframe>
                   )}
                 </div>

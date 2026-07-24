@@ -168,9 +168,9 @@ const handlePrintSlip = (apt: AdminAppointment) => {
           </div>
         </div>
 
-        <div class="footer">
+        <div className="footer">
           Thank you for choosing Patel Dental Hospital. Please arrive 10 minutes prior to your scheduled time.<br>
-          Gayatrinagar Branch: Gayatrinagar Main Road, Rajkot | Amin Marg Branch: Amin Marg Road, Rajkot
+          Amin Marg Branch: Amin Marg Road, Rajkot | Gayatrinagar Branch: Gayatrinagar Main Road, Rajkot
         </div>
 
         <script>
@@ -670,8 +670,8 @@ export default function Appointments() {
                   id="filter-doctor"
                 >
                   <option value="All">All Specialists</option>
+                  <option value="Dr. Vipul Patel">Dr. Vipul Patel (Chief Surgeon)</option>
                   <option value="Dr. Kinjal Patel">Dr. Kinjal Patel</option>
-                  <option value="Dr. Vipul Patel">Dr. Vipul Patel</option>
                 </select>
               </div>
 
@@ -685,8 +685,8 @@ export default function Appointments() {
                   id="filter-branch"
                 >
                   <option value="All">All Branches</option>
+                  <option value="Amin Marg Branch">Amin Marg Branch (Main Branch)</option>
                   <option value="Gayatrinagar Branch">Gayatrinagar Branch</option>
-                  <option value="Amin Marg Branch">Amin Marg Branch</option>
                 </select>
               </div>
 

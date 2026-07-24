@@ -8,6 +8,7 @@ import {
   Microscope, Users, HeartHandshake, Sparkles, GraduationCap, Quote, Calendar, ArrowRight
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { DoctorBioRenderer } from '../components/DoctorBioRenderer';
 const patelClinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800';
 const patelCbctImaging = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
 const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
@@ -488,10 +489,6 @@ export default function About({ openAppointmentModal }: AboutProps) {
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="absolute top-4 left-4 bg-[#081C3A]/95 backdrop-blur-md text-white text-[10px] font-bold px-3.5 py-2 rounded-xl flex items-center space-x-1.5 shadow-sm border border-white/10 tracking-wider">
-                    <Award className="h-4 w-4 text-[#11B5D8]" />
-                    <span>SENIOR SPECIALIST</span>
-                  </span>
                   
                   <span className="absolute bottom-4 right-4 bg-[#081C3A]/85 backdrop-blur-md text-[#11B5D8] text-[10.5px] font-bold px-3 py-1.5 rounded-lg border border-teal-500/10">
                     Degree: {drVipul.titles}
@@ -522,17 +519,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
                   </p>
                 </div>
 
-                <p className="text-gray-650 font-sans text-sm sm:text-base leading-relaxed">
-                  {drVipul.briefIntro}
-                </p>
-
-                {/* Quote Block */}
-                <div className="bg-teal-50/50 border border-teal-100/50 p-6 rounded-[20px] relative">
-                  <Quote className="h-6 w-6 text-[#0D9488] mb-2.5 scale-x-[-1]" />
-                  <p className="text-gray-650 font-sans text-xs sm:text-sm leading-relaxed italic font-medium">
-                    "{drVipul.quote}"
-                  </p>
-                </div>
+                <DoctorBioRenderer bioText={drVipul.briefIntro} doctorName={drVipul.name} />
 
                 {/* Specializations & Expertises */}
                 <div className="space-y-4">

@@ -67,7 +67,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             </div>
             
             <p className="text-xs text-slate-400 font-sans leading-relaxed">
-              Serving Rajkot with uncompromising diagnostic accuracy, immediate loading titanium basal systems, and active anxiety protection protocols. Directed by expert clinician Dr. Kinjal Patel BDS.
+              Serving Rajkot with uncompromising diagnostic accuracy, immediate loading titanium basal systems, and active anxiety protection protocols. Directed by Chief Dental Implant Surgeon Dr. Vipul Patel (MDS) & Dr. Kinjal Patel (BDS).
             </p>
 
             {/* Certifications and Accreditations badge widgets */}
@@ -217,14 +217,14 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-white font-extrabold text-sm uppercase tracking-wide group-hover:text-brand-cyan transition-colors">
-                    Gayatrinagar Branch
+                    Amin Marg Branch
                   </span>
                   <span className="text-[9px] bg-brand-cyan/10 text-brand-cyan px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
-                    Main HQ
+                    Main Branch
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  {contactInfo?.address || 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot, Gujarat 360002.'}
+                  {contactInfo?.address || '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001'}
                 </p>
               </div>
 
@@ -237,7 +237,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                   <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
-                  href={contactInfo?.mapsLink || 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot'} 
+                  href={contactInfo?.mapsLink || 'https://share.google/JKMC3jmTqdylcXUJn'} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1.5 text-xs text-brand-teal hover:text-white font-bold transition-colors group-hover:underline"
@@ -254,14 +254,14 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-white font-extrabold text-sm uppercase tracking-wide group-hover:text-brand-cyan transition-colors">
-                    Amin Marg Branch
+                    Gayatrinagar Branch
                   </span>
                   <span className="text-[9px] bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
-                    Regional Center
+                    Second Branch
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  Business Centrum Complex, 1st Floor, Near Golden Super Market, Opp Fitness Hospital, Mavdi Main Road, Rajkot, Gujarat 360004.
+                  1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot
                 </p>
               </div>
 
@@ -274,7 +274,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                   <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
-                  href="https://maps.google.com/?q=Patel+Dental+Hospital+Mavdi+Rajkot" 
+                  href="https://share.google/Gsdeg6MvRtha7sREX" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1.5 text-xs text-brand-teal hover:text-white font-bold transition-colors group-hover:underline"
@@ -298,7 +298,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
           <div className="text-center md:text-right space-y-2 flex flex-col items-center md:items-end">
             <div>
               <p>Designed under clean sanitization protocols in Rajkot.</p>
-              <p>Chief Dental Surgeon: <span className="text-brand-cyan font-bold">Dr. Kinjal Patel BDS</span></p>
+              <p>Chief Dental Surgeon: <span className="text-brand-cyan font-bold">Dr. Vipul Patel (MDS)</span></p>
             </div>
             <button
               type="button"

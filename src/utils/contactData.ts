@@ -12,8 +12,8 @@ export const DEFAULT_CONTACT_INFO: ContactInfo = {
   whatsapp: '+91 9510397046',
   whatsappRaw: '919510397046',
   email: 'info@pateldentalrajkot.com',
-  address: 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot, Gujarat 360002',
-  mapsLink: 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot'
+  address: '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001',
+  mapsLink: 'https://share.google/JKMC3jmTqdylcXUJn'
 };
 
 export const contactService = {

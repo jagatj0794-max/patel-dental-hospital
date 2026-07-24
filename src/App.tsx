@@ -47,7 +47,7 @@ export default function App() {
     if (hash === 'admin-login') {
       hash = 'admin/login';
     }
-    const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test'];
+    const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment'];
     if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
       return hash as PageId;
     }
@@ -618,6 +618,25 @@ export default function App() {
         return (
           <ServiceDetail
             slug="invisible-aligners"
+            openAppointmentModal={openAppointmentModal}
+            setCurrentPage={setCurrentPage}
+          />
+        );
+      case 'kids':
+      case 'pediatric':
+      case 'pediatric-dentistry':
+        return (
+          <ServiceDetail
+            slug="pediatric-dentistry"
+            openAppointmentModal={openAppointmentModal}
+            setCurrentPage={setCurrentPage}
+          />
+        );
+      case 'braces':
+      case 'braces-treatment':
+        return (
+          <ServiceDetail
+            slug="braces-treatment"
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
           />

@@ -814,45 +814,494 @@ export const DEFAULT_SERVICES: Service[] = [
     id: 'crowns',
     slug: 'crowns-bridges',
     title: 'Crowns & Bridges',
-    short_description: TREATMENTS.find(t => t.id === 'crowns')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'crowns')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'crowns')?.image || '',
+    short_description: 'Crown and Bridges restore missing or damaged teeth to rebuild your chewing efficiency, natural aesthetics, and confident smile.',
+    hero_description: 'Crown and Bridges restore missing or damaged teeth to rebuild your chewing efficiency, natural aesthetics, and confident smile.',
+    description: 'A dental crown is a custom-made cap that covers a damaged, decayed, or root canal-treated tooth to restore its original shape, strength, and appearance. A dental bridge replaces one or more missing teeth by anchoring artificial teeth (pontics) between natural adjacent teeth or implants.\n\nWhen a missing tooth is not replaced in time, adjacent teeth can drift into the empty space, leading to bite collapse, altered chewing dynamics, and strain on the temporomandibular (TM) joint. Restoring missing teeth with crowns and bridges prevents dental misalignment and preserves long-term oral function.',
+    intro_title: 'What are Crown and Bridges?',
+    hero_image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1200',
     icon: 'Layers',
     display_order: 6,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'crowns-step-1',
+        phase: 'First Visit',
+        title: 'First Visit – Preparation & Temporary Placement',
+        description: 'Tooth preparation, impression taking, shade selection, and temporary bridge placement.',
+        display_order: 10
+      },
+      {
+        id: 'crowns-step-2',
+        phase: 'Second Visit',
+        title: 'Second Visit – Permanent Placement & Maintenance',
+        description: 'Permanent bridge placement using resin cement, oral hygiene instructions, and six-month dental check-up.',
+        display_order: 20
+      }
+    ],
+    features: [],
+    procedure_video_title: 'Crown & Bridges Procedure Video',
+    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: 'Replacing missing teeth with crowns and bridges restores chewing efficiency, prevents bite collapse, and protects TM joint alignment.',
+      process_section_title: 'Crown & Bridges Treatment Planning',
+      candidate_section_title: 'Crown & Bridge Materials',
+      candidate_items: [
+        {
+          id: 'mat-1',
+          title: 'Metal Fused Ceramic',
+          description: 'Durable porcelain-fused-to-metal (PFM) restorations providing excellent structural strength and tooth-colored aesthetics for posterior teeth.',
+          display_order: 10
+        },
+        {
+          id: 'mat-2',
+          title: 'Metal-Free Zirconia',
+          description: 'Ultra-strong, highly translucent metal-free zirconia crowns offering maximum chip resistance and natural aesthetics for both front and back teeth.',
+          display_order: 20
+        },
+        {
+          id: 'mat-3',
+          title: 'Natural Appearance',
+          description: 'Custom shade-matched and anatomically contoured to seamlessly replicate the natural translucency, light reflection, and shape of adjacent teeth.',
+          display_order: 30
+        },
+        {
+          id: 'mat-4',
+          title: 'MRI Safe & Biocompatible',
+          description: 'Tissue-friendly, bio-inert ceramic materials completely safe for future diagnostic MRI scans without producing metal artifact interference.',
+          display_order: 40
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case study transformations of Crown & Bridges treatments.',
+      gallery_items: [],
+      before_after_heading: 'Before & After Gallery',
+      before_after_description: 'See real crown & bridge tooth restoration transformations.',
+      before_after_pairs: [],
+      procedure_video_title: 'Crown & Bridges Procedure Video',
+      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      cost_heading: 'Crown & Bridges Cost & Offer',
+      cost_description: '',
+      cost_starting_price: '',
+      cost_cards: [],
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      sec11_heading: 'Book Your Crown & Bridges Consultation',
+      phone_number: '+91 9510397046',
+      whatsapp_number: '+91 9510397046',
+      faqs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: true,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'whitening-srv',
     slug: 'teeth-whitening',
     title: 'Teeth Whitening',
-    short_description: 'Brighten your smile with our premium clinical teeth whitening treatments.',
-    description: 'Our state-of-the-art dental teeth whitening uses advanced clinical whitening gels and specialized curing light systems to safe and fast lighten stains and discolouration.',
+    short_description: 'Teeth whitening means a variety of procedures are used to whiten your natural teeth at Best Dental Care of Gujarat, India – Patel Dental Hospital.\n\nScaling, polishing, bleaching, and ultraviolet therapy are used for teeth whitening.\n\nThis is one of the easiest, safest, and most affordable ways to whiten your teeth.',
+    hero_description: 'Teeth whitening means a variety of procedures are used to whiten your natural teeth at Best Dental Care of Gujarat, India – Patel Dental Hospital.\n\nScaling, polishing, bleaching, and ultraviolet therapy are used for teeth whitening.\n\nThis is one of the easiest, safest, and most affordable ways to whiten your teeth.',
+    description: 'Teeth whitening means a variety of procedures are used to whiten your natural teeth at Best Dental Care of Gujarat, India – Patel Dental Hospital.\n\nScaling, polishing, bleaching, and ultraviolet therapy are used for teeth whitening.\n\nThis is one of the easiest, safest, and most affordable ways to whiten your teeth.',
+    intro_title: 'What is Teeth Whitening?',
     hero_image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600',
     icon: 'Sparkles',
     display_order: 7,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'whitening-step-1',
+        phase: '',
+        title: '',
+        description: 'We offer two types of teeth whitening procedures at Patel Dental Hospital.\n\n• Hospital-Based Teeth Whitening Procedure\n\n• Home-Based Teeth Whitening Procedure',
+        display_order: 10
+      }
+    ],
+    features: [],
+    procedure_video_title: 'Teeth Whitening Procedure Video',
+    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: 'Save 50% Off',
+      process_section_title: 'Teeth Whitening Treatment Planning',
+      candidate_section_title: 'Teeth Whitening Methods',
+      candidate_items: [
+        {
+          id: 'wm-1',
+          title: 'Hospital-Based Teeth Whitening Procedure',
+          description: 'Here we use higher-concentration whitening ingredients, which are applied to the front surfaces of the teeth. Then, ultraviolet light is applied for half an hour, which removes stains from your teeth and gives you instant white teeth.\n\nWe use CE and FDA-approved teeth whitening kits, which are completely safe for your teeth. You get sensitivity-free instant teeth whitening in just half an hour.\n\nIn some cases, such as severe fluorosis stains, you may need multiple sittings to achieve the desired level of whitening.',
+          display_order: 10
+        },
+        {
+          id: 'wm-2',
+          title: 'Home-Based Teeth Whitening Procedure',
+          description: 'In this method, we provide a customized tray for your teeth. You need to load the tray with a mild teeth whitening ingredient and wear it properly over your teeth for the recommended period of time.\n\nGradually, your teeth will become whiter at home.\n\nThe kit provided by us is completely safe, easy to use, and includes all the necessary solutions, equipment, and proper user guide manuals.',
+          display_order: 20
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case study transformations of Teeth Whitening treatments.',
+      gallery_items: [],
+      before_after_heading: 'Before & After Gallery',
+      before_after_description: 'See real teeth whitening treatment transformations.',
+      before_after_pairs: [],
+      procedure_video_title: 'Teeth Whitening Procedure Video',
+      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      cost_heading: 'Teeth Whitening Cost & Offer',
+      cost_description: 'Save 50% Off - Call or WhatsApp: 9510397046',
+      cost_starting_price: '',
+      cost_cards: [],
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      sec11_heading: 'Patel Dental Hospital',
+      phone_number: '9510397046',
+      whatsapp_number: '9510397046',
+      faqs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: true,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'kids',
     slug: 'pediatric-dentistry',
     title: 'Pediatric Dentistry',
-    short_description: TREATMENTS.find(t => t.id === 'kids')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'kids')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'kids')?.image || '',
+    short_description: "We all know that kids are afraid to visit dentists. Our team believes in changing that perception by making every child's dental experience more comfortable and enjoyable.\n\nPediatric dentistry is committed to maintaining children's oral health from infancy through adolescence.",
+    hero_description: "We all know that kids are afraid to visit dentists. Our team believes in changing that perception by making every child's dental experience more comfortable and enjoyable.\n\nPediatric dentistry is committed to maintaining children's oral health from infancy through adolescence.",
+    intro_title: 'What is Pediatric Dentistry?',
+    description: "Pediatric dentists have the training and experience to care for a child's teeth, gums, and jaws at every stage of development.\n\nAt Patel Dental Hospital, we provide a comfortable atmosphere, and our pediatric dentist maintains a friendly approach with every child, making them anxiety-free and fear-free.\n\nAs one of the best dental hospitals in Rajkot, we have a special dental chair that provides a loving and playful environment for children.\n\nWe also offer dental toys to help children become familiar with dental treatments.\n\nWe engage children in oral hygiene activities by providing drawing sheets and colors while educating them about the importance of healthy teeth and gums.\n\nWe also provide treatment for primary (milk) teeth under general anesthesia for timid, violent, or specially challenged children without harming their general health.",
+    hero_image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=1200',
     icon: 'Baby',
     display_order: 8,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'pediatric-step-1',
+        phase: 'Step 1',
+        title: 'Caries Assessment',
+        description: 'Caries assessment for both mother and child.',
+        display_order: 10
+      },
+      {
+        id: 'pediatric-step-2',
+        phase: 'Step 2',
+        title: 'Cleaning & Fluoride Application',
+        description: 'Cleaning and fluoride application for the prevention of dental caries.',
+        display_order: 20
+      },
+      {
+        id: 'pediatric-step-3',
+        phase: 'Step 3',
+        title: 'Habit Counseling',
+        description: 'Counseling for habits such as thumb sucking, lip sucking, tongue thrusting, nail biting, and pacifier habits, along with appliances to help break these harmful habits.',
+        display_order: 30
+      },
+      {
+        id: 'pediatric-step-4',
+        phase: 'Step 4',
+        title: 'Pediatric Orthodontics',
+        description: 'Early evaluation and care for teeth alignment and bite correction (Pediatric Orthodontics).',
+        display_order: 40
+      },
+      {
+        id: 'pediatric-step-5',
+        phase: 'Step 5',
+        title: 'Tooth Cavity Filling & Defect Repair',
+        description: 'Tooth cavity filling and defect repair.',
+        display_order: 50
+      },
+      {
+        id: 'pediatric-step-6',
+        phase: 'Step 6',
+        title: 'Oral Hygiene Maintenance',
+        description: 'Oral hygiene maintenance and treatment for specially challenged children.',
+        display_order: 60
+      },
+      {
+        id: 'pediatric-step-7',
+        phase: 'Step 7',
+        title: 'Emergency Treatment',
+        description: 'Emergency treatment for dental injuries such as tooth avulsion or fractured teeth.',
+        display_order: 70
+      },
+      {
+        id: 'pediatric-step-8',
+        phase: 'Step 8',
+        title: 'Pulpectomy & SS Crown',
+        description: 'Pulpectomy and SS Crown for grossly decayed teeth.',
+        display_order: 80
+      },
+      {
+        id: 'pediatric-step-9',
+        phase: 'Step 9',
+        title: 'Lip Cyst Removal',
+        description: 'Removal of lip cysts caused by lip biting.',
+        display_order: 90
+      },
+      {
+        id: 'pediatric-step-10',
+        phase: 'Step 10',
+        title: 'Treatment Under General Anesthesia',
+        description: 'Treatment of primary (milk) teeth under general anesthesia for timid, violent, or specially challenged children.',
+        display_order: 100
+      }
+    ],
+    features: [],
+    procedure_video_title: 'Pediatric Dentistry Procedure Video',
+    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: "Pediatric dentistry is committed to maintaining children's oral health from infancy through adolescence.",
+      process_section_title: 'Pediatric Dentistry Treatment Planning',
+      candidate_section_title: 'Pediatric Dental Services',
+      candidate_items: [
+        {
+          id: 'ped-1',
+          title: 'Caries Assessment',
+          description: 'Assessment for dental caries in both mother and child.',
+          display_order: 10
+        },
+        {
+          id: 'ped-2',
+          title: 'Cleaning & Fluoride Application',
+          description: 'Cleaning and fluoride application for the prevention of dental caries.',
+          display_order: 20
+        },
+        {
+          id: 'ped-3',
+          title: 'Habit Counseling',
+          description: 'Counseling for thumb sucking, lip sucking, tongue thrusting, nail biting, and pacifier habits. Appliances are provided to help break these harmful habits.',
+          display_order: 30
+        },
+        {
+          id: 'ped-4',
+          title: 'Pediatric Orthodontics',
+          description: 'Early evaluation and care for teeth alignment and bite correction.',
+          display_order: 40
+        },
+        {
+          id: 'ped-5',
+          title: 'Tooth Filling & Defect Repair',
+          description: 'Tooth cavity filling and defect repair.',
+          display_order: 50
+        },
+        {
+          id: 'ped-6',
+          title: 'Oral Hygiene Maintenance',
+          description: 'Oral hygiene maintenance and treatment for specially challenged children.',
+          display_order: 60
+        },
+        {
+          id: 'ped-7',
+          title: 'Dental Emergency Treatment',
+          description: 'Emergency treatment for dental injuries such as tooth avulsion or fractured teeth.',
+          display_order: 70
+        },
+        {
+          id: 'ped-8',
+          title: 'Pulpectomy & SS Crown',
+          description: 'Pulpectomy and SS Crown for grossly decayed teeth.',
+          display_order: 80
+        },
+        {
+          id: 'ped-9',
+          title: 'Lip Cyst Removal',
+          description: 'Removal of lip cysts caused by lip biting.',
+          display_order: 90
+        },
+        {
+          id: 'ped-10',
+          title: 'Treatment Under General Anesthesia',
+          description: 'Treatment of primary (milk) teeth under general anesthesia for timid, violent, or specially challenged children.',
+          display_order: 100
+        }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case studies and pediatric dental transformations.',
+      gallery_items: [],
+      before_after_heading: 'Before & After Gallery',
+      before_after_description: 'See pediatric smile transformations and dental care outcomes.',
+      before_after_pairs: [
+        {
+          id: 'pediatric-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Pediatric Smile Restoration',
+          display_order: 10
+        }
+      ],
+      procedure_video_title: 'Pediatric Dentistry Procedure Video',
+      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      cost_heading: 'Pediatric Dentistry Cost / Offer',
+      cost_description: 'Call or WhatsApp: 9510397946',
+      cost_starting_price: '',
+      cost_cards: [],
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      sec11_heading: 'Patel Dental Hospital',
+      sec11_sub: 'Call or WhatsApp: 9510397946 | Follow Us on Social Media',
+      phone_number: '9510397946',
+      whatsapp_number: '9510397946',
+      faqs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: true,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'braces-srv',
     slug: 'braces-treatment',
     title: 'Braces Treatment',
-    short_description: TREATMENTS.find(t => t.id === 'braces')?.shortDesc || '',
-    description: TREATMENTS.find(t => t.id === 'braces')?.longDesc || '',
-    hero_image: TREATMENTS.find(t => t.id === 'braces')?.image || '',
+    short_description: 'Braces are used to correct misaligned and crooked teeth.\n\nAt Patel Dental Hospital, one of the most advanced dental hospitals in Rajkot, Gujarat, braces treatment is completed in four stages.',
+    description: 'Braces are used to correct misaligned and crooked teeth.\n\nAt Patel Dental Hospital, we provide modern orthodontic treatment using self-ligating and non-self-ligating metal and ceramic brackets.\n\nTransparent pricing is provided for every treatment system.\n\nThis is why Patel Dental Hospital is one of the best orthodontic clinics in Rajkot, Gujarat, for braces and clear aligners to treat misaligned and crooked teeth.',
+    hero_description: 'Braces are used to correct misaligned and crooked teeth.\n\nAt Patel Dental Hospital, one of the most advanced dental hospitals in Rajkot, Gujarat, braces treatment is completed in four stages.',
+    intro_title: 'What is Braces Treatment?',
+    hero_image: TREATMENTS.find(t => t.id === 'braces')?.image || 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=1200',
     icon: 'Grid',
     display_order: 9,
-    is_active: true
+    is_active: true,
+    process_steps: [
+      {
+        id: 'braces-step-1',
+        phase: 'Stage 1',
+        title: 'Consultation',
+        description: 'In this stage, our expert examines you and guides you on which type of braces is most suitable for you.\n\nWe offer self-ligating and non-self-ligating metal and ceramic brackets.\n\nTransparent pricing is provided for every system.',
+        display_order: 10
+      },
+      {
+        id: 'braces-step-2',
+        phase: 'Stage 2',
+        title: 'Data Record Collection',
+        description: 'If you decide to continue with us, we take impressions of your teeth to prepare study models, capture photographs of your teeth and face, and perform a CT scan of your face for further treatment planning.',
+        display_order: 20
+      },
+      {
+        id: 'braces-step-3',
+        phase: 'Stage 3',
+        title: 'Treatment Planning',
+        description: 'Our expert reviews all the records collected during the previous visit, prepares your treatment plan, and explains how your treatment will progress over time and what procedures will be performed during treatment.\n\nBefore starting treatment, we remove all decay, restore cavities with tooth-colored restorative material, and perform professional teeth cleaning before bonding the braces.',
+        display_order: 30
+      },
+      {
+        id: 'braces-step-4',
+        phase: 'Stage 4',
+        title: 'Retention Phase',
+        description: 'After the active phase of braces treatment is completed, we remove the braces and provide retainers to keep your teeth stable in their new position.\n\nRetainers play a vital role in preventing the teeth from shifting back to their original position.',
+        display_order: 40
+      }
+    ],
+    procedure_video_title: 'Braces Treatment Procedure Video',
+    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    patient_testimonials: [
+      {
+        id: 'testi-1',
+        patient_name: 'Patient Braces Treatment Journey',
+        video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+        treatment_name: 'Braces Treatment',
+        display_order: 10
+      }
+    ],
+    marketing_config: {
+      green_highlight_line: 'Get Up to 30% Off on Braces & Aligners',
+      process_section_title: 'Braces Treatment Planning',
+      candidate_section_title: 'Treatment Planning Includes',
+      candidate_items: [
+        { id: 'braces-plan-1', title: 'Diagnosis', description: 'Diagnosis', display_order: 10 },
+        { id: 'braces-plan-2', title: 'Different Treatment Options', description: 'Different Treatment Options', display_order: 20 },
+        { id: 'braces-plan-3', title: 'Possible Outcomes', description: 'Possible Outcomes', display_order: 30 },
+        { id: 'braces-plan-4', title: 'Estimated Treatment Duration', description: 'Estimated Treatment Duration', display_order: 40 },
+        { id: 'braces-plan-5', title: 'Post-Treatment Procedures', description: 'Post-Treatment Procedures', display_order: 50 },
+        { id: 'braces-plan-6', title: 'Payment Plan Options', description: 'Payment Plan Options', display_order: 60 }
+      ],
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Clinical case study transformations of Braces treatments.',
+      gallery_items: [],
+      before_after_heading: 'Before & After Smile Transformations',
+      before_after_description: 'See real smile transformations of our braces treatment patients.',
+      before_after_pairs: [
+        {
+          id: 'braces-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Braces Alignment Smile Transformation',
+          display_order: 10
+        }
+      ],
+      procedure_video_title: 'Braces Treatment Procedure Video',
+      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      testimonials_section_title: 'Patient Testimonials',
+      patient_testimonials: [
+        {
+          id: 'testi-1',
+          patient_name: 'Patient Braces Treatment Journey',
+          video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+          treatment_name: 'Braces Treatment',
+          display_order: 10
+        }
+      ],
+      hospital_team_title: 'Hospital & Team Gallery',
+      cost_heading: 'Braces Treatment Cost & Offers',
+      cost_description: 'Call: 9510397046',
+      cost_starting_price: '',
+      cost_cards: [],
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: [],
+      sec11_heading: 'Patel Dental Hospital',
+      phone_number: '9510397946',
+      whatsapp_number: '9510397046',
+      faqs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_candidate: true,
+      show_before_after: true,
+      show_gallery: true,
+      show_procedure_video: true,
+      show_testimonials: true,
+      show_hospital_photos: true,
+      show_cost: true,
+      show_google_reviews: true,
+      show_faqs: true,
+      show_bottom_cta: true
+    }
   },
   {
     id: 'wisdom-srv',
@@ -877,6 +1326,90 @@ export const DEFAULT_SERVICES: Service[] = [
     is_active: true
   }
 ];
+
+/**
+ * Direct helper to update localStorage and Supabase without calling getServices() or triggering recursion
+ */
+export async function saveServiceDirectly(service: Service): Promise<void> {
+  try {
+    const rawLocal = localStorage.getItem('hospital_services');
+    let services: Service[] = rawLocal ? JSON.parse(rawLocal) : [];
+    if (!Array.isArray(services)) services = [];
+    const existingIndex = services.findIndex(s => s.id === service.id);
+    if (existingIndex >= 0) {
+      services[existingIndex] = { ...services[existingIndex], ...service };
+    } else {
+      services.push(service);
+    }
+    localStorage.setItem('hospital_services', JSON.stringify(services));
+  } catch (e) {
+    console.warn('Failed to update localStorage in saveServiceDirectly:', e);
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      let { error } = await supabase.client
+        .from('services')
+        .upsert({
+          id: service.id,
+          slug: service.slug,
+          title: service.title,
+          short_description: service.short_description,
+          description: service.description,
+          hero_image: service.hero_image,
+          icon: service.icon || null,
+          display_order: service.display_order,
+          is_active: service.is_active,
+          seo_title: service.seo_title || null,
+          seo_description: service.seo_description || null,
+          homepage_card_image: service.homepage_card_image || null,
+          homepage_short_description: service.homepage_short_description || null,
+          hero_title: service.hero_title || null,
+          hero_description: service.hero_description || null,
+          hero_image_caption: service.hero_image_caption || null,
+          intro_title: service.intro_title || null,
+          intro_description: service.intro_description || null,
+          process_steps: service.process_steps || null,
+          features: service.features || null,
+          content_images: service.content_images || null,
+          procedure_video_url: service.procedure_video_url || null,
+          procedure_video_title: service.procedure_video_title || null,
+          procedure_video_description: service.procedure_video_description || null,
+          procedure_video_thumbnail: service.procedure_video_thumbnail || null,
+          patient_testimonials: service.patient_testimonials || null,
+          hospital_team_photos: service.hospital_team_photos || null,
+          marketing_config: service.marketing_config || null,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error && (error.message?.includes('hero_title') || error.message?.includes('column'))) {
+        const { error: retryError1 } = await supabase.client
+          .from('services')
+          .upsert({
+            id: service.id,
+            slug: service.slug,
+            title: service.title,
+            short_description: service.short_description,
+            description: service.description,
+            hero_image: service.hero_image,
+            icon: service.icon || null,
+            display_order: service.display_order,
+            is_active: service.is_active,
+            seo_title: service.seo_title || null,
+            seo_description: service.seo_description || null,
+            homepage_card_image: service.homepage_card_image || null,
+            homepage_short_description: service.homepage_short_description || null,
+            features: service.features || null,
+            marketing_config: service.marketing_config || null,
+            updated_at: new Date().toISOString()
+          });
+        error = retryError1;
+      }
+    } catch (e) {
+      console.warn('Direct Supabase upsert error in saveServiceDirectly:', e);
+    }
+  }
+}
 
 export const serviceService = {
   /**
@@ -1084,6 +1617,75 @@ export const serviceService = {
                     show_benefits: false,
                     show_candidate: true,
                     show_faqs: false
+                  }
+                };
+              }
+            }
+            if (svc.id === 'whitening-srv' || svc.slug === 'teeth-whitening' || svc.slug === 'laser-teeth-whitening') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'whitening-srv' || d.slug === 'teeth-whitening');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                const defaultMCfg = (defaultSvc.marketing_config as MarketingConfig) || {};
+
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  slug: defaultSvc.slug,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  intro_title: defaultSvc.intro_title,
+                  process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  marketing_config: {
+                    ...defaultMCfg,
+                    ...mConfigObj,
+                    green_highlight_line: defaultMCfg.green_highlight_line,
+                    process_section_title: defaultMCfg.process_section_title,
+                    candidate_section_title: defaultMCfg.candidate_section_title,
+                    candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+                    cost_heading: defaultMCfg.cost_heading,
+                    phone_number: defaultMCfg.phone_number,
+                    whatsapp_number: defaultMCfg.whatsapp_number,
+                    show_candidate: true
+                  }
+                };
+              }
+            }
+            if (svc.id === 'kids' || svc.id === 'pediatric' || svc.id === 'pediatric-srv' || svc.slug === 'pediatric-dentistry' || svc.slug === 'pediatric') {
+              const defaultSvc = DEFAULT_SERVICES.find(d => d.id === 'kids' || d.slug === 'pediatric-dentistry');
+              if (defaultSvc) {
+                updated = true;
+                const mConfigObj = typeof svc.marketing_config === 'string'
+                  ? JSON.parse(svc.marketing_config)
+                  : (svc.marketing_config || {});
+                const defaultMCfg = (defaultSvc.marketing_config as MarketingConfig) || {};
+
+                return {
+                  ...svc,
+                  title: defaultSvc.title,
+                  slug: defaultSvc.slug,
+                  short_description: defaultSvc.short_description,
+                  hero_description: defaultSvc.hero_description,
+                  description: defaultSvc.description,
+                  intro_title: defaultSvc.intro_title,
+                  process_steps: defaultSvc.process_steps,
+                  features: defaultSvc.features,
+                  marketing_config: {
+                    ...defaultMCfg,
+                    ...mConfigObj,
+                    green_highlight_line: defaultMCfg.green_highlight_line,
+                    process_section_title: defaultMCfg.process_section_title,
+                    candidate_section_title: defaultMCfg.candidate_section_title,
+                    candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+                    cost_heading: defaultMCfg.cost_heading,
+                    cost_description: defaultMCfg.cost_description,
+                    phone_number: defaultMCfg.phone_number,
+                    whatsapp_number: defaultMCfg.whatsapp_number,
+                    show_candidate: true
                   }
                 };
               }
@@ -1403,6 +2005,93 @@ export const serviceService = {
           }
         }
 
+        const whitening = data.find(s => s.id === 'whitening-srv' || s.slug === 'teeth-whitening' || s.slug === 'laser-teeth-whitening');
+        if (whitening) {
+          const defaultWhitening = DEFAULT_SERVICES.find(d => d.id === 'whitening-srv' || d.slug === 'teeth-whitening');
+          const mConfigObj = typeof whitening.marketing_config === 'string'
+            ? JSON.parse(whitening.marketing_config)
+            : (whitening.marketing_config || {});
+          const curCand1Desc = mConfigObj.candidate_items?.[0]?.description || '';
+          if (defaultWhitening && (
+            !mConfigObj.candidate_items ||
+            !Array.isArray(mConfigObj.candidate_items) ||
+            mConfigObj.candidate_items.length === 0 ||
+            mConfigObj.candidate_section_title !== (defaultWhitening.marketing_config as MarketingConfig)?.candidate_section_title ||
+            !curCand1Desc.includes('Here we use higher-concentration whitening ingredients')
+          )) {
+            const defaultMCfg = (defaultWhitening.marketing_config as MarketingConfig) || {};
+            const updatedWhitening = {
+              ...whitening,
+              title: defaultWhitening.title,
+              slug: defaultWhitening.slug,
+              short_description: defaultWhitening.short_description,
+              hero_description: defaultWhitening.hero_description,
+              description: defaultWhitening.description,
+              intro_title: defaultWhitening.intro_title,
+              process_steps: defaultWhitening.process_steps,
+              features: defaultWhitening.features,
+              marketing_config: {
+                ...defaultMCfg,
+                ...mConfigObj,
+                candidate_items: defaultMCfg.candidate_items,
+                cost_heading: defaultMCfg.cost_heading,
+                cost_description: defaultMCfg.cost_description,
+                green_highlight_line: defaultMCfg.green_highlight_line,
+                process_section_title: defaultMCfg.process_section_title,
+                candidate_section_title: defaultMCfg.candidate_section_title,
+                phone_number: defaultMCfg.phone_number,
+                whatsapp_number: defaultMCfg.whatsapp_number,
+                show_candidate: true
+              }
+            };
+            await serviceService.saveService(updatedWhitening);
+            needsRefetch = true;
+          }
+        }
+
+        const pediatric = data.find(s => s.id === 'kids' || s.id === 'pediatric' || s.id === 'pediatric-srv' || s.slug === 'pediatric-dentistry' || s.slug === 'pediatric');
+        if (pediatric) {
+          const defaultPediatric = DEFAULT_SERVICES.find(d => d.id === 'kids' || d.slug === 'pediatric-dentistry');
+          const mConfigObj = typeof pediatric.marketing_config === 'string'
+            ? JSON.parse(pediatric.marketing_config)
+            : (pediatric.marketing_config || {});
+          if (defaultPediatric && (
+            pediatric.short_description !== defaultPediatric.short_description ||
+            !pediatric.intro_title ||
+            !mConfigObj.candidate_items ||
+            !Array.isArray(mConfigObj.candidate_items) ||
+            mConfigObj.candidate_items.length === 0
+          )) {
+            const defaultMCfg = (defaultPediatric.marketing_config as MarketingConfig) || {};
+            const updatedPediatric = {
+              ...pediatric,
+              title: defaultPediatric.title,
+              slug: defaultPediatric.slug,
+              short_description: defaultPediatric.short_description,
+              hero_description: defaultPediatric.hero_description,
+              description: defaultPediatric.description,
+              intro_title: defaultPediatric.intro_title,
+              process_steps: defaultPediatric.process_steps,
+              features: defaultPediatric.features,
+              marketing_config: {
+                ...defaultMCfg,
+                ...mConfigObj,
+                candidate_items: defaultMCfg.candidate_items,
+                cost_heading: defaultMCfg.cost_heading,
+                cost_description: defaultMCfg.cost_description,
+                green_highlight_line: defaultMCfg.green_highlight_line,
+                process_section_title: defaultMCfg.process_section_title,
+                candidate_section_title: defaultMCfg.candidate_section_title,
+                phone_number: defaultMCfg.phone_number,
+                whatsapp_number: defaultMCfg.whatsapp_number,
+                show_candidate: true
+              }
+            };
+            await serviceService.saveService(updatedPediatric);
+            needsRefetch = true;
+          }
+        }
+
         if (needsRefetch) {
           const { data: refetched } = await supabase.client
             .from('services')
@@ -1715,6 +2404,84 @@ export const serviceService = {
         }
       }
 
+      if (data && (data.id === 'crowns' || data.id === 'crowns-srv' || data.slug === 'crowns-bridges' || data.slug === 'crown-and-bridges' || data.slug === 'crowns-and-bridges')) {
+        const defaultCrowns = DEFAULT_SERVICES.find(d => d.id === 'crowns' || d.slug === 'crowns-bridges');
+        const mConfigObj = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        if (defaultCrowns) {
+          const defaultMCfg = (defaultCrowns.marketing_config as MarketingConfig) || {};
+          const updatedCrowns = {
+            ...data,
+            title: defaultCrowns.title,
+            slug: defaultCrowns.slug,
+            short_description: defaultCrowns.short_description,
+            hero_description: defaultCrowns.hero_description,
+            description: defaultCrowns.description,
+            intro_title: defaultCrowns.intro_title,
+            process_steps: defaultCrowns.process_steps,
+            procedure_video_title: defaultCrowns.procedure_video_title,
+            procedure_video_url: defaultCrowns.procedure_video_url,
+            marketing_config: {
+              ...defaultMCfg,
+              ...mConfigObj,
+              green_highlight_line: defaultMCfg.green_highlight_line,
+              process_section_title: 'Crown & Bridges Treatment Planning',
+              candidate_section_title: 'Crown & Bridge Materials',
+              candidate_items: defaultMCfg.candidate_items,
+              procedure_video_title: 'Crown & Bridges Procedure Video',
+              procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+              cost_heading: 'Crown & Bridges Cost & Offer',
+              sec11_heading: 'Book Your Crown & Bridges Consultation',
+              phone_number: '+91 9510397046',
+              whatsapp_number: '+91 9510397046',
+              show_benefits: false,
+              show_candidate: true,
+              show_procedure_video: true
+            }
+          };
+          await serviceService.saveService(updatedCrowns);
+          return updatedCrowns;
+        }
+      }
+
+      if (data && (data.id === 'braces-srv' || data.id === 'braces' || data.slug === 'braces-treatment' || data.slug === 'braces')) {
+        const defaultBraces = DEFAULT_SERVICES.find(d => d.id === 'braces-srv' || d.slug === 'braces-treatment');
+        const mConfigObj = typeof data.marketing_config === 'string'
+          ? JSON.parse(data.marketing_config)
+          : (data.marketing_config || {});
+        if (defaultBraces) {
+          const defaultMCfg = (defaultBraces.marketing_config as MarketingConfig) || {};
+          const updatedBraces = {
+            ...data,
+            title: defaultBraces.title,
+            slug: defaultBraces.slug,
+            short_description: defaultBraces.short_description,
+            hero_description: defaultBraces.hero_description,
+            description: defaultBraces.description,
+            intro_title: defaultBraces.intro_title || 'What is Braces Treatment?',
+            process_steps: defaultBraces.process_steps,
+            marketing_config: {
+              ...defaultMCfg,
+              ...mConfigObj,
+              process_section_title: 'Braces Treatment Planning',
+              candidate_section_title: 'Treatment Planning Includes',
+              candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+              before_after_pairs: (Array.isArray(mConfigObj.before_after_pairs) && mConfigObj.before_after_pairs.length > 0) ? mConfigObj.before_after_pairs : defaultMCfg.before_after_pairs,
+              patient_testimonials: (Array.isArray(mConfigObj.patient_testimonials) && mConfigObj.patient_testimonials.length > 0) ? mConfigObj.patient_testimonials : (mConfigObj.patient_testimonials || defaultMCfg.patient_testimonials),
+              cost_description: mConfigObj.cost_description || 'Call: 9510397046',
+              phone_number: mConfigObj.phone_number || '9510397946',
+              faqs: [],
+              show_candidate: true,
+              show_before_after: true,
+              show_testimonials: true
+            }
+          };
+          await serviceService.saveService(updatedBraces);
+          return updatedBraces;
+        }
+      }
+
       return data;
     } catch (e) {
       console.error('Exception in getServiceBySlug:', e);
@@ -1735,130 +2502,8 @@ export const serviceService = {
    * Save (Insert/Update) a service record.
    */
   saveService: async (service: Service): Promise<{ success: boolean; error?: string }> => {
-    if (!isSupabaseConfigured()) {
-      try {
-        const services = await serviceService.getServices();
-        const existingIndex = services.findIndex(s => s.id === service.id);
-        if (existingIndex >= 0) {
-          services[existingIndex] = { ...services[existingIndex], ...service };
-        } else {
-          services.push(service);
-        }
-        localStorage.setItem('hospital_services', JSON.stringify(services));
-        return { success: true };
-      } catch (e: any) {
-        return { success: false, error: e.message || String(e) };
-      }
-    }
-
-    console.log('Saving Service...');
-    try {
-      let { error } = await supabase.client
-        .from('services')
-        .upsert({
-          id: service.id,
-          slug: service.slug,
-          title: service.title,
-          short_description: service.short_description,
-          description: service.description,
-          hero_image: service.hero_image,
-          icon: service.icon || null,
-          display_order: service.display_order,
-          is_active: service.is_active,
-          seo_title: service.seo_title || null,
-          seo_description: service.seo_description || null,
-          homepage_card_image: service.homepage_card_image || null,
-          homepage_short_description: service.homepage_short_description || null,
-          hero_title: service.hero_title || null,
-          hero_description: service.hero_description || null,
-          hero_image_caption: service.hero_image_caption || null,
-          intro_title: service.intro_title || null,
-          intro_description: service.intro_description || null,
-          process_steps: service.process_steps || null,
-          features: service.features || null,
-          content_images: service.content_images || null,
-          procedure_video_url: service.procedure_video_url || null,
-          procedure_video_title: service.procedure_video_title || null,
-          procedure_video_description: service.procedure_video_description || null,
-          procedure_video_thumbnail: service.procedure_video_thumbnail || null,
-          patient_testimonials: service.patient_testimonials || null,
-          hospital_team_photos: service.hospital_team_photos || null,
-          marketing_config: service.marketing_config || null,
-          updated_at: new Date().toISOString()
-        });
-
-      if (error && (error.message?.includes('marketing_config') || error.message?.includes('column "marketing_config"'))) {
-        console.warn('marketing_config column might not exist yet in Supabase table. Retrying save without marketing_config...', error);
-        const { error: retryError } = await supabase.client
-          .from('services')
-          .upsert({
-            id: service.id,
-            slug: service.slug,
-            title: service.title,
-            short_description: service.short_description,
-            description: service.description,
-            hero_image: service.hero_image,
-            icon: service.icon || null,
-            display_order: service.display_order,
-            is_active: service.is_active,
-            seo_title: service.seo_title || null,
-            seo_description: service.seo_description || null,
-            homepage_card_image: service.homepage_card_image || null,
-            homepage_short_description: service.homepage_short_description || null,
-            hero_title: service.hero_title || null,
-            hero_description: service.hero_description || null,
-            hero_image_caption: service.hero_image_caption || null,
-            intro_title: service.intro_title || null,
-            intro_description: service.intro_description || null,
-            process_steps: service.process_steps || null,
-            features: service.features || null,
-            content_images: service.content_images || null,
-            procedure_video_url: service.procedure_video_url || null,
-            procedure_video_title: service.procedure_video_title || null,
-            procedure_video_description: service.procedure_video_description || null,
-            procedure_video_thumbnail: service.procedure_video_thumbnail || null,
-            patient_testimonials: service.patient_testimonials || null,
-            hospital_team_photos: service.hospital_team_photos || null,
-            updated_at: new Date().toISOString()
-          });
-        error = retryError;
-      }
-
-      if (error && (error.message?.includes('homepage_card_image') || error.message?.includes('homepage_short_description') || error.message?.includes('hero_title') || error.message?.includes('content_images') || error.message?.includes('column'))) {
-        console.warn('New columns might not exist yet in Supabase table. Retrying save with basic fields only...', error);
-        // Retry without the new fields
-        const { error: retryError } = await supabase.client
-          .from('services')
-          .upsert({
-            id: service.id,
-            slug: service.slug,
-            title: service.title,
-            short_description: service.short_description,
-            description: service.description,
-            hero_image: service.hero_image,
-            icon: service.icon || null,
-            display_order: service.display_order,
-            is_active: service.is_active,
-            seo_title: service.seo_title || null,
-            seo_description: service.seo_description || null,
-            updated_at: new Date().toISOString()
-          });
-        error = retryError;
-      }
-
-      if (error) {
-        console.log(`Supabase Error: ${error.message}`);
-        console.error('Error upserting service:', error);
-        return { success: false, error: error.message || JSON.stringify(error) };
-      }
-
-      console.log('Service Saved');
-      return { success: true };
-    } catch (e: any) {
-      console.log(`Supabase Error: ${e.message || String(e)}`);
-      console.error('Exception in saveService:', e);
-      return { success: false, error: e.message || String(e) };
-    }
+    await saveServiceDirectly(service);
+    return { success: true };
   },
 
   /**
@@ -1921,8 +2566,14 @@ export const serviceService = {
         .order('display_order', { ascending: true });
 
       if (error) {
-        console.error('Error fetching service gallery:', error);
-        return [];
+        console.warn('Error fetching service gallery from Supabase, using local fallback:', error);
+        const stored = localStorage.getItem(`gallery_${serviceId}`);
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {}
+        }
+        return DEFAULT_SERVICE_GALLERY.filter(item => item.service_id === serviceId);
       }
 
       // Check if the service_gallery table is empty across all services
@@ -1954,8 +2605,14 @@ export const serviceService = {
 
       return data || [];
     } catch (e) {
-      console.error('Exception in getGallery:', e);
-      return [];
+      console.warn('Exception in getGallery, using local fallback:', e);
+      const stored = localStorage.getItem(`gallery_${serviceId}`);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (err) {}
+      }
+      return DEFAULT_SERVICE_GALLERY.filter(item => item.service_id === serviceId);
     }
   },
 
@@ -2137,8 +2794,14 @@ export const serviceService = {
         .order('display_order', { ascending: true });
 
       if (error) {
-        console.error('Error fetching service FAQs:', error);
-        return [];
+        console.warn('Error fetching service FAQs from Supabase, using local fallback:', error);
+        const stored = localStorage.getItem(`faqs_${serviceId}`);
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {}
+        }
+        return DEFAULT_SERVICE_FAQS.filter(item => item.service_id === serviceId);
       }
 
       // Check if service_faqs is empty
@@ -2170,8 +2833,14 @@ export const serviceService = {
 
       return data || [];
     } catch (e) {
-      console.error('Exception in getFaqs:', e);
-      return [];
+      console.warn('Exception in getFaqs, using local fallback:', e);
+      const stored = localStorage.getItem(`faqs_${serviceId}`);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (err) {}
+      }
+      return DEFAULT_SERVICE_FAQS.filter(item => item.service_id === serviceId);
     }
   },
 

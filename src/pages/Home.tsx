@@ -325,7 +325,7 @@ export default function Home({
   const [selectedMomentIndex, setSelectedMomentIndex] = useState<number | null>(null);
   const [selectedOurClinicImgIndex, setSelectedOurClinicImgIndex] = useState<number | null>(null);
   const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(0);
-  const [activeMapBranch, setActiveMapBranch] = useState<'gayatrinagar' | 'mavdi'>('gayatrinagar');
+  const [activeMapBranch, setActiveMapBranch] = useState<'amin_marg' | 'gayatrinagar'>('amin_marg');
 
   // Architectural readiness for future filtering using Category & Branch metadata
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -446,7 +446,7 @@ export default function Home({
               
               {/* 1. Small trust badge */}
               <div className="mb-4 lg:mb-8 animate-fade-in shadow-sm">
-                <span className="inline-flex items-center px-4 py-2 rounded-full bg-white border border-gray-100/50 text-[#081C3A] font-bold text-[10px] md:text-[11px] uppercase tracking-widest backdrop-blur-md shadow-sm">
+                <span className="inline-flex items-center px-4 py-2 rounded-full bg-white border border-[#C9A96E] text-[#1E3A5F] font-bold text-[10px] md:text-[11px] uppercase tracking-widest backdrop-blur-md shadow-sm">
                   <span className="mr-1.5">🏆</span> Awarded as Best Dental Hospital in India by FAMDENT
                 </span>
               </div>
@@ -455,35 +455,35 @@ export default function Home({
               <div className="flex flex-col text-left space-y-2 lg:space-y-3 max-w-[550px]">
                 {/* Small Heading */}
                 <div className="font-display text-xs lg:text-[13px] font-black tracking-widest uppercase">
-                  <span className="text-white">Patel Dental Hospital</span> <span className="text-[#4FD1FF]">| Rajkot</span>
+                  <span className="text-[#1E3A5F]">Patel Dental Hospital</span> <span className="text-[#1E3A5F]">| Rajkot</span>
                 </div>
                 {/* Main Heading */}
-                <h1 className="font-display text-[26px] sm:text-[32px] md:text-[36px] lg:text-[40px] xl:text-[46px] leading-[1.15] font-black text-[#F8FBFF] tracking-tight">
+                <h1 className="font-display text-[26px] sm:text-[32px] md:text-[36px] lg:text-[40px] xl:text-[46px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight">
                   Give You One More<br />
-                  <span className="relative inline-block text-[#BEEBFF]">
+                  <span className="relative inline-block text-[#00897B]">
                     Reason To Smile
                     {/* Subtle underline accent */}
-                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[4px] bg-[#E0F2FE] rounded-full" />
+                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[4px] bg-[#C9A96E] rounded-full" />
                   </span>
                 </h1>
                 {/* Secondary Heading */}
-                <div className="font-display text-sm sm:text-base lg:text-[17px] font-bold text-[#FFFFFF] leading-snug pt-1">
+                <div className="font-display text-sm sm:text-base lg:text-[17px] font-bold text-[#1E3A5F] leading-snug pt-1">
                   Advanced Implant Hospital <br className="hidden sm:inline" />
-                  <span className="text-[#5EEBFF] font-extrabold">with Fix Teeth in Just One Week</span>
+                  <span className="text-[#00897B] font-extrabold">with Fix Teeth in Just One Week</span>
                 </div>
               </div>
 
               {/* Subtitle / Description & Trust Statement */}
               <div className="mt-4 flex flex-col space-y-2.5 text-left max-w-[480px]">
-                <p className="font-sans text-sm md:text-base leading-relaxed font-medium text-[#F5F7FA]">
+                <p className="font-sans text-sm md:text-base leading-relaxed font-medium text-[#4B5563]">
                   With Patel Dental Hospital, take the first step towards a beautiful smile and better dental health.
                 </p>
-                <p className="font-sans text-xs md:text-sm font-semibold italic text-[#E5EDF5]">
+                <p className="font-sans text-xs md:text-sm font-semibold italic text-[#4B5563]">
                   Experience Modern Dentistry With Gentle Touch.
                 </p>
                 {/* Trust Statement */}
-                <div className="flex items-center space-x-1.5 text-xs md:text-[13px] font-bold text-white pt-0.5">
-                  <Sparkles className="h-4 w-4 text-emerald-500 animate-pulse" />
+                <div className="flex items-center space-x-1.5 text-xs md:text-[13px] font-bold text-[#00897B] pt-0.5">
+                  <Sparkles className="h-4 w-4 text-[#00897B] animate-pulse" />
                   <span>We Give You A Perfect Smile, Guaranteed.</span>
                 </div>
               </div>
@@ -493,7 +493,7 @@ export default function Home({
                 <button
                   id="hero-primary-cta"
                   onClick={openAppointmentModal}
-                  className="h-[56px] px-8 w-full sm:flex-1 bg-gradient-to-r from-[#0099F7] to-[#00C6A7] hover:from-[#00a3ff] hover:to-[#00d4b3] text-white text-[16.5px] font-extrabold rounded-[16px] shadow-[0_12px_30px_rgba(0,140,255,0.22)] hover:shadow-[0_15px_35px_rgba(0,140,255,0.32)] cursor-pointer transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
+                  className="h-[56px] px-8 w-full sm:flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[16.5px] font-extrabold rounded-[16px] shadow-[0_12px_30px_rgba(0,137,123,0.22)] hover:shadow-[0_15px_35px_rgba(0,137,123,0.32)] cursor-pointer transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
                 >
                   <Calendar className="h-5 w-5 shrink-0" />
                   <span className="whitespace-nowrap">Book Appointment</span>
@@ -503,9 +503,9 @@ export default function Home({
                   href={`https://wa.me/${whatsappRaw}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-[56px] w-full sm:flex-1 bg-white hover:bg-[#F3FFFC] text-[#0F9D8F] text-[16.5px] font-extrabold rounded-[16px] border-2 border-[#14B8A6] hover:border-[#0F9D8F] shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
+                  className="h-[56px] w-full sm:flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[16.5px] font-extrabold rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
                 >
-                  <MessageCircle className="h-5 w-5 fill-[#0F9D8F]/10 shrink-0 text-[#0F9D8F]" strokeWidth={2.5} />
+                  <MessageCircle className="h-5 w-5 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
                   <span className="whitespace-nowrap">WhatsApp Us</span>
                 </a>
               </div>
@@ -546,35 +546,35 @@ export default function Home({
             
             {/* 1. Label */}
             <div className="animate-fade-in font-display text-[9px] sm:text-[10.5px] font-black tracking-wider uppercase">
-              <span className="text-white">Patel Dental Hospital</span> <span className="text-[#4FD1FF]">| Rajkot</span>
+              <span className="text-[#1E3A5F]">Patel Dental Hospital</span> <span className="text-[#1E3A5F]">| Rajkot</span>
             </div>
 
             {/* 2. Headline */}
             <div className="flex flex-col text-center space-y-1 max-w-[450px]">
               {/* Main Heading */}
-              <h1 className="font-display text-[21px] sm:text-[25px] leading-[1.2] font-black text-[#F8FBFF] tracking-tight">
+              <h1 className="font-display text-[21px] sm:text-[25px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight">
                 Give You One More<br />
-                <span className="text-[#BEEBFF]">
+                <span className="text-[#00897B]">
                   Reason To Smile
                 </span>
               </h1>
               {/* Secondary Heading */}
-              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#FFFFFF] leading-snug">
-                Advanced Implant Hospital <span className="text-[#5EEBFF] font-extrabold">with Fix Teeth in Just One Week</span>
+              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#1E3A5F] leading-snug">
+                Advanced Implant Hospital <span className="text-[#00897B] font-extrabold">with Fix Teeth in Just One Week</span>
               </div>
             </div>
 
             {/* 3. Short description & Supporting Line & Trust Statement */}
             <div className="flex flex-col space-y-1 text-center max-w-[450px]">
-              <p className="font-sans text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[12px] sm:text-[14px] leading-relaxed font-semibold text-[#F5F7FA]">
+              <p className="font-sans text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[12px] sm:text-[14px] leading-relaxed font-semibold text-[#4B5563]">
                 With Patel Dental Hospital, take the first step towards a beautiful smile and better dental health.
               </p>
-              <p className="font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-bold italic text-[#E5EDF5]">
+              <p className="font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-bold italic text-[#4B5563]">
                 Experience Modern Dentistry With Gentle Touch.
               </p>
               {/* Trust Statement */}
-              <p className="text-white font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-extrabold flex items-center justify-center space-x-1 mt-0.5">
-                <Sparkles className="h-3.5 w-3.5 text-emerald-400 shrink-0 animate-pulse" />
+              <p className="text-[#00897B] font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-extrabold flex items-center justify-center space-x-1 mt-0.5">
+                <Sparkles className="h-3.5 w-3.5 text-[#00897B] shrink-0 animate-pulse" />
                 <span>We Give You A Perfect Smile, Guaranteed.</span>
               </p>
             </div>
@@ -583,7 +583,7 @@ export default function Home({
             <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[340px] sm:max-w-[380px] mx-auto">
               <button
                 onClick={openAppointmentModal}
-                className="h-[46px] sm:h-[50px] flex-1 bg-gradient-to-r from-[#0099F7] to-[#00C6A7] hover:from-[#00a3ff] hover:to-[#00d4b3] text-white text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] shadow-[0_6px_15px_rgba(0,140,255,0.15)] hover:shadow-[0_10px_20px_rgba(0,140,255,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                className="h-[46px] sm:h-[50px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
                 <Calendar className="h-[14px] w-[14px] shrink-0" />
                 <span className="whitespace-nowrap">Book Appointment</span>
@@ -593,9 +593,9 @@ export default function Home({
                 href={`https://wa.me/${whatsappRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-[46px] sm:h-[50px] flex-1 bg-white text-[#0F9D8F] text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] border-2 border-[#14B8A6] hover:border-[#0F9D8F] hover:bg-[#F3FFFC] shadow-[0_5px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                className="h-[46px] sm:h-[50px] flex-1 bg-white text-[#00897B] text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] hover:bg-[#00897B]/5 shadow-[0_5px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
-                <MessageCircle className="h-[14px] w-[14px] shrink-0 fill-[#0F9D8F]/10 text-[#0F9D8F]" strokeWidth={2.5} />
+                <MessageCircle className="h-[14px] w-[14px] shrink-0 fill-[#00897B]/10 text-[#00897B]" strokeWidth={2.5} />
                 <span className="whitespace-nowrap">WhatsApp Us</span>
               </a>
             </div>
@@ -607,56 +607,56 @@ export default function Home({
           <div 
             className="w-full max-w-md mx-auto rounded-[20px] overflow-hidden bg-white border border-[#E5E7EB] shadow-md flex flex-col"
           >
-            {/* SECTION 1 (Dark Blue) */}
-            <div className="bg-[#0B5FA5] p-6 text-center text-white flex flex-col items-center">
-              <h3 className="font-display font-bold text-[18px] sm:text-[20px] leading-tight text-white mb-3 max-w-[280px]">
+            {/* SECTION 1 (Emergency Call) */}
+            <div className="bg-[#1E3A5F] p-6 text-center text-white flex flex-col items-center">
+              <h3 className="font-display font-bold text-[18px] sm:text-[20px] leading-tight text-[#FFFFFF] mb-3 max-w-[280px]">
                 Call us for Emergency Dental Treatment
               </h3>
-              <span className="text-[11px] font-bold text-white/80 tracking-widest uppercase mb-1">
+              <span className="text-[11px] font-bold text-[#E6F6F4] tracking-widest uppercase mb-1">
                 Please Call Us At
               </span>
               <a 
                 href={`tel:${phoneRaw}`} 
-                className="text-white font-black text-[24px] sm:text-[28px] tracking-tight hover:text-white/90 transition-all duration-300 leading-none"
+                className="text-[#FFFFFF] font-black text-[24px] sm:text-[28px] tracking-tight hover:text-white/90 transition-all duration-300 leading-none"
               >
                 {displayPhone}
               </a>
             </div>
 
-            {/* SECTION 2 (Light Blue) */}
-            <div className="bg-[#1698D4] p-6 text-center text-white flex flex-col items-center">
+            {/* SECTION 2 (Opening Hours) */}
+            <div className="bg-[#00897B] p-6 text-center text-white flex flex-col items-center">
               <div className="flex items-center justify-center space-x-2 mb-3">
-                <Clock className="h-5 w-5 shrink-0 text-white" />
-                <h4 className="font-display font-bold text-[18px] text-white">
+                <Clock className="h-5 w-5 shrink-0 text-[#FFFFFF]" />
+                <h4 className="font-display font-bold text-[18px] text-[#FFFFFF]">
                   Opening Hours
                 </h4>
               </div>
               
-              <p className="font-bold text-[14px] text-white/90 mb-4">
+              <p className="font-bold text-[14px] text-[#E6F6F4] mb-4">
                 Monday – Saturday
               </p>
 
               <div className="w-full grid grid-cols-2 gap-4 max-w-xs">
                 <div className="text-center">
-                  <span className="text-[11px] font-bold text-white/75 tracking-wider uppercase block">Morning</span>
-                  <span className="font-black text-[14px] block mt-1 text-white">09:00 AM – 01:00 PM</span>
+                  <span className="text-[11px] font-bold text-[#E6F6F4] tracking-wider uppercase block">Morning</span>
+                  <span className="font-black text-[14px] block mt-1 text-[#FFFFFF]">09:00 AM – 01:00 PM</span>
                 </div>
                 <div className="text-center">
-                  <span className="text-[11px] font-bold text-white/75 tracking-wider uppercase block">Evening</span>
-                  <span className="font-black text-[14px] block mt-1 text-white">04:00 PM – 08:00 PM</span>
+                  <span className="text-[11px] font-bold text-[#E6F6F4] tracking-wider uppercase block">Evening</span>
+                  <span className="font-black text-[14px] block mt-1 text-[#FFFFFF]">04:00 PM – 08:00 PM</span>
                 </div>
               </div>
             </div>
 
-            {/* SECTION 3 (Green) */}
-            <div className="bg-[#5FAE2E] p-6 text-center text-white flex flex-col items-center">
-              <h4 className="font-display font-bold text-[18px] text-white mb-2">
+            {/* SECTION 3 (Book Appointment) */}
+            <div className="bg-[#E6F6F4] p-6 text-center flex flex-col items-center">
+              <h4 className="font-display font-bold text-[18px] text-[#1E3A5F] mb-2">
                 Book an Appointment
               </h4>
-              <p className="font-display font-extrabold text-[12px] tracking-wider uppercase leading-none text-white/90">
+              <p className="font-display font-extrabold text-[12px] tracking-wider uppercase leading-none text-[#00897B]">
                 Patel Dental Hospital
               </p>
-              <p className="text-[11px] font-bold text-white/85 mt-1 max-w-[280px]">
+              <p className="text-[11px] font-bold text-[#4B5563] mt-1 max-w-[280px]">
                 Awarded as Best Dental Hospital by FAMDENT
               </p>
 
@@ -664,7 +664,7 @@ export default function Home({
               <div className="grid grid-cols-2 gap-3 w-full mt-5 max-w-xs">
                 <button
                   onClick={openAppointmentModal}
-                  className="h-[44px] bg-white hover:bg-slate-50 text-[#5FAE2E] text-[13px] font-bold rounded-lg flex items-center justify-center active:scale-98 transition-all duration-300 shadow-sm text-center"
+                  className="h-[44px] bg-[#00897B] hover:bg-[#00796B] text-[#FFFFFF] text-[13px] font-bold rounded-lg flex items-center justify-center active:scale-98 transition-all duration-300 shadow-sm text-center cursor-pointer"
                 >
                   Book Appointment
                 </button>
@@ -673,7 +673,7 @@ export default function Home({
                   href={`https://wa.me/${whatsappRaw}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-[44px] bg-transparent hover:bg-white/10 text-white text-[13px] font-bold rounded-lg border-2 border-white flex items-center justify-center active:scale-98 transition-all duration-300 text-center"
+                  className="h-[44px] bg-[#FFFFFF] hover:bg-[#00897B] text-[#00897B] hover:text-[#FFFFFF] text-[13px] font-bold rounded-lg border-2 border-[#00897B] flex items-center justify-center active:scale-98 transition-all duration-300 text-center cursor-pointer"
                 >
                   <span className="whitespace-nowrap">WhatsApp Us</span>
                 </a>
@@ -780,7 +780,7 @@ export default function Home({
                 borderColor: "border-sky-100",
               },
               {
-                value: 60000,
+                value: 45000,
                 suffix: "+",
                 title: "Satisfied Patients",
                 subtitle: "Exceptional Success Rate",
@@ -790,7 +790,7 @@ export default function Home({
                 borderColor: "border-blue-100/50",
               },
               {
-                value: 5000,
+                value: 4000,
                 suffix: "+",
                 title: "NRI Patients",
                 subtitle: "Global Smile Standards",
@@ -810,7 +810,7 @@ export default function Home({
                 borderColor: "border-cyan-100/50",
               },
               {
-                value: 7000,
+                value: 15000,
                 suffix: "+",
                 title: "Dental Implants",
                 subtitle: "Fixed Teeth Solutions",
@@ -2193,6 +2193,17 @@ export default function Home({
               <div className="flex bg-slate-50 p-1.5 rounded-xl border border-slate-100 gap-1.5">
                 <button
                   type="button"
+                  onClick={() => setActiveMapBranch('amin_marg')}
+                  className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
+                    activeMapBranch === 'amin_marg'
+                      ? 'bg-white shadow-[0_4px_12px_rgba(8,28,58,0.04)] text-[#0D9488] border border-slate-100'
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  Amin Marg Branch (Main)
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveMapBranch('gayatrinagar')}
                   className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
                     activeMapBranch === 'gayatrinagar'
@@ -2201,17 +2212,6 @@ export default function Home({
                   }`}
                 >
                   Gayatrinagar Branch
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveMapBranch('mavdi')}
-                  className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
-                    activeMapBranch === 'mavdi'
-                      ? 'bg-white shadow-[0_4px_12px_rgba(8,28,58,0.04)] text-[#0D9488] border border-slate-100'
-                      : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  Amin Marg Branch
                 </button>
               </div>
 
@@ -2224,7 +2224,7 @@ export default function Home({
                       HOSPITAL NAME
                     </span>
                     <h3 className="font-display font-[900] text-[#081C3A] text-lg sm:text-xl">
-                      Patel Dental Hospital {activeMapBranch === 'gayatrinagar' ? '(Gayatrinagar Main Branch)' : '(Amin Marg Branch)'}
+                      Patel Dental Hospital {activeMapBranch === 'amin_marg' ? '(Amin Marg Main Branch)' : '(Gayatrinagar Branch)'}
                     </h3>
                   </div>
 
@@ -2236,9 +2236,9 @@ export default function Home({
                         ADDRESS
                       </span>
                       <p className="text-slate-600 font-semibold text-[13.5px] leading-relaxed">
-                        {activeMapBranch === 'gayatrinagar' 
-                          ? 'Rameshwar Complex, 1st Floor, Opp SBI Bank, Gayatrinagar Main Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot, Gujarat 360002' 
-                          : 'Business Centrum Complex, 1st Floor, Near Golden Super Market, Opp Fitness Hospital, Mavdi Main Road, Rajkot, Gujarat 360004'}
+                        {activeMapBranch === 'amin_marg' 
+                          ? '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001' 
+                          : '1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot'}
                       </p>
                     </div>
                   </div>
@@ -2295,9 +2295,9 @@ export default function Home({
                 {/* Lower Buttons row */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
                   <a
-                    href={activeMapBranch === 'gayatrinagar' 
-                      ? 'https://maps.google.com/?q=Patel+Dental+Hospital+Gayatrinagar+Rajkot' 
-                      : 'https://maps.google.com/?q=Patel+Dental+Hospital+Mavdi+Rajkot'}
+                    href={activeMapBranch === 'amin_marg' 
+                      ? 'https://share.google/JKMC3jmTqdylcXUJn' 
+                      : 'https://share.google/Gsdeg6MvRtha7sREX'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 inline-flex items-center justify-center text-[13px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-5 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:shadow-md cursor-pointer transition-all duration-300 text-center"
@@ -2342,13 +2342,23 @@ export default function Home({
                     </span>
                   </div>
                   <span className="text-[10px] bg-slate-200/70 text-slate-600 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                    {activeMapBranch === 'gayatrinagar' ? 'Gayatrinagar Main HQ' : 'Mavdi Center'}
+                    {activeMapBranch === 'amin_marg' ? 'Amin Marg Main Branch' : 'Gayatrinagar Branch'}
                   </span>
                 </div>
 
                 {/* Map iframe wrapper */}
                 <div className="relative flex-1 min-h-[350px]">
-                  {activeMapBranch === 'gayatrinagar' ? (
+                  {activeMapBranch === 'amin_marg' ? (
+                    <iframe
+                      id="google-map-iframe-amin-marg"
+                      className="w-full h-full border-0 absolute inset-0 z-10"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.7483428104!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca223cfb8bdb%3A0xc6cb1c7caef1eb15!2sPatel%20Dental%20Hospital%20-%20Mavdi%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Patel Dental Hospital Amin Marg Main Branch"
+                    ></iframe>
+                  ) : (
                     <iframe
                       id="google-map-iframe-gayatrinagar"
                       className="w-full h-full border-0 absolute inset-0 z-10"
@@ -2356,17 +2366,7 @@ export default function Home({
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      title="Patel Dental Hospital Gayatrinagar Branch Loop Road"
-                    ></iframe>
-                  ) : (
-                    <iframe
-                      id="google-map-iframe-mavdi"
-                      className="w-full h-full border-0 absolute inset-0 z-10"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.7483428104!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca223cfb8bdb%3A0xc6cb1c7caef1eb15!2sPatel%20Dental%20Hospital%20-%20Mavdi%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Patel Dental Hospital Mavdi Main Road"
+                      title="Patel Dental Hospital Gayatrinagar Branch"
                     ></iframe>
                   )}
                 </div>
