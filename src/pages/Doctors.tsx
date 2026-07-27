@@ -37,7 +37,7 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
   });
 
   return (
-    <div id="doctors-page-view" className="relative pt-[72px] bg-slate-50/50 min-h-screen">
+    <div id="doctors-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-slate-50/50 min-h-screen">
       
       {/* 1. Header Hero Banner */}
       <section className="bg-gradient-to-b from-[#0ea5e9]/10 via-[#0D9488]/5 to-transparent py-12 md:py-20 text-center">

@@ -177,7 +177,7 @@ export default function Treatments({ openAppointmentModal }: TreatmentsProps) {
               onClick={() => openAppointmentModal(t.title)}
               className="px-3 py-3 bg-brand-navy hover:bg-brand-cyan text-white hover:text-brand-navy font-extrabold text-xs rounded-xl transition-all duration-300 flex items-center justify-center space-x-1 cursor-pointer border border-transparent focus:outline-hidden group/btn"
             >
-              <span>Book Appointment</span>
+              <span>Free Consultation</span>
             </button>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function Treatments({ openAppointmentModal }: TreatmentsProps) {
   };
 
   return (
-    <div id="treatments-page-view" className="relative pt-[72px] bg-[#FAFAFC]">
+    <div id="treatments-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-[#FAFAFC]">
       {/* Page Title Section */}
       <section className="py-16 bg-linear-to-b from-brand-sky/40 via-white to-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -87,9 +87,16 @@ export interface ContactInfo {
 }
 
 export interface DentalVideo {
-  id: string; // YouTube Video ID
+  id: string; // YouTube Video ID or Instagram shortcode or video URL
   title: string;
   treatment: string;
+  videoPlatform?: 'youtube' | 'instagram' | 'mp4';
+  platform?: 'youtube' | 'instagram' | 'mp4';
+  url?: string;
+  youtubeUrl?: string;
+  thumbnail?: string;
+  category?: string;
+  createdAt?: string;
 }
 
 export interface MarketingConfig {

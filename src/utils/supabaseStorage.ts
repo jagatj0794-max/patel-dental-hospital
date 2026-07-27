@@ -72,3 +72,69 @@ export async function uploadImage(file: File): Promise<string> {
 
   throw lastError || new Error('Failed to upload image after trying all potential storage paths.');
 }
+
+/**
+ * Uploads an MP4 video file to Supabase Storage in the 'media' bucket, inside the 'videos/' folder.
+ * Generates a unique filename using Date.now() plus a random string.
+ *
+ * @param file The video file to upload
+ * @returns The public URL of the uploaded video
+ */
+export async function uploadVideo(file: File): Promise<string> {
+  const originalName = file.name;
+  const extIndex = originalName.lastIndexOf('.');
+  const fileExt = extIndex !== -1 ? originalName.substring(extIndex + 1) : '';
+  const randomString = Math.random().toString(36).substring(2, 10);
+  const uniqueName = `${Date.now()}_${randomString}${fileExt ? '.' + fileExt : ''}`;
+
+  // Get current user ID if authenticated
+  let userId: string | undefined;
+  try {
+    const { data } = await supabase.client.auth.getUser();
+    userId = data?.user?.id;
+  } catch (e) {
+    console.warn('Failed to get user session:', e);
+  }
+
+  // Construct potential paths based on common RLS policies
+  const pathsToTry: string[] = [];
+  
+  if (userId) {
+    pathsToTry.push(`${userId}/videos/${uniqueName}`);
+    pathsToTry.push(`${userId}/${uniqueName}`);
+  }
+  
+  pathsToTry.push(`videos/${uniqueName}`);
+  pathsToTry.push(uniqueName);
+
+  let lastError: any = null;
+
+  for (const filePath of pathsToTry) {
+    try {
+      const { error } = await supabase.client.storage
+        .from('media')
+        .upload(filePath, file, {
+          upsert: false,
+          contentType: 'video/mp4'
+        });
+
+      if (!error) {
+        // Success! Get public URL
+        const { data: publicUrlData } = supabase.client.storage
+          .from('media')
+          .getPublicUrl(filePath);
+
+        if (publicUrlData && publicUrlData.publicUrl) {
+          return publicUrlData.publicUrl;
+        }
+      } else {
+        lastError = error;
+      }
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('Failed to upload video after trying all potential storage paths.');
+}
+

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.videos (
   title text NOT NULL,
   treatment text NOT NULL,
   display_order integer DEFAULT 0,
+  "videoPlatform" text DEFAULT 'youtube', -- youtube or instagram
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

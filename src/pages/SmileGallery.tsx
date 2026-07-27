@@ -62,7 +62,7 @@ export default function SmileGallery({ onSelectItem, openAppointmentModal, galle
   const flagshipItem = galleryItems.find(item => item.id === 'case-sameday-1') || galleryItems[0];
 
   return (
-    <div id="smile-gallery-page-view" className="relative pt-[72px] bg-[#FAFAFC]">
+    <div id="smile-gallery-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-[#FAFAFC]">
       
       {/* Visual Subheader Header */}
       <section className="pt-8 pb-12 bg-linear-to-b from-brand-sky/40 via-white to-transparent">

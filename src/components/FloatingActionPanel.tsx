@@ -96,7 +96,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo 
                 exit={{ opacity: 0, x: 15, scale: 0.95 }}
                 className="bg-slate-900/95 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl shadow-xl text-right shrink-0 pointer-events-none"
               >
-                <span className="block text-[11px] font-black text-brand-cyan uppercase tracking-wider">Book Consultation</span>
+                <span className="block text-[11px] font-black text-brand-cyan uppercase tracking-wider">Free Consultation</span>
                 <span className="block text-[9px] text-gray-300 mt-0.5">Free Clinical Visit</span>
               </motion.div>
             )}
@@ -157,7 +157,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo 
           >
             <Calendar className="h-4 w-4 text-white shrink-0" />
             <span className="text-[10px] min-[370px]:text-[11px] uppercase font-black tracking-wider leading-none">
-              Book Slot
+              Free Consultation
             </span>
           </motion.button>
         </div>

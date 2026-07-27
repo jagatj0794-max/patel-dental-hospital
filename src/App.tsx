@@ -730,7 +730,7 @@ export default function App() {
       )}
 
       {/* Main Dynamic Workspace Area */}
-      <main className="flex-grow">
+      <main className="flex-grow pt-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
@@ -833,7 +833,7 @@ export default function App() {
               <div className="bg-brand-navy p-6 text-white flex justify-between items-center relative">
                 <div className="space-y-1">
                   <h3 className="font-display font-extrabold text-lg leading-none">
-                    Book Dental Appointment
+                    Free Consultation
                   </h3>
                   <span className="text-[11px] text-brand-cyan font-semibold block uppercase tracking-wider">
                     Dental Consultation
@@ -973,7 +973,7 @@ export default function App() {
                           type="submit"
                           className="w-full py-3.5 bg-brand-cyan hover:bg-brand-navy text-white text-xs font-bold rounded-xl shadow-lg transition"
                         >
-                          Book Appointment
+                          Free Consultation
                         </button>
                       </div>
                     </motion.form>

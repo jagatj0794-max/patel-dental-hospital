@@ -44,7 +44,7 @@ import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, Servi
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
-import { uploadImage } from '../utils/supabaseStorage';
+import { uploadImage, uploadVideo } from '../utils/supabaseStorage';
 import { heroService } from '../utils/heroData';
 import { doctorService } from '../utils/doctorData';
 import { galleryService } from '../utils/galleryData';
@@ -2601,9 +2601,14 @@ export default function Admin({
 
   const [previewImage, setPreviewImage] = useState<{ id: string; url: string; title: string; category?: string; branch?: string; altText?: string } | null>(null);
   const [videoDrawerOpen, setVideoDrawerOpen] = useState(false);
-  const [editingVideo, setEditingVideo] = useState<{ id: string; youtubeUrl: string; title: string; thumbnail: string } | null>(null);
+  const [editingVideo, setEditingVideo] = useState<{ id: string; youtubeUrl: string; title: string; thumbnail: string; videoPlatform?: 'youtube' | 'instagram' | 'mp4' } | null>(null);
   const [contactSaved, setContactSaved] = useState(false);
   const [videoUrlInput, setVideoUrlInput] = useState('');
+  const [videoPlatformInput, setVideoPlatformInput] = useState<'youtube' | 'instagram' | 'mp4'>('youtube');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
+  const [customVideoTitle, setCustomVideoTitle] = useState('');
 
   // Image Edit Drawer states
   const [imageDrawerOpen, setImageDrawerOpen] = useState(false);
@@ -3843,12 +3848,39 @@ export default function Admin({
       }
       case 'media': {
         // Derive mediaVideos dynamically from the synchronized videosList prop
-        const mediaVideos = (videosList || []).map(v => ({
-          id: v.id,
-          youtubeUrl: `https://www.youtube.com/watch?v=${v.id}`,
-          title: v.title,
-          thumbnail: `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`
-        }));
+        const mediaVideos = (videosList || []).map(v => {
+          const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
+          const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
+          const platform = isMp4 ? 'mp4' : (isInstagram ? 'instagram' : 'youtube');
+          
+          let youtubeUrl = '';
+          if (platform === 'mp4') {
+            youtubeUrl = v.id;
+          } else if (platform === 'instagram') {
+            youtubeUrl = `https://www.instagram.com/p/${v.id}/`;
+          } else {
+            youtubeUrl = `https://www.youtube.com/watch?v=${v.id}`;
+          }
+
+          let thumbnail = v.thumbnail;
+          if (!thumbnail) {
+            if (platform === 'mp4') {
+              thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+            } else if (platform === 'instagram') {
+              thumbnail = `https://www.instagram.com/p/${v.id}/media/?size=l`;
+            } else {
+              thumbnail = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+            }
+          }
+
+          return {
+            id: v.id,
+            youtubeUrl: youtubeUrl,
+            title: v.title,
+            thumbnail: thumbnail,
+            videoPlatform: platform
+          };
+        });
 
         // Local Media helpers
         const getYouTubeId = (url: string): string | null => {
@@ -3856,6 +3888,16 @@ export default function Admin({
           const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
           const match = url.match(regExp);
           return (match && match[2].length === 11) ? match[2] : null;
+        };
+
+        const getInstagramId = (url: string): string | null => {
+          if (!url) return null;
+          const match = url.match(/(?:instagram\.com\/(?:p|reel)\/)([A-Za-z0-9_-]+)/);
+          return match ? match[1] : null;
+        };
+
+        const getInstagramAutoTitle = (url: string): string => {
+          return "Patient Instagram Testimony Reel";
         };
 
         const getAutoTitle = (url: string): string => {
@@ -3941,29 +3983,86 @@ export default function Admin({
         };
 
         const handleSaveVideo = async () => {
-          const ytId = getYouTubeId(videoUrlInput);
-          if (!ytId) {
-            alert('Please enter a valid YouTube video URL.');
-            return;
+          let currentPlatform = videoPlatformInput;
+          if (videoUrlInput.includes('instagram.com') || videoUrlInput.includes('instagr.am')) {
+            currentPlatform = 'instagram';
+          } else if (videoUrlInput.includes('youtube.com') || videoUrlInput.includes('youtu.be')) {
+            currentPlatform = 'youtube';
+          } else if (videoUrlInput.startsWith('http') && (videoUrlInput.endsWith('.mp4') || videoUrlInput.includes('supabase.co'))) {
+            currentPlatform = 'mp4';
+          } else if (editingVideo && (editingVideo.videoPlatform === 'instagram' || editingVideo.platform === 'instagram')) {
+            currentPlatform = 'instagram';
+          } else if (editingVideo && (editingVideo.videoPlatform === 'mp4' || editingVideo.platform === 'mp4')) {
+            currentPlatform = 'mp4';
           }
-          const generatedTitle = getAutoTitle(videoUrlInput);
+
+          let extractedId = '';
+          let generatedTitle = '';
+          let thumbnail = '';
+          let videoUrl = '';
+
+          if (currentPlatform === 'mp4') {
+            extractedId = videoUrlInput;
+            if (!extractedId) {
+              alert('Please upload an MP4 video or enter a valid video URL.');
+              return;
+            }
+            generatedTitle = customVideoTitle || 'Patient Testimonial';
+            thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+            videoUrl = videoUrlInput;
+          } else {
+            const isYoutube = currentPlatform === 'youtube';
+            const id = isYoutube ? getYouTubeId(videoUrlInput) : getInstagramId(videoUrlInput);
+            
+            if (!id) {
+              alert(`Please enter a valid ${isYoutube ? 'YouTube' : 'Instagram'} video URL.`);
+              return;
+            }
+            extractedId = id;
+            
+            generatedTitle = isYoutube 
+              ? getAutoTitle(videoUrlInput) 
+              : getInstagramAutoTitle(videoUrlInput);
+
+            thumbnail = isYoutube
+              ? `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`
+              : `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+
+            videoUrl = isYoutube
+              ? `https://www.youtube.com/watch?v=${extractedId}`
+              : `https://www.instagram.com/p/${extractedId}/`;
+          }
 
           let updated: DentalVideo[];
           if (editingVideo) {
-            // Edit mode: replace the old video with the new ytId and title
+            // Edit mode: replace the old video with the new id, title, treatment, and platform
             updated = (videosList || []).map(v => v.id === editingVideo.id ? {
-              id: ytId,
+              id: extractedId,
               title: generatedTitle,
-              treatment: 'Patient Testimonial'
+              treatment: 'Patient Testimonial',
+              category: 'Patient Testimonial',
+              videoPlatform: currentPlatform,
+              platform: currentPlatform,
+              url: videoUrl,
+              youtubeUrl: videoUrl,
+              thumbnail: thumbnail,
+              createdAt: v.createdAt || new Date().toISOString()
             } : v);
           } else {
             // Add mode: append a new video object to videosList
             updated = [
               ...(videosList || []),
               {
-                id: ytId,
+                id: extractedId,
                 title: generatedTitle,
-                treatment: 'Patient Testimonial'
+                treatment: 'Patient Testimonial',
+                category: 'Patient Testimonial',
+                videoPlatform: currentPlatform,
+                platform: currentPlatform,
+                url: videoUrl,
+                youtubeUrl: videoUrl,
+                thumbnail: thumbnail,
+                createdAt: new Date().toISOString()
               }
             ];
           }
@@ -3988,6 +4087,10 @@ export default function Admin({
           setVideoDrawerOpen(false);
           setEditingVideo(null);
           setVideoUrlInput('');
+          setCustomVideoTitle('');
+          setVideoFile(null);
+          setVideoUploadError(null);
+          setIsUploadingVideo(false);
         };
 
         const handleDeleteVideo = async (id: string) => {
@@ -4070,9 +4173,36 @@ export default function Admin({
           setNewCategoryName('');
         };
 
-        const ytIdPreview = getYouTubeId(videoUrlInput);
-        const previewVideoTitle = ytIdPreview ? getAutoTitle(videoUrlInput) : 'Enter YouTube URL above';
-        const previewVideoThumbnail = ytIdPreview ? `https://img.youtube.com/vi/${ytIdPreview}/hqdefault.jpg` : '';
+        const isYoutube = videoPlatformInput === 'youtube';
+        const isInstagram = videoPlatformInput === 'instagram';
+        const isMp4 = videoPlatformInput === 'mp4';
+        
+        let videoIdPreview = null;
+        if (isYoutube) {
+          videoIdPreview = getYouTubeId(videoUrlInput);
+        } else if (isInstagram) {
+          videoIdPreview = getInstagramId(videoUrlInput);
+        } else if (isMp4) {
+          videoIdPreview = videoUrlInput || null;
+        }
+
+        let previewVideoTitle = '';
+        if (isYoutube) {
+          previewVideoTitle = videoIdPreview ? getAutoTitle(videoUrlInput) : 'Enter YouTube URL above';
+        } else if (isInstagram) {
+          previewVideoTitle = videoIdPreview ? getInstagramAutoTitle(videoUrlInput) : 'Enter Instagram URL above';
+        } else if (isMp4) {
+          previewVideoTitle = customVideoTitle || 'Patient Testimonial';
+        }
+
+        let previewVideoThumbnail = '';
+        if (isYoutube) {
+          previewVideoThumbnail = videoIdPreview ? `https://img.youtube.com/vi/${videoIdPreview}/hqdefault.jpg` : '';
+        } else if (isInstagram) {
+          previewVideoThumbnail = videoIdPreview ? `https://www.instagram.com/p/${videoIdPreview}/media/?size=l` : '';
+        } else if (isMp4) {
+          previewVideoThumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+        }
 
         return (
           <div className="space-y-6" id="admin-media-view">
@@ -4490,19 +4620,24 @@ export default function Admin({
                     onClick={() => {
                       setEditingVideo(null);
                       setVideoUrlInput('');
+                      setVideoPlatformInput('youtube');
+                      setCustomVideoTitle('');
+                      setVideoFile(null);
+                      setVideoUploadError(null);
+                      setIsUploadingVideo(false);
                       setVideoDrawerOpen(true);
                     }}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Add YouTube Video</span>
+                    <span>Add Patient Video</span>
                   </button>
                 </div>
 
                 {/* Video Grid */}
                 {mediaVideos.length === 0 ? (
                   <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
-                    No videos registered. Add some YouTube patient testimonials to get started!
+                    No videos registered. Add some patient testimonials to get started!
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -4511,14 +4646,17 @@ export default function Admin({
                         key={item.id}
                         className="group bg-white rounded-2xl border border-slate-150 shadow-3xs overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col"
                       >
-                        {/* YouTube Thumbnail Card with custom Play button overlay */}
-                        <div className="relative aspect-video w-full overflow-hidden bg-slate-950 flex items-center justify-center">
+                        {/* Thumbnail Card with custom Play button overlay */}
+                        <div className="relative aspect-video w-full overflow-hidden bg-transparent flex items-center justify-center">
                           <img
                             src={item.thumbnail}
                             alt={item.title}
                             className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                            onError={(e) => {
+                              e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+                            }}
                           />
-                          <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition flex items-center justify-center">
+                          <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition flex items-center justify-center z-10">
                             <div className="bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 duration-200 transition">
                               <Play className="h-6 w-6 text-white fill-current translate-x-0.5" />
                             </div>
@@ -4528,9 +4666,9 @@ export default function Admin({
                             href={item.youtubeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5"
+                            className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5 z-20"
                           >
-                            <span>Open on YouTube</span>
+                            <span>Open on {item.videoPlatform === 'instagram' ? 'Instagram' : 'YouTube'}</span>
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         </div>
@@ -4547,6 +4685,11 @@ export default function Admin({
                               onClick={() => {
                                 setEditingVideo(item);
                                 setVideoUrlInput(item.youtubeUrl);
+                                setVideoPlatformInput(item.videoPlatform || 'youtube');
+                                setCustomVideoTitle(item.title || '');
+                                setVideoFile(null);
+                                setVideoUploadError(null);
+                                setIsUploadingVideo(false);
                                 setVideoDrawerOpen(true);
                               }}
                               className="text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
@@ -4667,6 +4810,10 @@ export default function Admin({
                     setVideoDrawerOpen(false);
                     setEditingVideo(null);
                     setVideoUrlInput('');
+                    setCustomVideoTitle('');
+                    setVideoFile(null);
+                    setVideoUploadError(null);
+                    setIsUploadingVideo(false);
                   }}
                 />
 
@@ -4683,6 +4830,10 @@ export default function Admin({
                           setVideoDrawerOpen(false);
                           setEditingVideo(null);
                           setVideoUrlInput('');
+                          setCustomVideoTitle('');
+                          setVideoFile(null);
+                          setVideoUploadError(null);
+                          setIsUploadingVideo(false);
                         }}
                         className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
                       >
@@ -4692,7 +4843,7 @@ export default function Admin({
                       
                       <div className="min-w-0">
                         <h3 className="font-display font-extrabold text-[#081C3A] text-base md:text-lg leading-tight">
-                          {editingVideo ? 'Edit YouTube Video' : 'Add New YouTube Video'}
+                          {editingVideo ? 'Edit Video' : 'Add New Video'}
                         </h3>
                         <p className="text-slate-500 text-[11px] font-medium mt-0.5 truncate flex items-center gap-1">
                           <span className="font-bold text-blue-600">Action:</span>
@@ -4709,6 +4860,10 @@ export default function Admin({
                         setVideoDrawerOpen(false);
                         setEditingVideo(null);
                         setVideoUrlInput('');
+                        setCustomVideoTitle('');
+                        setVideoFile(null);
+                        setVideoUploadError(null);
+                        setIsUploadingVideo(false);
                       }}
                       className="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-lg transition"
                     >
@@ -4722,17 +4877,31 @@ export default function Admin({
                     <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/80 space-y-2.5">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-center">Video Live Preview Card</span>
                       
-                      {ytIdPreview ? (
+                      {videoIdPreview ? (
                         <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-5 max-w-[350px] mx-auto flex flex-col items-center transition-all duration-200">
-                          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 mb-3.5">
-                            <img
-                              src={previewVideoThumbnail}
-                              alt="Live Preview"
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center">
-                              <Play className="h-10 w-10 text-white fill-current" />
-                            </div>
+                          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-transparent mb-3.5 flex items-center justify-center">
+                            {videoPlatformInput === 'mp4' ? (
+                              <video
+                                src={videoUrlInput}
+                                controls
+                                className="w-full h-full object-cover"
+                                preload="metadata"
+                              />
+                            ) : (
+                              <>
+                                <img
+                                  src={previewVideoThumbnail}
+                                  alt="Live Preview"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center pointer-events-none">
+                                  <Play className="h-10 w-10 text-white fill-current" />
+                                </div>
+                              </>
+                            )}
                           </div>
                           
                           <h4 className="font-display font-extrabold text-slate-900 text-sm leading-snug text-center">
@@ -4748,7 +4917,9 @@ export default function Admin({
                         <div className="bg-white rounded-3xl border border-slate-100 border-dashed p-10 text-center max-w-[350px] mx-auto">
                           <Video className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                           <span className="text-xs text-slate-400 font-medium block">
-                            Live Preview displays automatically once you enter a valid YouTube URL.
+                            {videoPlatformInput === 'mp4'
+                              ? "Live Preview displays automatically once you upload a valid .mp4 video."
+                              : `Live Preview displays automatically once you enter a valid ${videoPlatformInput === 'youtube' ? 'YouTube' : 'Instagram'} URL.`}
                           </span>
                         </div>
                       )}
@@ -4756,19 +4927,239 @@ export default function Admin({
 
                     {/* Inputs */}
                     <div className="space-y-4">
+                      {/* Video Platform Dropdown */}
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">YouTube Video URL</label>
-                        <input
-                          type="text"
-                          value={videoUrlInput}
-                          onChange={(e) => setVideoUrlInput(e.target.value)}
-                          placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                        <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video Platform</label>
+                        <select
+                          value={videoPlatformInput}
+                          onChange={(e) => {
+                            const val = e.target.value as 'youtube' | 'instagram' | 'mp4';
+                            setVideoPlatformInput(val);
+                            setVideoUrlInput('');
+                            setVideoFile(null);
+                            setVideoUploadError(null);
+                            if (val !== 'mp4') {
+                              setCustomVideoTitle('');
+                            }
+                          }}
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
-                        />
-                        <p className="text-[10px] text-slate-400 font-medium">
-                          The system extracts the YouTube Video ID and automatically pulls the corresponding HD thumbnail and dynamic clinical title.
-                        </p>
+                        >
+                          <option value="youtube">YouTube</option>
+                          <option value="instagram">Instagram</option>
+                          <option value="mp4">MP4 Video</option>
+                        </select>
                       </div>
+
+                      {videoPlatformInput === 'mp4' ? (
+                        <>
+                          {/* Custom Title Input */}
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video Title</label>
+                            <input
+                              type="text"
+                              value={customVideoTitle}
+                              onChange={(e) => setCustomVideoTitle(e.target.value)}
+                              placeholder="e.g. Patient Testimonial on Digital Dental Care"
+                              className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
+                            />
+                          </div>
+
+                          {/* MP4 File Upload */}
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Upload MP4 Video File</label>
+                            
+                            {videoUrlInput ? (
+                              <div className="p-4 border border-slate-200 rounded-xl bg-[#F0FDFA] border-[#CCFBF1] space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="h-9 w-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
+                                      <Video className="h-5 w-5 shrink-0" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-bold text-teal-900">MP4 Video Ready</p>
+                                      <p className="text-[10px] text-teal-600 truncate max-w-[220px]">{videoUrlInput}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    {/* Replace input */}
+                                    <label className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition cursor-pointer" title="Replace uploaded video">
+                                      <Pencil className="h-4 w-4" />
+                                      <input
+                                        type="file"
+                                        accept=".mp4"
+                                        onChange={(e) => {
+                                          if (e.target.files && e.target.files[0]) {
+                                            const file = e.target.files[0];
+                                            if (file.type !== 'video/mp4' && !file.name.endsWith('.mp4')) {
+                                              setVideoUploadError('Unsupported file type. Only .mp4 files are accepted.');
+                                              return;
+                                            }
+                                            const maxBytes = 100 * 1024 * 1024; // 100 MB
+                                            if (file.size > maxBytes) {
+                                              setVideoUploadError('File is too large. Maximum size allowed is 100 MB.');
+                                              return;
+                                            }
+                                            setVideoUploadError(null);
+                                            setVideoFile(file);
+                                            setIsUploadingVideo(true);
+                                            uploadVideo(file).then((publicUrl) => {
+                                              setVideoUrlInput(publicUrl);
+                                            }).catch((err: any) => {
+                                              console.error('Error uploading video:', err);
+                                              setVideoUploadError(err.message || 'Failed to upload video.');
+                                              setVideoFile(null);
+                                            }).finally(() => {
+                                              setIsUploadingVideo(false);
+                                            });
+                                          }
+                                        }}
+                                        className="hidden"
+                                      />
+                                    </label>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setVideoUrlInput('');
+                                        setVideoFile(null);
+                                      }}
+                                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition"
+                                      title="Delete uploaded video"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                onDragOver={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                    const file = e.dataTransfer.files[0];
+                                    if (file.type !== 'video/mp4' && !file.name.endsWith('.mp4')) {
+                                      setVideoUploadError('Unsupported file type. Only .mp4 files are accepted.');
+                                      return;
+                                    }
+                                    const maxBytes = 100 * 1024 * 1024; // 100 MB
+                                    if (file.size > maxBytes) {
+                                      setVideoUploadError('File is too large. Maximum size allowed is 100 MB.');
+                                      return;
+                                    }
+                                    setVideoUploadError(null);
+                                    setVideoFile(file);
+                                    setIsUploadingVideo(true);
+                                    uploadVideo(file).then((publicUrl) => {
+                                      setVideoUrlInput(publicUrl);
+                                      if (!customVideoTitle) {
+                                        const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                                        setCustomVideoTitle(nameWithoutExt);
+                                      }
+                                    }).catch((err: any) => {
+                                      console.error('Error uploading video:', err);
+                                      setVideoUploadError(err.message || 'Failed to upload video.');
+                                      setVideoFile(null);
+                                    }).finally(() => {
+                                      setIsUploadingVideo(false);
+                                    });
+                                  }
+                                }}
+                                className="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-2xl p-6 text-center cursor-pointer bg-slate-50/50 hover:bg-blue-50/10 transition relative group"
+                              >
+                                <input
+                                  type="file"
+                                  accept=".mp4"
+                                  onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                      const file = e.target.files[0];
+                                      if (file.type !== 'video/mp4' && !file.name.endsWith('.mp4')) {
+                                        setVideoUploadError('Unsupported file type. Only .mp4 files are accepted.');
+                                        return;
+                                      }
+                                      const maxBytes = 100 * 1024 * 1024; // 100 MB
+                                      if (file.size > maxBytes) {
+                                        setVideoUploadError('File is too large. Maximum size allowed is 100 MB.');
+                                        return;
+                                      }
+                                      setVideoUploadError(null);
+                                      setVideoFile(file);
+                                      setIsUploadingVideo(true);
+                                      uploadVideo(file).then((publicUrl) => {
+                                        setVideoUrlInput(publicUrl);
+                                        if (!customVideoTitle) {
+                                          const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                                          setCustomVideoTitle(nameWithoutExt);
+                                        }
+                                      }).catch((err: any) => {
+                                        console.error('Error uploading video:', err);
+                                        setVideoUploadError(err.message || 'Failed to upload video.');
+                                        setVideoFile(null);
+                                      }).finally(() => {
+                                        setIsUploadingVideo(false);
+                                      });
+                                    }
+                                  }}
+                                  className="absolute inset-0 opacity-0 cursor-pointer"
+                                  disabled={isUploadingVideo}
+                                />
+                                
+                                {isUploadingVideo ? (
+                                  <div className="space-y-2 py-2">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto" />
+                                    <p className="text-xs font-bold text-slate-600">Uploading video to Supabase Storage...</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">Please do not close this drawer.</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2 py-1">
+                                    <Upload className="h-8 w-8 text-slate-400 mx-auto group-hover:scale-110 duration-200 transition" />
+                                    <div className="space-y-0.5">
+                                      <p className="text-xs font-bold text-slate-700">Drag & drop your .mp4 file here, or click to browse</p>
+                                      <p className="text-[10px] text-slate-400 font-medium">Accepts only .mp4 files. Max size 100 MB.</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {videoUploadError && (
+                              <p className="text-[10px] text-rose-500 font-bold mt-1.5 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                                <span>⚠ {videoUploadError}</span>
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        /* Video URL Input */
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video URL</label>
+                          <input
+                            type="text"
+                            value={videoUrlInput}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setVideoUrlInput(val);
+                              if (val.includes('instagram.com') || val.includes('instagr.am')) {
+                                setVideoPlatformInput('instagram');
+                              } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
+                                setVideoPlatformInput('youtube');
+                              }
+                            }}
+                            placeholder={videoPlatformInput === 'youtube'
+                              ? "e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                              : "e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"}
+                            className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
+                          />
+                          <p className="text-[10px] text-slate-400 font-medium">
+                            {videoPlatformInput === 'youtube'
+                              ? "The system extracts the YouTube Video ID and automatically pulls the corresponding HD thumbnail and dynamic clinical title."
+                              : "The system extracts the Instagram post or reel ID and integrates the media directly."}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -4780,6 +5171,10 @@ export default function Admin({
                         setVideoDrawerOpen(false);
                         setEditingVideo(null);
                         setVideoUrlInput('');
+                        setCustomVideoTitle('');
+                        setVideoFile(null);
+                        setVideoUploadError(null);
+                        setIsUploadingVideo(false);
                       }}
                       className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition duration-150 cursor-pointer flex items-center gap-1.5 shadow-3xs"
                     >
@@ -4790,9 +5185,9 @@ export default function Admin({
                     <button
                       type="button"
                       onClick={handleSaveVideo}
-                      disabled={!ytIdPreview}
+                      disabled={!videoIdPreview}
                       className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl transition duration-150 flex items-center gap-1.5 ${
-                        ytIdPreview 
+                        videoIdPreview 
                           ? 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/10 cursor-pointer' 
                           : 'bg-slate-300 cursor-not-allowed'
                       }`}
@@ -5519,9 +5914,9 @@ export default function Admin({
       <div className="lg:hidden w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between relative z-30 shrink-0">
         <div className="flex items-center space-x-2">
           <img 
-            src="/LOGO 3D FULL NAME WHITE (3).png" 
+            src="/Best Dntal Hospital Rajkot.PNG" 
             alt="Patel Logo" 
-            className="h-9 w-auto object-contain"
+            className="h-9 w-auto object-contain rounded-md"
             referrerPolicy="no-referrer"
           />
           <span className="font-display font-black text-xs text-[#081C3A] tracking-wider uppercase bg-[#F0FDFA] border border-[#CCFBF1] px-2 py-0.5 rounded-md">
@@ -5551,9 +5946,9 @@ export default function Admin({
           {/* Logo Brand Header (Desktop only) */}
           <div className="hidden lg:flex flex-col items-center pb-4 border-b border-slate-100">
             <img 
-              src="/LOGO 3D FULL NAME WHITE (3).png" 
+              src="/Best Dntal Hospital Rajkot.PNG" 
               alt="Patel Dental Hospital Logo" 
-              className="h-[52px] w-auto object-contain mb-3"
+              className="h-[52px] w-auto object-contain mb-3 rounded-lg"
               referrerPolicy="no-referrer"
             />
             <span className="text-[10px] tracking-widest text-[#0D9488] font-bold uppercase bg-[#F0FDFA] border border-[#CCFBF1] px-3 py-0.5 rounded-full block">

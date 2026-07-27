@@ -169,7 +169,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
   ];
 
   return (
-    <div id="about-page-view" className="relative pt-[72px] bg-white text-[#081C3A] overflow-hidden">
+    <div id="about-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-white text-[#081C3A] overflow-hidden">
       
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 bg-gradient-to-b from-slate-50/50 via-white to-transparent" id="about-hero">
@@ -243,7 +243,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
                   onClick={openAppointmentModal}
                   className="px-8 py-4 bg-[#081C3A] hover:bg-[#0D9488] text-white text-xs font-bold rounded-[16px] shadow-[0_8px_30px_rgba(8,28,58,0.1)] transition-all duration-300 uppercase tracking-wider flex items-center space-x-2 group cursor-pointer"
                 >
-                  <span>Book Appointment</span>
+                  <span>Free Consultation</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </button>
                 <button
@@ -606,7 +606,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
               onClick={openAppointmentModal}
               className="w-full sm:w-auto px-8 py-4 bg-[#081C3A] hover:bg-[#0D9488] text-white text-xs font-bold rounded-2xl shadow-lg cursor-pointer transition duration-300 uppercase tracking-widest"
             >
-              Book Appointment
+              Free Consultation
             </button>
             <button
               onClick={() => { window.location.hash = 'contact'; }}

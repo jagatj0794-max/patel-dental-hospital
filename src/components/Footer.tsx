@@ -59,9 +59,9 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             <div className="flex items-center">
               <img 
                 id="footer-brand-logo-img"
-                src="/LOGO 3D FULL NAME WHITE (3).png" 
+                src="/Best Dntal Hospital Rajkot.PNG" 
                 alt="Patel Dental Hospital Logo"
-                className="h-[55px] w-auto object-contain"
+                className="h-[55px] w-auto object-contain rounded-lg"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -223,8 +223,14 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                     Main Branch
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  {contactInfo?.address || '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001'}
+                <p className="text-xs text-slate-400 leading-relaxed font-sans whitespace-pre-line">
+                  {contactInfo?.address || `Patel Dental Hospital,
+Business Centrum Complex, 1st Floor,
+Opp. Kings Heights,
+Beside Golden Super Market,
+Pandit Deendayal Upadhyay Road,
+From Rajnagar Chowk towards Amin Marg,
+Rajkot – 360001, Gujarat, India.`}
                 </p>
               </div>
 
@@ -237,7 +243,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                   <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
-                  href={contactInfo?.mapsLink || 'https://share.google/JKMC3jmTqdylcXUJn'} 
+                  href={contactInfo?.mapsLink || 'https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic'} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1.5 text-xs text-brand-teal hover:text-white font-bold transition-colors group-hover:underline"
@@ -260,8 +266,15 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                     Second Branch
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot
+                <p className="text-xs text-slate-400 leading-relaxed font-sans whitespace-pre-line">
+                  Dr. Vipul Patel
+                  Patel Dental Hospital,
+                  1st Floor, Rameshwar Complex,
+                  Opp. SBI Bank,
+                  Gayatrinagar Road,
+                  Jalaram Chowk,
+                  Bhaktinagar Circle,
+                  Rajkot, Gujarat, India.
                 </p>
               </div>
 
@@ -274,7 +287,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                   <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
-                  href="https://share.google/Gsdeg6MvRtha7sREX" 
+                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1.5 text-xs text-brand-teal hover:text-white font-bold transition-colors group-hover:underline"

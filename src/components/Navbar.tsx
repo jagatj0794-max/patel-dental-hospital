@@ -61,7 +61,7 @@ const navHierarchy = [
     id: 'contact',
     dropdown: [
       { label: 'Contact Information', id: 'contact-info' },
-      { label: 'Book Appointment', id: 'book-now' },
+      { label: 'Free Consultation', id: 'book-now' },
       { label: 'Location Map', id: 'map' },
     ]
   }
@@ -156,14 +156,12 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
     >
       {/* Top Bar */}
       <div 
-        className={`bg-gradient-to-r from-[#1488CC] via-[#20B2AA] to-[#6BCB3C] w-full transition-all duration-300 overflow-hidden ${
-          isScrolled ? 'h-0 opacity-0' : 'h-[40px] opacity-100'
-        }`}
+        className="bg-gradient-to-r from-[#1488CC] via-[#20B2AA] to-[#6BCB3C] w-full h-[40px] opacity-100 transition-all duration-300 overflow-hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between text-white text-[13px] font-medium tracking-wide">
-          <div className="flex items-center space-x-2">
-            <Phone className="h-3.5 w-3.5" />
-            <span>{contactInfo?.phone || '+91 9510397046'}</span>
+          <div className="flex items-center space-x-0 gap-[10px]">
+            <Phone className="h-[21px] w-[21px] shrink-0" fill="#FF4D4F" stroke="#FF4D4F" />
+            <span className="font-bold text-[17px] text-white leading-none select-all">{contactInfo?.phone || '+91 9510397046'}</span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPin className="h-3.5 w-3.5" />
@@ -176,8 +174,8 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
       {/* Main Navbar */}
       <div className={`transition-all duration-300 ${
         isScrolled 
-          ? 'py-1.5 sm:py-2 lg:py-3' 
-          : 'py-2.5 sm:py-3.5 lg:py-4'
+          ? 'py-1 sm:py-1.5 lg:py-2' 
+          : 'py-2 sm:py-3 lg:py-3.5'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between flex-nowrap">
@@ -189,14 +187,14 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             >
               <img 
                 id="navbar-brand-logo-img"
-                src="/LOGO 3D FULL NAME WHITE (3)-1.png" 
+                src="/Best Dntal Hospital Rajkot.PNG" 
                 alt="Patel Dental Hospital Logo"
-                className="h-[35px] sm:h-[42px] lg:h-[50px] xl:h-[58px] w-auto max-w-[190px] sm:max-w-[230px] lg:max-w-[250px] xl:max-w-[300px] object-contain transition-transform duration-300 group-hover:scale-[1.02] origin-left bg-transparent"
+                className="w-auto h-[52px] sm:h-[60px] lg:h-[72px] object-contain transition-all duration-300 group-hover:scale-[1.02] origin-left bg-transparent rounded-lg max-w-[65vw] sm:max-w-[340px] lg:max-w-[380px] xl:max-w-[500px]"
               />
             </div>
 
             {/* Center Desktop Navigation */}
-            <div className="hidden lg:flex flex-nowrap items-center justify-center flex-grow mx-4 z-50 relative">
+            <div className="hidden lg:flex flex-nowrap items-center justify-end flex-grow mx-2 xl:mx-4 xl:space-x-1.5 z-50 relative">
               {menuItems.map((item) => (
                 <div 
                   key={item.id}
@@ -254,7 +252,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                 className="flex items-center text-[13px] xl:text-[14px] font-bold text-white bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] hover:from-[#0F766E] hover:to-[#0284c7] px-5 py-2.5 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] cursor-pointer hover:shadow-lg transition-all duration-300 transform active:scale-95"
               >
                 <Calendar className="h-4 w-4 mr-2" />
-                Appointments
+                Free Consultation
               </button>
             </div>
 
@@ -280,16 +278,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: '100vh' }}
             exit={{ opacity: 0, height: 0 }}
-            className={`lg:hidden fixed left-0 w-full bg-white shadow-xl overflow-y-auto z-40 border-t border-gray-100 ${
-              isScrolled 
-                ? 'top-[44px] sm:top-[54px]' 
-                : 'top-[84px] sm:top-[98px]'
-            }`}
-            style={{ 
-              maxHeight: isScrolled 
-                ? 'calc(100vh - 44px)' 
-                : 'calc(100vh - 84px)' 
-            }}
+            className="lg:hidden absolute top-full left-0 w-full bg-white shadow-xl overflow-y-auto z-40 border-t border-gray-100 max-h-[calc(100vh-120px)]"
           >
             <div className="px-4 py-4 pb-24 space-y-1">
               {menuItems.map((item) => (
@@ -353,7 +342,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                   className="flex items-center justify-center w-full bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] py-3.5 rounded-xl font-bold text-white transition shadow-md"
                 >
                   <Calendar className="h-5 w-5 mr-2" />
-                  Book Appointment Now
+                  Free Consultation
                 </button>
               </div>
             </div>

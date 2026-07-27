@@ -114,7 +114,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
   ];
 
   return (
-    <div id="teeth-whitening-page-view" className="relative pt-[72px] bg-[#FAFAFC]">
+    <div id="teeth-whitening-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-[#FAFAFC]">
       
       {/* SECTION 1: Hero Section */}
       <section className="py-16 sm:py-24 bg-white relative z-10 border-b border-slate-100">
@@ -159,7 +159,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                   className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
                 >
                   <Calendar className="h-4 w-4" />
-                  Book Appointment
+                  Free Consultation
                   <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </button>
                 
@@ -853,10 +853,23 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                         <span className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">
                           ADDRESS
                         </span>
-                        <p className="text-slate-600 font-semibold text-[13px] leading-relaxed">
+                        <p className="text-slate-600 font-semibold text-[13px] leading-relaxed whitespace-pre-line">
                           {activeMapBranch === 'amin_marg' 
-                            ? '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001' 
-                            : '1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot'}
+                            ? `Patel Dental Hospital,
+Business Centrum Complex, 1st Floor,
+Opp. Kings Heights,
+Beside Golden Super Market,
+Pandit Deendayal Upadhyay Road,
+From Rajnagar Chowk towards Amin Marg,
+Rajkot – 360001, Gujarat, India.` 
+                            : `Dr. Vipul Patel
+Patel Dental Hospital,
+1st Floor, Rameshwar Complex,
+Opp. SBI Bank,
+Gayatrinagar Road,
+Jalaram Chowk,
+Bhaktinagar Circle,
+Rajkot, Gujarat, India.`}
                         </p>
                       </div>
                     </div>
@@ -916,8 +929,8 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
                 <a
                   href={activeMapBranch === 'amin_marg' 
-                    ? 'https://share.google/JKMC3jmTqdylcXUJn' 
-                    : 'https://share.google/Gsdeg6MvRtha7sREX'}
+                    ? 'https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic' 
+                    : 'https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center text-[13px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-5 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:shadow-md cursor-pointer transition-all duration-300 text-center"
@@ -968,7 +981,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
                     <iframe
                       id="google-map-iframe-amin-marg"
                       className="w-full h-full border-0 absolute inset-0 z-10 animate-fade-in"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.7483428104!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca223cfb8bdb%3A0xc6cb1c7caef1eb15!2sPatel%20Dental%20Hospital%20-%20Mavdi%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.6517595304677!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959cb46342cee0b%3A0x795278e6d37bfdd7!2sPatel%20Dental%20Hospital%20-%20Amin%20Marg%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
@@ -1070,7 +1083,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
         <div className="max-w-2xl mx-auto px-4 relative z-10 space-y-6">
           <HeartHandshake className="h-10 w-10 text-[#0D9488] mx-auto animate-pulse" />
           <h2 className="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-white">
-            Book Appointment
+            Free Consultation
           </h2>
           <p className="text-gray-350 text-xs sm:text-sm leading-relaxed max-w-md mx-auto">
             Experience world-class, premium teeth whitening treatments customized to your unique profile. Reach out directly via phone or WhatsApp.
@@ -1082,7 +1095,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
               className="w-full sm:w-auto px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-bold rounded-xl transition flex items-center justify-center space-x-2 shadow-md cursor-pointer"
             >
               <Calendar className="h-4 w-4" />
-              <span>Book Appointment</span>
+              <span>Free Consultation</span>
             </button>
 
             <a

@@ -84,7 +84,7 @@ export default function SameDayFix({ openAppointmentModal, contactInfo }: SameDa
   };
 
   return (
-    <div id="sameday-page-view" className="relative pt-[72px] bg-[#FAFAFC]">
+    <div id="sameday-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-[#FAFAFC]">
       {/* High-Impact Hero Banner */}
       <section className="relative pt-8 pb-12 md:py-20 lg:py-24 bg-linear-to-b from-brand-sky/50 via-white to-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

@@ -9,15 +9,15 @@ async function run() {
   const supabase = createClient(url, key);
   
   console.log('--- Database Tables ---');
-  const { data: services, error: tableError } = await supabase
-    .from('services')
+  const { data: videos, error: tableError } = await supabase
+    .from('videos')
     .select('*');
 
   if (tableError) {
-    console.error('Error fetching services:', tableError);
+    console.error('Error fetching videos:', tableError);
   } else {
-    console.log(`Services table exists. Found ${services?.length} services.`);
-    console.log(JSON.stringify(services, null, 2));
+    console.log(`Videos table exists. Found ${videos?.length} videos.`);
+    console.log(JSON.stringify(videos, null, 2));
   }
 
   // Probe other tables

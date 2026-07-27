@@ -7,13 +7,74 @@ import { DentalVideo } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export const DEFAULT_VIDEOS: DentalVideo[] = [
-  { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants' },
-  { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab' },
-  { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners' },
-  { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care' },
-  { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover' },
-  { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry' }
+  { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=cyai6CjMD0s', thumbnail: 'https://img.youtube.com/vi/cyai6CjMD0s/hqdefault.jpg', category: 'Dental Implants', createdAt: new Date().toISOString() },
+  { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew', thumbnail: 'https://img.youtube.com/vi/SnOxxv_S2ew/hqdefault.jpg', category: 'Full Mouth Rehab', createdAt: new Date().toISOString() },
+  { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=2okui6RFf_k', thumbnail: 'https://img.youtube.com/vi/2okui6RFf_k/hqdefault.jpg', category: 'Invisible Aligners', createdAt: new Date().toISOString() },
+  { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=-eoVpGDqCRs', thumbnail: 'https://img.youtube.com/vi/-eoVpGDqCRs/hqdefault.jpg', category: 'Advanced Dental Care', createdAt: new Date().toISOString() },
+  { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=VZyPnTzlR9U', thumbnail: 'https://img.youtube.com/vi/VZyPnTzlR9U/hqdefault.jpg', category: 'Smile Makeover', createdAt: new Date().toISOString() },
+  { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=DBejq69FOGI', thumbnail: 'https://img.youtube.com/vi/DBejq69FOGI/hqdefault.jpg', category: 'General Dentistry', createdAt: new Date().toISOString() }
 ];
+
+export const detectPlatform = (video: any): 'youtube' | 'instagram' | 'mp4' => {
+  if (!video) return 'youtube';
+
+  // 1. Explicit check of platform fields
+  if (video.platform === 'mp4' || video.videoPlatform === 'mp4') {
+    return 'mp4';
+  }
+  if (video.platform === 'instagram' || video.videoPlatform === 'instagram') {
+    return 'instagram';
+  }
+  if (video.platform === 'youtube' || video.videoPlatform === 'youtube') {
+    return 'youtube';
+  }
+
+  // 2. Detect from url, youtubeUrl, or similar fields if present
+  const url = video.url || video.youtubeUrl || '';
+  if (url) {
+    if (url.includes('instagram.com') || url.includes('instagr.am')) {
+      return 'instagram';
+    }
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      return 'youtube';
+    }
+    if (url.endsWith('.mp4') || url.includes('supabase.co')) {
+      return 'mp4';
+    }
+  }
+
+  // 3. Detect from id prefix/format
+  const id = video.id || '';
+  if (id.startsWith('instagram__') || id.includes('instagram')) {
+    return 'instagram';
+  }
+  if (id.startsWith('youtube__') || id.includes('youtube')) {
+    return 'youtube';
+  }
+  if (id.endsWith('.mp4') || id.includes('supabase.co')) {
+    return 'mp4';
+  }
+
+  // 4. Special matching for known Instagram IDs (e.g. from migrations/old records)
+  if (id === 'DbS7_fJMTYC') {
+    return 'instagram';
+  }
+
+  // 5. Detect from title or treatment keywords
+  const title = (video.title || '').toLowerCase();
+  const treatment = (video.treatment || '').toLowerCase();
+  if (title.includes('instagram') || title.includes('reel') || treatment.includes('instagram') || treatment.includes('reel')) {
+    return 'instagram';
+  }
+
+  // 6. Default YouTube videos
+  const defaultYoutubeIds = ['cyai6CjMD0s', 'SnOxxv_S2ew', '2okui6RFf_k', '-eoVpGDqCRs', 'VZyPnTzlR9U', 'DBejq69FOGI', 'dQw4w9WgXcQ', 'ysz5S6PUM-U', 'ScMzIvxBSi4'];
+  if (defaultYoutubeIds.includes(id)) {
+    return 'youtube';
+  }
+
+  return 'youtube';
+};
 
 export const videoService = {
   /**
@@ -21,8 +82,19 @@ export const videoService = {
    * If table is empty, seeds default videos.
    */
   getVideos: async (): Promise<DentalVideo[]> => {
+    // Check localStorage fallback first
+    let localVideos: DentalVideo[] | null = null;
+    try {
+      const local = localStorage.getItem('patel_dental_videos_list');
+      if (local) {
+        localVideos = JSON.parse(local);
+      }
+    } catch (e) {
+      console.warn('Failed to parse local videos storage:', e);
+    }
+
     if (!isSupabaseConfigured()) {
-      return DEFAULT_VIDEOS;
+      return (localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS;
     }
 
     try {
@@ -33,7 +105,7 @@ export const videoService = {
 
       if (error) {
         console.warn('Error fetching videos from Supabase:', error);
-        return DEFAULT_VIDEOS;
+        return (localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS;
       }
 
       if (!data || data.length === 0) {
@@ -42,7 +114,8 @@ export const videoService = {
           id: video.id,
           title: video.title,
           treatment: video.treatment,
-          display_order: idx
+          display_order: idx,
+          videoPlatform: video.videoPlatform || 'youtube'
         }));
 
         const { error: seedError } = await supabase.client
@@ -50,20 +123,63 @@ export const videoService = {
           .insert(initialRows);
 
         if (seedError) {
-          console.warn('Error seeding default videos:', seedError);
+          console.warn('Error seeding default videos with videoPlatform, trying fallback:', seedError);
+          const fallbackRows = initialRows.map(({ videoPlatform, ...rest }) => rest);
+          const { error: fallbackError } = await supabase.client
+            .from('videos')
+            .insert(fallbackRows);
+          if (fallbackError) {
+            console.warn('Error seeding fallback default videos:', fallbackError);
+          }
+        }
+
+        // Cache default videos locally
+        try {
+          localStorage.setItem('patel_dental_videos_list', JSON.stringify(DEFAULT_VIDEOS));
+        } catch (e) {
+          console.warn('Error caching default videos:', e);
         }
 
         return DEFAULT_VIDEOS;
       }
 
-      return data.map((row: any) => ({
-        id: row.id,
-        title: row.title || '',
-        treatment: row.treatment || ''
-      }));
+      const remoteVideos = data.map((row: any) => {
+        // Match with localVideos version if exists to preserve metadata
+        const localMatch = localVideos?.find(v => v.id === row.id);
+        const combined = { ...row, ...localMatch };
+        const detectedPlatform = detectPlatform(combined);
+
+        const id = row.id;
+        const platform = detectedPlatform;
+        const url = platform === 'mp4' ? id : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/` : `https://www.youtube.com/watch?v=${id}`);
+        const thumbnail = platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/media/?size=l` : `https://img.youtube.com/vi/${id}/hqdefault.jpg`);
+        const createdAt = row.created_at || new Date().toISOString();
+
+        return {
+          id: id,
+          title: row.title || '',
+          treatment: row.treatment || 'Patient Testimonial',
+          videoPlatform: platform,
+          platform: platform,
+          url: url,
+          youtubeUrl: url,
+          thumbnail: thumbnail,
+          category: row.treatment || 'Patient Testimonial',
+          createdAt: createdAt
+        };
+      });
+
+      // Update localStorage with Supabase data
+      try {
+        localStorage.setItem('patel_dental_videos_list', JSON.stringify(remoteVideos));
+      } catch (e) {
+        console.warn('Error updating local videos cache:', e);
+      }
+
+      return remoteVideos;
     } catch (e) {
       console.warn('Exception in getVideos:', e);
-      return DEFAULT_VIDEOS;
+      return (localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS;
     }
   },
 
@@ -72,19 +188,49 @@ export const videoService = {
    * Deletes those not present in current set.
    */
   saveVideos: async (videos: DentalVideo[]): Promise<boolean> => {
+    const enrichedVideos = videos.map((video) => {
+      const platform = video.platform || video.videoPlatform || detectPlatform(video);
+      const url = video.url || video.youtubeUrl || (platform === 'mp4' ? video.id : (platform === 'instagram' ? `https://www.instagram.com/p/${video.id}/` : `https://www.youtube.com/watch?v=${video.id}`));
+      const thumbnail = video.thumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${video.id}/media/?size=l` : `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`));
+      const createdAt = video.createdAt || new Date().toISOString();
+      const title = video.title || 'Patient Testimonial';
+      const category = video.category || video.treatment || 'Patient Testimonial';
+
+      return {
+        id: video.id,
+        title: title,
+        treatment: category,
+        videoPlatform: platform,
+        platform: platform,
+        url: url,
+        youtubeUrl: url,
+        thumbnail: thumbnail,
+        category: category,
+        createdAt: createdAt
+      };
+    });
+
+    // Always update localStorage first so we have local persistence
+    try {
+      localStorage.setItem('patel_dental_videos_list', JSON.stringify(enrichedVideos));
+    } catch (e) {
+      console.warn('Failed to save videos to localStorage:', e);
+    }
+
     if (!isSupabaseConfigured()) {
-      return false;
+      return true; // Return true because we successfully saved to localStorage fallback
     }
 
     try {
-      const rowsToUpsert = videos.map((video, idx) => ({
+      const rowsToUpsert = enrichedVideos.map((video, idx) => ({
         id: video.id,
         title: video.title,
         treatment: video.treatment,
-        display_order: idx
+        display_order: idx,
+        videoPlatform: video.videoPlatform || 'youtube'
       }));
 
-      const videoIds = videos.map(v => v.id);
+      const videoIds = enrichedVideos.map(v => v.id);
 
       // Delete items not in current selection
       if (videoIds.length > 0) {
@@ -114,8 +260,16 @@ export const videoService = {
           .upsert(rowsToUpsert);
 
         if (upsertError) {
-          console.error('Error upserting videos:', upsertError);
-          return false;
+          console.warn('Error upserting videos with videoPlatform, trying fallback:', upsertError);
+          const fallbackRows = rowsToUpsert.map(({ videoPlatform, ...rest }) => rest);
+          const { error: fallbackError } = await supabase.client
+            .from('videos')
+            .upsert(fallbackRows);
+
+          if (fallbackError) {
+            console.error('Error upserting with fallback:', fallbackError);
+            return false;
+          }
         }
       }
 

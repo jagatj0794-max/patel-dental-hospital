@@ -245,7 +245,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
               faqs: [],
               phone_number: '+91 9510397046',
               whatsapp_number: '+91 9510397046',
-              sec11_heading: 'Book Your Single Sitting Root Canal Appointment',
+              sec11_heading: 'Book Your Single Sitting Root Canal Free Consultation',
               show_hero: true,
               show_introduction: true,
               show_process: true,
@@ -1954,10 +1954,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
                   <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Primary Button Label</label>
                   <input
                     type="text"
-                    value={mConfig.sec11_primary_label || 'Book Appointment'}
+                    value={mConfig.sec11_primary_label || 'Free Consultation'}
                     onChange={(e) => updateMConfigField('sec11_primary_label', e.target.value)}
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                    placeholder="e.g. Book Appointment"
+                    placeholder="e.g. Free Consultation"
                   />
                 </div>
                 <div className="space-y-1.5">

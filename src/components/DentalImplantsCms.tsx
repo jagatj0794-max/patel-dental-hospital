@@ -707,16 +707,16 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
               {/* Buttons Configurations */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Book Appointment Button Text</label>
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Free Consultation Button Text</label>
                   <input
                     type="text"
-                    value={mConfig.cta_appointment_text || 'Book Appointment'}
+                    value={mConfig.cta_appointment_text || 'Free Consultation'}
                     onChange={(e) => updateMConfigField('cta_appointment_text', e.target.value)}
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Book Appointment Link override (optional)</label>
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Free Consultation Link override (optional)</label>
                   <input
                     type="text"
                     value={mConfig.primary_cta_link || ''}
@@ -2400,7 +2400,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                     value={mConfig.sec11_primary_label || ''}
                     onChange={(e) => updateMConfigField('sec11_primary_label', e.target.value)}
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                    placeholder="e.g. Book Appointment"
+                    placeholder="e.g. Free Consultation"
                   />
                 </div>
                 <div className="space-y-1.5">

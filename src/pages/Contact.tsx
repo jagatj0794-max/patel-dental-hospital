@@ -125,7 +125,7 @@ export default function Contact({
   };
 
   return (
-    <div id="contact-page-view" className="relative pt-[72px] bg-[#FAFAFC]">
+    <div id="contact-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-[#FAFAFC]">
       {/* Intro section */}
       <section className="py-16 bg-linear-to-b from-brand-sky/40 via-white to-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,7 +152,7 @@ export default function Contact({
             <div className="lg:col-span-7 bg-white rounded-3xl border border-gray-150 p-6 md:p-10 shadow-sm relative">
               <div className="mb-8">
                 <h2 className="font-display font-extrabold text-brand-navy text-xl sm:text-2xl tracking-tight">
-                  Book Clinical Appointment
+                  Free Consultation
                 </h2>
                 <p className="text-gray-400 text-xs sm:text-sm mt-1">
                   Once submitted, our consulting desk will call back to confirm your specific hour slot.
@@ -301,7 +301,7 @@ export default function Contact({
                       className="w-full py-4 bg-brand-navy hover:bg-brand-cyan text-white text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer shadow-lg"
                     >
                       <Send className="h-4 w-4" />
-                      <span>Submit Appointment Booking &rarr;</span>
+                      <span>Request Free Consultation &rarr;</span>
                     </button>
                   </motion.form>
                 ) : (
@@ -352,7 +352,7 @@ export default function Contact({
                         }}
                         className="px-6 py-2.5 bg-brand-cyan hover:bg-brand-teal text-white text-xs font-bold rounded-lg transition"
                       >
-                        Book Another Appointment
+                        Request Free Consultation
                       </button>
                     </div>
                   </motion.div>
@@ -396,8 +396,14 @@ export default function Contact({
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
                     <MapPin className="h-5 w-5 text-brand-teal mr-2 shrink-0 mt-0.5" />
-                    <p className="leading-relaxed">
-                      {contactInfo?.address || '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001'}
+                    <p className="leading-relaxed whitespace-pre-line">
+                      {contactInfo?.address || `Patel Dental Hospital,
+Business Centrum Complex, 1st Floor,
+Opp. Kings Heights,
+Beside Golden Super Market,
+Pandit Deendayal Upadhyay Road,
+From Rajnagar Chowk towards Amin Marg,
+Rajkot – 360001, Gujarat, India.`}
                     </p>
                   </div>
                   <div className="flex items-center">
@@ -420,8 +426,15 @@ export default function Contact({
                 <div className="space-y-3.5 text-xs sm:text-sm font-sans text-gray-600">
                   <div className="flex items-start">
                     <MapPin className="h-5 w-5 text-brand-teal mr-2 shrink-0 mt-0.5" />
-                    <p className="leading-relaxed">
-                      1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot
+                    <p className="leading-relaxed whitespace-pre-line">
+                      Dr. Vipul Patel
+                      Patel Dental Hospital,
+                      1st Floor, Rameshwar Complex,
+                      Opp. SBI Bank,
+                      Gayatrinagar Road,
+                      Jalaram Chowk,
+                      Bhaktinagar Circle,
+                      Rajkot, Gujarat, India.
                     </p>
                   </div>
                   <div className="flex items-center">
@@ -457,7 +470,7 @@ export default function Contact({
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <a
-                  href={contactInfo?.mapsLink || "https://share.google/JKMC3jmTqdylcXUJn"}
+                  href={contactInfo?.mapsLink || "https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic"}
                   target="_blank"
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-brand-navy hover:bg-brand-cyan text-white text-xs font-bold rounded-xl transition shadow"
@@ -465,7 +478,7 @@ export default function Contact({
                   Amin Marg Branch Map
                 </a>
                 <a
-                  href="https://share.google/Gsdeg6MvRtha7sREX"
+                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic"
                   target="_blank"
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow"

@@ -37,6 +37,11 @@ function isYouTubeUrl(url: string) {
   return url.includes('youtube.com') || url.includes('youtu.be');
 }
 
+function isMp4Url(url: string) {
+  if (!url) return false;
+  return url.endsWith('.mp4') || url.includes('supabase.co');
+}
+
 function getFallbackMedia(slug: string, title: string) {
   let heroImg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
   let heroCap = 'State-of-the-art dental clinical care at Patel Dental Hospital.';
@@ -1001,7 +1006,7 @@ export default function ServiceDetail({
       : true; // Default fallback: enabled
     
     if (appointmentEnabled) {
-      const text = mConfig.cta_appointment_text || 'Book Appointment';
+      const text = mConfig.cta_appointment_text || 'Free Consultation';
       const dest = mConfig.cta_appointment_dest || 'appointment';
       const value = mConfig.cta_appointment_dest_value || '';
       
@@ -1180,7 +1185,7 @@ export default function ServiceDetail({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-5 sm:py-12 px-4 sm:px-6 lg:px-8 selection:bg-[#0D9488]/20 selection:text-[#081C3A]">
+    <div className="min-h-screen bg-slate-50 pt-[108px] sm:pt-[124px] lg:pt-[140px] pb-5 sm:pb-12 px-4 sm:px-6 lg:px-8 selection:bg-[#0D9488]/20 selection:text-[#081C3A]">
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-16 lg:space-y-20">
         
         {/* Navigation Breadcrumb */}
@@ -1655,7 +1660,16 @@ export default function ServiceDetail({
               )}
 
               <div className="max-w-[640px] mx-auto w-full px-2 sm:px-0">
-                {isYouTubeUrl(effectiveVideoUrl) ? (
+                {isMp4Url(effectiveVideoUrl) ? (
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
+                    <video
+                      src={effectiveVideoUrl}
+                      controls
+                      className="w-full h-full object-cover"
+                      preload="metadata"
+                    />
+                  </div>
+                ) : isYouTubeUrl(effectiveVideoUrl) ? (
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
                     <iframe
                       src={getYouTubeEmbedUrl(effectiveVideoUrl)}
@@ -1765,7 +1779,16 @@ export default function ServiceDetail({
                   const patientName = typeof t.patient_name === 'string' ? t.patient_name.trim() : '';
                   return (
                     <div key={t.id || idx} className="flex flex-col items-center w-full">
-                      {isYouTubeUrl(reelUrl) ? (
+                      {isMp4Url(reelUrl) ? (
+                        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
+                          <video
+                            src={reelUrl}
+                            controls
+                            className="w-full h-full object-cover"
+                            preload="metadata"
+                          />
+                        </div>
+                      ) : isYouTubeUrl(reelUrl) ? (
                         <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
                           <iframe
                             src={getYouTubeEmbedUrl(reelUrl)}
@@ -1951,7 +1974,7 @@ export default function ServiceDetail({
                   className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 group"
                 >
                   <Calendar className="h-4.5 w-4.5" />
-                  <span>{mConfig.bottom_cta_primary_text || "Book Appointment"}</span>
+                  <span>{mConfig.bottom_cta_primary_text || "Free Consultation"}</span>
                   <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </button>
                 
@@ -2358,7 +2381,7 @@ export default function ServiceDetail({
                           Clinical Consultation
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                          {mConfig.sec11_heading || (isToothColouredFilling ? 'Book Your Tooth Coloured Filling Consultation' : isWisdomToothSurgery ? 'Book Your Wisdom Tooth Surgery Consultation' : isBracesTreatment ? 'Book Your Braces Treatment Consultation' : isPediatricDentistry ? 'Book Your Pediatric Dentistry Consultation' : isTeethWhitening ? 'Book Your Teeth Whitening Consultation' : isCrownsAndBridges ? 'Book Your Crown & Bridges Consultation' : isSmileMakeover ? 'Book Your Smile Makeover Consultation' : isInvisibleAligners ? 'Book Your Invisible Aligners Consultation' : isRootCanal ? 'Book Your Single Sitting Root Canal Appointment' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
+                          {mConfig.sec11_heading || (isToothColouredFilling ? 'Book Your Tooth Coloured Filling Consultation' : isWisdomToothSurgery ? 'Book Your Wisdom Tooth Surgery Consultation' : isBracesTreatment ? 'Book Your Braces Treatment Consultation' : isPediatricDentistry ? 'Book Your Pediatric Dentistry Consultation' : isTeethWhitening ? 'Book Your Teeth Whitening Consultation' : isCrownsAndBridges ? 'Book Your Crown & Bridges Consultation' : isSmileMakeover ? 'Book Your Smile Makeover Consultation' : isInvisibleAligners ? 'Book Your Invisible Aligners Consultation' : isRootCanal ? 'Book Your Single Sitting Root Canal Free Consultation' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
                         </h2>
                         {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
                           <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
@@ -2374,7 +2397,7 @@ export default function ServiceDetail({
                           className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                         >
                           <Calendar className="h-4.5 w-4.5 shrink-0" />
-                          <span>{mConfig.sec11_primary_label || 'Book Appointment'}</span>
+                          <span>{mConfig.sec11_primary_label || 'Free Consultation'}</span>
                           <ArrowRight className="h-4 w-4 shrink-0" />
                         </button>
 

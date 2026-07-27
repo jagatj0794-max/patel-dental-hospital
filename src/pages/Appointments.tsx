@@ -170,7 +170,7 @@ const handlePrintSlip = (apt: AdminAppointment) => {
 
         <div className="footer">
           Thank you for choosing Patel Dental Hospital. Please arrive 10 minutes prior to your scheduled time.<br>
-          Amin Marg Branch: Amin Marg Road, Rajkot | Gayatrinagar Branch: Gayatrinagar Main Road, Rajkot
+          Patel Dental Hospital – Amin Marg Branch: From Rajnagar Chowk towards Amin Marg, Rajkot | Patel Dental Hospital – Gayatrinagar Branch: Jalaram Chowk, Bhaktinagar Circle, Rajkot
         </div>
 
         <script>

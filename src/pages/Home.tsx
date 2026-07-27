@@ -8,11 +8,12 @@ import {
   ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
   HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
   Stethoscope, Cpu, X, Maximize2, Eye, Heart, ChevronLeft, ChevronRight, Phone as PhoneIcon,
-  ChevronDown, MapPin, Clock, Mail, ExternalLink, Trophy
+  ChevronDown, MapPin, Clock, Mail, ExternalLink, Trophy, Instagram
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { InstagramEmbed } from '../components/InstagramEmbed';
 
 // Custom SVG Premium Dental-Specific Representation Icons
 const DentalImplantIcon = ({ className }: { className?: string }) => (
@@ -291,7 +292,7 @@ interface HomeProps {
   heroBgImageMobile?: string;
   mediaImages?: Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>;
   patientMoments?: PatientMoment[];
-  videosList?: Array<{ id: string; title: string; treatment: string }>;
+  videosList?: Array<{ id: string; title: string; treatment: string; videoPlatform?: 'youtube' | 'instagram' | 'mp4' }>;
   contactInfo?: ContactInfo;
 }
 
@@ -313,14 +314,27 @@ export default function Home({
   const displayPhone = contactInfo?.phone || '+91 9510397046';
   const displayWhatsapp = contactInfo?.whatsapp || '+91 9510397046';
 
-  const videosToRender = videosList && videosList.length > 0 ? videosList : [
-    { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants' },
-    { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab' },
-    { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners' },
-    { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care' },
-    { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover' },
-    { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry' }
+  const rawVideos = videosList && videosList.length > 0 ? videosList : [
+    { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants', videoPlatform: 'youtube' },
+    { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab', videoPlatform: 'youtube' },
+    { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners', videoPlatform: 'youtube' },
+    { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care', videoPlatform: 'youtube' },
+    { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover', videoPlatform: 'youtube' },
+    { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry', videoPlatform: 'youtube' }
   ];
+
+  const videosToRender = rawVideos.map(v => {
+    const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
+    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
+    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('youtube' as const));
+    const url = platform === 'mp4' ? v.id : (platform === 'instagram' ? `https://www.instagram.com/p/${v.id}/` : `https://www.youtube.com/watch?v=${v.id}`);
+    return {
+      ...v,
+      videoPlatform: platform,
+      platform: platform,
+      url: url
+    };
+  });
   const [visibleCount, setVisibleCount] = useState(12);
   const [selectedMomentIndex, setSelectedMomentIndex] = useState<number | null>(null);
   const [selectedOurClinicImgIndex, setSelectedOurClinicImgIndex] = useState<number | null>(null);
@@ -418,7 +432,7 @@ export default function Home({
   };
 
   return (
-    <div id="home-page-view" className="relative pt-[72px] bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
+    <div id="home-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
 
       {/* 1 & 2. Hero Section & BOTTOM TRUST BAR */}
       <section className="relative z-30 w-full bg-[#FAFAFC] pb-0 lg:pb-0" id="immersive-clinical-hero">
@@ -437,7 +451,6 @@ export default function Home({
               className="w-full h-full object-cover object-center lg:object-[right_center]"
               referrerPolicy="no-referrer"
             />
-
           </div>
 
           <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full relative z-20 flex flex-col justify-between flex-grow h-full">
@@ -446,45 +459,70 @@ export default function Home({
               
               {/* 1. Small trust badge */}
               <div className="mb-4 lg:mb-8 animate-fade-in shadow-sm">
-                <span className="inline-flex items-center px-4 py-2 rounded-full bg-white border border-[#C9A96E] text-[#1E3A5F] font-bold text-[10px] md:text-[11px] uppercase tracking-widest backdrop-blur-md shadow-sm">
-                  <span className="mr-1.5">🏆</span> Awarded as Best Dental Hospital in India by FAMDENT
+                <span className="inline-flex items-center px-7 py-[11px] rounded-full bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[13px] md:text-[14.5px] leading-relaxed uppercase tracking-widest backdrop-blur-md shadow-md">
+                  <span className="text-[29px] leading-none shrink-0 mr-[14px] select-none">🏆</span> Awarded as Best Dental Hospital in India by FAMDENT
                 </span>
               </div>
 
               {/* 2. Headline */}
               <div className="flex flex-col text-left space-y-2 lg:space-y-3 max-w-[550px]">
-                {/* Small Heading */}
-                <div className="font-display text-xs lg:text-[13px] font-black tracking-widest uppercase">
-                  <span className="text-[#1E3A5F]">Patel Dental Hospital</span> <span className="text-[#1E3A5F]">| Rajkot</span>
-                </div>
                 {/* Main Heading */}
-                <h1 className="font-display text-[26px] sm:text-[32px] md:text-[36px] lg:text-[40px] xl:text-[46px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight">
-                  Give You One More<br />
+                <h1 className="font-display text-[19px] sm:text-[24px] md:text-[28px] lg:text-[31px] xl:text-[35px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+                  WORLD CLASS{" "}
                   <span className="relative inline-block text-[#00897B]">
-                    Reason To Smile
+                    DENTAL CARE
                     {/* Subtle underline accent */}
-                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[4px] bg-[#C9A96E] rounded-full" />
+                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[3px] md:h-[4px] bg-[#C9A96E] rounded-full" />
                   </span>
                 </h1>
                 {/* Secondary Heading */}
                 <div className="font-display text-sm sm:text-base lg:text-[17px] font-bold text-[#1E3A5F] leading-snug pt-1">
-                  Advanced Implant Hospital <br className="hidden sm:inline" />
-                  <span className="text-[#00897B] font-extrabold">with Fix Teeth in Just One Week</span>
+                  Best Dental Hospital In India <br className="hidden sm:inline" />
+                  <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
                 </div>
               </div>
 
-              {/* Subtitle / Description & Trust Statement */}
-              <div className="mt-4 flex flex-col space-y-2.5 text-left max-w-[480px]">
-                <p className="font-sans text-sm md:text-base leading-relaxed font-medium text-[#4B5563]">
-                  With Patel Dental Hospital, take the first step towards a beautiful smile and better dental health.
-                </p>
-                <p className="font-sans text-xs md:text-sm font-semibold italic text-[#4B5563]">
-                  Experience Modern Dentistry With Gentle Touch.
-                </p>
-                {/* Trust Statement */}
-                <div className="flex items-center space-x-1.5 text-xs md:text-[13px] font-bold text-[#00897B] pt-0.5">
-                  <Sparkles className="h-4 w-4 text-[#00897B] animate-pulse" />
-                  <span>We Give You A Perfect Smile, Guaranteed.</span>
+              {/* Desktop-only Quick Information Cards section */}
+              <div className="hidden lg:grid grid-cols-2 gap-3.5 w-[430px] xl:w-[460px] max-w-none mt-5 mb-6 relative z-30">
+                {/* CARD 1 */}
+                <div className="flex flex-col justify-center bg-[#1E3A5F] text-white px-4 py-3 xl:px-4.5 xl:py-3.5 rounded-[16px] shadow-md border border-[#1E3A5F] h-[135px] xl:h-[140px]">
+                  <div>
+                    <h3 className="font-display text-[15px] xl:text-[16px] font-extrabold tracking-wide uppercase text-white mb-1.5 leading-tight">
+                      Need Dental Consultation?
+                    </h3>
+                    <p className="font-sans text-[12.5px] xl:text-[13.5px] text-white/80 font-medium">
+                      Please Call Us
+                    </p>
+                    <p className="font-display text-[18px] xl:text-[20px] font-extrabold text-[#C9A96E] mt-1.5">
+                      +91 9510397046
+                    </p>
+                  </div>
+                </div>
+
+                {/* CARD 2 */}
+                <div className="flex flex-col justify-center bg-[#E6F6F4] px-4 py-3 xl:px-4.5 xl:py-3.5 rounded-[16px] shadow-md border border-[#E6F6F4]/50 h-[135px] xl:h-[140px]">
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Clock className="h-4 w-4 text-[#00897B] shrink-0" />
+                      <h3 className="font-display text-[15px] xl:text-[16px] font-extrabold tracking-wide uppercase text-[#1E3A5F] leading-tight">
+                        Working Hours
+                      </h3>
+                    </div>
+                    <div className="space-y-1">
+                      <div>
+                        <div className="text-[#1E3A5F] font-extrabold text-[12px] xl:text-[13px]">Monday – Saturday</div>
+                        <div className="text-[#4B5563] text-[11px] xl:text-[12px] font-semibold leading-snug">
+                          09:00 AM – 01:00 PM<br />
+                          04:00 PM – 08:00 PM
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[#1E3A5F] font-extrabold text-[12px] xl:text-[13px]">
+                          Sunday: <span className="text-[#00897B] font-black">Closed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -496,7 +534,7 @@ export default function Home({
                   className="h-[56px] px-8 w-full sm:flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[16.5px] font-extrabold rounded-[16px] shadow-[0_12px_30px_rgba(0,137,123,0.22)] hover:shadow-[0_15px_35px_rgba(0,137,123,0.32)] cursor-pointer transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
                 >
                   <Calendar className="h-5 w-5 shrink-0" />
-                  <span className="whitespace-nowrap">Book Appointment</span>
+                  <span className="whitespace-nowrap">Free Consultation</span>
                 </button>
 
                 <a
@@ -544,39 +582,17 @@ export default function Home({
 
           <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3.5 px-4 sm:px-6 relative z-10 pt-8 sm:pt-10 pb-4">
             
-            {/* 1. Label */}
-            <div className="animate-fade-in font-display text-[9px] sm:text-[10.5px] font-black tracking-wider uppercase">
-              <span className="text-[#1E3A5F]">Patel Dental Hospital</span> <span className="text-[#1E3A5F]">| Rajkot</span>
-            </div>
-
             {/* 2. Headline */}
             <div className="flex flex-col text-center space-y-1 max-w-[450px]">
               {/* Main Heading */}
-              <h1 className="font-display text-[21px] sm:text-[25px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight">
-                Give You One More<br />
-                <span className="text-[#00897B]">
-                  Reason To Smile
-                </span>
+              <h1 className="font-display text-[16px] sm:text-[19px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+                WORLD CLASS <span className="text-[#00897B]">DENTAL CARE</span>
               </h1>
               {/* Secondary Heading */}
               <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#1E3A5F] leading-snug">
-                Advanced Implant Hospital <span className="text-[#00897B] font-extrabold">with Fix Teeth in Just One Week</span>
+                Best Dental Hospital In India <br />
+                <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
               </div>
-            </div>
-
-            {/* 3. Short description & Supporting Line & Trust Statement */}
-            <div className="flex flex-col space-y-1 text-center max-w-[450px]">
-              <p className="font-sans text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[12px] sm:text-[14px] leading-relaxed font-semibold text-[#4B5563]">
-                With Patel Dental Hospital, take the first step towards a beautiful smile and better dental health.
-              </p>
-              <p className="font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-bold italic text-[#4B5563]">
-                Experience Modern Dentistry With Gentle Touch.
-              </p>
-              {/* Trust Statement */}
-              <p className="text-[#00897B] font-sans text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-[12.5px] font-extrabold flex items-center justify-center space-x-1 mt-0.5">
-                <Sparkles className="h-3.5 w-3.5 text-[#00897B] shrink-0 animate-pulse" />
-                <span>We Give You A Perfect Smile, Guaranteed.</span>
-              </p>
             </div>
 
             {/* 4 & 5. Buttons below description, horizontal row of two equal buttons with improved styling */}
@@ -586,7 +602,7 @@ export default function Home({
                 className="h-[46px] sm:h-[50px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
                 <Calendar className="h-[14px] w-[14px] shrink-0" />
-                <span className="whitespace-nowrap">Book Appointment</span>
+                <span className="whitespace-nowrap">Free Consultation</span>
               </button>
 
               <a
@@ -651,7 +667,7 @@ export default function Home({
             {/* SECTION 3 (Book Appointment) */}
             <div className="bg-[#E6F6F4] p-6 text-center flex flex-col items-center">
               <h4 className="font-display font-bold text-[18px] text-[#1E3A5F] mb-2">
-                Book an Appointment
+                Free Consultation
               </h4>
               <p className="font-display font-extrabold text-[12px] tracking-wider uppercase leading-none text-[#00897B]">
                 Patel Dental Hospital
@@ -666,7 +682,7 @@ export default function Home({
                   onClick={openAppointmentModal}
                   className="h-[44px] bg-[#00897B] hover:bg-[#00796B] text-[#FFFFFF] text-[13px] font-bold rounded-lg flex items-center justify-center active:scale-98 transition-all duration-300 shadow-sm text-center cursor-pointer"
                 >
-                  Book Appointment
+                  Free Consultation
                 </button>
 
                 <a
@@ -914,7 +930,7 @@ export default function Home({
                 if (!cardData.isActive) return null;
 
                 const mConfig = cardData.mConfig;
-                const appointmentText = mConfig.cta_appointment_text || 'Book Appointment';
+                const appointmentText = mConfig.cta_appointment_text || 'Free Consultation';
                 const appointmentDest = mConfig.cta_appointment_dest || 'appointment';
                 const appointmentDestValue = mConfig.cta_appointment_dest_value || '';
 
@@ -1027,60 +1043,94 @@ export default function Home({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="bg-white rounded-[16px] overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_40px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col"
+                className={video.videoPlatform === 'instagram' ? "w-full max-w-[430px] mx-auto flex flex-col items-center" : "bg-white rounded-[16px] overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_40px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col"}
               >
-                <div className="aspect-video w-full bg-slate-900 relative overflow-hidden shrink-0">
-                  {activeVideos[video.id] ? (
-                    <iframe
-                      className="w-full h-full border-0 absolute inset-0 z-10"
-                      src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-                      title={video.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                      loading="lazy"
-                    ></iframe>
-                  ) : (
-                    <button
-                      onClick={() => setActiveVideos(prev => ({ ...prev, [video.id]: true }))}
-                      className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group/video focus:outline-none"
-                      aria-label={`Play ${video.title}`}
-                    >
-                      <img
-                        src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-                        alt={video.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-105"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
+                {video.videoPlatform === 'instagram' ? (
+                  <InstagramEmbed
+                    url={video.url || `https://www.instagram.com/p/${video.id}/`}
+                    title={video.title}
+                  />
+                ) : video.videoPlatform === 'mp4' ? (
+                  <>
+                    <div className="aspect-video w-full bg-slate-900 relative overflow-hidden shrink-0">
+                      <video
+                        src={video.url || video.id}
+                        controls
+                        className="w-full h-full object-cover"
+                        preload="metadata"
                       />
-                      <div className="absolute inset-0 bg-black/25 group-hover/video:bg-black/35 transition-colors duration-300 pointer-events-none" />
-                      {/* Play Button Icon */}
-                      <div className="absolute z-20 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#0D9488] group-hover/video:text-white transition-all duration-300 pointer-events-none">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="w-6 h-6 md:w-7 md:h-7 translate-x-0.5"
-                        >
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
+                    </div>
+                    <div className="p-4 sm:p-5 flex-grow flex flex-col justify-between hidden md:flex">
+                      <div>
+                        <span className="inline-block text-[11px] font-bold text-[#0D9488] bg-[#F0FDFA] border border-[#CCFBF1] px-2.5 py-1 rounded-full mb-2">
+                          {video.treatment}
+                        </span>
+                        <h4 className="font-display font-bold text-[#081C3A] text-[15px] sm:text-[16px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
+                          {video.title}
+                        </h4>
                       </div>
-                    </button>
-                  )}
-                </div>
-                <div className="p-4 sm:p-5 flex-grow flex flex-col justify-between hidden md:flex">
-                  <div>
-                    <span className="inline-block text-[11px] font-bold text-[#0D9488] bg-[#F0FDFA] border border-[#CCFBF1] px-2.5 py-1 rounded-full mb-2">
-                      {video.treatment}
-                    </span>
-                    <h4 className="font-display font-bold text-[#081C3A] text-[15px] sm:text-[16px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
-                      {video.title}
-                    </h4>
-                  </div>
-                  <div className="text-slate-450 text-[12px] sm:text-[13px] font-medium mt-3 flex items-center justify-between border-t border-slate-50 pt-3">
-                    <span>Verified Testimonial</span>
-                    <span className="text-[#11B5D8]">★ Featured</span>
-                  </div>
-                </div>
+                      <div className="text-slate-450 text-[12px] sm:text-[13px] font-medium mt-3 flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span>Verified Testimonial</span>
+                        <span className="text-[#11B5D8]">★ Featured</span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="aspect-video w-full bg-slate-900 relative overflow-hidden shrink-0">
+                      {activeVideos[video.id] ? (
+                        <iframe
+                          className="w-full h-full border-0 absolute inset-0 z-10"
+                          src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
+                          title={video.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          loading="lazy"
+                        ></iframe>
+                      ) : (
+                        <button
+                          onClick={() => setActiveVideos(prev => ({ ...prev, [video.id]: true }))}
+                          className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group/video focus:outline-none"
+                          aria-label={`Play ${video.title}`}
+                        >
+                          <img
+                            src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+                            alt={video.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-105"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-black/25 group-hover/video:bg-black/35 transition-colors duration-300 pointer-events-none" />
+                          {/* Play Button Icon */}
+                          <div className="absolute z-20 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#0D9488] group-hover/video:text-white transition-all duration-300 pointer-events-none">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-6 h-6 md:w-7 md:h-7 translate-x-0.5"
+                            >
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </button>
+                      )}
+                    </div>
+                    <div className="p-4 sm:p-5 flex-grow flex flex-col justify-between hidden md:flex">
+                      <div>
+                        <span className="inline-block text-[11px] font-bold text-[#0D9488] bg-[#F0FDFA] border border-[#CCFBF1] px-2.5 py-1 rounded-full mb-2">
+                          {video.treatment}
+                        </span>
+                        <h4 className="font-display font-bold text-[#081C3A] text-[15px] sm:text-[16px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
+                          {video.title}
+                        </h4>
+                      </div>
+                      <div className="text-slate-450 text-[12px] sm:text-[13px] font-medium mt-3 flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span>Verified Testimonial</span>
+                        <span className="text-[#11B5D8]">★ Featured</span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </motion.div>
             ))}
           </div>
@@ -1165,7 +1215,7 @@ export default function Home({
                       className="inline-flex items-center text-[13px] sm:text-[14px] font-bold text-white bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] hover:from-[#0F766E] hover:to-[#0284c7] px-6 sm:px-8 py-3 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95"
                     >
                       <Calendar className="h-4 w-4 mr-2" />
-                      Book Appointment
+                      Free Consultation
                     </button>
                   </div>
                 </motion.div>
@@ -1717,7 +1767,7 @@ export default function Home({
                       className="flex-1 flex items-center justify-center text-[13px] sm:text-[14px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] px-6 py-4 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95 text-center"
                     >
                       <Calendar className="h-4 w-4 mr-2" />
-                      Book Appointment
+                      Free Consultation
                     </button>
                     
                     {/* Secondary Button */}
@@ -2058,7 +2108,7 @@ export default function Home({
                   className="inline-flex items-center justify-center text-[14px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-8 py-4 rounded-xl shadow-[0_4px_14px_0_rgba(14,165,233,0.3)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95 text-center"
                 >
                   <Calendar className="h-4.5 w-4.5 mr-2" />
-                  Book Appointment
+                  Free Consultation
                 </button>
                 
                 <a
@@ -2172,204 +2222,144 @@ export default function Home({
       <section className="py-16 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="visit-hospital">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Centered Heading */}
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase block mb-1">
+              FIND OUR CLINICS
+            </span>
+            <h2 className="font-display font-[900] text-[#081C3A] text-[28px] sm:text-[36px] md:text-[40px] leading-tight tracking-tight">
+              Visit Patel Dental Hospital
+            </h2>
+            <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mt-4 rounded-full" />
+          </div>
+
+          {/* Two Equal Width Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
             
-            {/* Left Side: Contact details */}
-            <div className="lg:col-span-6 space-y-6 sm:space-y-8">
-              <div className="space-y-3">
-                <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase block mb-1">
-                  FIND OUR CLINICS
-                </span>
-                <h2 className="font-display font-[900] text-[#081C3A] text-[28px] sm:text-[36px] md:text-[40px] leading-tight tracking-tight">
-                  Visit Patel Dental Hospital
-                </h2>
-                <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mb-4 rounded-full" />
-                <p className="text-slate-500 text-[14.5px] sm:text-[16px] font-medium leading-relaxed">
-                  We look forward to welcoming you at our state-of-the-art clinics in Rajkot. Enjoy advanced, computerized dental care in a comfortable, sterile-certified environment. Choose a branch to view specific location maps.
-                </p>
-              </div>
-
-              {/* Branch Quick Selector Tabs */}
-              <div className="flex bg-slate-50 p-1.5 rounded-xl border border-slate-100 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setActiveMapBranch('amin_marg')}
-                  className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
-                    activeMapBranch === 'amin_marg'
-                      ? 'bg-white shadow-[0_4px_12px_rgba(8,28,58,0.04)] text-[#0D9488] border border-slate-100'
-                      : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  Amin Marg Branch (Main)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveMapBranch('gayatrinagar')}
-                  className={`flex-1 py-3 px-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
-                    activeMapBranch === 'gayatrinagar'
-                      ? 'bg-white shadow-[0_4px_12px_rgba(8,28,58,0.04)] text-[#0D9488] border border-slate-100'
-                      : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  Gayatrinagar Branch
-                </button>
-              </div>
-
-              {/* Multi-Branch card information */}
-              <div className="bg-slate-50/50 border border-slate-100/70 rounded-[20px] p-6 sm:p-8 space-y-6 hover:shadow-[0_8px_30px_rgba(8,28,58,0.02)] transition-all duration-300">
-                <div className="space-y-4">
-                  {/* Hospital Name */}
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#0D9488] block mb-0.5">
-                      HOSPITAL NAME
-                    </span>
-                    <h3 className="font-display font-[900] text-[#081C3A] text-lg sm:text-xl">
-                      Patel Dental Hospital {activeMapBranch === 'amin_marg' ? '(Amin Marg Main Branch)' : '(Gayatrinagar Branch)'}
-                    </h3>
-                  </div>
-
-                  {/* Address */}
-                  <div className="flex items-start gap-3 pt-4 border-t border-slate-100">
-                    <MapPin className="w-5 h-5 text-[#0D9488] shrink-0 mt-0.5" />
-                    <div>
-                      <span className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">
-                        ADDRESS
-                      </span>
-                      <p className="text-slate-600 font-semibold text-[13.5px] leading-relaxed">
-                        {activeMapBranch === 'amin_marg' 
-                          ? '1st Floor, Business Centrum Complex, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, Rajnagar Chowk to Amin Marg Road, Rajkot – 360001' 
-                          : '1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle, Rajkot'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Contact Phone & Email Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                    <div className="flex items-start gap-3">
-                      <Phone className="w-4.5 h-4.5 text-[#11B5D8] shrink-0 mt-0.5" />
-                      <div>
-                        <span className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">
-                          PHONE NUMBER
-                        </span>
-                        <a 
-                          href={`tel:${phoneRaw}`} 
-                          className="block text-[#081C3A] font-black text-[14px] hover:text-[#0D9488] transition-colors"
-                        >
-                          {displayPhone}
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <Mail className="w-4.5 h-4.5 text-[#11B5D8] shrink-0 mt-0.5" />
-                      <div>
-                        <span className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">
-                          EMAIL ADDRESS
-                        </span>
-                        <a 
-                          href="mailto:info@pateldentalrajkot.com" 
-                          className="block text-[#081C3A] font-extrabold text-[13px] hover:text-[#0D9488] transition-colors break-all"
-                        >
-                          info@pateldentalrajkot.com
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Working Hours */}
-                  <div className="flex items-start gap-3 pt-4 border-t border-slate-100">
-                    <Clock className="w-4.5 h-4.5 text-[#0ea5e9] shrink-0 mt-0.5" />
-                    <div>
-                      <span className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">
-                        WORKING HOURS
-                      </span>
-                      <div className="text-slate-600 font-semibold text-[13px] space-y-0.5 mt-1">
-                        <p><strong className="text-slate-700">Mon &ndash; Sat Morning:</strong> 09:00 AM &ndash; 01:00 PM</p>
-                        <p><strong className="text-slate-700">Mon &ndash; Sat Evening:</strong> 04:00 PM &ndash; 08:00 PM</p>
-                        <p><strong className="text-amber-600">Sunday Schedules:</strong> Prior Appointments Only</p>
-                      </div>
-                    </div>
-                  </div>
+            {/* Card 1: Main Branch (Amin Marg) */}
+            <div 
+              id="branch-card-amin-marg"
+              className="bg-white rounded-[18px] border border-[#E6F6F4] p-[28px] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                {/* Heading */}
+                <div>
+                  <h3 className="font-display font-[900] text-[#1E3A5F] text-lg sm:text-xl md:text-2xl flex items-center gap-2">
+                    <span className="shrink-0">🏥</span> Patel Dental Hospital
+                  </h3>
+                  <p className="text-xs sm:text-sm font-bold text-[#00897B] tracking-wider uppercase mt-1">
+                    MAIN BRANCH (AMIN MARG)
+                  </p>
                 </div>
 
-                {/* Lower Buttons row */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
-                  <a
-                    href={activeMapBranch === 'amin_marg' 
-                      ? 'https://share.google/JKMC3jmTqdylcXUJn' 
-                      : 'https://share.google/Gsdeg6MvRtha7sREX'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center text-[13px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-5 py-3.5 rounded-xl shadow-[0_4px_14px_rgba(14,165,233,0.25)] hover:shadow-md cursor-pointer transition-all duration-300 text-center"
-                  >
-                    <MapPin className="h-4 w-4 mr-1.5 shrink-0" />
-                    Get Directions
-                  </a>
-                  
-                  <a
-                    href={`tel:${phoneRaw}`}
-                    className="inline-flex items-center justify-center text-[13px] font-bold text-[#081C3A] bg-white hover:bg-slate-50 px-5 py-3.5 rounded-xl border border-slate-200 shadow-sm cursor-pointer transition-all duration-300 text-center shrink-0"
-                  >
-                    <Phone className="h-4 w-4 mr-1.5 shrink-0 text-[#0ea5e9]" />
-                    Call Now
-                  </a>
+                {/* Address */}
+                <div className="pt-3 border-t border-slate-100 space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
+                    <span className="shrink-0 text-sm">📍</span> Address
+                  </span>
+                  <p className="text-[#4B5563] font-semibold text-[13.5px] sm:text-[14px] leading-relaxed whitespace-pre-line">
+                    Patel Dental Hospital
+                    Business Centrum Complex
+                    1st Floor
+                    Opp. Kings Heights
+                    Beside Golden Super Market
+                    Pandit Deendayal Upadhyay Road
+                    From Rajnagar Chowk towards Amin Marg
+                    Rajkot – 360001
+                  </p>
+                </div>
 
-                  <a
-                    href={`https://wa.me/${whatsappRaw}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center text-[13px] font-bold text-[#0D9488] bg-[#EBFDFB] hover:bg-[#CCFBF1] px-5 py-3.5 rounded-xl border border-[#CCFBF1] cursor-pointer transition-all duration-300 text-center shrink-0"
+                {/* Phone */}
+                <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                  <span className="shrink-0 text-sm">☎</span>
+                  <a 
+                    href="tel:+919510397046" 
+                    className="text-[#00897B] font-extrabold text-[14.5px] hover:underline"
                   >
-                    <svg className="w-4 h-4 mr-1.5 fill-current shrink-0" viewBox="0 0 24 24">
-                      <path d="M12.012 2c-5.506 0-9.988 4.482-9.988 9.988 0 1.761.46 3.473 1.332 4.978l-1.354 4.947 5.074-1.329c1.455.795 3.09 1.215 4.751 1.217h.004c5.503 0 10.015-4.482 10.015-9.988 0-2.668-1.039-5.176-2.927-7.065C17.142 2.927 14.654 2 12.012 2zm6.918 13.916c-.302.851-1.481 1.564-2.03 1.614-.543.05-1.085.253-3.486-.698-2.887-1.144-4.708-4.088-4.851-4.28-.142-.191-1.151-1.536-1.151-2.929 0-1.392.711-2.078.966-2.355.255-.276.553-.346.737-.346.184 0 .368.002.528.01.169.008.397-.064.622.482.23.559.78 1.901.848 2.039.068.139.113.301.021.485-.092.184-.139.299-.276.46-.139.162-.291.36-.416.483-.139.138-.284.288-.121.567.162.279.722 1.189 1.549 1.921.1.088.194.175.289.261 1.071.954 1.884 1.222 2.184 1.373.3.151.474.126.651-.077.177-.203.76-.884.966-1.186.205-.302.41-.252.691-.151.282.101 1.782.84 2.091.995.31.156.516.233.593.364.077.132.077.76-.225 1.611z" />
-                    </svg>
-                    WhatsApp
+                    +91 9510397046
                   </a>
                 </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
+                <a
+                  href="https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer"
+                >
+                  <span className="mr-1.5 shrink-0">📍</span> Get Directions
+                </a>
+                <a
+                  href="tel:+919510397046"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#1E3A5F] hover:bg-[#00897B] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer"
+                >
+                  <span className="mr-1.5 shrink-0">📞</span> Call Now
+                </a>
               </div>
             </div>
 
-            {/* Right Side: Embedded Map container */}
-            <div className="lg:col-span-6 h-full min-h-[440px] lg:min-h-[520px]">
-              <div className="rounded-[24px] overflow-hidden bg-slate-100 border border-slate-150 h-full w-full shadow-[0_15px_45px_rgba(8,28,58,0.03)] relative group flex flex-col">
-                
-                {/* Custom active heading bar on the map block */}
-                <div className="bg-slate-50 border-b border-slate-150 py-3.5 px-6 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#0D9488]"></div>
-                    <span className="text-[#081C3A] text-xs font-bold uppercase tracking-wider">
-                      Interactive Location Map
-                    </span>
-                  </div>
-                  <span className="text-[10px] bg-slate-200/70 text-slate-600 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                    {activeMapBranch === 'amin_marg' ? 'Amin Marg Main Branch' : 'Gayatrinagar Branch'}
-                  </span>
+            {/* Card 2: Gayatrinagar Branch */}
+            <div 
+              id="branch-card-gayatrinagar"
+              className="bg-white rounded-[18px] border border-[#E6F6F4] p-[28px] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                {/* Heading */}
+                <div>
+                  <h3 className="font-display font-[900] text-[#1E3A5F] text-lg sm:text-xl md:text-2xl flex items-center gap-2">
+                    <span className="shrink-0">🏥</span> Patel Dental Hospital
+                  </h3>
+                  <p className="text-xs sm:text-sm font-bold text-[#00897B] tracking-wider uppercase mt-1">
+                    GAYATRINAGAR BRANCH
+                  </p>
                 </div>
 
-                {/* Map iframe wrapper */}
-                <div className="relative flex-1 min-h-[350px]">
-                  {activeMapBranch === 'amin_marg' ? (
-                    <iframe
-                      id="google-map-iframe-amin-marg"
-                      className="w-full h-full border-0 absolute inset-0 z-10"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3692.7483428104!2d70.7712347!3d22.2534567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca223cfb8bdb%3A0xc6cb1c7caef1eb15!2sPatel%20Dental%20Hospital%20-%20Mavdi%20Branch!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Patel Dental Hospital Amin Marg Main Branch"
-                    ></iframe>
-                  ) : (
-                    <iframe
-                      id="google-map-iframe-gayatrinagar"
-                      className="w-full h-full border-0 absolute inset-0 z-10"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.8217300346394!2d70.8037307!3d22.2847055!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959ca163959c02d%3A0xe5eb6c4c5cf4ab2c!2sPatel%20Dental%20Hospital%20-%20Best%20Dental%20Hospital%20in%20Rajkot!5e0!3m2!1sen!2sin!4v1718060000000!5m2!1sen!2sin"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Patel Dental Hospital Gayatrinagar Branch"
-                    ></iframe>
-                  )}
+                {/* Address */}
+                <div className="pt-3 border-t border-slate-100 space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
+                    <span className="shrink-0 text-sm">📍</span> Address
+                  </span>
+                  <p className="text-[#4B5563] font-semibold text-[13.5px] sm:text-[14px] leading-relaxed whitespace-pre-line">
+                    Patel Dental Hospital
+                    1st Floor, Rameshwar Complex
+                    Opp. SBI Bank
+                    Gayatrinagar Road
+                    Jalaram Chowk
+                    Bhaktinagar Circle
+                    Rajkot
+                  </p>
                 </div>
+
+                {/* Phone */}
+                <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                  <span className="shrink-0 text-sm">☎</span>
+                  <a 
+                    href="tel:+919510397046" 
+                    className="text-[#00897B] font-extrabold text-[14.5px] hover:underline"
+                  >
+                    +91 9510397046
+                  </a>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
+                <a
+                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer"
+                >
+                  <span className="mr-1.5 shrink-0">📍</span> Get Directions
+                </a>
+                <a
+                  href="tel:+919510397046"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#1E3A5F] hover:bg-[#00897B] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer"
+                >
+                  <span className="mr-1.5 shrink-0">📞</span> Call Now
+                </a>
               </div>
             </div>
 
