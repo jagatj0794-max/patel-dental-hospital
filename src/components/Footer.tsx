@@ -67,7 +67,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             </div>
             
             <p className="text-xs text-slate-400 font-sans leading-relaxed">
-              Serving Rajkot with uncompromising diagnostic accuracy, immediate loading titanium basal systems, and active anxiety protection protocols. Directed by Chief Dental Implant Surgeon Dr. Vipul Patel (MDS) & Dr. Kinjal Patel (BDS).
+              Recognized as the best dental hospital in Rajkot, Gujarat. Providing advanced dental care in Rajkot with 3D CBCT diagnostics, immediate loading titanium implants, and single-sitting root canals. Directed by Chief Dental Implant Surgeon Dr. Vipul Patel (MDS) & Dr. Kinjal Patel (BDS).
             </p>
 
             {/* Certifications and Accreditations badge widgets */}
@@ -78,7 +78,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               </div>
               <div className="flex items-center space-x-2 text-xs text-slate-300 bg-slate-900 border border-white/[0.04] p-2.5 rounded-lg">
                 <Award className="h-4 w-4 text-amber-500 shrink-0" />
-                <span className="font-semibold tracking-wide text-[10px] uppercase">Elite Same Day Loading Fellowship</span>
+                <span className="font-semibold tracking-wide text-[10px] uppercase">Fix Teeth In Just One Week With Dental Implant</span>
               </div>
             </div>
 
@@ -206,7 +206,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               Dual Branch Network Locations
             </span>
             <p className="text-slate-400 text-xs font-sans mt-0.5">
-              Locate our sterile-certified operatory clinics strategically situated across Rajkot.
+              Visit the best dental clinic in Rajkot at our sterile-certified operatory clinics strategically located across Rajkot.
             </p>
           </div>
 

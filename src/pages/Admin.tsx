@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   LayoutDashboard, 
   Sparkles, 
@@ -40,8 +41,8 @@ import {
   Star,
   EyeOff
 } from 'lucide-react';
-import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq } from '../types';
-import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown } from 'lucide-react';
+import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, Award } from '../types';
+import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
 import { uploadImage, uploadVideo } from '../utils/supabaseStorage';
@@ -49,7 +50,9 @@ import { heroService } from '../utils/heroData';
 import { doctorService } from '../utils/doctorData';
 import { galleryService } from '../utils/galleryData';
 import { videoService } from '../utils/videoData';
+import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { contactService } from '../utils/contactData';
+import { awardsService, DEFAULT_AWARDS } from '../utils/awardsData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
@@ -84,9 +87,11 @@ interface AdminProps {
   setVideosList: React.Dispatch<React.SetStateAction<DentalVideo[]>>;
   contactInfo: ContactInfo;
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>;
+  awardsList: Award[];
+  setAwardsList: React.Dispatch<React.SetStateAction<Award[]>>;
 }
 
-type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services' | 'implants-cms';
+type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services' | 'implants-cms' | 'awards-cms';
 
 export default function Admin({ 
   setCurrentPage, 
@@ -107,7 +112,9 @@ export default function Admin({
   videosList,
   setVideosList,
   contactInfo,
-  setContactInfo
+  setContactInfo,
+  awardsList,
+  setAwardsList
 }: AdminProps) {
   const [activeTab, setActiveTab] = useState<SidebarTab>('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -153,6 +160,16 @@ export default function Admin({
   const [docPhotoDragging, setDocPhotoDragging] = useState(false);
   const [doctorToDelete, setDoctorToDelete] = useState<string | null>(null);
   const [smileToDelete, setSmileToDelete] = useState<string | null>(null);
+
+  // Awards local draft states
+  const [draftAwards, setDraftAwards] = useState<Award[]>(() => awardsList);
+  const [editingAward, setEditingAward] = useState<Award | null>(null);
+  const [awardToDelete, setAwardToDelete] = useState<string | null>(null);
+  const [isAwardUploading, setIsAwardUploading] = useState(false);
+
+  useEffect(() => {
+    setDraftAwards(awardsList);
+  }, [awardsList]);
 
   // Services Tab states
   const [servicesList, setServicesList] = useState<Service[]>([]);
@@ -2659,6 +2676,7 @@ export default function Admin({
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'services', label: 'Services', icon: Stethoscope },
+    { id: 'awards-cms', label: 'Awards', icon: Trophy },
   ] as const;
 
   const handleLogout = async () => {
@@ -4646,32 +4664,41 @@ export default function Admin({
                         key={item.id}
                         className="group bg-white rounded-2xl border border-slate-150 shadow-3xs overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col"
                       >
-                        {/* Thumbnail Card with custom Play button overlay */}
-                        <div className="relative aspect-video w-full overflow-hidden bg-transparent flex items-center justify-center">
-                          <img
-                            src={item.thumbnail}
-                            alt={item.title}
-                            className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
-                            onError={(e) => {
-                              e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition flex items-center justify-center z-10">
-                            <div className="bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 duration-200 transition">
-                              <Play className="h-6 w-6 text-white fill-current translate-x-0.5" />
-                            </div>
+                        {/* Thumbnail Card with custom Play button overlay or MP4 Reel Player */}
+                        {item.videoPlatform === 'mp4' || (item as any).platform === 'mp4' || item.id.endsWith('.mp4') || item.id.includes('supabase.co') ? (
+                          <div className="w-full max-w-[430px] mx-auto flex justify-center py-2">
+                            <Mp4ReelPlayer
+                              src={item.youtubeUrl || item.id}
+                              containerClassName="aspect-[9/16] h-[440px] sm:h-[460px] rounded-xl overflow-hidden bg-black border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.03)]"
+                            />
                           </div>
-                          
-                          <a
-                            href={item.youtubeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5 z-20"
-                          >
-                            <span>Open on {item.videoPlatform === 'instagram' ? 'Instagram' : 'YouTube'}</span>
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </div>
+                        ) : (
+                          <div className="relative aspect-video w-full overflow-hidden bg-transparent flex items-center justify-center">
+                            <img
+                              src={item.thumbnail}
+                              alt={item.title}
+                              className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                              onError={(e) => {
+                                e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition flex items-center justify-center z-10">
+                              <div className="bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 duration-200 transition">
+                                <Play className="h-6 w-6 text-white fill-current translate-x-0.5" />
+                              </div>
+                            </div>
+                            
+                            <a
+                              href={item.youtubeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5 z-20"
+                            >
+                              <span>Open on {item.videoPlatform === 'instagram' ? 'Instagram' : 'YouTube'}</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
+                        )}
 
                         {/* Title & Actions footer */}
                         <div className="p-4 flex-1 flex flex-col">
@@ -4879,30 +4906,28 @@ export default function Admin({
                       
                       {videoIdPreview ? (
                         <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-5 max-w-[350px] mx-auto flex flex-col items-center transition-all duration-200">
-                          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-transparent mb-3.5 flex items-center justify-center">
-                            {videoPlatformInput === 'mp4' ? (
-                              <video
+                          {videoPlatformInput === 'mp4' ? (
+                            <div className="w-full max-w-[320px] mx-auto flex justify-center mb-3.5">
+                              <Mp4ReelPlayer
                                 src={videoUrlInput}
-                                controls
-                                className="w-full h-full object-cover"
-                                preload="metadata"
+                                containerClassName="aspect-[9/16] h-[420px] sm:h-[440px] rounded-xl overflow-hidden bg-black border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.03)]"
                               />
-                            ) : (
-                              <>
-                                <img
-                                  src={previewVideoThumbnail}
-                                  alt="Live Preview"
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
-                                  }}
-                                />
-                                <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center pointer-events-none">
-                                  <Play className="h-10 w-10 text-white fill-current" />
-                                </div>
-                              </>
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-transparent mb-3.5 flex items-center justify-center">
+                              <img
+                                src={previewVideoThumbnail}
+                                alt="Live Preview"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center pointer-events-none">
+                                <Play className="h-10 w-10 text-white fill-current" />
+                              </div>
+                            </div>
+                          )}
                           
                           <h4 className="font-display font-extrabold text-slate-900 text-sm leading-snug text-center">
                             {previewVideoTitle}
@@ -5680,6 +5705,381 @@ export default function Admin({
         return <Appointments />;
       case 'implants-cms':
         return <DentalImplantsCms onSaveSuccess={loadServicesList} />;
+      case 'awards-cms':
+        return (
+          <div className="space-y-6" id="admin-awards-view">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08)]">
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900">
+                  Awards & Recognition Management
+                </h1>
+                <p className="text-slate-500 text-xs md:text-sm mt-1">
+                  Manage the awards and recognitions featured on the website homepage.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingAward({
+                      id: 'new-' + Math.random().toString(36).substr(2, 9),
+                      title: '',
+                      description: '',
+                      image: 'https://images.unsplash.com/photo-1578351614283-132d1e0892c4?w=600&auto=format&fit=crop&q=80',
+                      display_order: draftAwards.length,
+                      is_visible: true
+                    });
+                  }}
+                  className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Add New Award</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setSaveMessage('Saving awards list to Supabase/localStorage...');
+                    const success = await awardsService.saveAwards(draftAwards);
+                    if (success) {
+                      setAwardsList(draftAwards);
+                      setSaveMessage('Awards list saved successfully! Public website updated.');
+                    } else {
+                      setSaveMessage('Failed to save awards. Please try again.');
+                    }
+                    setTimeout(() => setSaveMessage(null), 4000);
+                  }}
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Save Awards</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraftAwards(awardsList);
+                    setSaveMessage('Changes discarded.');
+                    setTimeout(() => setSaveMessage(null), 3000);
+                  }}
+                  className="border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl transition cursor-pointer"
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+
+            {/* List / Cards Layout */}
+            {draftAwards.length === 0 ? (
+              <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-12 text-center text-slate-500">
+                <Trophy className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                <p className="font-bold text-sm text-slate-700">No awards added yet</p>
+                <p className="text-xs mt-1 text-slate-400">Add some awards to display on the homepage.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {draftAwards.map((award, index) => (
+                  <div
+                    key={award.id}
+                    className={`bg-white rounded-2xl p-5 border shadow-3xs hover:shadow-xs transition duration-300 relative flex flex-col justify-between ${
+                      award.is_visible ? 'border-slate-100' : 'border-slate-200 bg-slate-55/30 opacity-75'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Action Row */}
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black text-slate-400 bg-slate-50 border border-slate-200/60 px-2 py-0.5 rounded-md">
+                            ORDER: {index + 1}
+                          </span>
+                          {!award.is_visible && (
+                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded-md">
+                              Hidden
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => {
+                              const newAwards = [...draftAwards];
+                              const temp = newAwards[index];
+                              newAwards[index] = newAwards[index - 1];
+                              newAwards[index - 1] = temp;
+                              setDraftAwards(newAwards);
+                            }}
+                            className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-35 disabled:pointer-events-none transition"
+                            title="Move Up"
+                          >
+                            <ChevronLeft className="h-4 w-4 rotate-90" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === draftAwards.length - 1}
+                            onClick={() => {
+                              const newAwards = [...draftAwards];
+                              const temp = newAwards[index];
+                              newAwards[index] = newAwards[index + 1];
+                              newAwards[index + 1] = temp;
+                              setDraftAwards(newAwards);
+                            }}
+                            className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-35 disabled:pointer-events-none transition"
+                            title="Move Down"
+                          >
+                            <ChevronRight className="h-4 w-4 rotate-90" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingAward(award)}
+                            className="p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition"
+                            title="Edit"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAwardToDelete(award.id)}
+                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Content Row */}
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
+                          <img
+                            src={award.image}
+                            alt={award.title}
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-slate-900 font-bold text-sm leading-tight">
+                            {award.title || <span className="text-slate-400 italic font-normal">Untitled Award</span>}
+                          </h3>
+                          <p className="text-slate-550 text-xs leading-relaxed line-clamp-2 font-medium">
+                            {award.description || <span className="text-slate-400 italic font-normal">No description provided</span>}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Visibility Switch */}
+                    <div className="border-t border-slate-50 pt-3 mt-4 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase">Visibility</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDraftAwards(draftAwards.map(a => a.id === award.id ? { ...a, is_visible: !a.is_visible } : a));
+                        }}
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full transition cursor-pointer border ${
+                          award.is_visible
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+                            : 'bg-slate-100 text-slate-600 border-slate-200/50'
+                        }`}
+                      >
+                        {award.is_visible ? 'Visible' : 'Hidden'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Form Modal for Creating/Editing Award */}
+            {editingAward && (
+              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden"
+                >
+                  <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h2 className="font-display font-bold text-[#081C3A]">
+                      {editingAward.id.startsWith('new-') ? 'Add New Award' : 'Edit Award Details'}
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => setEditingAward(null)}
+                      className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition cursor-pointer"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const exists = draftAwards.some(a => a.id === editingAward.id);
+                      if (exists) {
+                        setDraftAwards(draftAwards.map(a => a.id === editingAward.id ? editingAward : a));
+                      } else {
+                        setDraftAwards([...draftAwards, editingAward]);
+                      }
+                      setEditingAward(null);
+                    }}
+                    className="p-6 space-y-4"
+                  >
+                    {/* Title */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Title</label>
+                      <input
+                        type="text"
+                        required
+                        value={editingAward.title}
+                        onChange={(e) => setEditingAward({ ...editingAward, title: e.target.value })}
+                        placeholder="e.g. Best Dental Hospital in Gujarat"
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Description</label>
+                      <textarea
+                        value={editingAward.description || ''}
+                        onChange={(e) => setEditingAward({ ...editingAward, description: e.target.value })}
+                        placeholder="Give a short description of why this award was received..."
+                        rows={3}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                      />
+                    </div>
+
+                    {/* Image URL & File Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Image</label>
+                      <div className="flex gap-3">
+                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
+                          <img
+                            src={editingAward.image}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        <div className="flex-grow space-y-2">
+                          <input
+                            type="text"
+                            value={editingAward.image}
+                            onChange={(e) => setEditingAward({ ...editingAward, image: e.target.value })}
+                            placeholder="Image URL..."
+                            className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                          />
+                          <div className="flex items-center gap-2">
+                            <label className="cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 transition inline-block">
+                              <span>Choose File</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    const file = e.target.files[0];
+                                    setIsAwardUploading(true);
+                                    try {
+                                      const url = await uploadImage(file);
+                                      setEditingAward({ ...editingAward, image: url });
+                                    } catch (err: any) {
+                                      console.warn('Fallback to local base64 storage:', err);
+                                      const reader = new FileReader();
+                                      reader.onload = () => {
+                                        if (typeof reader.result === 'string') {
+                                          setEditingAward({ ...editingAward, image: reader.result });
+                                        }
+                                      };
+                                      reader.readAsDataURL(file);
+                                    } finally {
+                                      setIsAwardUploading(false);
+                                    }
+                                  }
+                                }}
+                              />
+                            </label>
+                            {isAwardUploading && (
+                              <span className="text-[10px] text-slate-400 font-bold animate-pulse">Uploading image...</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Visibility Toggle */}
+                    <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <input
+                        type="checkbox"
+                        id="award-visibility"
+                        checked={editingAward.is_visible}
+                        onChange={(e) => setEditingAward({ ...editingAward, is_visible: e.target.checked })}
+                        className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-slate-300 rounded"
+                      />
+                      <label htmlFor="award-visibility" className="text-xs text-slate-700 font-bold select-none cursor-pointer">
+                        Show this award on the website homepage
+                      </label>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex justify-end gap-2.5 border-t border-slate-50 pt-4 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setEditingAward(null)}
+                        className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 border border-slate-200 hover:bg-slate-50 transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isAwardUploading}
+                        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                      >
+                        Apply Changes
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            )}
+
+            {/* Delete Confirmation Dialog */}
+            {awardToDelete && (
+              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white rounded-2xl border border-slate-100 p-6 shadow-2xl max-w-sm w-full"
+                >
+                  <Trophy className="h-10 w-10 text-red-500 mb-3" />
+                  <h3 className="text-slate-900 font-bold text-base font-display">Delete Award</h3>
+                  <p className="text-slate-500 text-xs mt-1.5 leading-relaxed font-medium">
+                    Are you sure you want to delete this award? This will remove it from the homepage.
+                  </p>
+                  <div className="flex justify-end gap-2 mt-5">
+                    <button
+                      type="button"
+                      onClick={() => setAwardToDelete(null)}
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 border border-slate-200 hover:bg-slate-50 transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDraftAwards(draftAwards.filter(a => a.id !== awardToDelete));
+                        setAwardToDelete(null);
+                      }}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                    >
+                      Delete Award
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </div>
+        );
       case 'services':
         return (
           <div className="space-y-6" id="admin-services-view">

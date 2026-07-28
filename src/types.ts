@@ -76,6 +76,15 @@ export interface PatientMoment {
   image: string;
 }
 
+export interface Award {
+  id: string;
+  title: string;
+  description?: string;
+  image: string;
+  display_order: number;
+  is_visible: boolean;
+}
+
 export interface ContactInfo {
   phone: string;
   phoneRaw: string;

@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, PhoneCall, Plus, Table, Trash2, X, Sparkles, Check, CheckSquare } from 'lucide-react';
 
-import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo } from './types';
+import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo, Award } from './types';
 import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
 import { supabase } from './utils/supabase';
@@ -18,6 +18,7 @@ import { videoService, DEFAULT_VIDEOS } from './utils/videoData';
 import { contactService, DEFAULT_CONTACT_INFO } from './utils/contactData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
 import { appointmentService } from './utils/appointmentData';
+import { awardsService, DEFAULT_AWARDS } from './utils/awardsData';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingActionPanel from './components/FloatingActionPanel';
@@ -243,6 +244,28 @@ export default function App() {
   // Contact management state initialized with default values; updated from Supabase on mount
   const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
 
+  // Load Awards from Supabase/localStorage on mount
+  useEffect(() => {
+    let active = true;
+    const fetchAwards = async () => {
+      try {
+        const data = await awardsService.getAwards();
+        if (active) {
+          setAwardsList(data);
+        }
+      } catch (e) {
+        console.warn("Failed to load awards on mount:", e);
+      }
+    };
+    fetchAwards();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Awards state initialized with default values
+  const [awardsList, setAwardsList] = useState<Award[]>(DEFAULT_AWARDS);
+
   // Load and listen to Supabase authentication changes
   useEffect(() => {
     let subscription: any = null;
@@ -401,13 +424,78 @@ export default function App() {
   }, [currentPage]);
 
   const openAppointmentModal = (preselectedTreatment?: any) => {
+    console.log('[Popup Debug] Popup open function called. Preselected:', preselectedTreatment);
     if (preselectedTreatment && typeof preselectedTreatment === 'string') {
       setAppointmentTreatment(preselectedTreatment);
     } else {
       setAppointmentTreatment('General Consultation');
     }
     setIsAppointmentOpen(true);
+    safeStorage.setSessionItem('appointment_popup_triggered', 'true');
+    console.log('[Popup Debug] sessionStorage set: appointment_popup_triggered = true');
   };
+
+  // Automatic Consultation Popup
+  useEffect(() => {
+    const isTriggered = safeStorage.getSessionItem('appointment_popup_triggered') === 'true';
+    console.log('[Popup Debug] useEffect running. Current sessionStorage appointment_popup_triggered:', isTriggered);
+    if (isTriggered) {
+      console.log('[Popup Debug] Popup already triggered in this session. Aborting setup.');
+      return;
+    }
+
+    console.log('[Popup Debug] Starting 15s timer and scroll listener.');
+    let timer: NodeJS.Timeout | null = null;
+
+    const triggerPopup = () => {
+      console.log('[Popup Debug] triggerPopup executed.');
+      safeStorage.setSessionItem('appointment_popup_triggered', 'true');
+      openAppointmentModal();
+      if (timer) {
+        console.log('[Popup Debug] Clearing timer.');
+        clearTimeout(timer);
+      }
+      console.log('[Popup Debug] Removing scroll listener.');
+      window.removeEventListener('scroll', handleScroll);
+    };
+
+    console.log('[Popup Debug] Timer started.');
+    timer = setTimeout(() => {
+      console.log('[Popup Debug] Timer fired.');
+      if (safeStorage.getSessionItem('appointment_popup_triggered') !== 'true') {
+        triggerPopup();
+      } else {
+        console.log('[Popup Debug] Timer fired but popup already triggered.');
+      }
+    }, 15000);
+
+    const handleScroll = () => {
+      if (safeStorage.getSessionItem('appointment_popup_triggered') === 'true') {
+        window.removeEventListener('scroll', handleScroll);
+        if (timer) clearTimeout(timer);
+        return;
+      }
+
+      const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      if (docHeight > 0) {
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        if (scrollPercent >= 35) {
+          console.log('[Popup Debug] Scroll trigger reached:', scrollPercent.toFixed(1) + '%');
+          triggerPopup();
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    console.log('[Popup Debug] Scroll listener attached.');
+
+    return () => {
+      console.log('[Popup Debug] Cleaning up timer and scroll listener.');
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const handleBookAppointment = async (data: {
     name: string;
@@ -596,6 +684,7 @@ export default function App() {
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
+            awardsList={awardsList}
           />
         );
       case 'about':
@@ -693,6 +782,8 @@ export default function App() {
             setVideosList={setVideosList}
             contactInfo={contactInfo}
             setContactInfo={setContactInfo}
+            awardsList={awardsList}
+            setAwardsList={setAwardsList}
           />
         );
       default:
@@ -707,6 +798,7 @@ export default function App() {
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
+            awardsList={awardsList}
           />
         );
     }

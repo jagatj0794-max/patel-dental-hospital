@@ -22,10 +22,10 @@ const navHierarchy = [
     label: 'About Us', 
     id: 'about',
     dropdown: [
-      { label: 'About Hospital', id: 'about' },
       { label: 'Meet Doctors', id: 'doctors' },
-      { label: 'Our Team', id: 'team' },
       { label: 'Technology', id: 'technology' },
+      { label: 'Social Service', id: 'social-service' },
+      { label: 'Gallery', id: 'gallery' },
     ]
   },
   {
@@ -151,7 +151,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         isScrolled
           ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100'
-          : 'bg-white'
+          : 'bg-white/85 backdrop-blur-md shadow-sm border-b border-gray-100/60'
       }`}
     >
       {/* Top Bar */}

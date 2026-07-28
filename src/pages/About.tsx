@@ -303,7 +303,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
             <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block mb-3">
               Hospital Achievements
             </span>
-            <h2 className="font-display font-[900] text-[#081C3A] text-[36px] sm:text-[44px] md:text-[52px] tracking-tight leading-none uppercase">
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
               ABOUT HOSPITAL
             </h2>
             <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto mt-4 rounded-full" />
@@ -377,7 +377,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
             <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block mb-3">
               Our Core Principles
             </span>
-            <h2 className="font-display font-[900] text-[#081C3A] text-[36px] sm:text-[44px] md:text-[52px] tracking-tight leading-none uppercase">
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
               OUR PHILOSOPHY
             </h2>
             <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto mt-4 rounded-full" />
@@ -424,7 +424,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
             <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block mb-3">
               Uncompromised Standards
             </span>
-            <h2 className="font-display font-[900] text-[#081C3A] text-[36px] sm:text-[44px] md:text-[52px] tracking-tight leading-none uppercase">
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
               WHY PATIENTS TRUST US
             </h2>
             <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto mt-4 rounded-full" />
@@ -471,7 +471,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
             <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block mb-3">
               Senior Specialist Profile
             </span>
-            <h2 className="font-display font-[900] text-[#081C3A] text-[36px] sm:text-[44px] md:text-[52px] tracking-tight leading-none uppercase">
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
               DOCTOR HIGHLIGHT
             </h2>
             <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto mt-4 rounded-full" />
@@ -552,7 +552,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
             <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block mb-3">
               Meet Our Dental Professionals & Staff
             </span>
-            <h2 className="font-display font-[900] text-[#081C3A] text-[36px] sm:text-[44px] md:text-[52px] tracking-tight leading-none uppercase">
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
               OUR TEAM
             </h2>
             <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto mt-4 rounded-full" />

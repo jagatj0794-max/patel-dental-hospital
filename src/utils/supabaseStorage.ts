@@ -87,16 +87,26 @@ export async function uploadVideo(file: File): Promise<string> {
   const randomString = Math.random().toString(36).substring(2, 10);
   const uniqueName = `${Date.now()}_${randomString}${fileExt ? '.' + fileExt : ''}`;
 
-  // Get current user ID if authenticated
-  let userId: string | undefined;
+  // Retrieve current session and user from Supabase Auth client
+  let session: any = null;
+  let currentUser: any = null;
   try {
-    const { data } = await supabase.client.auth.getUser();
-    userId = data?.user?.id;
+    const { data: sessionData } = await supabase.client.auth.getSession();
+    session = sessionData?.session || null;
+    const { data: userData } = await supabase.client.auth.getUser();
+    currentUser = userData?.user || session?.user || null;
   } catch (e) {
-    console.warn('Failed to get user session:', e);
+    console.warn('[uploadVideo] Error retrieving session/user from Supabase Auth:', e);
   }
 
-  // Construct potential paths based on common RLS policies
+  const authUid = currentUser?.id || session?.user?.id || null;
+  const authRole = currentUser?.role || session?.user?.role || (session ? 'authenticated' : 'anon');
+  const sessionUserId = session?.user?.id || null;
+  const isAuthenticated = !!(session && (currentUser || session?.user));
+  const reqAuthStatus = isAuthenticated ? 'authenticated' : 'anonymous';
+  const bucketName = 'media';
+  
+  let userId: string | undefined = currentUser?.id;
   const pathsToTry: string[] = [];
   
   if (userId) {
@@ -107,12 +117,25 @@ export async function uploadVideo(file: File): Promise<string> {
   pathsToTry.push(`videos/${uniqueName}`);
   pathsToTry.push(uniqueName);
 
+  const primaryPath = pathsToTry[0];
+
+  // Print required runtime diagnostic values
+  console.group('📹 [MP4 UPLOAD RUNTIME DIAGNOSTICS]');
+  console.log('- auth.uid():', authUid);
+  console.log('- auth.role():', authRole);
+  console.log('- session.user.id:', sessionUserId);
+  console.log('- whether the request is authenticated or anonymous:', reqAuthStatus);
+  console.log('- bucket name:', bucketName);
+  console.log('- upload path:', primaryPath);
+  console.log('- current user object:', currentUser);
+  console.groupEnd();
+
   let lastError: any = null;
 
   for (const filePath of pathsToTry) {
     try {
       const { error } = await supabase.client.storage
-        .from('media')
+        .from(bucketName)
         .upload(filePath, file, {
           upsert: false,
           contentType: 'video/mp4'
@@ -121,7 +144,7 @@ export async function uploadVideo(file: File): Promise<string> {
       if (!error) {
         // Success! Get public URL
         const { data: publicUrlData } = supabase.client.storage
-          .from('media')
+          .from(bucketName)
           .getPublicUrl(filePath);
 
         if (publicUrlData && publicUrlData.publicUrl) {

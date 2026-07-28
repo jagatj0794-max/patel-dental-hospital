@@ -19,6 +19,7 @@ import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
 import { InstagramEmbed } from '../components/InstagramEmbed';
+import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { GooglePatientReviews } from '../components/GooglePatientReviews';
 const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
 
@@ -1661,13 +1662,8 @@ export default function ServiceDetail({
 
               <div className="max-w-[640px] mx-auto w-full px-2 sm:px-0">
                 {isMp4Url(effectiveVideoUrl) ? (
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
-                    <video
-                      src={effectiveVideoUrl}
-                      controls
-                      className="w-full h-full object-cover"
-                      preload="metadata"
-                    />
+                  <div className="w-full max-w-[430px] mx-auto flex justify-center">
+                    <Mp4ReelPlayer src={effectiveVideoUrl} />
                   </div>
                 ) : isYouTubeUrl(effectiveVideoUrl) ? (
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
@@ -1780,13 +1776,8 @@ export default function ServiceDetail({
                   return (
                     <div key={t.id || idx} className="flex flex-col items-center w-full">
                       {isMp4Url(reelUrl) ? (
-                        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
-                          <video
-                            src={reelUrl}
-                            controls
-                            className="w-full h-full object-cover"
-                            preload="metadata"
-                          />
+                        <div className="w-full max-w-[430px] mx-auto flex justify-center">
+                          <Mp4ReelPlayer src={reelUrl} />
                         </div>
                       ) : isYouTubeUrl(reelUrl) ? (
                         <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">

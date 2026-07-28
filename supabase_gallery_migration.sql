@@ -15,9 +15,28 @@ CREATE TABLE IF NOT EXISTS public.gallery (
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.gallery ENABLE ROW LEVEL SECURITY;
 
+-- Drop previous policies to avoid conflicts
+DROP POLICY IF EXISTS "Allow public read access to gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Allow all write operations to gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Allow insert access to gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Allow update access to gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Allow delete access to gallery" ON public.gallery;
+
 -- Select policy (Allow anyone to read)
 CREATE POLICY "Allow public read access to gallery" ON public.gallery
   FOR SELECT USING (true);
+
+-- Insert policy for gallery items
+CREATE POLICY "Allow insert access to gallery" ON public.gallery
+  FOR INSERT WITH CHECK (true);
+
+-- Update policy for gallery items
+CREATE POLICY "Allow update access to gallery" ON public.gallery
+  FOR UPDATE USING (true) WITH CHECK (true);
+
+-- Delete policy for gallery items
+CREATE POLICY "Allow delete access to gallery" ON public.gallery
+  FOR DELETE USING (true);
 
 -- All write operations policy (Allow authenticated / public insert/update/delete for the app's needs)
 CREATE POLICY "Allow all write operations to gallery" ON public.gallery

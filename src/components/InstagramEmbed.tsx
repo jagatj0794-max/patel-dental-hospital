@@ -55,6 +55,10 @@ export const InstagramEmbed: React.FC<InstagramEmbedProps> = ({
       script.onload = () => {
         setTimeout(runProcess, 50);
       };
+      script.onerror = (e) => {
+        console.warn('Instagram embed script failed to load:', e);
+        setIframeError(true);
+      };
       document.body.appendChild(script);
     } else {
       // Script exists, trigger the process call after a short delay
