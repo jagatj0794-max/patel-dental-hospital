@@ -7,7 +7,7 @@ import React from 'react';
 import { 
   Phone, MapPin, Clock, Heart, Shield, Mail, 
   Facebook, Instagram, Youtube, Calendar, 
-  ChevronRight, ExternalLink, ShieldCheck, HeartHandshake, Award
+  ChevronRight, ExternalLink, ShieldCheck, HeartHandshake, Award, BadgeCheck, Sparkles 
 } from 'lucide-react';
 import { PageId, ContactInfo } from '../types';
 
@@ -77,7 +77,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                 <span className="font-semibold tracking-wide text-[10px] uppercase">ISO 9001:2015 Approved sterilization</span>
               </div>
               <div className="flex items-center space-x-2 text-xs text-slate-300 bg-slate-900 border border-white/[0.04] p-2.5 rounded-lg">
-                <Award className="h-4 w-4 text-amber-500 shrink-0" />
+                <BadgeCheck className="h-4 w-4 text-amber-400 shrink-0 drop-shadow-[0_0_6px_rgba(251,191,36,0.3)]" />
                 <span className="font-semibold tracking-wide text-[10px] uppercase">Fix Teeth In Just One Week With Dental Implant</span>
               </div>
             </div>
@@ -108,19 +108,16 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
           {/* Column 2: Quick Links Navigation Map */}
           <div>
             <h4 className="font-display text-white text-xs font-black tracking-widest uppercase mb-6 pb-2 border-b border-white/[0.05]">
-              Quick Navigation
+              QUICK LINKS
             </h4>
             <ul className="space-y-3 text-xs">
               {[
-                { label: 'Home / Overview', target: 'home' },
-                { label: 'About Patel Hospital', target: 'about' },
-                { label: 'Dental Treatments', target: 'treatments' },
-                { label: 'Same Day Fixed Teeth', target: 'sameday' },
-                { label: 'Dental Implants', target: 'implants' },
-                { label: 'Smile Success Gallery', target: 'gallery' },
-                { label: 'Specialist Clinicians', target: 'doctors' },
-                { label: 'Contact & Directions', target: 'contact' },
-                { label: 'Admin Portal', target: 'admin' },
+                { label: 'Home', target: 'home' },
+                { label: 'Meet Doctors', target: 'doctors' },
+                { label: 'Technology', target: 'about' },
+                { label: 'Social Service', target: 'about' },
+                { label: 'Gallery', target: 'gallery' },
+                { label: 'Contact Us', target: 'contact' },
               ].map((link, idx) => (
                 <li key={idx}>
                   <button
@@ -138,17 +135,22 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
           {/* Column 3: Diagnostic Treatments Quick Indexes */}
           <div>
             <h4 className="font-display text-white text-xs font-black tracking-widest uppercase mb-6 pb-2 border-b border-white/[0.05]">
-              Oral Treatments
+              OUR SERVICES
             </h4>
             <ul className="space-y-3 text-xs">
               {[
-                { label: 'Same Day Teeth Restorations', target: 'sameday' },
-                { label: 'Computerized 3D Guided Implants', target: 'implants' },
-                { label: 'Full Mouth Bite Rehabilitation', target: 'treatments' },
-                { label: 'Micro Rotary Endodontics (RCT)', target: 'treatments' },
-                { label: 'Pediatric Anxiety Controlled Care', target: 'treatments' },
-                { label: 'Smile Design & Cosmetic Veneers', target: 'treatments' },
-                { label: 'Biological Bone-Save Extractions', target: 'treatments' },
+                { label: 'Dental Implants', target: 'services/dental-implants' },
+                { label: 'Single Sitting Root Canal Treatment', target: 'services/root-canal-treatment' },
+                { label: 'Full Mouth Rehabilitation', target: 'services/full-mouth-rehabilitation' },
+                { label: 'Invisible Aligners', target: 'services/invisible-aligners' },
+                { label: 'Smile Makeover', target: 'services/smile-makeover' },
+                { label: 'Crowns & Bridges', target: 'services/crowns-bridges' },
+                { label: 'Teeth Whitening', target: 'services/teeth-whitening' },
+                { label: 'Pediatric Dentistry', target: 'services/pediatric-dentistry' },
+                { label: 'Teeth Whitening', target: 'services/teeth-whitening' },
+                { label: 'Braces Treatment', target: 'services/braces-treatment' },
+                { label: 'Wisdom Tooth Surgery', target: 'services/wisdom-tooth-surgery' },
+                { label: 'Tooth Coloured Filling', target: 'services/tooth-coloured-filling' },
               ].map((treatment, idx) => (
                 <li key={idx}>
                   <button
@@ -188,11 +190,11 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             <div className="space-y-3">
               <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500 block">Headquarters Contact</span>
               <a 
-                href={`mailto:${contactInfo?.email || 'info@pateldentalrajkot.com'}`} 
+                href={`mailto:${contactInfo?.email || 'Pateldentalhospital1@gmail.com'}`} 
                 className="flex items-center space-x-2 text-xs text-slate-400 hover:text-brand-cyan transition"
               >
                 <Mail className="h-4 w-4 text-slate-500" />
-                <span>{contactInfo?.email || 'info@pateldentalrajkot.com'}</span>
+                <span>{contactInfo?.email || 'Pateldentalhospital1@gmail.com'}</span>
               </a>
             </div>
           </div>

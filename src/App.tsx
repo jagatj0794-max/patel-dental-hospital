@@ -18,7 +18,7 @@ import { videoService, DEFAULT_VIDEOS } from './utils/videoData';
 import { contactService, DEFAULT_CONTACT_INFO } from './utils/contactData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
 import { appointmentService } from './utils/appointmentData';
-import { awardsService, DEFAULT_AWARDS } from './utils/awardsData';
+import { awardsService } from './utils/awardsData';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingActionPanel from './components/FloatingActionPanel';
@@ -244,7 +244,10 @@ export default function App() {
   // Contact management state initialized with default values; updated from Supabase on mount
   const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
 
-  // Load Awards from Supabase/localStorage on mount
+  // Awards state
+  const [awardsList, setAwardsList] = useState<Award[]>([]);
+
+  // Load Awards from Supabase on mount
   useEffect(() => {
     let active = true;
     const fetchAwards = async () => {
@@ -262,9 +265,6 @@ export default function App() {
       active = false;
     };
   }, []);
-
-  // Awards state initialized with default values
-  const [awardsList, setAwardsList] = useState<Award[]>(DEFAULT_AWARDS);
 
   // Load and listen to Supabase authentication changes
   useEffect(() => {
@@ -733,6 +733,8 @@ export default function App() {
       case 'gallery':
         return (
           <SmileGallery
+            patientMoments={patientMoments}
+            mediaImages={mediaImages}
             onSelectItem={(item) => setSelectedGalleryItem(item)}
             openAppointmentModal={openAppointmentModal}
             galleryItems={mappedGalleryItems}

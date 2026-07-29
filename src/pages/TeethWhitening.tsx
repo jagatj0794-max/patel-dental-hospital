@@ -898,10 +898,10 @@ Rajkot, Gujarat, India.`}
                             EMAIL ADDRESS
                           </span>
                           <a 
-                            href="mailto:info@pateldentalrajkot.com" 
+                            href="mailto:Pateldentalhospital1@gmail.com" 
                             className="block text-[#081C3A] font-extrabold text-[12px] hover:text-[#0D9488] transition-colors break-all"
                           >
-                            info@pateldentalrajkot.com
+                            Pateldentalhospital1@gmail.com
                           </a>
                         </div>
                       </div>

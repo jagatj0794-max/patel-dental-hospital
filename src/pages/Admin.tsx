@@ -42,7 +42,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, Award } from '../types';
-import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
 import { uploadImage, uploadVideo } from '../utils/supabaseStorage';
@@ -52,7 +52,7 @@ import { galleryService } from '../utils/galleryData';
 import { videoService } from '../utils/videoData';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { contactService } from '../utils/contactData';
-import { awardsService, DEFAULT_AWARDS } from '../utils/awardsData';
+import { awardsService } from '../utils/awardsData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
@@ -166,10 +166,26 @@ export default function Admin({
   const [editingAward, setEditingAward] = useState<Award | null>(null);
   const [awardToDelete, setAwardToDelete] = useState<string | null>(null);
   const [isAwardUploading, setIsAwardUploading] = useState(false);
+  const [isLoadingAwards, setIsLoadingAwards] = useState(false);
+
+  const loadAwardsList = async () => {
+    setIsLoadingAwards(true);
+    try {
+      const freshAwards = await awardsService.getAwards();
+      setDraftAwards(freshAwards);
+      setAwardsList(freshAwards);
+    } catch (err) {
+      console.error('Error loading awards from public.awards:', err);
+    } finally {
+      setIsLoadingAwards(false);
+    }
+  };
 
   useEffect(() => {
-    setDraftAwards(awardsList);
-  }, [awardsList]);
+    if (activeTab === 'media' || activeTab === 'awards-cms') {
+      loadAwardsList();
+    }
+  }, [activeTab]);
 
   // Services Tab states
   const [servicesList, setServicesList] = useState<Service[]>([]);
@@ -2592,7 +2608,7 @@ export default function Admin({
   };
 
   // Media local interactive states
-  const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'smiles' | 'videos'>('gallery');
+  const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'awards' | 'smiles' | 'videos'>('gallery');
   const [categories, setCategories] = useState<string[]>([
     'Homepage Slider',
     'Homepage Gallery',
@@ -2676,7 +2692,6 @@ export default function Admin({
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'services', label: 'Services', icon: Stethoscope },
-    { id: 'awards-cms', label: 'Awards', icon: Trophy },
   ] as const;
 
   const handleLogout = async () => {
@@ -4237,7 +4252,7 @@ export default function Admin({
               </div>
 
               {/* Tab Selector */}
-              <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100 shrink-0 self-start md:self-auto">
+              <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100 shrink-0 self-start md:self-auto flex-wrap gap-1">
                 <button
                   type="button"
                   onClick={() => setActiveMediaTab('gallery')}
@@ -4251,6 +4266,17 @@ export default function Admin({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setActiveMediaTab('awards')}
+                  className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all duration-150 cursor-pointer ${
+                    activeMediaTab === 'awards'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span className="text-sm">🏆</span> Awards
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveMediaTab('smiles')}
                   className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all duration-150 cursor-pointer ${
                     activeMediaTab === 'smiles'
@@ -4258,7 +4284,7 @@ export default function Admin({
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  <span className="text-sm">😊</span> Happy Smiles
+                  <span className="text-sm">😊</span> Smile Gallery
                 </button>
                 <button
                   type="button"
@@ -4403,6 +4429,381 @@ export default function Admin({
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Awards View Tab Content */}
+            {activeMediaTab === 'awards' && (
+              <div className="space-y-6" id="admin-awards-view">
+                {/* Header Banner */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.08)]">
+                  <div>
+                    <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900">
+                      Awards & Recognition Management
+                    </h1>
+                    <p className="text-slate-500 text-xs md:text-sm mt-1">
+                      Manage awards and recognitions connected directly to public.awards.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingAward({
+                          id: 'award-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8),
+                          title: '',
+                          image_url: '',
+                          display_order: draftAwards.length,
+                          is_active: true
+                        });
+                      }}
+                      className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Add New Award</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setSaveMessage('Saving awards list to public.awards...');
+                        const success = await awardsService.saveAwards(draftAwards);
+                        if (success) {
+                          await loadAwardsList();
+                          setSaveMessage('Awards list saved successfully! Public website updated.');
+                        } else {
+                          setSaveMessage('Failed to save awards. Please try again.');
+                        }
+                        setTimeout(() => setSaveMessage(null), 4000);
+                      }}
+                      className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
+                    >
+                      <Save className="h-4 w-4" />
+                      <span>Save Awards</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        loadAwardsList();
+                        setSaveMessage('Changes discarded.');
+                        setTimeout(() => setSaveMessage(null), 3000);
+                      }}
+                      className="border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl transition cursor-pointer"
+                    >
+                      Discard
+                    </button>
+                  </div>
+                </div>
+
+                {/* List / Cards Layout */}
+                {isLoadingAwards ? (
+                  <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-500">
+                    <Trophy className="h-8 w-8 text-teal-600 animate-bounce mx-auto mb-3" />
+                    <p className="font-bold text-sm text-slate-700">Loading awards from database...</p>
+                  </div>
+                ) : draftAwards.length === 0 ? (
+                  <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-12 text-center text-slate-500">
+                    <Trophy className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                    <p className="font-bold text-sm text-slate-700">No awards added yet</p>
+                    <p className="text-xs mt-1 text-slate-400">Add some awards to display on the homepage.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {draftAwards.map((award, index) => (
+                      <div
+                        key={award.id}
+                        className={`bg-white rounded-2xl p-5 border shadow-3xs hover:shadow-xs transition duration-300 relative flex flex-col justify-between ${
+                          award.is_active ? 'border-slate-100' : 'border-slate-200 bg-slate-50/50 opacity-75'
+                        }`}
+                      >
+                        <div>
+                          {/* Top Action Row */}
+                          <div className="flex items-start justify-between gap-3 mb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-black text-slate-400 bg-slate-50 border border-slate-200/60 px-2 py-0.5 rounded-md">
+                                ORDER: {index + 1}
+                              </span>
+                              {!award.is_active && (
+                                <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded-md">
+                                  Hidden
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => {
+                                  const newAwards = [...draftAwards];
+                                  const temp = newAwards[index];
+                                  newAwards[index] = newAwards[index - 1];
+                                  newAwards[index - 1] = temp;
+                                  setDraftAwards(newAwards);
+                                }}
+                                className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-35 disabled:pointer-events-none transition"
+                                title="Move Up"
+                              >
+                                <ChevronLeft className="h-4 w-4 rotate-90" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === draftAwards.length - 1}
+                                onClick={() => {
+                                  const newAwards = [...draftAwards];
+                                  const temp = newAwards[index];
+                                  newAwards[index] = newAwards[index + 1];
+                                  newAwards[index + 1] = temp;
+                                  setDraftAwards(newAwards);
+                                }}
+                                className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-35 disabled:pointer-events-none transition"
+                                title="Move Down"
+                              >
+                                <ChevronRight className="h-4 w-4 rotate-90" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingAward(award)}
+                                className="p-1 text-slate-400 hover:text-teal-600 transition"
+                                title="Edit Award"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAwardToDelete(award.id)}
+                                className="p-1 text-slate-400 hover:text-red-500 transition"
+                                title="Delete Award"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Main Card Content */}
+                          <div className="flex items-center gap-4">
+                            <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0 flex items-center justify-center">
+                              {award.image_url ? (
+                                <img
+                                  src={award.image_url}
+                                  alt={award.title || 'Award Image'}
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                              ) : (
+                                <Trophy className="h-8 w-8 text-slate-300" />
+                              )}
+                            </div>
+                            <div className="flex-grow min-w-0">
+                              <h3 className="font-display font-bold text-slate-900 text-sm truncate">
+                                {award.title || 'Untitled Award'}
+                              </h3>
+                              <p className="text-slate-400 text-xs mt-1 truncate font-mono text-[11px]">
+                                {award.image_url ? award.image_url : 'No image set'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Form Modal for Creating/Editing Award */}
+                {editingAward && (
+                  <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden"
+                    >
+                      <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h2 className="font-display font-bold text-[#081C3A]">
+                          {editingAward.id.startsWith('award-') || editingAward.id.startsWith('new-') ? 'Award Details' : 'Edit Award Details'}
+                        </h2>
+                        <button
+                          type="button"
+                          onClick={() => setEditingAward(null)}
+                          className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition cursor-pointer"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          if (!editingAward) return;
+                          const updated: Award = {
+                            ...editingAward,
+                            title: editingAward.title.trim(),
+                            image_url: editingAward.image_url.trim(),
+                            display_order: editingAward.display_order ?? draftAwards.length,
+                            is_active: editingAward.is_active !== false
+                          };
+
+                          const exists = draftAwards.some(a => a.id === updated.id);
+                          let nextAwards: Award[];
+                          if (exists) {
+                            nextAwards = draftAwards.map(a => a.id === updated.id ? updated : a);
+                          } else {
+                            nextAwards = [...draftAwards, updated];
+                          }
+
+                          setDraftAwards(nextAwards);
+                          setEditingAward(null);
+                        }}
+                        className="p-6 space-y-4"
+                      >
+                        {/* Title Field */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Title</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingAward.title}
+                            onChange={(e) => setEditingAward({ ...editingAward, title: e.target.value })}
+                            placeholder="e.g. Best Dental Hospital in Gujarat"
+                            className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                          />
+                        </div>
+
+                        {/* Image URL & File Selector */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Image</label>
+                          <div className="flex gap-3">
+                            <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0 flex items-center justify-center">
+                              {editingAward.image_url ? (
+                                <img
+                                  src={editingAward.image_url}
+                                  alt="Preview"
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                              ) : (
+                                <Trophy className="h-6 w-6 text-slate-300" />
+                              )}
+                            </div>
+                            <div className="flex-grow space-y-2">
+                              <input
+                                type="text"
+                                value={editingAward.image_url}
+                                onChange={(e) => setEditingAward({ ...editingAward, image_url: e.target.value })}
+                                placeholder="Image URL..."
+                                className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              />
+                              <div className="flex items-center gap-2">
+                                <label className="cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 transition inline-block">
+                                  <span>{isAwardUploading ? 'Uploading...' : 'Choose Image File'}</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    disabled={isAwardUploading}
+                                    onChange={async (e) => {
+                                      if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        setIsAwardUploading(true);
+                                        try {
+                                          const url = await uploadImage(file);
+                                          setEditingAward({ ...editingAward, image_url: url });
+                                        } catch (err: any) {
+                                          console.error('Failed to upload award image:', err);
+                                          alert('Failed to upload image. Please try again.');
+                                        } finally {
+                                          setIsAwardUploading(false);
+                                        }
+                                      }
+                                    }}
+                                    className="hidden"
+                                  />
+                                </label>
+                                {isAwardUploading && <p className="text-[10px] text-teal-600 font-bold animate-pulse">Uploading to Supabase Storage...</p>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Visibility Toggle */}
+                        <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          <input
+                            type="checkbox"
+                            id="award-visibility"
+                            checked={editingAward.is_active}
+                            onChange={(e) => setEditingAward({ ...editingAward, is_active: e.target.checked })}
+                            className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-slate-300 rounded"
+                          />
+                          <label htmlFor="award-visibility" className="text-xs text-slate-700 font-bold select-none cursor-pointer">
+                            Active (Show this award on the website homepage)
+                          </label>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex justify-end gap-2.5 border-t border-slate-50 pt-4 mt-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingAward(null)}
+                            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 border border-slate-200 hover:bg-slate-50 transition cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={isAwardUploading}
+                            className="px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                          >
+                            Apply & Save
+                          </button>
+                        </div>
+                      </form>
+                    </motion.div>
+                  </div>
+                )}
+
+                {/* Delete Confirmation Dialog */}
+                {awardToDelete && (
+                  <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-white rounded-2xl border border-slate-100 p-6 shadow-2xl max-w-sm w-full"
+                    >
+                      <Trophy className="h-10 w-10 text-red-500 mb-3" />
+                      <h3 className="text-slate-900 font-bold text-base font-display">Delete Award</h3>
+                      <p className="text-slate-500 text-xs mt-1.5 leading-relaxed font-medium">
+                        Are you sure you want to delete this award from public.awards?
+                      </p>
+                      <div className="flex justify-end gap-2 mt-5">
+                        <button
+                          type="button"
+                          onClick={() => setAwardToDelete(null)}
+                          className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 border border-slate-200 hover:bg-slate-50 transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!awardToDelete) return;
+                            const targetId = awardToDelete;
+                            setAwardToDelete(null);
+
+                            setDraftAwards(draftAwards.filter(a => a.id !== targetId));
+                            setSaveMessage('Deleting award from public.awards...');
+                            const success = await awardsService.deleteAward(targetId);
+                            if (success) {
+                              await loadAwardsList();
+                              setSaveMessage('Award deleted successfully.');
+                            } else {
+                              setSaveMessage('Failed to delete award from database.');
+                            }
+                            setTimeout(() => setSaveMessage(null), 3000);
+                          }}
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                        >
+                          Delete Award
+                        </button>
+                      </div>
+                    </motion.div>
                   </div>
                 )}
               </div>
@@ -5665,7 +6066,7 @@ export default function Admin({
                     type="email"
                     value={draftEmail}
                     onChange={(e) => setDraftEmail(e.target.value)}
-                    placeholder="e.g. info@pateldentalrajkot.com"
+                    placeholder="e.g. Pateldentalhospital1@gmail.com"
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white text-slate-800"
                   />
                   <p className="text-[10px] text-slate-400 font-medium">Official inbox address for clinical communications and inquiries.</p>
@@ -5715,7 +6116,7 @@ export default function Admin({
                   Awards & Recognition Management
                 </h1>
                 <p className="text-slate-500 text-xs md:text-sm mt-1">
-                  Manage the awards and recognitions featured on the website homepage.
+                  Manage awards and recognitions connected directly to public.awards.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2.5">
@@ -5723,12 +6124,11 @@ export default function Admin({
                   type="button"
                   onClick={() => {
                     setEditingAward({
-                      id: 'new-' + Math.random().toString(36).substr(2, 9),
+                      id: 'award-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8),
                       title: '',
-                      description: '',
-                      image: 'https://images.unsplash.com/photo-1578351614283-132d1e0892c4?w=600&auto=format&fit=crop&q=80',
+                      image_url: '',
                       display_order: draftAwards.length,
-                      is_visible: true
+                      is_active: true
                     });
                   }}
                   className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
@@ -5739,10 +6139,10 @@ export default function Admin({
                 <button
                   type="button"
                   onClick={async () => {
-                    setSaveMessage('Saving awards list to Supabase/localStorage...');
+                    setSaveMessage('Saving awards list to public.awards...');
                     const success = await awardsService.saveAwards(draftAwards);
                     if (success) {
-                      setAwardsList(draftAwards);
+                      await loadAwardsList();
                       setSaveMessage('Awards list saved successfully! Public website updated.');
                     } else {
                       setSaveMessage('Failed to save awards. Please try again.');
@@ -5757,7 +6157,7 @@ export default function Admin({
                 <button
                   type="button"
                   onClick={() => {
-                    setDraftAwards(awardsList);
+                    loadAwardsList();
                     setSaveMessage('Changes discarded.');
                     setTimeout(() => setSaveMessage(null), 3000);
                   }}
@@ -5769,7 +6169,12 @@ export default function Admin({
             </div>
 
             {/* List / Cards Layout */}
-            {draftAwards.length === 0 ? (
+            {isLoadingAwards ? (
+              <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-500">
+                <Trophy className="h-8 w-8 text-teal-600 animate-bounce mx-auto mb-3" />
+                <p className="font-bold text-sm text-slate-700">Loading awards from database...</p>
+              </div>
+            ) : draftAwards.length === 0 ? (
               <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-12 text-center text-slate-500">
                 <Trophy className="h-10 w-10 text-slate-300 mx-auto mb-3" />
                 <p className="font-bold text-sm text-slate-700">No awards added yet</p>
@@ -5781,7 +6186,7 @@ export default function Admin({
                   <div
                     key={award.id}
                     className={`bg-white rounded-2xl p-5 border shadow-3xs hover:shadow-xs transition duration-300 relative flex flex-col justify-between ${
-                      award.is_visible ? 'border-slate-100' : 'border-slate-200 bg-slate-55/30 opacity-75'
+                      award.is_active ? 'border-slate-100' : 'border-slate-200 bg-slate-50/50 opacity-75'
                     }`}
                   >
                     <div>
@@ -5791,7 +6196,7 @@ export default function Admin({
                           <span className="text-[10px] font-black text-slate-400 bg-slate-50 border border-slate-200/60 px-2 py-0.5 rounded-md">
                             ORDER: {index + 1}
                           </span>
-                          {!award.is_visible && (
+                          {!award.is_active && (
                             <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded-md">
                               Hidden
                             </span>
@@ -5850,20 +6255,23 @@ export default function Admin({
                       {/* Content Row */}
                       <div className="flex gap-4">
                         <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
-                          <img
-                            src={award.image}
-                            alt={award.title}
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
+                          {award.image_url ? (
+                            <img
+                              src={award.image_url}
+                              alt={award.title}
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-300 font-bold text-xs">
+                              No image
+                            </div>
+                          )}
                         </div>
                         <div className="space-y-1">
                           <h3 className="text-slate-900 font-bold text-sm leading-tight">
                             {award.title || <span className="text-slate-400 italic font-normal">Untitled Award</span>}
                           </h3>
-                          <p className="text-slate-550 text-xs leading-relaxed line-clamp-2 font-medium">
-                            {award.description || <span className="text-slate-400 italic font-normal">No description provided</span>}
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -5874,15 +6282,15 @@ export default function Admin({
                       <button
                         type="button"
                         onClick={() => {
-                          setDraftAwards(draftAwards.map(a => a.id === award.id ? { ...a, is_visible: !a.is_visible } : a));
+                          setDraftAwards(draftAwards.map(a => a.id === award.id ? { ...a, is_active: !a.is_active } : a));
                         }}
                         className={`text-[10px] font-bold px-2.5 py-1 rounded-full transition cursor-pointer border ${
-                          award.is_visible
+                          award.is_active
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
                             : 'bg-slate-100 text-slate-600 border-slate-200/50'
                         }`}
                       >
-                        {award.is_visible ? 'Visible' : 'Hidden'}
+                        {award.is_active ? 'Visible' : 'Hidden'}
                       </button>
                     </div>
                   </div>
@@ -5900,7 +6308,7 @@ export default function Admin({
                 >
                   <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h2 className="font-display font-bold text-[#081C3A]">
-                      {editingAward.id.startsWith('new-') ? 'Add New Award' : 'Edit Award Details'}
+                      {editingAward.id.startsWith('award-') || editingAward.id.startsWith('new-') ? 'Award Details' : 'Edit Award Details'}
                     </h2>
                     <button
                       type="button"
@@ -5912,15 +6320,38 @@ export default function Admin({
                   </div>
 
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                       e.preventDefault();
-                      const exists = draftAwards.some(a => a.id === editingAward.id);
+                      if (!editingAward) return;
+                      const updated: Award = {
+                        ...editingAward,
+                        title: editingAward.title.trim(),
+                        image_url: editingAward.image_url.trim(),
+                        display_order: editingAward.display_order ?? draftAwards.length,
+                        is_active: editingAward.is_active !== false
+                      };
+
+                      const exists = draftAwards.some(a => a.id === updated.id);
+                      let nextAwards: Award[];
                       if (exists) {
-                        setDraftAwards(draftAwards.map(a => a.id === editingAward.id ? editingAward : a));
+                        nextAwards = draftAwards.map(a => a.id === updated.id ? updated : a);
                       } else {
-                        setDraftAwards([...draftAwards, editingAward]);
+                        nextAwards = [...draftAwards, updated];
                       }
+                      setDraftAwards(nextAwards);
+
+                      setIsAwardUploading(true);
+                      setSaveMessage('Saving award to public.awards database...');
+                      const success = await awardsService.saveAward(updated);
+                      if (success) {
+                        await loadAwardsList();
+                        setSaveMessage('Award saved to database successfully!');
+                      } else {
+                        setSaveMessage('Saved in local draft. Click Save Awards to sync with database.');
+                      }
+                      setIsAwardUploading(false);
                       setEditingAward(null);
+                      setTimeout(() => setSaveMessage(null), 3000);
                     }}
                     className="p-6 space-y-4"
                   >
@@ -5937,35 +6368,27 @@ export default function Admin({
                       />
                     </div>
 
-                    {/* Description */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Description</label>
-                      <textarea
-                        value={editingAward.description || ''}
-                        onChange={(e) => setEditingAward({ ...editingAward, description: e.target.value })}
-                        placeholder="Give a short description of why this award was received..."
-                        rows={3}
-                        className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
-                      />
-                    </div>
-
                     {/* Image URL & File Selector */}
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Award Image</label>
                       <div className="flex gap-3">
-                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
-                          <img
-                            src={editingAward.image}
-                            alt="Preview"
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
+                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0 flex items-center justify-center">
+                          {editingAward.image_url ? (
+                            <img
+                              src={editingAward.image_url}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <Trophy className="h-6 w-6 text-slate-300" />
+                          )}
                         </div>
                         <div className="flex-grow space-y-2">
                           <input
                             type="text"
-                            value={editingAward.image}
-                            onChange={(e) => setEditingAward({ ...editingAward, image: e.target.value })}
+                            value={editingAward.image_url}
+                            onChange={(e) => setEditingAward({ ...editingAward, image_url: e.target.value })}
                             placeholder="Image URL..."
                             className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
                           />
@@ -5982,16 +6405,10 @@ export default function Admin({
                                     setIsAwardUploading(true);
                                     try {
                                       const url = await uploadImage(file);
-                                      setEditingAward({ ...editingAward, image: url });
+                                      setEditingAward({ ...editingAward, image_url: url });
                                     } catch (err: any) {
-                                      console.warn('Fallback to local base64 storage:', err);
-                                      const reader = new FileReader();
-                                      reader.onload = () => {
-                                        if (typeof reader.result === 'string') {
-                                          setEditingAward({ ...editingAward, image: reader.result });
-                                        }
-                                      };
-                                      reader.readAsDataURL(file);
+                                      console.error('Failed to upload award image:', err);
+                                      alert('Failed to upload image. Please try again.');
                                     } finally {
                                       setIsAwardUploading(false);
                                     }
@@ -6000,7 +6417,7 @@ export default function Admin({
                               />
                             </label>
                             {isAwardUploading && (
-                              <span className="text-[10px] text-slate-400 font-bold animate-pulse">Uploading image...</span>
+                              <span className="text-[10px] text-slate-400 font-bold animate-pulse">Uploading image to storage...</span>
                             )}
                           </div>
                         </div>
@@ -6012,12 +6429,12 @@ export default function Admin({
                       <input
                         type="checkbox"
                         id="award-visibility"
-                        checked={editingAward.is_visible}
-                        onChange={(e) => setEditingAward({ ...editingAward, is_visible: e.target.checked })}
+                        checked={editingAward.is_active}
+                        onChange={(e) => setEditingAward({ ...editingAward, is_active: e.target.checked })}
                         className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-slate-300 rounded"
                       />
                       <label htmlFor="award-visibility" className="text-xs text-slate-700 font-bold select-none cursor-pointer">
-                        Show this award on the website homepage
+                        Active (Show this award on the website homepage)
                       </label>
                     </div>
 
@@ -6035,7 +6452,7 @@ export default function Admin({
                         disabled={isAwardUploading}
                         className="px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                       >
-                        Apply Changes
+                        Apply & Save
                       </button>
                     </div>
                   </form>
@@ -6054,7 +6471,7 @@ export default function Admin({
                   <Trophy className="h-10 w-10 text-red-500 mb-3" />
                   <h3 className="text-slate-900 font-bold text-base font-display">Delete Award</h3>
                   <p className="text-slate-500 text-xs mt-1.5 leading-relaxed font-medium">
-                    Are you sure you want to delete this award? This will remove it from the homepage.
+                    Are you sure you want to delete this award from public.awards?
                   </p>
                   <div className="flex justify-end gap-2 mt-5">
                     <button
@@ -6066,9 +6483,21 @@ export default function Admin({
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setDraftAwards(draftAwards.filter(a => a.id !== awardToDelete));
+                      onClick={async () => {
+                        if (!awardToDelete) return;
+                        const targetId = awardToDelete;
                         setAwardToDelete(null);
+
+                        setDraftAwards(draftAwards.filter(a => a.id !== targetId));
+                        setSaveMessage('Deleting award from public.awards...');
+                        const success = await awardsService.deleteAward(targetId);
+                        if (success) {
+                          await loadAwardsList();
+                          setSaveMessage('Award deleted successfully.');
+                        } else {
+                          setSaveMessage('Failed to delete award from database.');
+                        }
+                        setTimeout(() => setSaveMessage(null), 3000);
                       }}
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                     >

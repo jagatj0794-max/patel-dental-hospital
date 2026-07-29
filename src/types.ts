@@ -79,10 +79,11 @@ export interface PatientMoment {
 export interface Award {
   id: string;
   title: string;
-  description?: string;
-  image: string;
+  image_url: string;
   display_order: number;
-  is_visible: boolean;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ContactInfo {

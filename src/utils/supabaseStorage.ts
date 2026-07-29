@@ -60,6 +60,7 @@ export async function uploadImage(file: File): Promise<string> {
           .getPublicUrl(filePath);
 
         if (publicUrlData && publicUrlData.publicUrl) {
+          console.log('[Storage Upload Success] Image uploaded to Supabase Storage successfully:', publicUrlData.publicUrl);
           return publicUrlData.publicUrl;
         }
       } else {

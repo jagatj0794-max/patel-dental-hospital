@@ -2579,13 +2579,13 @@ export default function ServiceDetail({
 
                       {(mConfig.contact_email || mConfig.contact_email === undefined) && (
                         <a 
-                          href={`mailto:${mConfig.contact_email || 'info@pateldentalhospital.com'}`}
+                          href={`mailto:${mConfig.contact_email || contactInfo?.email || 'Pateldentalhospital1@gmail.com'}`}
                           className="flex items-start gap-2.5 hover:text-white transition group"
                         >
                           <Mail className="h-4 w-4 text-teal-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                           <div className="min-w-0 flex-1">
                             <span className="block text-[10px] text-slate-500 font-bold uppercase">Send Clinical Mail</span>
-                            <span className="truncate block font-semibold">{mConfig.contact_email || 'info@pateldentalhospital.com'}</span>
+                            <span className="truncate block font-semibold">{mConfig.contact_email || contactInfo?.email || 'Pateldentalhospital1@gmail.com'}</span>
                           </div>
                         </a>
                       )}
