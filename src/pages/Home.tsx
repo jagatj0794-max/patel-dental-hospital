@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
   HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
@@ -13,8 +13,6 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service, Award as AwardType } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
-import { awardsService } from '../utils/awardsData';
-import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 
@@ -353,31 +351,6 @@ export default function Home({
   const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
-  const [localAwards, setLocalAwards] = useState<AwardType[]>(awardsList || []);
-
-  useEffect(() => {
-    let active = true;
-    const fetchHomeAwards = async () => {
-      try {
-        const freshAwards = await awardsService.getAwards();
-        if (active && freshAwards && freshAwards.length > 0) {
-          setLocalAwards(freshAwards);
-        }
-      } catch (err) {
-        console.warn('Failed to load awards on Home page mount:', err);
-      }
-    };
-    fetchHomeAwards();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (awardsList && awardsList.length > 0) {
-      setLocalAwards(awardsList);
-    }
-  }, [awardsList]);
 
   React.useEffect(() => {
     serviceService.getServices().then(res => {
@@ -455,15 +428,6 @@ export default function Home({
       greenHighlightLine
     };
   };
-
-  // Determine source array for awards (prefer local state, fallback to awardsList prop)
-  const awardsToDisplay = (localAwards && localAwards.length > 0)
-    ? localAwards
-    : (awardsList && awardsList.length > 0 ? awardsList : []);
-
-  const filteredSortedAwards = awardsToDisplay
-    .filter(a => a && a.is_active !== false && (a as any).is_active !== 'false')
-    .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
 
   return (
     <div id="home-page-view" className="relative pt-0 bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
@@ -1113,10 +1077,10 @@ export default function Home({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center justify-center">
-            {filteredSortedAwards.map((award, index) => {
-              console.log("Rendering award card:", award);
-              const imageUrl = award.image_url || (award as any).image || (award as any).url;
-              return (
+            {awardsList
+              .filter(a => a.is_active !== false)
+              .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+              .map((award, index) => (
                 <motion.div
                   key={award.id}
                   id={`award-card-${award.id}`}
@@ -1124,17 +1088,16 @@ export default function Home({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex justify-center items-center overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_4px_25px_rgba(8,28,58,0.015)] max-w-[85%] sm:max-w-[75%] md:max-w-full w-full mx-auto p-2"
+                  className="flex justify-center items-center overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_4px_25px_rgba(8,28,58,0.015)] max-w-[62%] w-full mx-auto"
                 >
                   <img
-                    src={imageUrl}
+                    src={award.image_url}
                     alt={award.title || "Award Certificate"}
-                    className="w-full h-auto rounded-2xl object-contain max-h-[450px]"
+                    className="w-full h-auto rounded-3xl object-contain"
                     referrerPolicy="no-referrer"
                   />
                 </motion.div>
-              );
-            })}
+              ))}
           </div>
         </div>
       </section>
@@ -1440,11 +1403,11 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
                 <img
-                   className="w-full h-full object-cover absolute inset-0 z-10"
-                   src="/_MG_3249.JPG"
-                   alt="Patel Dental Hospital Advanced Clinical Care"
-                   referrerPolicy="no-referrer"
-                   loading="lazy"
+                  className="w-full h-full object-cover absolute inset-0 z-10"
+                  src="/premium-dental-clinic.jpg"
+                  alt="Patel Dental Hospital Advanced Clinical Care"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
               </div>
             </motion.div>
@@ -1620,7 +1583,7 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
-                  src="/IMG_3610.JPG"
+                  src={patelReceptionLounge}
                   alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"
