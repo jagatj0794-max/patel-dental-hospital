@@ -6,11 +6,41 @@
 import { supabase } from './supabase';
 import { Award } from '../types';
 
+const DEFAULT_FALLBACK_AWARDS: Award[] = [
+  {
+    id: 'default-award-1',
+    title: 'Awarded as Best Dental Hospital in India',
+    image_url: '/Best Dntal Hospital Rajkot.PNG',
+    display_order: 1,
+    is_active: true
+  }
+];
+
+function getFallbackAwards(): Award[] {
+  try {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('cached_public_awards');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          console.log('[AWARDS CACHE] Successfully loaded cached awards list from localStorage:', parsed);
+          return parsed;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[AWARDS CACHE] Error loading awards list from localStorage cache:', e);
+  }
+  console.log('[AWARDS CACHE] No cached awards list found. Using static default fallback awards.');
+  return DEFAULT_FALLBACK_AWARDS;
+}
+
 export const awardsService = {
   lastError: null as string | null,
 
   /**
    * Fetches all awards directly from public.awards table sorted by display_order ASC.
+   * Leverages caching and a static fallback to resist unauthenticated read issues or connection glitches on load/refresh.
    */
   getAwards: async (): Promise<Award[]> => {
     try {
@@ -23,15 +53,18 @@ export const awardsService = {
       if (error) {
         console.error('Error fetching awards from public.awards table:', error);
         awardsService.lastError = error.message;
-        return [];
+        return getFallbackAwards();
+      }
+
+      if (!data || data.length === 0) {
+        console.log('[Fetch Empty] Supabase public.awards table query returned 0 rows. Checking for local storage fallback...');
+        return getFallbackAwards();
       }
 
       console.log('[Fetch Success] Successfully fetched awards from public.awards');
       console.log('[Records Returned] Records returned from Supabase public.awards:', data);
 
-      if (!data) return [];
-
-      return data.map((row: any) => ({
+      const mapped = data.map((row: any) => ({
         id: row.id,
         title: row.title || '',
         image_url: row.image_url || '',
@@ -40,10 +73,22 @@ export const awardsService = {
         created_at: row.created_at,
         updated_at: row.updated_at
       }));
+
+      // Persist to local cache for subsequent page refreshes
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('cached_public_awards', JSON.stringify(mapped));
+          console.log('[AWARDS CACHE] Successfully persisted public awards to localStorage cache.');
+        }
+      } catch (cacheErr) {
+        console.warn('[AWARDS CACHE] Failed to write awards to localStorage cache:', cacheErr);
+      }
+
+      return mapped;
     } catch (e: any) {
       console.error('Exception in getAwards:', e);
       awardsService.lastError = e?.message || String(e);
-      return [];
+      return getFallbackAwards();
     }
   },
 
@@ -235,14 +280,32 @@ export const awardsService = {
         }
       }
 
-      // Select * from awards and print returned rows
+      // Select * from awards and update our cache
       const { data: finalRows, error: finalErr } = await supabase.client
         .from('awards')
-        .select('*');
+        .select('*')
+        .order('display_order', { ascending: true });
       if (finalErr) {
         console.error("Error querying 'select * from awards' immediately after saving:", finalErr);
-      } else {
+      } else if (finalRows) {
         console.log("select * from awards output:", finalRows);
+        const mapped = finalRows.map((row: any) => ({
+          id: row.id,
+          title: row.title || '',
+          image_url: row.image_url || '',
+          display_order: Number(row.display_order) || 0,
+          is_active: row.is_active !== false,
+          created_at: row.created_at,
+          updated_at: row.updated_at
+        }));
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cached_public_awards', JSON.stringify(mapped));
+            console.log('[AWARDS CACHE] Updated localStorage cache with newly saved awards in saveAwards:', mapped);
+          }
+        } catch (cacheErr) {
+          console.warn('[AWARDS CACHE] Failed to write new awards list to localStorage cache in saveAwards:', cacheErr);
+        }
       }
 
       return true;
