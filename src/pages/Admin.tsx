@@ -4467,15 +4467,17 @@ export default function Admin({
                     <button
                       type="button"
                       onClick={async () => {
+                        console.log("draftAwards before save:", draftAwards);
                         setSaveMessage('Saving awards list to public.awards...');
                         const success = await awardsService.saveAwards(draftAwards);
                         if (success) {
                           await loadAwardsList();
                           setSaveMessage('Awards list saved successfully! Public website updated.');
                         } else {
-                          setSaveMessage('Failed to save awards. Please try again.');
+                          const errMsg = awardsService.lastError || 'Unknown database error';
+                          setSaveMessage(`Failed to save awards: ${errMsg}`);
                         }
-                        setTimeout(() => setSaveMessage(null), 4000);
+                        setTimeout(() => setSaveMessage(null), 6000);
                       }}
                       className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
                     >
@@ -4651,7 +4653,19 @@ export default function Admin({
                           }
 
                           setDraftAwards(nextAwards);
-                          setEditingAward(null);
+                          setIsAwardUploading(true);
+                          setSaveMessage('Saving award to public.awards database...');
+                          const success = await awardsService.saveAward(updated);
+                          if (success) {
+                            await loadAwardsList();
+                            setSaveMessage('Award saved to database successfully!');
+                            setEditingAward(null);
+                          } else {
+                            const errMsg = awardsService.lastError || 'Unknown database error';
+                            setSaveMessage(`Failed to save award to database: ${errMsg}`);
+                          }
+                          setIsAwardUploading(false);
+                          setTimeout(() => setSaveMessage(null), 5000);
                         }}
                         className="p-6 space-y-4"
                       >
@@ -4705,7 +4719,7 @@ export default function Admin({
                                         setIsAwardUploading(true);
                                         try {
                                           const url = await uploadImage(file);
-                                          setEditingAward({ ...editingAward, image_url: url });
+                                          setEditingAward(prev => prev ? { ...prev, image_url: url } : null);
                                         } catch (err: any) {
                                           console.error('Failed to upload award image:', err);
                                           alert('Failed to upload image. Please try again.');
@@ -4787,6 +4801,7 @@ export default function Admin({
                             const targetId = awardToDelete;
                             setAwardToDelete(null);
 
+                            const originalAwards = [...draftAwards];
                             setDraftAwards(draftAwards.filter(a => a.id !== targetId));
                             setSaveMessage('Deleting award from public.awards...');
                             const success = await awardsService.deleteAward(targetId);
@@ -4794,9 +4809,11 @@ export default function Admin({
                               await loadAwardsList();
                               setSaveMessage('Award deleted successfully.');
                             } else {
-                              setSaveMessage('Failed to delete award from database.');
+                              setDraftAwards(originalAwards);
+                              const errMsg = awardsService.lastError || 'Unknown database error';
+                              setSaveMessage(`Failed to delete award: ${errMsg}`);
                             }
-                            setTimeout(() => setSaveMessage(null), 3000);
+                            setTimeout(() => setSaveMessage(null), 5000);
                           }}
                           className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                         >
@@ -6139,15 +6156,17 @@ export default function Admin({
                 <button
                   type="button"
                   onClick={async () => {
+                    console.log("draftAwards before save:", draftAwards);
                     setSaveMessage('Saving awards list to public.awards...');
                     const success = await awardsService.saveAwards(draftAwards);
                     if (success) {
                       await loadAwardsList();
                       setSaveMessage('Awards list saved successfully! Public website updated.');
                     } else {
-                      setSaveMessage('Failed to save awards. Please try again.');
+                      const errMsg = awardsService.lastError || 'Unknown database error';
+                      setSaveMessage(`Failed to save awards: ${errMsg}`);
                     }
-                    setTimeout(() => setSaveMessage(null), 4000);
+                    setTimeout(() => setSaveMessage(null), 6000);
                   }}
                   className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
                 >
@@ -6346,12 +6365,13 @@ export default function Admin({
                       if (success) {
                         await loadAwardsList();
                         setSaveMessage('Award saved to database successfully!');
+                        setEditingAward(null);
                       } else {
-                        setSaveMessage('Saved in local draft. Click Save Awards to sync with database.');
+                        const errMsg = awardsService.lastError || 'Unknown database error';
+                        setSaveMessage(`Failed to save award to database: ${errMsg}`);
                       }
                       setIsAwardUploading(false);
-                      setEditingAward(null);
-                      setTimeout(() => setSaveMessage(null), 3000);
+                      setTimeout(() => setSaveMessage(null), 5000);
                     }}
                     className="p-6 space-y-4"
                   >
@@ -6405,7 +6425,7 @@ export default function Admin({
                                     setIsAwardUploading(true);
                                     try {
                                       const url = await uploadImage(file);
-                                      setEditingAward({ ...editingAward, image_url: url });
+                                      setEditingAward(prev => prev ? { ...prev, image_url: url } : null);
                                     } catch (err: any) {
                                       console.error('Failed to upload award image:', err);
                                       alert('Failed to upload image. Please try again.');
@@ -6488,6 +6508,7 @@ export default function Admin({
                         const targetId = awardToDelete;
                         setAwardToDelete(null);
 
+                        const originalAwards = [...draftAwards];
                         setDraftAwards(draftAwards.filter(a => a.id !== targetId));
                         setSaveMessage('Deleting award from public.awards...');
                         const success = await awardsService.deleteAward(targetId);
@@ -6495,9 +6516,11 @@ export default function Admin({
                           await loadAwardsList();
                           setSaveMessage('Award deleted successfully.');
                         } else {
-                          setSaveMessage('Failed to delete award from database.');
+                          setDraftAwards(originalAwards);
+                          const errMsg = awardsService.lastError || 'Unknown database error';
+                          setSaveMessage(`Failed to delete award: ${errMsg}`);
                         }
-                        setTimeout(() => setSaveMessage(null), 3000);
+                        setTimeout(() => setSaveMessage(null), 5000);
                       }}
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                     >
@@ -11488,7 +11511,7 @@ export default function Admin({
                               type="email"
                               value={contactEmailDraft}
                               onChange={(e) => setContactEmailDraft(e.target.value)}
-                              placeholder="e.g. clinic@hospital.com"
+                              placeholder="e.g. Pateldentalhospital1@gmail.com"
                               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
                             />
                           </div>

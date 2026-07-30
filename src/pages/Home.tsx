@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
   HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
@@ -13,6 +13,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service, Award as AwardType } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { awardsService } from '../utils/awardsData';
+import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 
@@ -351,6 +353,90 @@ export default function Home({
   const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
+  const hasFetchedFromSupabase = React.useRef(false);
+  const [localAwards, setLocalAwardsState] = useState<AwardType[]>(awardsList || []);
+
+  const setLocalAwards = (val: AwardType[] | ((prev: AwardType[]) => AwardType[])) => {
+    console.log('[AWARDS] setLocalAwards called with value/fn:', typeof val === 'function' ? 'function' : val);
+    setLocalAwardsState(val);
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    const runAwardsDebugAndFetch = async () => {
+      console.log('[AWARDS] Fetching awards from Supabase on mount...');
+      
+      let isReady = false;
+      let url = 'NOT LOADED';
+      let keyLoaded = 'FALSE';
+      let sessionExists = 'FALSE';
+
+      try {
+        isReady = isSupabaseConfigured();
+        url = import.meta.env.VITE_SUPABASE_URL || 'NOT LOADED';
+        keyLoaded = import.meta.env.VITE_SUPABASE_ANON_KEY ? 'TRUE' : 'FALSE';
+
+        if (isReady) {
+          try {
+            const { data: sessionData } = await supabase.client.auth.getSession();
+            sessionExists = sessionData?.session ? 'TRUE' : 'FALSE';
+          } catch (sessionErr) {
+            console.log('[AWARDS] Session fetch error:', sessionErr);
+          }
+        }
+      } catch (assessErr) {
+        console.error('[AWARDS] Error during configuration assessment:', assessErr);
+      }
+
+      console.log('Supabase Client Ready:', isReady ? 'TRUE' : 'FALSE');
+      console.log('Supabase URL:', url);
+      console.log('Anon Key Loaded:', keyLoaded);
+      console.log('Session Exists:', sessionExists);
+
+      if (isReady && active) {
+        try {
+          // Fetch using awardsService directly
+          const freshAwards = await awardsService.getAwards();
+          console.log('[AWARDS] Query succeeded. Returned array before filtering:', freshAwards);
+          
+          if (active && freshAwards && freshAwards.length > 0) {
+            freshAwards.forEach((award) => {
+              console.log('[AWARDS] Award item details:', {
+                id: award.id,
+                title: award.title,
+                image_url: award.image_url,
+                is_active: award.is_active,
+                display_order: award.display_order
+              });
+            });
+            hasFetchedFromSupabase.current = true;
+            setLocalAwards(freshAwards);
+          }
+        } catch (queryErr) {
+          console.log('[AWARDS] Query failed with exception:', queryErr);
+        }
+      } else {
+        console.log('[AWARDS] Query not executed because Supabase config is not ready.');
+      }
+    };
+
+    runAwardsDebugAndFetch();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('[AWARDS] Prop synchronization check. awardsList length:', awardsList?.length, 'hasFetchedFromSupabase:', hasFetchedFromSupabase.current);
+    if (awardsList && awardsList.length > 0) {
+      console.log('[AWARDS] Synchronizing state with awardsList prop:', awardsList);
+      setLocalAwards(awardsList);
+    } else {
+      console.log('[AWARDS] Skipping sync: awardsList prop is empty or null.');
+    }
+  }, [awardsList]);
 
   React.useEffect(() => {
     serviceService.getServices().then(res => {
@@ -428,6 +514,55 @@ export default function Home({
       greenHighlightLine
     };
   };
+
+  // Determine source array for awards (prefer local state, fallback to awardsList prop)
+  const awardsToDisplay = (localAwards && localAwards.length > 0)
+    ? localAwards
+    : (awardsList && awardsList.length > 0 ? awardsList : []);
+
+  // Print raw array before filtering as requested
+  console.log('[AWARDS DEBUG] Raw fetched/received awards array before filtering:', awardsToDisplay);
+
+  const filteredSortedAwards = awardsToDisplay
+    .filter(a => a && a.is_active !== false && (a as any).is_active !== 'false')
+    .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+
+  console.log('[AWARDS DEBUG] Filtered and sorted awards array to render:', filteredSortedAwards);
+
+  filteredSortedAwards.forEach((award) => {
+    const imgUrl = award.image_url || (award as any).image || (award as any).url;
+    console.log('[AWARDS DEBUG] Checking award image_url:', imgUrl);
+    
+    // Verification checks
+    const isNull = imgUrl === null;
+    const isUndefined = imgUrl === undefined;
+    const isEmpty = imgUrl === '';
+    const isValidUrl = typeof imgUrl === 'string' && (imgUrl.startsWith('http://') || imgUrl.startsWith('https://') || imgUrl.startsWith('/') || imgUrl.startsWith('data:'));
+    
+    console.log(`[AWARDS DEBUG] Image Verification for award ID "${award.id}":`, {
+      isNull,
+      isUndefined,
+      isEmpty,
+      isValidUrl
+    });
+  });
+
+  if (filteredSortedAwards.length === 0) {
+    let reason = '';
+    if (!awardsToDisplay || awardsToDisplay.length === 0) {
+      reason = 'No awards data available in localAwards or awardsList prop';
+    } else {
+      const activeCount = awardsToDisplay.filter(a => a && a.is_active !== false && (a as any).is_active !== 'false').length;
+      if (activeCount === 0) {
+        reason = `All existing awards (${awardsToDisplay.length}) have is_active === false`;
+      } else {
+        reason = 'No awards left after sorting and filtering';
+      }
+    }
+    console.log('[AWARDS DEBUG] React decided not to render any card because:', reason);
+  }
+
+  console.log("Rendering awards:", awardsToDisplay);
 
   return (
     <div id="home-page-view" className="relative pt-0 bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
@@ -1077,10 +1212,10 @@ export default function Home({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center justify-center">
-            {awardsList
-              .filter(a => a.is_active !== false)
-              .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
-              .map((award, index) => (
+            {filteredSortedAwards.map((award, index) => {
+              console.log("Rendering award card:", award);
+              const imageUrl = award.image_url || (award as any).image || (award as any).url;
+              return (
                 <motion.div
                   key={award.id}
                   id={`award-card-${award.id}`}
@@ -1088,16 +1223,17 @@ export default function Home({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex justify-center items-center overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_4px_25px_rgba(8,28,58,0.015)] max-w-[62%] w-full mx-auto"
+                  className="flex justify-center items-center overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_4px_25px_rgba(8,28,58,0.015)] max-w-[85%] sm:max-w-[75%] md:max-w-full w-full mx-auto p-2"
                 >
                   <img
-                    src={award.image_url}
+                    src={imageUrl}
                     alt={award.title || "Award Certificate"}
-                    className="w-full h-auto rounded-3xl object-contain"
+                    className="w-full h-auto rounded-2xl object-contain max-h-[450px]"
                     referrerPolicy="no-referrer"
                   />
                 </motion.div>
-              ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1403,11 +1539,11 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
                 <img
-                  className="w-full h-full object-cover absolute inset-0 z-10"
-                  src="/premium-dental-clinic.jpg"
-                  alt="Patel Dental Hospital Advanced Clinical Care"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
+                   className="w-full h-full object-cover absolute inset-0 z-10"
+                   src="/_MG_3249.JPG"
+                   alt="Patel Dental Hospital Advanced Clinical Care"
+                   referrerPolicy="no-referrer"
+                   loading="lazy"
                 />
               </div>
             </motion.div>
@@ -1583,7 +1719,7 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
-                  src={patelReceptionLounge}
+                  src="/IMG_3610.JPG"
                   alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"

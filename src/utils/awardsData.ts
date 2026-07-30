@@ -7,11 +7,14 @@ import { supabase } from './supabase';
 import { Award } from '../types';
 
 export const awardsService = {
+  lastError: null as string | null,
+
   /**
    * Fetches all awards directly from public.awards table sorted by display_order ASC.
    */
   getAwards: async (): Promise<Award[]> => {
     try {
+      awardsService.lastError = null;
       const { data, error } = await supabase.client
         .from('awards')
         .select('*')
@@ -19,6 +22,7 @@ export const awardsService = {
 
       if (error) {
         console.error('Error fetching awards from public.awards table:', error);
+        awardsService.lastError = error.message;
         return [];
       }
 
@@ -36,8 +40,9 @@ export const awardsService = {
         created_at: row.created_at,
         updated_at: row.updated_at
       }));
-    } catch (e) {
+    } catch (e: any) {
       console.error('Exception in getAwards:', e);
+      awardsService.lastError = e?.message || String(e);
       return [];
     }
   },
@@ -47,6 +52,7 @@ export const awardsService = {
    */
   saveAward: async (award: Award): Promise<boolean> => {
     try {
+      awardsService.lastError = null;
       const row = {
         id: award.id,
         title: award.title || '',
@@ -57,11 +63,17 @@ export const awardsService = {
       };
 
       // Check if award already exists
-      const { data: existing } = await supabase.client
+      const { data: existing, error: checkErr } = await supabase.client
         .from('awards')
         .select('id')
         .eq('id', award.id)
         .maybeSingle();
+
+      if (checkErr) {
+        console.error('Error checking if award exists:', checkErr);
+        awardsService.lastError = checkErr.message;
+        return false;
+      }
 
       if (existing) {
         const { data, error } = await supabase.client
@@ -72,6 +84,7 @@ export const awardsService = {
 
         if (error) {
           console.error('Error updating award in public.awards:', error);
+          awardsService.lastError = error.message;
           return false;
         }
 
@@ -84,6 +97,7 @@ export const awardsService = {
 
         if (error) {
           console.error('Error inserting award into public.awards:', error);
+          awardsService.lastError = error.message;
           return false;
         }
 
@@ -91,8 +105,9 @@ export const awardsService = {
       }
 
       return true;
-    } catch (e) {
+    } catch (e: any) {
       console.error('Exception in saveAward:', e);
+      awardsService.lastError = e?.message || String(e);
       return false;
     }
   },
@@ -102,6 +117,7 @@ export const awardsService = {
    */
   deleteAward: async (id: string): Promise<boolean> => {
     try {
+      awardsService.lastError = null;
       const { error } = await supabase.client
         .from('awards')
         .delete()
@@ -109,13 +125,15 @@ export const awardsService = {
 
       if (error) {
         console.error('Error deleting award from public.awards table:', error);
+        awardsService.lastError = error.message;
         return false;
       }
 
       console.log('[Delete Success] Successfully deleted award from public.awards:', id);
       return true;
-    } catch (e) {
+    } catch (e: any) {
       console.error('Exception in deleteAward:', e);
+      awardsService.lastError = e?.message || String(e);
       return false;
     }
   },
@@ -126,18 +144,34 @@ export const awardsService = {
    */
   saveAwards: async (awards: Award[]): Promise<boolean> => {
     try {
+      awardsService.lastError = null;
+
+      console.log("saveAwards received:", awards);
+      console.log("awards.length:", awards.length);
+
       // 1. Fetch current IDs in database
       const { data: existingData, error: fetchErr } = await supabase.client
         .from('awards')
         .select('id');
 
-      const existingIds = new Set((existingData || []).map((row: any) => row.id));
+      console.log("existing database rows:", existingData);
 
-      if (!fetchErr && existingData) {
+      if (fetchErr) {
+        console.error('Error fetching existing awards in saveAwards:', fetchErr);
+        awardsService.lastError = fetchErr.message;
+        return false;
+      }
+
+      const existingIds = new Set((existingData || []).map((row: any) => row.id));
+      let idsToDelete: string[] = [];
+
+      if (existingData) {
         const currentIds = new Set(awards.map(a => a.id));
-        const idsToDelete = existingData
+        idsToDelete = existingData
           .map((row: any) => row.id)
           .filter((id: string) => !currentIds.has(id));
+
+        console.log("idsToDelete:", idsToDelete);
 
         if (idsToDelete.length > 0) {
           const { error: deleteErr } = await supabase.client
@@ -146,11 +180,15 @@ export const awardsService = {
             .in('id', idsToDelete);
 
           if (deleteErr) {
-            console.warn('Error deleting removed awards from public.awards:', deleteErr);
+            console.error('Error deleting removed awards from public.awards:', deleteErr);
+            awardsService.lastError = deleteErr.message;
+            return false;
           } else {
             console.log('[Delete Success] Removed obsolete awards from public.awards:', idsToDelete);
           }
         }
+      } else {
+        console.log("idsToDelete:", idsToDelete);
       }
 
       // 2. Insert or update each record
@@ -166,6 +204,7 @@ export const awardsService = {
         };
 
         if (existingIds.has(aw.id)) {
+          console.log("row being updated:", row);
           const { data, error } = await supabase.client
             .from('awards')
             .update(row)
@@ -174,10 +213,13 @@ export const awardsService = {
 
           if (error) {
             console.error(`Error updating award ${aw.id} in public.awards:`, error);
+            awardsService.lastError = error.message;
+            return false;
           } else {
             console.log('[Update Success] Successfully updated award in public.awards:', data);
           }
         } else {
+          console.log("row being inserted:", row);
           const { data, error } = await supabase.client
             .from('awards')
             .insert(row)
@@ -185,15 +227,28 @@ export const awardsService = {
 
           if (error) {
             console.error(`Error inserting award ${aw.id} into public.awards:`, error);
+            awardsService.lastError = error.message;
+            return false;
           } else {
             console.log('[Insert Success] Successfully inserted award into public.awards:', data);
           }
         }
       }
 
+      // Select * from awards and print returned rows
+      const { data: finalRows, error: finalErr } = await supabase.client
+        .from('awards')
+        .select('*');
+      if (finalErr) {
+        console.error("Error querying 'select * from awards' immediately after saving:", finalErr);
+      } else {
+        console.log("select * from awards output:", finalRows);
+      }
+
       return true;
-    } catch (e) {
+    } catch (e: any) {
       console.error('Exception in saveAwards:', e);
+      awardsService.lastError = e?.message || String(e);
       return false;
     }
   }
