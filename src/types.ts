@@ -320,6 +320,27 @@ export interface ServiceFaq {
   display_order: number;
 }
 
+export interface SocialServiceItem {
+  id: string;
+  image_url: string;
+  title?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface TechnologyItem {
+  id: string;
+  image_url: string;
+  title?: string;
+  description?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 
 
 

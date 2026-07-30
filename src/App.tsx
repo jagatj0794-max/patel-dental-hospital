@@ -17,8 +17,10 @@ import { galleryService, DEFAULT_MEDIA_IMAGES } from './utils/galleryData';
 import { videoService, DEFAULT_VIDEOS } from './utils/videoData';
 import { contactService, DEFAULT_CONTACT_INFO } from './utils/contactData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
-import { appointmentService } from './utils/appointmentData';
+import { appointmentService, AdminAppointment } from './utils/appointmentData';
 import { awardsService } from './utils/awardsData';
+import { whatsappNotificationService } from './utils/notificationService';
+import { realtimeService } from './utils/realtimeService';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingActionPanel from './components/FloatingActionPanel';
@@ -36,6 +38,8 @@ import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import SupabaseTest from './pages/SupabaseTest';
 import ServiceDetail from './pages/ServiceDetail';
+import SocialService from './pages/SocialService';
+import Technology from './pages/Technology';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
@@ -48,7 +52,7 @@ export default function App() {
     if (hash === 'admin-login') {
       hash = 'admin/login';
     }
-    const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment'];
+    const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology'];
     if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
       return hash as PageId;
     }
@@ -74,7 +78,7 @@ export default function App() {
           .in('id', bookedIds);
 
         if (error) {
-          console.error('Error fetching my appointments:', error);
+          console.warn('Error fetching my appointments:', error);
           return;
         }
 
@@ -404,7 +408,7 @@ export default function App() {
       if (hash === 'admin-login') {
         hash = 'admin/login';
       }
-      const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test'];
+      const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'social-service', 'technology'];
       if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
         setCurrentPage(hash as PageId);
         window.scrollTo({ top: 0 });
@@ -513,51 +517,55 @@ export default function App() {
     }
 
     const newId = `apt-${Date.now()}`;
-    const newApt = {
+    const newAdminApt: AdminAppointment = {
       id: newId,
-      patient_name: data.name,
-      mobile_number: data.phone,
+      patientName: data.name,
+      mobileNumber: data.phone,
       email: '',
       age: 0,
       gender: 'Male',
       doctor: 'To Be Assigned',
-      branch: data.branch,
+      branch: data.branch as any,
       service: data.treatment,
-      appointment_date: data.date,
-      appointment_time: data.timeSlot,
-      booking_date: new Date().toISOString().split('T')[0],
+      appointmentDate: data.date,
+      appointmentTime: data.timeSlot,
+      bookingDate: new Date().toISOString().split('T')[0],
       status: 'Pending',
       symptoms: data.message || '',
       notes: ''
     };
 
     try {
-      const { error } = await supabase.client
-        .from('appointments')
-        .insert(newApt);
+      // Delegate insertion and notification triggering to appointmentService (single source)
+      await appointmentService.saveAppointment(newAdminApt);
 
-      if (error) {
-        console.error('Error booking appointment on Supabase:', error);
-        return false;
-      } else {
-        const patientFormat: Appointment = {
-          id: newId,
-          name: data.name,
-          phone: data.phone,
-          treatment: data.treatment,
-          branch: data.branch as any,
-          date: data.date,
-          timeSlot: data.timeSlot,
-          message: data.message,
-          createdAt: new Date().toISOString(),
-          status: 'Pending'
-        };
-        setAppointments(prev => [patientFormat, ...prev]);
-        
-        const existingSessionIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
-        safeStorage.setSessionItem('my_booked_ids', JSON.stringify([newId, ...existingSessionIds]));
-        return true;
-      }
+      const patientFormat: Appointment = {
+        id: newId,
+        name: data.name,
+        phone: data.phone,
+        treatment: data.treatment,
+        branch: data.branch as any,
+        date: data.date,
+        timeSlot: data.timeSlot,
+        message: data.message,
+        createdAt: new Date().toISOString(),
+        status: 'Pending'
+      };
+      setAppointments(prev => [patientFormat, ...prev]);
+      
+      const existingSessionIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
+      safeStorage.setSessionItem('my_booked_ids', JSON.stringify([newId, ...existingSessionIds]));
+
+      // Trigger WhatsApp Notification
+      whatsappNotificationService.sendWhatsAppNotification({
+        patientName: data.name,
+        mobileNumber: data.phone,
+        doctorName: 'To Be Assigned',
+        date: data.date,
+        time: data.timeSlot
+      }).catch(err => console.error('[WhatsApp Notification] Failed to trigger:', err));
+
+      return true;
     } catch (e) {
       console.error('Exception booking appointment:', e);
       return false;
@@ -740,6 +748,10 @@ export default function App() {
             galleryItems={mappedGalleryItems}
           />
         );
+      case 'social-service':
+        return <SocialService />;
+      case 'technology':
+        return <Technology />;
       case 'doctors':
         return <Doctors openAppointmentModal={openAppointmentModal} doctorsList={doctorsList} />;
       case 'contact':

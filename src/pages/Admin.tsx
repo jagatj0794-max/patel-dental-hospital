@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, 
   Sparkles, 
@@ -39,12 +39,16 @@ import {
   Settings,
   Layers,
   Star,
-  EyeOff
+  EyeOff,
+  Heart,
+  Bell,
+  BellRing
 } from 'lucide-react';
-import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, Award } from '../types';
+import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, Award, SocialServiceItem, TechnologyItem } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
+import { dbNotificationService } from '../utils/dbNotificationService';
 import { uploadImage, uploadVideo } from '../utils/supabaseStorage';
 import { heroService } from '../utils/heroData';
 import { doctorService } from '../utils/doctorData';
@@ -53,6 +57,8 @@ import { videoService } from '../utils/videoData';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { contactService } from '../utils/contactData';
 import { awardsService } from '../utils/awardsData';
+import { socialServiceService, generateUUID } from '../utils/socialServiceData';
+import { technologyService } from '../utils/technologyData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
@@ -181,9 +187,49 @@ export default function Admin({
     }
   };
 
+  // Social Services local draft states
+  const [draftSocialServices, setDraftSocialServices] = useState<SocialServiceItem[]>([]);
+  const [editingSocialService, setEditingSocialService] = useState<SocialServiceItem | null>(null);
+  const [socialServiceToDelete, setSocialServiceToDelete] = useState<string | null>(null);
+  const [isSocialServiceUploading, setIsSocialServiceUploading] = useState(false);
+  const [isLoadingSocialServices, setIsLoadingSocialServices] = useState(false);
+
+  const loadSocialServicesList = async () => {
+    setIsLoadingSocialServices(true);
+    try {
+      const freshItems = await socialServiceService.getSocialServices();
+      setDraftSocialServices(freshItems);
+    } catch (err) {
+      console.error('Error loading social services from public.social_service:', err);
+    } finally {
+      setIsLoadingSocialServices(false);
+    }
+  };
+
+  // Technology local draft states
+  const [draftTechnology, setDraftTechnology] = useState<TechnologyItem[]>([]);
+  const [editingTechnology, setEditingTechnology] = useState<TechnologyItem | null>(null);
+  const [technologyToDelete, setTechnologyToDelete] = useState<string | null>(null);
+  const [isTechnologyUploading, setIsTechnologyUploading] = useState(false);
+  const [isLoadingTechnology, setIsLoadingTechnology] = useState(false);
+
+  const loadTechnologyList = async () => {
+    setIsLoadingTechnology(true);
+    try {
+      const freshItems = await technologyService.getTechnology();
+      setDraftTechnology(freshItems);
+    } catch (err) {
+      console.error('Error loading technology from public.technology:', err);
+    } finally {
+      setIsLoadingTechnology(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'media' || activeTab === 'awards-cms') {
       loadAwardsList();
+      loadSocialServicesList();
+      loadTechnologyList();
     }
   }, [activeTab]);
 
@@ -2608,7 +2654,7 @@ export default function Admin({
   };
 
   // Media local interactive states
-  const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'awards' | 'smiles' | 'videos'>('gallery');
+  const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'awards' | 'smiles' | 'videos' | 'social-service' | 'technology'>('gallery');
   const [categories, setCategories] = useState<string[]>([
     'Homepage Slider',
     'Homepage Gallery',
@@ -2656,6 +2702,150 @@ export default function Admin({
   useEffect(() => {
     setDraftDoctors(doctorsList);
   }, [doctorsList]);
+
+  // Real-time appointment notification states
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [activeToast, setActiveToast] = useState<any | null>(null);
+  const [notificationError, setNotificationError] = useState<string | null>(null);
+
+  // Load all notifications from Supabase
+  const fetchNotifications = async () => {
+    try {
+      const list = await dbNotificationService.getNotifications();
+      // Map properties to match UI keys
+      const mapped = list.map(item => ({
+        id: item.id,
+        patientName: item.patient_name,
+        mobileNumber: item.mobile_number,
+        appointmentDate: item.appointment_date,
+        appointmentTime: item.appointment_time,
+        doctor: item.doctor,
+        isRead: item.is_read,
+        timestamp: item.created_at
+      }));
+      setNotifications(mapped);
+      setNotificationError(null);
+    } catch (err: any) {
+      console.error('[Admin] Error loading notifications from Supabase:', err);
+      setNotificationError('Unable to sync notifications with the database. Please ensure the "notifications" table is created.');
+    }
+  };
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  // Sound Player Function
+  const playNotificationSound = () => {
+    try {
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav');
+      audio.volume = 0.55;
+      audio.play().catch(e => console.warn('Audio play was prevented. Click to allow.', e));
+    } catch (err) {
+      console.error('Could not play notification sound:', err);
+    }
+  };
+
+  // Safe incoming notification handler with deduplication
+  const handleIncomingAppointmentNotification = (apptData: any) => {
+    const id = apptData.id || `notif-${Date.now()}`;
+    
+    setActiveToast(prevToast => {
+      // Deduplicate toast alerts
+      const isDuplicate = prevToast && (
+        prevToast.id === id ||
+        (prevToast.patientName === (apptData.patient_name || apptData.patientName) &&
+         prevToast.appointmentDate === (apptData.appointment_date || apptData.appointmentDate) &&
+         prevToast.appointmentTime === (apptData.appointment_time || apptData.appointmentTime))
+      );
+
+      if (isDuplicate) return prevToast;
+
+      // Play chime
+      playNotificationSound();
+
+      // Refresh full list from Supabase
+      setTimeout(() => {
+        fetchNotifications();
+      }, 700);
+
+      return {
+        id,
+        patientName: apptData.patient_name || apptData.patientName || 'Anonymous',
+        mobileNumber: apptData.mobile_number || apptData.mobileNumber || 'N/A',
+        appointmentDate: apptData.appointment_date || apptData.appointmentDate || 'N/A',
+        appointmentTime: apptData.appointment_time || apptData.appointmentTime || 'N/A',
+        doctor: apptData.doctor || 'To Be Assigned',
+        isRead: false,
+        timestamp: new Date().toISOString()
+      };
+    });
+  };
+
+  // Subscribe to real-time events
+  useEffect(() => {
+    console.log('[Realtime] Subscribing to public:appointments insert and broadcast events...');
+    
+    const channel = supabase.client
+      .channel('public:appointments-admin-listener')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'appointments'
+        },
+        (payload: any) => {
+          console.log('[Realtime] postgres_changes INSERT payload:', payload);
+          if (payload.new) {
+            handleIncomingAppointmentNotification(payload.new);
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'new-appointment' },
+        (response: any) => {
+          console.log('[Realtime] broadcast new-appointment payload:', response);
+          if (response.payload) {
+            handleIncomingAppointmentNotification(response.payload);
+          }
+        }
+      )
+      .subscribe((status: string) => {
+        console.log(`[Realtime] Admin channel status: ${status}`);
+      });
+
+    return () => {
+      console.log('[Realtime] Removing admin listener channel.');
+      supabase.client.removeChannel(channel);
+    };
+  }, []);
+
+  const handleMarkAsRead = async (notifId: string) => {
+    // Optimistic update
+    setNotifications(prev => prev.map(notif => 
+      notif.id === notifId ? { ...notif, isRead: true } : notif
+    ));
+    await dbNotificationService.markAsRead(notifId);
+    fetchNotifications();
+  };
+
+  const handleMarkAllAsRead = async () => {
+    // Optimistic update
+    setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
+    await dbNotificationService.markAllAsRead();
+    fetchNotifications();
+  };
+
+  const handleClearAllNotifications = async () => {
+    // Optimistic update
+    setNotifications([]);
+    await dbNotificationService.clearAll();
+    fetchNotifications();
+  };
 
   const [isDragging, setIsDragging] = useState(false);
   const [isDraggingMobile, setIsDraggingMobile] = useState(false);
@@ -4297,6 +4487,28 @@ export default function Admin({
                 >
                   <span className="text-sm">🎥</span> Videos
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab('social-service')}
+                  className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all duration-150 cursor-pointer ${
+                    activeMediaTab === 'social-service'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span className="text-sm">❤️</span> Social Service
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab('technology')}
+                  className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all duration-150 cursor-pointer ${
+                    activeMediaTab === 'technology'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span className="text-sm">🔬</span> Technology
+                </button>
               </div>
             </div>
 
@@ -4467,15 +4679,17 @@ export default function Admin({
                     <button
                       type="button"
                       onClick={async () => {
+                        console.log("draftAwards before save:", draftAwards);
                         setSaveMessage('Saving awards list to public.awards...');
                         const success = await awardsService.saveAwards(draftAwards);
                         if (success) {
                           await loadAwardsList();
                           setSaveMessage('Awards list saved successfully! Public website updated.');
                         } else {
-                          setSaveMessage('Failed to save awards. Please try again.');
+                          const errMsg = awardsService.lastError || 'Unknown database error';
+                          setSaveMessage(`Failed to save awards: ${errMsg}`);
                         }
-                        setTimeout(() => setSaveMessage(null), 4000);
+                        setTimeout(() => setSaveMessage(null), 6000);
                       }}
                       className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
                     >
@@ -4651,7 +4865,19 @@ export default function Admin({
                           }
 
                           setDraftAwards(nextAwards);
-                          setEditingAward(null);
+                          setIsAwardUploading(true);
+                          setSaveMessage('Saving award to public.awards database...');
+                          const success = await awardsService.saveAward(updated);
+                          if (success) {
+                            await loadAwardsList();
+                            setSaveMessage('Award saved to database successfully!');
+                            setEditingAward(null);
+                          } else {
+                            const errMsg = awardsService.lastError || 'Unknown database error';
+                            setSaveMessage(`Failed to save award to database: ${errMsg}`);
+                          }
+                          setIsAwardUploading(false);
+                          setTimeout(() => setSaveMessage(null), 5000);
                         }}
                         className="p-6 space-y-4"
                       >
@@ -4705,7 +4931,7 @@ export default function Admin({
                                         setIsAwardUploading(true);
                                         try {
                                           const url = await uploadImage(file);
-                                          setEditingAward({ ...editingAward, image_url: url });
+                                          setEditingAward(prev => prev ? { ...prev, image_url: url } : null);
                                         } catch (err: any) {
                                           console.error('Failed to upload award image:', err);
                                           alert('Failed to upload image. Please try again.');
@@ -4787,6 +5013,7 @@ export default function Admin({
                             const targetId = awardToDelete;
                             setAwardToDelete(null);
 
+                            const originalAwards = [...draftAwards];
                             setDraftAwards(draftAwards.filter(a => a.id !== targetId));
                             setSaveMessage('Deleting award from public.awards...');
                             const success = await awardsService.deleteAward(targetId);
@@ -4794,9 +5021,11 @@ export default function Admin({
                               await loadAwardsList();
                               setSaveMessage('Award deleted successfully.');
                             } else {
-                              setSaveMessage('Failed to delete award from database.');
+                              setDraftAwards(originalAwards);
+                              const errMsg = awardsService.lastError || 'Unknown database error';
+                              setSaveMessage(`Failed to delete award: ${errMsg}`);
                             }
-                            setTimeout(() => setSaveMessage(null), 3000);
+                            setTimeout(() => setSaveMessage(null), 5000);
                           }}
                           className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                         >
@@ -5137,6 +5366,456 @@ export default function Admin({
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeMediaTab === 'social-service' && (
+              <div className="space-y-6" id="social-service-tab-content">
+                {/* Actions row */}
+                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Showing <span className="font-bold text-slate-800">{(draftSocialServices || []).length}</span> social service photos
+                  </div>
+                  
+                  <div>
+                    <label
+                      htmlFor="social-service-upload-file-trigger"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Upload Social Service Image</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="social-service-upload-file-trigger"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const file = e.target.files[0];
+                          console.log('[SocialService] Upload Started:', file.name);
+                          setSaveMessage('Uploading social service image to Supabase...');
+                          try {
+                            const imageUrl = await uploadImage(file);
+                            console.log('[SocialService] Upload Success:', imageUrl);
+                            const updated = [
+                              {
+                                id: generateUUID(),
+                                image_url: imageUrl,
+                                title: '',
+                                display_order: draftSocialServices.length,
+                                is_active: true
+                              },
+                              ...(draftSocialServices || [])
+                            ];
+                            setDraftSocialServices(updated);
+                            setSaveMessage('Saving social service image to Supabase...');
+                            const success = await socialServiceService.saveSocialServices(updated);
+                            if (success) {
+                              setSaveMessage('Social service image uploaded and saved to Supabase successfully!');
+                            } else {
+                              setSaveMessage('Failed to save social service image to database.');
+                            }
+                          } catch (err: any) {
+                            console.warn('Upload failed, falling back to local Base64:', err);
+                            try {
+                              const dataUrl = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              });
+                              const updated = [
+                                {
+                                  id: generateUUID(),
+                                  image_url: dataUrl,
+                                  title: '',
+                                  display_order: draftSocialServices.length,
+                                  is_active: true
+                                },
+                                ...(draftSocialServices || [])
+                              ];
+                              setDraftSocialServices(updated);
+                              await socialServiceService.saveSocialServices(updated);
+                              setSaveMessage('Social service image loaded locally and saved.');
+                            } catch (fallbackErr) {
+                              console.error(fallbackErr);
+                            }
+                          } finally {
+                            setTimeout(() => setSaveMessage(null), 3500);
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Grid */}
+                {(!draftSocialServices || draftSocialServices.length === 0) ? (
+                  <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
+                    No social service photos uploaded yet. Add some community moments!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {draftSocialServices.map((item) => (
+                      <div 
+                        key={item.id}
+                        id={`admin-social-service-card-${item.id}`}
+                        className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-teal-100 transition-all duration-200 shadow-3xs"
+                      >
+                        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
+                          <img 
+                            src={item.image_url} 
+                            alt="Social Service Moment" 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Replace & Delete Actions */}
+                        <div className="flex items-center justify-between gap-2 mt-auto">
+                          <label
+                            htmlFor={`social-service-replace-trigger-${item.id}`}
+                            className="font-bold text-xs text-teal-600 hover:text-teal-700 bg-teal-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-teal-100 transition select-none flex-1 text-center cursor-pointer"
+                          >
+                            <Upload className="h-3 w-3 shrink-0" />
+                            <span>Replace</span>
+                          </label>
+                          <input
+                            type="file"
+                            id={`social-service-replace-trigger-${item.id}`}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                const file = e.target.files[0];
+                                console.log('[SocialService] Upload Started:', file.name);
+                                setSaveMessage('Replacing social service photo on Supabase...');
+                                try {
+                                  const imageUrl = await uploadImage(file);
+                                  console.log('[SocialService] Upload Success:', imageUrl);
+                                  const updated = (draftSocialServices || []).map(moment => moment.id === item.id ? { ...moment, image_url: imageUrl } : moment);
+                                  setDraftSocialServices(updated);
+                                  setSaveMessage('Saving updated social service photo to Supabase...');
+                                  const success = await socialServiceService.saveSocialServices(updated);
+                                  if (success) {
+                                    setSaveMessage('Social service photo replaced and saved successfully!');
+                                  } else {
+                                    setSaveMessage('Failed to save replacement to database.');
+                                  }
+                                } catch (err: any) {
+                                  console.warn('Upload failed, falling back to local Base64:', err);
+                                  try {
+                                    const dataUrl = await new Promise<string>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve(reader.result as string);
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    });
+                                    const updated = (draftSocialServices || []).map(moment => moment.id === item.id ? { ...moment, image_url: dataUrl } : moment);
+                                    setDraftSocialServices(updated);
+                                    await socialServiceService.saveSocialServices(updated);
+                                    setSaveMessage('Social service photo replaced locally.');
+                                  } catch (fallbackErr) {
+                                    console.error(fallbackErr);
+                                  }
+                                } finally {
+                                  setTimeout(() => setSaveMessage(null), 3500);
+                                }
+                              }
+                            }}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSocialServiceToDelete(item.id);
+                            }}
+                            className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
+                            aria-label="Delete Social Service Photo"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Custom Social Service Image Delete Confirmation Dialog Modal */}
+                {socialServiceToDelete && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+                    {/* Backdrop click to close */}
+                    <div className="absolute inset-0" onClick={() => setSocialServiceToDelete(null)} />
+                    
+                    {/* Card container */}
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Image</h3>
+                      <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                        Are you sure you want to delete this image?
+                      </p>
+                      <div className="flex items-center justify-end gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setSocialServiceToDelete(null)}
+                          className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const updated = (draftSocialServices || []).filter(moment => moment.id !== socialServiceToDelete);
+                            setDraftSocialServices(updated);
+                            setSocialServiceToDelete(null);
+                            setSaveMessage('Deleting social service photo and syncing with Supabase...');
+                            try {
+                              const success = await socialServiceService.saveSocialServices(updated);
+                              if (success) {
+                                setSaveMessage('Social service photo deleted successfully!');
+                              } else {
+                                setSaveMessage('Failed to delete social service photo on Supabase database.');
+                              }
+                            } catch (err: any) {
+                              console.error('Error deleting social service photo:', err);
+                              setSaveMessage('Error: ' + (err.message || err));
+                            } finally {
+                              setTimeout(() => setSaveMessage(null), 3500);
+                            }
+                          }}
+                          className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeMediaTab === 'technology' && (
+              <div className="space-y-6" id="technology-tab-content">
+                {/* Actions row */}
+                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Showing <span className="font-bold text-slate-800">{(draftTechnology || []).length}</span> technology photos
+                  </div>
+                  
+                  <div>
+                    <label
+                      htmlFor="technology-upload-file-trigger"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Upload Technology Image</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="technology-upload-file-trigger"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const file = e.target.files[0];
+                          console.log('[Technology] Upload Started:', file.name);
+                          setSaveMessage('Uploading technology image to Supabase...');
+                          try {
+                            const imageUrl = await uploadImage(file);
+                            console.log('[Technology] Upload Success:', imageUrl);
+                            const updated = [
+                              {
+                                id: generateUUID(),
+                                image_url: imageUrl,
+                                title: '',
+                                display_order: draftTechnology.length,
+                                is_active: true
+                              },
+                              ...(draftTechnology || [])
+                            ];
+                            setDraftTechnology(updated);
+                            setSaveMessage('Saving technology image to Supabase...');
+                            const success = await technologyService.saveTechnologyList(updated);
+                            if (success) {
+                              setSaveMessage('Technology image uploaded and saved to Supabase successfully!');
+                            } else {
+                              setSaveMessage('Failed to save technology image to database.');
+                            }
+                          } catch (err: any) {
+                            console.warn('Upload failed, falling back to local Base64:', err);
+                            try {
+                              const dataUrl = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              });
+                              const updated = [
+                                {
+                                  id: generateUUID(),
+                                  image_url: dataUrl,
+                                  title: '',
+                                  display_order: draftTechnology.length,
+                                  is_active: true
+                                },
+                                ...(draftTechnology || [])
+                              ];
+                              setDraftTechnology(updated);
+                              await technologyService.saveTechnologyList(updated);
+                              setSaveMessage('Technology image loaded locally and saved.');
+                            } catch (fallbackErr) {
+                              console.error(fallbackErr);
+                            }
+                          } finally {
+                            setTimeout(() => setSaveMessage(null), 3500);
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Grid */}
+                {(!draftTechnology || draftTechnology.length === 0) ? (
+                  <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
+                    No technology photos uploaded yet. Add some advanced equipment moments!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {draftTechnology.map((item) => (
+                      <div 
+                        key={item.id}
+                        id={`admin-technology-card-${item.id}`}
+                        className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-indigo-100 transition-all duration-200 shadow-3xs"
+                      >
+                        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
+                          <img 
+                            src={item.image_url} 
+                            alt="Technology Equipment" 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Replace & Delete Actions */}
+                        <div className="flex items-center justify-between gap-2 mt-auto">
+                          <label
+                            htmlFor={`technology-replace-trigger-${item.id}`}
+                            className="font-bold text-xs text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-indigo-100 transition select-none flex-1 text-center cursor-pointer"
+                          >
+                            <Upload className="h-3 w-3 shrink-0" />
+                            <span>Replace</span>
+                          </label>
+                          <input
+                            type="file"
+                            id={`technology-replace-trigger-${item.id}`}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                const file = e.target.files[0];
+                                console.log('[Technology] Upload Started:', file.name);
+                                setSaveMessage('Replacing technology photo on Supabase...');
+                                try {
+                                  const imageUrl = await uploadImage(file);
+                                  console.log('[Technology] Upload Success:', imageUrl);
+                                  const updated = (draftTechnology || []).map(moment => moment.id === item.id ? { ...moment, image_url: imageUrl } : moment);
+                                  setDraftTechnology(updated);
+                                  setSaveMessage('Saving updated technology photo to Supabase...');
+                                  const success = await technologyService.saveTechnologyList(updated);
+                                  if (success) {
+                                    setSaveMessage('Technology photo replaced and saved successfully!');
+                                  } else {
+                                    setSaveMessage('Failed to save replacement to database.');
+                                  }
+                                } catch (err: any) {
+                                  console.warn('Upload failed, falling back to local Base64:', err);
+                                  try {
+                                    const dataUrl = await new Promise<string>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve(reader.result as string);
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    });
+                                    const updated = (draftTechnology || []).map(moment => moment.id === item.id ? { ...moment, image_url: dataUrl } : moment);
+                                    setDraftTechnology(updated);
+                                    await technologyService.saveTechnologyList(updated);
+                                    setSaveMessage('Technology photo replaced locally.');
+                                  } catch (fallbackErr) {
+                                    console.error(fallbackErr);
+                                  }
+                                } finally {
+                                  setTimeout(() => setSaveMessage(null), 3500);
+                                }
+                              }
+                            }}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTechnologyToDelete(item.id);
+                            }}
+                            className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
+                            aria-label="Delete Technology Photo"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Custom Technology Image Delete Confirmation Dialog Modal */}
+                {technologyToDelete && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+                    {/* Backdrop click to close */}
+                    <div className="absolute inset-0" onClick={() => setTechnologyToDelete(null)} />
+                    
+                    {/* Card container */}
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Image</h3>
+                      <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                        Are you sure you want to delete this image?
+                      </p>
+                      <div className="flex items-center justify-end gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setTechnologyToDelete(null)}
+                          className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const updated = (draftTechnology || []).filter(moment => moment.id !== technologyToDelete);
+                            setDraftTechnology(updated);
+                            setTechnologyToDelete(null);
+                            setSaveMessage('Deleting technology photo and syncing with Supabase...');
+                            try {
+                              const success = await technologyService.saveTechnologyList(updated);
+                              if (success) {
+                                setSaveMessage('Technology photo deleted successfully!');
+                              } else {
+                                setSaveMessage('Failed to delete technology photo on Supabase database.');
+                              }
+                            } catch (err: any) {
+                              console.error('Error deleting technology photo:', err);
+                              setSaveMessage('Error: ' + (err.message || err));
+                            } finally {
+                              setTimeout(() => setSaveMessage(null), 3500);
+                            }
+                          }}
+                          className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -6139,15 +6818,17 @@ export default function Admin({
                 <button
                   type="button"
                   onClick={async () => {
+                    console.log("draftAwards before save:", draftAwards);
                     setSaveMessage('Saving awards list to public.awards...');
                     const success = await awardsService.saveAwards(draftAwards);
                     if (success) {
                       await loadAwardsList();
                       setSaveMessage('Awards list saved successfully! Public website updated.');
                     } else {
-                      setSaveMessage('Failed to save awards. Please try again.');
+                      const errMsg = awardsService.lastError || 'Unknown database error';
+                      setSaveMessage(`Failed to save awards: ${errMsg}`);
                     }
-                    setTimeout(() => setSaveMessage(null), 4000);
+                    setTimeout(() => setSaveMessage(null), 6000);
                   }}
                   className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-sm"
                 >
@@ -6346,12 +7027,13 @@ export default function Admin({
                       if (success) {
                         await loadAwardsList();
                         setSaveMessage('Award saved to database successfully!');
+                        setEditingAward(null);
                       } else {
-                        setSaveMessage('Saved in local draft. Click Save Awards to sync with database.');
+                        const errMsg = awardsService.lastError || 'Unknown database error';
+                        setSaveMessage(`Failed to save award to database: ${errMsg}`);
                       }
                       setIsAwardUploading(false);
-                      setEditingAward(null);
-                      setTimeout(() => setSaveMessage(null), 3000);
+                      setTimeout(() => setSaveMessage(null), 5000);
                     }}
                     className="p-6 space-y-4"
                   >
@@ -6405,7 +7087,7 @@ export default function Admin({
                                     setIsAwardUploading(true);
                                     try {
                                       const url = await uploadImage(file);
-                                      setEditingAward({ ...editingAward, image_url: url });
+                                      setEditingAward(prev => prev ? { ...prev, image_url: url } : null);
                                     } catch (err: any) {
                                       console.error('Failed to upload award image:', err);
                                       alert('Failed to upload image. Please try again.');
@@ -6488,6 +7170,7 @@ export default function Admin({
                         const targetId = awardToDelete;
                         setAwardToDelete(null);
 
+                        const originalAwards = [...draftAwards];
                         setDraftAwards(draftAwards.filter(a => a.id !== targetId));
                         setSaveMessage('Deleting award from public.awards...');
                         const success = await awardsService.deleteAward(targetId);
@@ -6495,9 +7178,11 @@ export default function Admin({
                           await loadAwardsList();
                           setSaveMessage('Award deleted successfully.');
                         } else {
-                          setSaveMessage('Failed to delete award from database.');
+                          setDraftAwards(originalAwards);
+                          const errMsg = awardsService.lastError || 'Unknown database error';
+                          setSaveMessage(`Failed to delete award: ${errMsg}`);
                         }
-                        setTimeout(() => setSaveMessage(null), 3000);
+                        setTimeout(() => setSaveMessage(null), 5000);
                       }}
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                     >
@@ -6833,7 +7518,205 @@ export default function Admin({
       )}
 
       {/* MAIN RIGHT WORKSPACE: holds the tab panels dynamically */}
-      <main id="admin-main-workspace" className="flex-grow p-4 md:p-8 overflow-y-auto max-w-full">
+      <main id="admin-main-workspace" className="flex-grow p-4 md:p-8 overflow-y-auto max-w-full relative">
+        {/* TOP STATUS & NOTIFICATION BAR */}
+        <div className="w-full flex items-center justify-between bg-white border border-slate-200/80 rounded-2xl px-6 py-4 mb-6 shadow-3xs" id="admin-top-bar">
+          <div>
+            <h2 className="font-display font-black text-[#081C3A] text-sm md:text-base capitalize tracking-wide">
+              {activeTab === 'dashboard' ? 'Overview Dashboard' : `${activeTab} Management`}
+            </h2>
+            <p className="text-[10px] md:text-xs text-slate-400 font-medium">
+              Real-time synchronization active • {notifications.filter(n => !n.isRead).length} unread alerts
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 relative">
+            {/* Notification Bell Trigger */}
+            <button
+              onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
+              className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-100 flex items-center justify-center border-none"
+              id="admin-notification-bell-btn"
+            >
+              {notifications.some(n => !n.isRead) ? (
+                <BellRing className="h-5 w-5 text-blue-600 animate-bounce" />
+              ) : (
+                <Bell className="h-5 w-5" />
+              )}
+              {notifications.filter(n => !n.isRead).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[9px] h-5 w-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="admin-notification-badge">
+                  {notifications.filter(n => !n.isRead).length}
+                </span>
+              )}
+            </button>
+
+            {/* Notification Dropdown Board */}
+            {isNotificationDropdownOpen && (
+              <div className="absolute right-0 top-12 w-[320px] md:w-[380px] bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden" id="admin-notification-dropdown">
+                <div className="px-5 py-4 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+                  <div>
+                    <h4 className="font-display font-bold text-slate-800 text-xs">Real-time Notifications</h4>
+                    <p className="text-[9px] text-slate-400 mt-0.5">Real-time logs for new appointments</p>
+                  </div>
+                  <div className="flex gap-2.5">
+                    {notifications.some(n => !n.isRead) && (
+                      <button
+                        onClick={handleMarkAllAsRead}
+                        className="text-[10px] font-black text-blue-600 hover:text-blue-700 hover:underline bg-transparent border-none cursor-pointer p-0"
+                        id="btn-mark-all-read"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                    {notifications.length > 0 && (
+                      <button
+                        onClick={handleClearAllNotifications}
+                        className="text-[10px] font-black text-rose-600 hover:text-rose-700 hover:underline bg-transparent border-none cursor-pointer p-0"
+                        id="btn-clear-all-notifs"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="max-h-[350px] overflow-y-auto divide-y divide-slate-100" id="admin-notifications-list">
+                  {notificationError ? (
+                    <div className="p-6 text-center text-rose-600 font-semibold text-xs" id="admin-notifications-error">
+                      {notificationError}
+                    </div>
+                  ) : notifications.length === 0 ? (
+                    <div className="p-8 text-center" id="admin-notifications-empty">
+                      <Bell className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                      <p className="text-xs text-slate-400 font-semibold">No notifications received yet.</p>
+                      <p className="text-[10px] text-slate-300 mt-1">Book an appointment on the website to see this work in real-time.</p>
+                    </div>
+                  ) : (
+                    notifications.map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`p-4 transition hover:bg-slate-50/50 flex flex-col gap-2 ${
+                          notif.isRead ? 'opacity-70' : 'bg-blue-50/20 border-l-2 border-blue-600'
+                        }`}
+                        id={`notif-item-${notif.id}`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <span className="text-xs font-black text-[#081C3A] uppercase tracking-wide">
+                            {notif.patientName}
+                          </span>
+                          <span className="text-[8px] text-slate-400 font-mono">
+                            {new Date(notif.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-slate-600">
+                          <div>
+                            <span className="text-[9px] text-slate-400 block font-bold uppercase tracking-wider">Phone</span>
+                            <span className="font-semibold">{notif.mobileNumber}</span>
+                          </div>
+                          <div>
+                            <span className="text-[9px] text-slate-400 block font-bold uppercase tracking-wider">Doctor</span>
+                            <span className="font-semibold text-teal-700">{notif.doctor}</span>
+                          </div>
+                          <div className="mt-1">
+                            <span className="text-[9px] text-slate-400 block font-bold uppercase tracking-wider">Date</span>
+                            <span className="font-semibold">{notif.appointmentDate}</span>
+                          </div>
+                          <div className="mt-1">
+                            <span className="text-[9px] text-slate-400 block font-bold uppercase tracking-wider">Time</span>
+                            <span className="font-semibold">{notif.appointmentTime}</span>
+                          </div>
+                        </div>
+
+                        {!notif.isRead && (
+                          <button
+                            onClick={() => handleMarkAsRead(notif.id)}
+                            className="mt-1 self-start py-1 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 text-[9px] font-black uppercase tracking-wider rounded-md border-none transition cursor-pointer"
+                            id={`btn-mark-read-${notif.id}`}
+                          >
+                            Mark Read
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Real-time Sliding Toast Popup Alert */}
+        <AnimatePresence>
+          {activeToast && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-slate-900 text-white rounded-2xl shadow-2xl border border-slate-800 overflow-hidden font-sans"
+              id="realtime-toast-alert"
+            >
+              <div className="p-5 space-y-3.5">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider font-mono">
+                      New Realtime Booking
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setActiveToast(null)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg transition cursor-pointer bg-transparent border-none"
+                    id="btn-close-toast"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-1.5">
+                  <h4 className="text-sm font-black text-white uppercase tracking-wide">
+                    {activeToast.patientName}
+                  </h4>
+                  <p className="text-xs text-slate-400 font-medium">
+                    A new appointment slot has been requested and successfully inserted!
+                  </p>
+                </div>
+
+                <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-[8px] text-slate-500 block font-bold uppercase tracking-widest">Doctor</span>
+                    <span className="font-bold text-slate-200">{activeToast.doctor}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] text-slate-500 block font-bold uppercase tracking-widest">Mobile</span>
+                    <span className="font-bold text-slate-200">{activeToast.mobileNumber}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] text-slate-500 block font-bold uppercase tracking-widest">Date</span>
+                    <span className="font-bold text-slate-200">{activeToast.appointmentDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] text-slate-500 block font-bold uppercase tracking-widest">Time</span>
+                    <span className="font-bold text-slate-200">{activeToast.appointmentTime}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      handleMarkAsRead(activeToast.id);
+                      setActiveToast(null);
+                    }}
+                    className="flex-1 py-2 bg-[#0D9488] hover:bg-[#0b7e74] text-white text-[10px] font-extrabold uppercase tracking-widest rounded-lg transition-all text-center cursor-pointer border-none shadow-3xs"
+                    id="toast-btn-acknowledge"
+                  >
+                    Acknowledge
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {renderTabContent()}
       </main>
 
@@ -11488,7 +12371,7 @@ export default function Admin({
                               type="email"
                               value={contactEmailDraft}
                               onChange={(e) => setContactEmailDraft(e.target.value)}
-                              placeholder="e.g. clinic@hospital.com"
+                              placeholder="e.g. Pateldentalhospital1@gmail.com"
                               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800 font-medium"
                             />
                           </div>

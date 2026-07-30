@@ -4,6 +4,8 @@
  */
 
 import { supabase } from './supabase';
+import { realtimeService } from './realtimeService';
+import { dbNotificationService } from './dbNotificationService';
 
 export interface AdminAppointment {
   id: string;
@@ -153,10 +155,34 @@ export const appointmentService = {
         const { error } = await supabase.client
           .from('appointments')
           .insert(dbRow);
-        if (error) console.error('Error inserting appointment on Supabase:', error);
+        if (error) {
+          console.error('Error inserting appointment on Supabase:', error);
+          throw error;
+        } else {
+          // Single Source: Save to Supabase notifications table after successful appointment insert
+          dbNotificationService.createNotification({
+            appointment_id: appointment.id,
+            patient_name: appointment.patientName,
+            mobile_number: appointment.mobileNumber,
+            appointment_date: appointment.appointmentDate,
+            appointment_time: appointment.appointmentTime,
+            doctor: appointment.doctor || 'To Be Assigned'
+          }).catch(err => console.error('[DB Notification] Failed to create from saveAppointment:', err));
+
+          // Trigger Real-time Notification Event
+          realtimeService.triggerNewAppointment({
+            id: appointment.id,
+            patientName: appointment.patientName,
+            mobileNumber: appointment.mobileNumber,
+            appointmentDate: appointment.appointmentDate,
+            appointmentTime: appointment.appointmentTime,
+            doctor: appointment.doctor || 'To Be Assigned'
+          }).catch(err => console.error('[Real-time Notification] Failed to trigger from saveAppointment:', err));
+        }
       }
     } catch (e) {
       console.error('Exception saving appointment:', e);
+      throw e;
     }
     return appointmentService.getAllAppointments();
   },

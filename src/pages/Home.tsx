@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
   HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
@@ -13,6 +13,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service, Award as AwardType } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { awardsService } from '../utils/awardsData';
+import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 
@@ -351,6 +353,31 @@ export default function Home({
   const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
+  const [localAwards, setLocalAwards] = useState<AwardType[]>(awardsList || []);
+
+  useEffect(() => {
+    let active = true;
+    const fetchHomeAwards = async () => {
+      try {
+        const freshAwards = await awardsService.getAwards();
+        if (active && freshAwards && freshAwards.length > 0) {
+          setLocalAwards(freshAwards);
+        }
+      } catch (err) {
+        console.warn('Failed to load awards on Home page mount:', err);
+      }
+    };
+    fetchHomeAwards();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (awardsList && awardsList.length > 0) {
+      setLocalAwards(awardsList);
+    }
+  }, [awardsList]);
 
   React.useEffect(() => {
     serviceService.getServices().then(res => {
@@ -428,6 +455,15 @@ export default function Home({
       greenHighlightLine
     };
   };
+
+  // Determine source array for awards (prefer local state, fallback to awardsList prop)
+  const awardsToDisplay = (localAwards && localAwards.length > 0)
+    ? localAwards
+    : (awardsList && awardsList.length > 0 ? awardsList : []);
+
+  const filteredSortedAwards = awardsToDisplay
+    .filter(a => a && a.is_active !== false && (a as any).is_active !== 'false')
+    .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
 
   return (
     <div id="home-page-view" className="relative pt-0 bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
@@ -1065,7 +1101,7 @@ export default function Home({
 
       {/* Awards & Recognition Section */}
       <section className="py-16 sm:py-20 bg-slate-50 relative z-10 border-t border-b border-slate-100" id="awards-recognition">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
             <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
@@ -1076,11 +1112,11 @@ export default function Home({
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center justify-center">
-            {awardsList
-              .filter(a => a.is_active !== false)
-              .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
-              .map((award, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 justify-center items-stretch w-full">
+            {filteredSortedAwards.map((award, index) => {
+              console.log("Rendering award card:", award);
+              const imageUrl = award.image_url || (award as any).image || (award as any).url;
+              return (
                 <motion.div
                   key={award.id}
                   id={`award-card-${award.id}`}
@@ -1088,16 +1124,17 @@ export default function Home({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex justify-center items-center overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_4px_25px_rgba(8,28,58,0.015)] max-w-[62%] w-full mx-auto"
+                  className="flex justify-center items-center overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.03)] hover:shadow-[0_15px_40px_rgba(8,28,58,0.06)] transition-all duration-300 w-full p-3 sm:p-4"
                 >
                   <img
-                    src={award.image_url}
+                    src={imageUrl}
                     alt={award.title || "Award Certificate"}
-                    className="w-full h-auto rounded-3xl object-contain"
+                    className="w-full h-auto rounded-xl sm:rounded-2xl object-contain max-h-[550px] mx-auto block"
                     referrerPolicy="no-referrer"
                   />
                 </motion.div>
-              ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1336,7 +1373,7 @@ export default function Home({
                 >
                   <img
                     className="w-full h-full object-cover absolute inset-0"
-                    src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200"
+                    src="/IMG_20190225_120201.jpg"
                     alt="Patel Dental Hospital Premium Modern Treatment Center"
                     referrerPolicy="no-referrer"
                   />
@@ -1403,11 +1440,11 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
                 <img
-                  className="w-full h-full object-cover absolute inset-0 z-10"
-                  src="/premium-dental-clinic.jpg"
-                  alt="Patel Dental Hospital Advanced Clinical Care"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
+                   className="w-full h-full object-cover absolute inset-0 z-10"
+                   src="/_MG_3249.JPG"
+                   alt="Patel Dental Hospital Advanced Clinical Care"
+                   referrerPolicy="no-referrer"
+                   loading="lazy"
                 />
               </div>
             </motion.div>
@@ -1583,7 +1620,7 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
-                  src={patelReceptionLounge}
+                  src="/IMG_3610.JPG"
                   alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"

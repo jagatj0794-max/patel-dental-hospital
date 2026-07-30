@@ -51,7 +51,8 @@ export const awardsService = {
         .order('display_order', { ascending: true });
 
       if (error) {
-        console.error('Error fetching awards from public.awards table:', error);
+        console.warn('Error fetching awards from public.awards table (falling back to default local data):', error);
+        console.warn('Note: If this table does not exist yet, you can run the SQL query from "supabase_awards_migration.sql" in your Supabase SQL Editor to provision it.');
         awardsService.lastError = error.message;
         return getFallbackAwards();
       }
@@ -86,7 +87,7 @@ export const awardsService = {
 
       return mapped;
     } catch (e: any) {
-      console.error('Exception in getAwards:', e);
+      console.warn('Exception in getAwards (falling back to default local data):', e);
       awardsService.lastError = e?.message || String(e);
       return getFallbackAwards();
     }

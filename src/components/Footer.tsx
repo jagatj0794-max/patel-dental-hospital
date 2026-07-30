@@ -114,8 +114,8 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
               {[
                 { label: 'Home', target: 'home' },
                 { label: 'Meet Doctors', target: 'doctors' },
-                { label: 'Technology', target: 'about' },
-                { label: 'Social Service', target: 'about' },
+                { label: 'Technology', target: 'technology' },
+                { label: 'Social Service', target: 'social-service' },
                 { label: 'Gallery', target: 'gallery' },
                 { label: 'Contact Us', target: 'contact' },
               ].map((link, idx) => (

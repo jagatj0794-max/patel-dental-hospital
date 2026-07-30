@@ -1,0 +1,255 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { supabase } from './supabase';
+import { TechnologyItem } from '../types';
+
+export function generateUUID(): string {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+export const technologyService = {
+  lastError: null as string | null,
+
+  /**
+   * Fetches all technology items directly from public.technology table sorted by display_order ASC.
+   * Supabase is the single source of truth.
+   */
+  getTechnology: async (): Promise<TechnologyItem[]> => {
+    try {
+      console.log('[Technology] Fetch Started');
+      technologyService.lastError = null;
+      const { data, error } = await supabase.client
+        .from('technology')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error('[Technology] Fetch Error', error);
+        console.warn('Error fetching technology from public.technology table:', error);
+        technologyService.lastError = error.message;
+        return [];
+      }
+
+      if (!data || data.length === 0) {
+        console.log('[Technology] Fetch Result: 0 records returned from Supabase public.technology table.');
+        return [];
+      }
+
+      console.log('[Technology] Fetch Result: ' + data.length + ' records returned.');
+      console.log('[Fetch Success] Successfully fetched technology from public.technology');
+      console.log('[Records Returned] Records returned from Supabase public.technology:', data);
+
+      const mapped = data.map((row: any) => ({
+        id: row.id,
+        title: row.title || '',
+        description: row.description || '',
+        image_url: row.image_url || '',
+        display_order: Number(row.display_order) || 0,
+        is_active: row.is_active !== false,
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      }));
+
+      return mapped;
+    } catch (e: any) {
+      console.error('[Technology] Fetch Error', e);
+      console.warn('Exception in getTechnology:', e);
+      technologyService.lastError = e?.message || String(e);
+      return [];
+    }
+  },
+
+  /**
+   * Saves or updates a single technology item in public.technology table.
+   */
+  saveTechnologyItem: async (item: TechnologyItem): Promise<boolean> => {
+    try {
+      technologyService.lastError = null;
+      const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+      const itemId = isValidUUID ? item.id : generateUUID();
+      const row = {
+        id: itemId,
+        title: item.title || '',
+        description: item.description || '',
+        image_url: item.image_url || '',
+        display_order: item.display_order || 0,
+        is_active: item.is_active !== false,
+        created_at: item.created_at || new Date().toISOString()
+      };
+
+      // Check if item already exists
+      const { data: existing, error: checkErr } = await supabase.client
+        .from('technology')
+        .select('id')
+        .eq('id', itemId)
+        .maybeSingle();
+
+      if (checkErr) {
+        console.error('Error checking if technology item exists:', checkErr);
+        technologyService.lastError = checkErr.message;
+        return false;
+      }
+
+      if (existing) {
+        const { data, error } = await supabase.client
+          .from('technology')
+          .update(row)
+          .eq('id', itemId)
+          .select();
+
+        if (error) {
+          console.error('Error updating technology in public.technology:', error);
+          technologyService.lastError = error.message;
+          return false;
+        }
+
+        console.log('[Update Success] Successfully updated technology item in public.technology:', data);
+      } else {
+        const { data, error } = await supabase.client
+          .from('technology')
+          .insert(row)
+          .select();
+
+        if (error) {
+          console.error('Error inserting technology into public.technology:', error);
+          technologyService.lastError = error.message;
+          return false;
+        }
+
+        console.log('[Insert Success] Successfully inserted technology item into public.technology:', data);
+      }
+
+      return true;
+    } catch (e: any) {
+      console.error('Exception in saveTechnologyItem:', e);
+      technologyService.lastError = e?.message || String(e);
+      return false;
+    }
+  },
+
+  /**
+   * Deletes a technology record from public.technology table.
+   */
+  deleteTechnologyItem: async (id: string): Promise<boolean> => {
+    try {
+      technologyService.lastError = null;
+      const { error } = await supabase.client
+        .from('technology')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting technology from public.technology table:', error);
+        technologyService.lastError = error.message;
+        return false;
+      }
+
+      console.log('[Delete Success] Successfully deleted technology item from public.technology:', id);
+      return true;
+    } catch (e: any) {
+      console.error('Exception in deleteTechnologyItem:', e);
+      technologyService.lastError = e?.message || String(e);
+      return false;
+    }
+  },
+
+  /**
+   * Saves the entire list of technology to public.technology.
+   * Removes records no longer present in the list, and upserts current ones.
+   */
+  saveTechnologyList: async (items: TechnologyItem[]): Promise<boolean> => {
+    try {
+      technologyService.lastError = null;
+
+      console.log("[Technology] Database insert/update starting with items:", items);
+
+      // 1. Fetch current IDs in database
+      const { data: existingData, error: fetchErr } = await supabase.client
+        .from('technology')
+        .select('id');
+
+      console.log("existing database technology rows:", existingData);
+
+      if (fetchErr) {
+        console.error('[Technology] Save Error / Supabase Error:', fetchErr);
+        console.error('Error fetching existing technology in saveTechnologyList:', fetchErr);
+        technologyService.lastError = fetchErr.message;
+        return false;
+      }
+
+      const existingIds = new Set((existingData || []).map((row: any) => row.id));
+      let idsToDelete: string[] = [];
+
+      if (existingData) {
+        const currentIds = new Set(items.map(a => a.id));
+        idsToDelete = existingData
+          .map((row: any) => row.id)
+          .filter((id: string) => !currentIds.has(id));
+
+        console.log("technology idsToDelete:", idsToDelete);
+
+        if (idsToDelete.length > 0) {
+          const { error: deleteErr } = await supabase.client
+            .from('technology')
+            .delete()
+            .in('id', idsToDelete);
+
+          if (deleteErr) {
+            console.error('[Technology] Save Error / Supabase Error:', deleteErr);
+            console.error('Error deleting removed technology from public.technology:', deleteErr);
+            technologyService.lastError = deleteErr.message;
+            return false;
+          }
+        }
+      }
+
+      // 2. Map and Upsert
+      const rowsToUpsert = items.map((item, index) => {
+        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+        const itemId = isValidUUID ? item.id : generateUUID();
+        return {
+          id: itemId,
+          title: item.title || '',
+          description: item.description || '',
+          image_url: item.image_url || '',
+          display_order: index, // automatic ordering based on the passed list order
+          is_active: item.is_active !== false,
+          created_at: item.created_at || new Date().toISOString()
+        };
+      });
+
+      if (rowsToUpsert.length > 0) {
+        const { error: upsertErr } = await supabase.client
+          .from('technology')
+          .upsert(rowsToUpsert);
+
+        if (upsertErr) {
+          console.error('[Technology] Save Error / Supabase Error:', upsertErr);
+          console.error('Error upserting technology into public.technology:', upsertErr);
+          technologyService.lastError = upsertErr.message;
+          return false;
+        }
+      }
+
+      console.log('[Technology] Database insert/update succeeded.');
+      console.log('[Technology] Save Success');
+
+      return true;
+    } catch (e: any) {
+      console.error('[Technology] Save Error:', e);
+      console.error('Exception in saveTechnologyList:', e);
+      technologyService.lastError = e?.message || String(e);
+      return false;
+    }
+  }
+};
