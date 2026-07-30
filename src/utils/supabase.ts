@@ -129,34 +129,7 @@ export function getSupabase(): SupabaseClient {
   console.log("SUPABASE URL RAW =", JSON.stringify(supabaseUrl));
   console.log("SUPABASE KEY RAW =", JSON.stringify(supabaseAnonKey));
 
-  const clientOptions: any = {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  };
-
-  // If in browser, use custom fetch to route requests through our server-side proxy
-  if (typeof window !== 'undefined') {
-    clientOptions.global = {
-      fetch: (url: string, options: any) => {
-        try {
-          const targetUrl = new URL(url);
-          const configUrl = new URL(supabaseUrl!);
-          if (targetUrl.host === configUrl.host) {
-            const proxyUrl = `/api/supabase${targetUrl.pathname}${targetUrl.search}`;
-            return fetch(proxyUrl, options);
-          }
-        } catch (e) {
-          console.error('[Supabase Client Proxy Fetch] Error processing URL:', e);
-        }
-        return fetch(url, options);
-      }
-    };
-  }
-
-  supabaseClientInstance = createClient(supabaseUrl!, supabaseAnonKey!, clientOptions);
+  supabaseClientInstance = createClient(supabaseUrl!, supabaseAnonKey!);
   return supabaseClientInstance;
 }
 
