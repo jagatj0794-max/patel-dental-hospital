@@ -11,7 +11,7 @@ import {
   ChevronDown, MapPin, Clock, Mail, ExternalLink, Trophy, Instagram
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { PageId, PatientMoment, ContactInfo, Service, Award as AwardType } from '../types';
+import { PageId, PatientMoment, ContactInfo, Service, AwardItem } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { awardsService } from '../utils/awardsData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
@@ -302,7 +302,6 @@ interface HomeProps {
   patientMoments?: PatientMoment[];
   videosList?: Array<{ id: string; title: string; treatment: string; videoPlatform?: 'youtube' | 'instagram' | 'mp4' }>;
   contactInfo?: ContactInfo;
-  awardsList?: AwardType[];
 }
 
 export default function Home({ 
@@ -315,8 +314,7 @@ export default function Home({
   mediaImages = [],
   patientMoments,
   videosList = [],
-  contactInfo,
-  awardsList = []
+  contactInfo
 }: HomeProps) {
   const momentsToRender = patientMoments !== undefined ? patientMoments : PATIENT_MOMENTS;
   const phoneRaw = contactInfo?.phoneRaw || '+919510397046';
@@ -353,31 +351,7 @@ export default function Home({
   const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
-  const [localAwards, setLocalAwards] = useState<AwardType[]>(awardsList || []);
-
-  useEffect(() => {
-    let active = true;
-    const fetchHomeAwards = async () => {
-      try {
-        const freshAwards = await awardsService.getAwards();
-        if (active && freshAwards && freshAwards.length > 0) {
-          setLocalAwards(freshAwards);
-        }
-      } catch (err) {
-        console.warn('Failed to load awards on Home page mount:', err);
-      }
-    };
-    fetchHomeAwards();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (awardsList && awardsList.length > 0) {
-      setLocalAwards(awardsList);
-    }
-  }, [awardsList]);
+  const [awardsList, setAwardsList] = useState<AwardItem[]>([]);
 
   React.useEffect(() => {
     serviceService.getServices().then(res => {
@@ -386,6 +360,12 @@ export default function Home({
       }
     }).catch(err => {
       console.error("Error loading services for home page:", err);
+    });
+
+    awardsService.getAwards().then(res => {
+      setAwardsList(res || []);
+    }).catch(err => {
+      console.error("Error loading awards for home page:", err);
     });
   }, []);
 
@@ -455,15 +435,6 @@ export default function Home({
       greenHighlightLine
     };
   };
-
-  // Determine source array for awards (prefer local state, fallback to awardsList prop)
-  const awardsToDisplay = (localAwards && localAwards.length > 0)
-    ? localAwards
-    : (awardsList && awardsList.length > 0 ? awardsList : []);
-
-  const filteredSortedAwards = awardsToDisplay
-    .filter(a => a && a.is_active !== false && (a as any).is_active !== 'false')
-    .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
 
   return (
     <div id="home-page-view" className="relative pt-0 bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
@@ -1099,43 +1070,52 @@ export default function Home({
         </div>
       </section>
 
-      {/* Awards & Recognition Section */}
-      <section className="py-16 sm:py-20 bg-slate-50 relative z-10 border-t border-b border-slate-100" id="awards-recognition">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+      {/* Awards Section */}
+      <section className="py-16 sm:py-20 bg-slate-50/50 relative z-10 border-t border-sky-100/30" id="awards-and-recognitions">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
-              BEST DENTAL HOSPITAL IN RAJKOT
+              ACCOLADES & RECOGNITION
             </span>
-            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase">
-              Awarded as Best Dental Hospital in India
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-3">
+              Awards & Achievements
             </h2>
+            <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 justify-center items-stretch w-full">
-            {filteredSortedAwards.map((award, index) => {
-              console.log("Rendering award card:", award);
-              const imageUrl = award.image_url || (award as any).image || (award as any).url;
-              return (
+          {awardsList && awardsList.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {awardsList.map((item, idx) => (
                 <motion.div
-                  key={award.id}
-                  id={`award-card-${award.id}`}
-                  initial={{ opacity: 0, y: 30 }}
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex justify-center items-center overflow-hidden rounded-[20px] sm:rounded-[24px] bg-white border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.03)] hover:shadow-[0_15px_40px_rgba(8,28,58,0.06)] transition-all duration-300 w-full p-3 sm:p-4"
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  className="bg-white rounded-[20px] overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.03)] hover:shadow-[0_15px_35px_rgba(8,28,58,0.08)] hover:-translate-y-1 transition-all duration-300 group"
                 >
-                  <img
-                    src={imageUrl}
-                    alt={award.title || "Award Certificate"}
-                    className="w-full h-auto rounded-xl sm:rounded-2xl object-contain max-h-[550px] mx-auto block"
-                    referrerPolicy="no-referrer"
-                  />
+                  <div className="aspect-square w-full bg-slate-50 relative overflow-hidden">
+                    <img
+                      src={item.image_url}
+                      alt="Award & Recognition"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </motion.div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-3xs max-w-2xl mx-auto">
+              <div className="w-12 h-12 rounded-full bg-teal-50 text-[#0D9488] flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                🏆
+              </div>
+              <p className="text-slate-500 text-sm font-medium">
+                Awards & Recognitions will be displayed here.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

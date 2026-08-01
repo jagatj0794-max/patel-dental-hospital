@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, PhoneCall, Plus, Table, Trash2, X, Sparkles, Check, CheckSquare } from 'lucide-react';
 
-import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo, Award } from './types';
+import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo } from './types';
 import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
 import { supabase } from './utils/supabase';
@@ -18,7 +18,6 @@ import { videoService, DEFAULT_VIDEOS } from './utils/videoData';
 import { contactService, DEFAULT_CONTACT_INFO } from './utils/contactData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
 import { appointmentService, AdminAppointment } from './utils/appointmentData';
-import { awardsService } from './utils/awardsData';
 import { whatsappNotificationService } from './utils/notificationService';
 import { realtimeService } from './utils/realtimeService';
 import Navbar from './components/Navbar';
@@ -247,28 +246,6 @@ export default function App() {
 
   // Contact management state initialized with default values; updated from Supabase on mount
   const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
-
-  // Awards state
-  const [awardsList, setAwardsList] = useState<Award[]>([]);
-
-  // Load Awards from Supabase on mount
-  useEffect(() => {
-    let active = true;
-    const fetchAwards = async () => {
-      try {
-        const data = await awardsService.getAwards();
-        if (active) {
-          setAwardsList(data);
-        }
-      } catch (e) {
-        console.warn("Failed to load awards on mount:", e);
-      }
-    };
-    fetchAwards();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   // Load and listen to Supabase authentication changes
   useEffect(() => {
@@ -692,7 +669,6 @@ export default function App() {
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
-            awardsList={awardsList}
           />
         );
       case 'about':
@@ -796,8 +772,6 @@ export default function App() {
             setVideosList={setVideosList}
             contactInfo={contactInfo}
             setContactInfo={setContactInfo}
-            awardsList={awardsList}
-            setAwardsList={setAwardsList}
           />
         );
       default:
@@ -812,7 +786,6 @@ export default function App() {
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
-            awardsList={awardsList}
           />
         );
     }

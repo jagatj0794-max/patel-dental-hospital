@@ -76,9 +76,8 @@ export interface PatientMoment {
   image: string;
 }
 
-export interface Award {
+export interface AwardItem {
   id: string;
-  title: string;
   image_url: string;
   display_order: number;
   is_active: boolean;
