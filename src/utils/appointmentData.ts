@@ -223,7 +223,7 @@ export const appointmentService = {
   /**
    * Fetches the booked timeslots for a given date and branch
    */
-  getBookedSlots: async (date: string, branch: string): Promise<string[]> => {
+  getBookedSlots: async (date: string, branch: string, _doctor?: string): Promise<string[]> => {
     try {
       if (!date || !branch) return [];
       const { data, error } = await supabase.client
@@ -247,7 +247,7 @@ export const appointmentService = {
   /**
    * Checks if a specific slot is available (not booked by a non-cancelled appointment)
    */
-  isSlotAvailable: async (date: string, timeSlot: string, branch: string): Promise<boolean> => {
+  isSlotAvailable: async (date: string, timeSlot: string, branch: string, _doctor?: string): Promise<boolean> => {
     try {
       if (!date || !timeSlot || !branch) return false;
       const { data, error } = await supabase.client

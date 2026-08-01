@@ -352,6 +352,32 @@ export default function Home({
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
   const [awardsList, setAwardsList] = useState<AwardItem[]>([]);
+  const [selectedAward, setSelectedAward] = useState<AwardItem | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedAward(null);
+      }
+    };
+    if (selectedAward) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedAward]);
+
+  useEffect(() => {
+    if (selectedAward) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedAward]);
 
   React.useEffect(() => {
     serviceService.getServices().then(res => {
@@ -1084,24 +1110,30 @@ export default function Home({
           </div>
 
           {awardsList && awardsList.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
               {awardsList.map((item, idx) => (
                 <motion.div
                   key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="bg-white rounded-[20px] overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.03)] hover:shadow-[0_15px_35px_rgba(8,28,58,0.08)] hover:-translate-y-1 transition-all duration-300 group"
+                  transition={{ duration: 0.5, delay: idx * 0.08 }}
+                  onClick={() => setSelectedAward(item)}
+                  className="bg-white rounded-[20px] overflow-hidden border border-slate-100 shadow-[0_4px_24px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_40px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer flex flex-col justify-between"
                 >
-                  <div className="aspect-square w-full bg-slate-50 relative overflow-hidden">
+                  <div className="aspect-[4/3] w-full bg-slate-50/40 relative flex items-center justify-center p-4 sm:p-5 overflow-hidden">
                     <img
                       src={item.image_url}
                       alt="Award & Recognition"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-102"
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
+                    <div className="absolute inset-0 bg-[#081C3A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="w-11 h-11 rounded-full bg-white/95 shadow-md flex items-center justify-center text-[#0D9488] scale-75 group-hover:scale-100 transition-all duration-300">
+                        <Maximize2 className="w-5 h-5" />
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -1118,6 +1150,49 @@ export default function Home({
           )}
         </div>
       </section>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedAward && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setSelectedAward(null)}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6 md:p-10 cursor-zoom-out"
+          >
+            {/* Close Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedAward(null);
+              }}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full transition-all duration-200 z-[10000] cursor-pointer"
+              aria-label="Close Lightbox"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Content Container */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center rounded-2xl overflow-hidden cursor-default"
+            >
+              <img
+                src={selectedAward.image_url}
+                alt="Award Full View"
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 5. Happy Smiles & Patient Moments Gallery */}
       <PatientMomentsGallery 

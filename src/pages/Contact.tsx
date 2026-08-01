@@ -104,6 +104,13 @@ export default function Contact({
     }
 
     try {
+      // 1. Live database check to prevent booking an already booked slot
+      const isAvailable = await appointmentService.isSlotAvailable(formData.date, formData.timeSlot, formData.branch, 'To Be Assigned');
+      if (!isAvailable) {
+        setValidationError('This time slot is already booked. Please choose another available slot.');
+        return;
+      }
+
       const success = await onBookAppointment({
         name: formData.name,
         phone: formData.phone,
@@ -115,12 +122,15 @@ export default function Contact({
       });
 
       if (success) {
+        // Refresh available slots immediately
+        const booked = await appointmentService.getBookedSlots(formData.date, formData.branch);
+        setBookedSlots(booked);
         setFormSubmitted(true);
       } else {
-        setValidationError('This appointment slot has already been booked. Please select another available time.');
+        setValidationError('This time slot is already booked. Please choose another available slot.');
       }
     } catch (err) {
-      setValidationError('This appointment slot has already been booked. Please select another available time.');
+      setValidationError('This time slot is already booked. Please choose another available slot.');
     }
   };
 
@@ -265,18 +275,23 @@ export default function Contact({
                         </label>
                         <select
                           value={formData.timeSlot}
-                          onChange={(e) => setFormData({ ...formData, timeSlot: e.target.value })}
-                          disabled={timeSlots.filter(slot => !bookedSlots.includes(slot)).length === 0}
-                          className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none disabled:opacity-60"
+                          onChange={(e) => {
+                            if (bookedSlots.includes(e.target.value)) {
+                              setValidationError('This time slot is already booked. Please choose another available slot.');
+                              return;
+                            }
+                            setFormData({ ...formData, timeSlot: e.target.value });
+                          }}
+                          className="w-full px-4 py-3 text-sm bg-[#FAFAFC] border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         >
-                          {timeSlots.filter(slot => !bookedSlots.includes(slot)).map((slot, i) => (
-                            <option key={i} value={slot}>
-                              {slot}
-                            </option>
-                          ))}
-                          {timeSlots.filter(slot => !bookedSlots.includes(slot)).length === 0 && (
-                            <option value="">No slots available</option>
-                          )}
+                          {timeSlots.map((slot, i) => {
+                            const isBooked = bookedSlots.includes(slot);
+                            return (
+                              <option key={i} value={slot} disabled={isBooked} className={isBooked ? 'text-gray-400 bg-gray-100 font-normal line-through' : ''}>
+                                {slot}{isBooked ? ' (Already Booked)' : ''}
+                              </option>
+                            );
+                          })}
                         </select>
                       </div>
                     </div>

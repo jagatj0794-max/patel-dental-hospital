@@ -2730,12 +2730,64 @@ export default function Admin({
     fetchNotifications();
   }, []);
 
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Preload audio and instantiate once
+    const audio = new Audio('/sounds/notification.wav');
+    audio.volume = 0.55;
+    audio.preload = 'auto';
+    audioRef.current = audio;
+
+    // Interaction listener to unlock audio playback
+    const unlockAudio = () => {
+      if (audioRef.current) {
+        // Play and immediately pause to unlock audio context without playing sound early
+        audioRef.current.play()
+          .then(() => {
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.currentTime = 0;
+            }
+            console.log('[Audio] Playback successfully unlocked via user interaction.');
+            cleanupListeners();
+          })
+          .catch(err => {
+            console.warn('[Audio] Failed to unlock audio context:', err);
+          });
+      }
+    };
+
+    const cleanupListeners = () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+      window.removeEventListener('mousedown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
+    window.addEventListener('mousedown', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
+
+    return () => {
+      cleanupListeners();
+    };
+  }, []);
+
   // Sound Player Function
   const playNotificationSound = () => {
     try {
-      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav');
-      audio.volume = 0.55;
-      audio.play().catch(e => console.warn('Audio play was prevented. Click to allow.', e));
+      if (!audioRef.current) {
+        const audio = new Audio('/sounds/notification.wav');
+        audio.volume = 0.55;
+        audio.preload = 'auto';
+        audioRef.current = audio;
+      }
+      audioRef.current.currentTime = 0;
+      audioRef.current.play()
+        .then(() => console.log('[Audio] Chime played successfully.'))
+        .catch(e => console.warn('[Audio] Playback prevented or failed:', e));
     } catch (err) {
       console.error('Could not play notification sound:', err);
     }

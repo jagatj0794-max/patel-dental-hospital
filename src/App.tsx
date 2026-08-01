@@ -42,6 +42,8 @@ import Technology from './pages/Technology';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
+const DOCTOR_WHATSAPP_NUMBER = "919510397046";
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageId>(() => {
     let hash = window.location.hash.replace('#', '');
@@ -488,7 +490,7 @@ export default function App() {
     message?: string;
   }): Promise<boolean> => {
     // 1. Double check availability before inserting to prevent race conditions
-    const isAvailable = await appointmentService.isSlotAvailable(data.date, data.timeSlot, data.branch);
+    const isAvailable = await appointmentService.isSlotAvailable(data.date, data.timeSlot, data.branch, 'To Be Assigned');
     if (!isAvailable) {
       return false;
     }
@@ -541,6 +543,27 @@ export default function App() {
         date: data.date,
         time: data.timeSlot
       }).catch(err => console.error('[WhatsApp Notification] Failed to trigger:', err));
+
+      // Automatically redirect to WhatsApp in a new tab
+      const formattedDate = (() => {
+        try {
+          const dateObj = new Date(data.date);
+          if (!isNaN(dateObj.getTime())) {
+            return dateObj.toLocaleDateString('en-US', {
+              weekday: 'short',
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          }
+        } catch (e) {}
+        return data.date;
+      })();
+
+      const messageText = `🏥 Patel Dental Hospital\n\nHello Doctor,\n\nI have successfully booked my appointment.\n\n👤 Patient Name:\n${data.name}\n\n📞 Mobile Number:\n${data.phone}\n\n🦷 Doctor:\n${newAdminApt.doctor}\n\n📅 Appointment Date:\n${formattedDate}\n\n🕒 Appointment Time:\n${data.timeSlot}\n\nThank you.`;
+
+      const encodedMsg = encodeURIComponent(messageText);
+      window.open(`https://wa.me/${DOCTOR_WHATSAPP_NUMBER}?text=${encodedMsg}`, '_blank');
 
       return true;
     } catch (e) {
@@ -625,20 +648,34 @@ export default function App() {
       return;
     }
 
-    const success = await handleBookAppointment({
-      name: modalForm.name,
-      phone: modalForm.phone,
-      treatment: appointmentTreatment,
-      branch: modalForm.branch,
-      date: modalForm.date,
-      timeSlot: modalForm.timeSlot,
-      message: modalForm.message,
-    });
+    try {
+      // 1. Live database check to prevent booking an already booked slot
+      const isAvailable = await appointmentService.isSlotAvailable(modalForm.date, modalForm.timeSlot, modalForm.branch, 'To Be Assigned');
+      if (!isAvailable) {
+        setBookingError('This time slot is already booked. Please choose another available slot.');
+        return;
+      }
 
-    if (success) {
-      setModalFormSubmitted(true);
-    } else {
-      setBookingError('This appointment slot has already been booked. Please select another available time.');
+      const success = await handleBookAppointment({
+        name: modalForm.name,
+        phone: modalForm.phone,
+        treatment: appointmentTreatment,
+        branch: modalForm.branch,
+        date: modalForm.date,
+        timeSlot: modalForm.timeSlot,
+        message: modalForm.message,
+      });
+
+      if (success) {
+        // Refresh available slots immediately
+        const booked = await appointmentService.getBookedSlots(modalForm.date, modalForm.branch);
+        setModalBookedSlots(booked);
+        setModalFormSubmitted(true);
+      } else {
+        setBookingError('This time slot is already booked. Please choose another available slot.');
+      }
+    } catch (err) {
+      setBookingError('This time slot is already booked. Please choose another available slot.');
     }
   };
 
@@ -1004,18 +1041,23 @@ export default function App() {
                           </label>
                           <select
                             value={modalForm.timeSlot}
-                            onChange={(e) => setModalForm({ ...modalForm, timeSlot: e.target.value })}
-                            disabled={ALL_MODAL_TIME_SLOTS.filter(s => !modalBookedSlots.includes(s)).length === 0}
+                            onChange={(e) => {
+                              if (modalBookedSlots.includes(e.target.value)) {
+                                setBookingError('This time slot is already booked. Please choose another available slot.');
+                                return;
+                              }
+                              setModalForm({ ...modalForm, timeSlot: e.target.value });
+                            }}
                             className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none disabled:opacity-60"
                           >
-                            {ALL_MODAL_TIME_SLOTS.filter(s => !modalBookedSlots.includes(s)).map((slot) => (
-                              <option key={slot} value={slot}>
-                                {slot}
-                              </option>
-                            ))}
-                            {ALL_MODAL_TIME_SLOTS.filter(s => !modalBookedSlots.includes(s)).length === 0 && (
-                              <option value="">No slots available</option>
-                            )}
+                            {ALL_MODAL_TIME_SLOTS.map((slot) => {
+                              const isBooked = modalBookedSlots.includes(slot);
+                              return (
+                                <option key={slot} value={slot} disabled={isBooked} className={isBooked ? 'text-gray-400 bg-gray-100' : ''}>
+                                  {slot}{isBooked ? ' (Already Booked)' : ''}
+                                </option>
+                              );
+                            })}
                           </select>
                         </div>
                       </div>
