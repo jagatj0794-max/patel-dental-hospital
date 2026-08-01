@@ -137,23 +137,31 @@ export function getSupabase(): SupabaseClient {
     }
   };
 
-  // If in browser, use custom fetch to route requests through our server-side proxy
+  // If in browser, use custom fetch to route requests through our server-side proxy (only in local or dev environments)
   if (typeof window !== 'undefined') {
-    clientOptions.global = {
-      fetch: (url: string, options: any) => {
-        try {
-          const targetUrl = new URL(url);
-          const configUrl = new URL(supabaseUrl!);
-          if (targetUrl.host === configUrl.host) {
-            const proxyUrl = `/api/supabase${targetUrl.pathname}${targetUrl.search}`;
-            return fetch(proxyUrl, options);
+    const isLocalOrDev = 
+      window.location.hostname.includes('localhost') || 
+      window.location.hostname.includes('127.0.0.1') || 
+      window.location.hostname.includes('run.app') || 
+      window.location.hostname.includes('ais-dev');
+
+    if (isLocalOrDev) {
+      clientOptions.global = {
+        fetch: (url: string, options: any) => {
+          try {
+            const targetUrl = new URL(url);
+            const configUrl = new URL(supabaseUrl!);
+            if (targetUrl.host === configUrl.host) {
+              const proxyUrl = `/api/supabase${targetUrl.pathname}${targetUrl.search}`;
+              return fetch(proxyUrl, options);
+            }
+          } catch (e) {
+            console.error('[Supabase Client Proxy Fetch] Error processing URL:', e);
           }
-        } catch (e) {
-          console.error('[Supabase Client Proxy Fetch] Error processing URL:', e);
+          return fetch(url, options);
         }
-        return fetch(url, options);
-      }
-    };
+      };
+    }
   }
 
   supabaseClientInstance = createClient(supabaseUrl!, supabaseAnonKey!, clientOptions);
