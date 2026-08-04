@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CmsSectionToggle from './CmsSectionToggle';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart,
@@ -8,6 +9,7 @@ import { Service } from '../types';
 import { serviceService } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
+import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
 
 interface CrownAndBridgesCmsProps {
   onSaveSuccess?: () => void;
@@ -648,21 +650,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.hero && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Hero block visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hero !== false}
-                    onChange={(e) => updateMConfigField('show_hero', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hero !== false}
+                onChange={(checked) => updateMConfigField('show_hero', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -725,7 +716,16 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 2. WHAT ARE CROWN AND BRIDGES? */}
+        {/* FEATURED TREATMENT VIDEO */}
+        <FeaturedVideoCmsSection
+          mConfig={mConfig}
+          updateMConfigField={updateMConfigField}
+          isExpanded={!!expandedSections.featuredVideo}
+          onToggle={() => toggleSection('featuredVideo')}
+          sectionNumber="2"
+        />
+
+        {/* 3. WHAT ARE CROWN AND BRIDGES? */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -735,7 +735,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Layers className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. What are Crown and Bridges?</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. What are Crown and Bridges?</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introductory description and highlight banner box</span>
               </div>
             </div>
@@ -744,21 +744,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.intro && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle introduction section visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_introduction !== false}
-                    onChange={(e) => updateMConfigField('show_introduction', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_introduction !== false}
+                onChange={(checked) => updateMConfigField('show_introduction', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -809,7 +798,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Crown & Bridges Treatment Planning</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Crown & Bridges Treatment Planning</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure step-by-step clinical workflow steps</span>
               </div>
             </div>
@@ -818,21 +807,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.process && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle process steps block visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_process !== false}
-                    onChange={(e) => updateMConfigField('show_process', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_process !== false}
+                onChange={(checked) => updateMConfigField('show_process', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Process Section Heading</label>
@@ -938,7 +916,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Shield className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Crown & Bridge Materials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Crown & Bridge Materials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure material types (Metal Fused Ceramic, Metal-Free Zirconia, Natural Appearance, MRI Safe)</span>
               </div>
             </div>
@@ -947,21 +925,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.materials && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle materials section visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_candidate !== false}
-                    onChange={(e) => updateMConfigField('show_candidate', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_candidate !== false}
+                onChange={(checked) => updateMConfigField('show_candidate', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Heading</label>
@@ -1056,7 +1023,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Before & After Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Before & After Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure slider comparison image pairs</span>
               </div>
             </div>
@@ -1065,21 +1032,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.before_after && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Before & After slider visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_before_after !== false}
-                    onChange={(e) => updateMConfigField('show_before_after', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_before_after !== false}
+                onChange={(checked) => updateMConfigField('show_before_after', checked)}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -1239,7 +1195,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure clinical case images and photos</span>
               </div>
             </div>
@@ -1248,21 +1204,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.gallery && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle clinical case gallery visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_gallery !== false}
-                    onChange={(e) => updateMConfigField('show_gallery', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_gallery !== false}
+                onChange={(checked) => updateMConfigField('show_gallery', checked)}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -1394,7 +1339,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure demonstration video URL</span>
               </div>
             </div>
@@ -1403,21 +1348,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.video && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle procedure video visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_procedure_video !== false}
-                    onChange={(e) => updateMConfigField('show_procedure_video', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_procedure_video !== false}
+                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1461,7 +1395,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient review reels and testimonials</span>
               </div>
             </div>
@@ -1470,21 +1404,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.testimonials && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle testimonials visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_testimonials !== false}
-                    onChange={(e) => updateMConfigField('show_testimonials', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_testimonials !== false}
+                onChange={(checked) => updateMConfigField('show_testimonials', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Testimonials Section Title</label>
@@ -1590,7 +1513,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure hospital facilities and specialist doctors photos</span>
               </div>
             </div>
@@ -1599,21 +1522,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.hospital_photos && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle hospital & team gallery visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hospital_photos !== false}
-                    onChange={(e) => updateMConfigField('show_hospital_photos', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hospital_photos !== false}
+                onChange={(checked) => updateMConfigField('show_hospital_photos', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Heading</label>
@@ -1747,7 +1659,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><DollarSign className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Offer</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure treatment pricing packages and discount offers</span>
               </div>
             </div>
@@ -1756,21 +1668,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.cost && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle pricing & offers visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_cost !== false}
-                    onChange={(e) => updateMConfigField('show_cost', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_cost !== false}
+                onChange={(checked) => updateMConfigField('show_cost', checked)}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -1869,7 +1770,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure verified Google reviews and star ratings</span>
               </div>
             </div>
@@ -1878,21 +1779,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.google_reviews && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Google reviews block visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_google_reviews !== false}
-                    onChange={(e) => updateMConfigField('show_google_reviews', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_google_reviews !== false}
+                onChange={(checked) => updateMConfigField('show_google_reviews', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Reviews Section Title</label>
@@ -1979,7 +1869,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Phone className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom appointment booking call to action banner</span>
               </div>
             </div>
@@ -1988,21 +1878,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.cta && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle bottom CTA section visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_bottom_cta !== false}
-                    onChange={(e) => updateMConfigField('show_bottom_cta', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_bottom_cta !== false}
+                onChange={(checked) => updateMConfigField('show_bottom_cta', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -2051,7 +1930,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Frequently Asked Questions (FAQ)</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. Frequently Asked Questions (FAQ)</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure common patient questions and answers</span>
               </div>
             </div>
@@ -2060,21 +1939,10 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
 
           {expandedSections.faqs && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle FAQ section visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_faqs !== false}
-                    onChange={(e) => updateMConfigField('show_faqs', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_faqs !== false}
+                onChange={(checked) => updateMConfigField('show_faqs', checked)}
+              />
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-between">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CmsSectionToggle from './CmsSectionToggle';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart,
@@ -8,6 +9,7 @@ import { Service } from '../types';
 import { serviceService, DEFAULT_FMR_GOOGLE_REVIEWS, DEFAULT_FMR_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
+import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
 
 interface FullMouthRehabCmsProps {
   onSaveSuccess?: () => void;
@@ -739,21 +741,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.hero && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Hero block visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hero !== false}
-                    onChange={(e) => updateMConfigField('show_hero', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hero !== false}
+                onChange={(checked) => updateMConfigField('show_hero', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -816,7 +807,16 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 2. ABOUT FULL MOUTH REHABILITATION */}
+        {/* FEATURED TREATMENT VIDEO */}
+        <FeaturedVideoCmsSection
+          mConfig={mConfig}
+          updateMConfigField={updateMConfigField}
+          isExpanded={!!expandedSections.featuredVideo}
+          onToggle={() => toggleSection('featuredVideo')}
+          sectionNumber="2"
+        />
+
+        {/* 3. ABOUT FULL MOUTH REHABILITATION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -826,7 +826,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. About Full Mouth Rehabilitation</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. About Full Mouth Rehabilitation</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introduction text, clinical overview, and highlight banner</span>
               </div>
             </div>
@@ -835,21 +835,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.about && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle About section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_introduction !== false}
-                    onChange={(e) => updateMConfigField('show_introduction', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_introduction !== false}
+                onChange={(checked) => updateMConfigField('show_introduction', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -887,7 +876,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. How We Perform Full Mouth Rehabilitation</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. How We Perform Full Mouth Rehabilitation</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure step-by-step treatment process steps</span>
               </div>
             </div>
@@ -896,21 +885,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.process && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle process steps section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_process !== false}
-                    onChange={(e) => updateMConfigField('show_process', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_process !== false}
+                onChange={(checked) => updateMConfigField('show_process', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Process Section Heading</label>
@@ -982,7 +960,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Shield className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Treatment Planning Includes</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Treatment Planning Includes</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure inclusions, advantages, and clinical planning scope</span>
               </div>
             </div>
@@ -991,21 +969,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.benefits && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Treatment Planning section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_benefits !== false}
-                    onChange={(e) => updateMConfigField('show_benefits', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_benefits !== false}
+                onChange={(checked) => updateMConfigField('show_benefits', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Heading</label>
@@ -1071,7 +1038,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Who Is a Candidate for Full Mouth Rehabilitation</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Who Is a Candidate for Full Mouth Rehabilitation</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure clinical criteria and candidate indications</span>
               </div>
             </div>
@@ -1080,21 +1047,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.candidate && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Candidate section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_candidate !== false}
-                    onChange={(e) => updateMConfigField('show_candidate', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_candidate !== false}
+                onChange={(checked) => updateMConfigField('show_candidate', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Candidate Section Heading</label>
@@ -1169,21 +1125,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           
           {expandedSections.beforeAfter && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400 font-normal">Toggle the entire Before & After Smile Transformation section</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_before_after !== false}
-                    onChange={(e) => updateMConfigField('show_before_after', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_before_after !== false}
+                onChange={(checked) => updateMConfigField('show_before_after', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
@@ -1345,7 +1290,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Upload, delete, and reorder full mouth clinical gallery images (Single Gallery)</span>
               </div>
             </div>
@@ -1354,21 +1299,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.gallery && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle case transformations gallery block visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_gallery !== false}
-                    onChange={(e) => updateMConfigField('show_gallery', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_gallery !== false}
+                onChange={(checked) => updateMConfigField('show_gallery', checked)}
+              />
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 {galleryItems.length === 0 ? (
@@ -1458,7 +1392,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure single clinical procedure demonstration video</span>
               </div>
             </div>
@@ -1467,21 +1401,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.procedure_video && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle procedure video visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_procedure_video !== false}
-                    onChange={(e) => updateMConfigField('show_procedure_video', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_procedure_video !== false}
+                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1525,7 +1448,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure multiple patient video review reels</span>
               </div>
             </div>
@@ -1534,21 +1457,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.testimonials && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Patient Testimonials section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_testimonials !== false}
-                    onChange={(e) => updateMConfigField('show_testimonials', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_testimonials !== false}
+                onChange={(checked) => updateMConfigField('show_testimonials', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Testimonials Section Title</label>
@@ -1620,7 +1532,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure hospital infrastructure and specialist doctor team photos</span>
               </div>
             </div>
@@ -1629,21 +1541,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.hospital_team && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Hospital & Team gallery block visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hospital_photos !== false}
-                    onChange={(e) => updateMConfigField('show_hospital_photos', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hospital_photos !== false}
+                onChange={(checked) => updateMConfigField('show_hospital_photos', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Gallery Title</label>
@@ -1744,7 +1645,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Offer</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure package pricing heading, descriptions, and starting offers</span>
               </div>
             </div>
@@ -1753,21 +1654,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.cost && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Cost / Offer section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_cost !== false}
-                    onChange={(e) => updateMConfigField('show_cost', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_cost !== false}
+                onChange={(checked) => updateMConfigField('show_cost', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1816,7 +1706,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure service-specific Google reviews and ratings</span>
               </div>
             </div>
@@ -1825,21 +1715,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.google_reviews && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Google Patient Reviews visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_google_reviews !== false}
-                    onChange={(e) => updateMConfigField('show_google_reviews', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_google_reviews !== false}
+                onChange={(checked) => updateMConfigField('show_google_reviews', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Reviews Section Title</label>
@@ -1911,7 +1790,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom call to action section, phone number, and WhatsApp link</span>
               </div>
             </div>
@@ -1920,21 +1799,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.bottom_cta && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Bottom CTA section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_bottom_cta !== false}
-                    onChange={(e) => updateMConfigField('show_bottom_cta', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_bottom_cta !== false}
+                onChange={(checked) => updateMConfigField('show_bottom_cta', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1982,7 +1850,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. FAQ Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. FAQ Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure service-specific frequently asked questions</span>
               </div>
             </div>
@@ -1991,21 +1859,10 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
 
           {expandedSections.faqs && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle FAQ section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_faqs !== false}
-                    onChange={(e) => updateMConfigField('show_faqs', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_faqs !== false}
+                onChange={(checked) => updateMConfigField('show_faqs', checked)}
+              />
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-between">

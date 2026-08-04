@@ -6,7 +6,6 @@
 export type PageId =
   | 'home'
   | 'about'
-  | 'treatments'
   | 'sameday'
   | 'implants'
   | 'gallery'
@@ -264,6 +263,23 @@ export interface MarketingConfig {
   }[];
   hospital_team_title?: string;
   show_hospital_team_photos?: boolean;
+
+  // Featured Treatment Video Section
+  featured_video_enabled?: boolean;
+  featured_video_heading?: string;
+  featured_video_description?: string;
+  featured_video_bullets?: string[];
+  featured_video_cta_text?: string;
+  featured_video_cta_link?: string;
+  featured_video_source?: 'youtube' | 'upload';
+  featured_video_youtube_url?: string;
+  featured_video_upload_url?: string;
+  featured_video_thumbnail_source?: 'auto' | 'custom';
+  featured_video_custom_thumbnail?: string;
+  featured_video_autoplay?: boolean;
+  featured_video_mute?: boolean;
+  featured_video_loop?: boolean;
+
   [key: string]: any;
 }
 

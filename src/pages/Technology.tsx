@@ -8,8 +8,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Maximize2, X, ChevronLeft, ChevronRight, ImageIcon, Sparkles, Cpu } from 'lucide-react';
 import { TechnologyItem } from '../types';
 import { technologyService } from '../utils/technologyData';
+import { useSEO } from '../utils/seo';
 
 export default function Technology() {
+  useSEO({
+    title: 'Advanced Digital Dentistry & Technology | Patel Dental Hospital',
+    description: 'Explore the cutting-edge dental technology at Patel Dental Hospital, Rajkot. From high-resolution 3D CBCT diagnostics and intraoral scanners to advanced laser dentistry for painless treatments.',
+    keywords: 'Digital Dentistry, Dental Technology Rajkot, 3D CBCT Scan Rajkot, Laser Dentistry, CAD CAM Dental, Intraoral Scanner, Advanced Dental Care, Patel Dental Hospital Technology'
+  });
+
   const [items, setItems] = useState<TechnologyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);

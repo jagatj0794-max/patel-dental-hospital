@@ -28,7 +28,6 @@ import Lightbox from './components/Lightbox';
 // Pages
 import Home from './pages/Home';
 import About from './pages/About';
-import Treatments from './pages/Treatments';
 import SameDayFix from './pages/SameDayFix';
 import SmileGallery from './pages/SmileGallery';
 import Doctors from './pages/Doctors';
@@ -53,7 +52,7 @@ export default function App() {
     if (hash === 'admin-login') {
       hash = 'admin/login';
     }
-    const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology'];
+    const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology'];
     if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
       return hash as PageId;
     }
@@ -387,7 +386,7 @@ export default function App() {
       if (hash === 'admin-login') {
         hash = 'admin/login';
       }
-      const validPages: PageId[] = ['home', 'about', 'treatments', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'social-service', 'technology'];
+      const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'social-service', 'technology'];
       if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
         setCurrentPage(hash as PageId);
         window.scrollTo({ top: 0 });
@@ -710,8 +709,6 @@ export default function App() {
         );
       case 'about':
         return <About openAppointmentModal={openAppointmentModal} />;
-      case 'treatments':
-        return <Treatments openAppointmentModal={openAppointmentModal} />;
       case 'sameday':
         return <SameDayFix openAppointmentModal={openAppointmentModal} contactInfo={contactInfo} />;
       case 'implants':

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { DoctorBioRenderer } from '../components/DoctorBioRenderer';
+import { useSEO } from '../utils/seo';
 const patelClinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800';
 const patelCbctImaging = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
 const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
@@ -19,6 +20,13 @@ interface AboutProps {
 }
 
 export default function About({ openAppointmentModal }: AboutProps) {
+  useSEO({
+    title: 'About Patel Dental Hospital | Best Dentist & Dental Clinic in Rajkot',
+    description: 'Discover Patel Dental Hospital in Rajkot, Gujarat. Led by Dr. Vipul Patel with 18+ years experience. Providing advanced, painless dental treatments under one roof with in-house CBCT and USA-standard sterilization.',
+    keywords: 'About Patel Dental Hospital, Best Dentist in Rajkot, Dental Clinic in Rajkot, Best Dental Hospital in Rajkot, Dental Surgeon, Family Dentist, Family Dental Clinic Gujarat, Dr Vipul Patel',
+    ogImage: patelClinicInterior
+  });
+
   // Existing facility features
   const facilityCards = [
     {

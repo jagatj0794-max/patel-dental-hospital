@@ -10,10 +10,10 @@ import {
   ArrowRight, Phone, Heart, CheckCircle2, X, ChevronLeft,
   Activity, Stethoscope, Video, Mail, MapPin, 
   Facebook, Instagram, Youtube, Linkedin, Twitter, MessageSquare, Star,
-  Award, Shield, Check, Clock, Users, ShieldCheck, FileText, CheckCircle
+  Award, Shield, Check, Clock, Users, ShieldCheck, FileText, CheckCircle, Play
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo } from '../types';
+import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
@@ -21,14 +21,58 @@ import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { GooglePatientReviews } from '../components/GooglePatientReviews';
+import { useSEO } from '../utils/seo';
 const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
 
-function getYouTubeEmbedUrl(url: string) {
+function extractYouTubeId(url: string): string {
   if (!url) return '';
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  if (match && match[2].length === 11) {
-    return `https://www.youtube.com/embed/${match[2]}`;
+  const trimmedUrl = url.trim();
+  
+  try {
+    // 1. Matches embed URLs like https://www.youtube.com/embed/VIDEO_ID
+    if (trimmedUrl.includes('/embed/')) {
+      const parts = trimmedUrl.split('/embed/');
+      if (parts[1]) {
+        const id = parts[1].split(/[?#&]/)[0];
+        if (id.length === 11) return id;
+      }
+    }
+    
+    // 2. Matches short URLs like https://youtu.be/VIDEO_ID
+    if (trimmedUrl.includes('youtu.be/')) {
+      const parts = trimmedUrl.split('youtu.be/');
+      if (parts[1]) {
+        const id = parts[1].split(/[?#&]/)[0];
+        if (id.length === 11) return id;
+      }
+    }
+
+    // 3. Matches watch URLs like watch?v=VIDEO_ID or watch&v=VIDEO_ID
+    if (trimmedUrl.includes('v=')) {
+      const parts = trimmedUrl.split('v=');
+      if (parts[1]) {
+        const id = parts[1].split(/[?#&]/)[0];
+        if (id.length === 11) return id;
+      }
+    }
+    
+    // Fallback regex match for any other pattern
+    const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]{11}).*/;
+    const match = trimmedUrl.match(regExp);
+    if (match && match[1] && match[1].length === 11) {
+      return match[1];
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+  
+  return '';
+}
+
+function getYouTubeEmbedUrl(url: string) {
+  const id = extractYouTubeId(url);
+  if (id) {
+    return `https://www.youtube.com/embed/${id}`;
   }
   return url;
 }
@@ -42,6 +86,231 @@ function isMp4Url(url: string) {
   if (!url) return false;
   return url.endsWith('.mp4') || url.includes('supabase.co');
 }
+
+interface FeaturedTreatmentVideoProps {
+  mConfig: MarketingConfig;
+  serviceTitle: string;
+  openAppointmentModal: (preselectedTreatment?: string) => void;
+}
+
+export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
+  mConfig,
+  serviceTitle,
+  openAppointmentModal
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const defaultYtUrl = 'https://www.youtube.com/watch?v=SnOxxv_S2ew';
+  const source = mConfig.featured_video_source || 'youtube';
+  const youtubeUrl = (mConfig.featured_video_youtube_url || '').trim() || defaultYtUrl;
+  const uploadUrl = (mConfig.featured_video_upload_url || '').trim();
+
+  const hasVideo = source === 'youtube' ? !!youtubeUrl : !!uploadUrl;
+  const isEnabled = mConfig.featured_video_enabled !== false;
+
+  if (!isEnabled || !hasVideo) {
+    return null;
+  }
+
+  const heading = mConfig.featured_video_heading || `Featured ${serviceTitle} Video`;
+  const description = mConfig.featured_video_description || `Learn more about the advanced procedures and clinical excellence of ${serviceTitle} treatment at Patel Dental Hospital. Watch our expert walk-through of the process.`;
+  const bullets = mConfig.featured_video_bullets && mConfig.featured_video_bullets.length > 0 
+    ? mConfig.featured_video_bullets 
+    : [
+        'Advanced state-of-the-art procedure methods',
+        'Minimally invasive and pain-free techniques',
+        'Expert clinical execution and diagnostic precision'
+      ];
+  const ctaText = mConfig.featured_video_cta_text || 'Schedule A Consultation';
+  const ctaLink = mConfig.featured_video_cta_link || '';
+
+  const getYouTubeId = (url: string) => {
+    return extractYouTubeId(url);
+  };
+
+  const buildYouTubeEmbedUrl = () => {
+    const id = getYouTubeId(youtubeUrl);
+    let embedUrl = `https://www.youtube.com/embed/${id}?rel=0`;
+    
+    // Always use autoplay=0, never autoplay=1
+    embedUrl += '&autoplay=0';
+    
+    const loop = !!mConfig.featured_video_loop;
+    if (loop) embedUrl += `&loop=1&playlist=${id}`;
+    
+    return embedUrl;
+  };
+
+  const getThumbnailUrl = () => {
+    if (mConfig.featured_video_thumbnail_source === 'custom' && mConfig.featured_video_custom_thumbnail) {
+      return mConfig.featured_video_custom_thumbnail;
+    }
+    if (source === 'youtube') {
+      const ytId = getYouTubeId(youtubeUrl);
+      if (ytId) {
+        return `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
+      }
+    }
+    return '';
+  };
+
+  const [imgSrc, setImgSrc] = useState(getThumbnailUrl());
+
+  useEffect(() => {
+    setImgSrc(getThumbnailUrl());
+  }, [
+    mConfig.featured_video_thumbnail_source,
+    mConfig.featured_video_custom_thumbnail,
+    source,
+    youtubeUrl
+  ]);
+
+  const handleImgError = () => {
+    if (imgSrc && imgSrc.includes('maxresdefault.jpg')) {
+      const ytId = getYouTubeId(youtubeUrl);
+      if (ytId) {
+        setImgSrc(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
+      }
+    }
+  };
+
+  const handleCtaClick = () => {
+    if (!ctaLink || ctaLink === '#appointment' || ctaLink === 'appointment') {
+      openAppointmentModal(`${serviceTitle} - Featured Video CTA`);
+    } else if (ctaLink.startsWith('http')) {
+      window.open(ctaLink, '_blank', 'noopener,noreferrer');
+    } else {
+      if (ctaLink.startsWith('#')) {
+        const id = ctaLink.substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.location.hash = ctaLink;
+        }
+      } else {
+        window.location.href = ctaLink;
+      }
+    }
+  };
+
+  return (
+    <div 
+      className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-14 shadow-xs hover:shadow-sm transition-shadow duration-300 relative overflow-hidden" 
+      id="featured-treatment-video-section"
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+        
+        {/* LEFT SIDE: Video Player (First in DOM so mobile/tablet is video first) */}
+        <div className="w-full">
+          <div className="relative aspect-video w-full bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200/60 group">
+            {isPlaying ? (
+              source !== 'upload' ? (
+                <iframe
+                  src={buildYouTubeEmbedUrl()}
+                  title={`${serviceTitle} Featured Video`}
+                  className="w-full h-full border-none"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={uploadUrl}
+                  className="w-full h-full object-cover"
+                  controls
+                  autoPlay={false}
+                  loop={!!mConfig.featured_video_loop}
+                />
+              )
+            ) : (
+              <button 
+                type="button"
+                onClick={() => setIsPlaying(true)}
+                className="absolute inset-0 w-full h-full cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+              >
+                {/* Thumbnail Image / Poster */}
+                {imgSrc ? (
+                  <img
+                    src={imgSrc}
+                    alt={`${serviceTitle} Video Thumbnail`}
+                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                    onError={handleImgError}
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  uploadUrl ? (
+                    <video
+                      src={uploadUrl}
+                      className="w-full h-full object-cover"
+                      preload="metadata"
+                      muted
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#081C3A] to-[#0A264F] flex items-center justify-center">
+                      <Video className="h-12 w-12 text-slate-400" />
+                    </div>
+                  )
+                )}
+
+                {/* Dark Overlay to increase play button contrast */}
+                <div className="absolute inset-0 bg-slate-950/25 group-hover:bg-slate-950/35 transition-colors duration-300" />
+
+                {/* Large Play Button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-16 w-16 sm:h-20 sm:w-20 bg-white/95 text-[#0D9488] rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                    <Play className="h-8 w-8 sm:h-10 sm:w-10 fill-current translate-x-0.5" />
+                  </div>
+                </div>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT SIDE: Content */}
+        <div className="space-y-4 sm:space-y-6 text-left font-sans">
+          <div className="space-y-3">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+              <Video className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+              Treatment Video
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+              {heading}
+            </h2>
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full" />
+          </div>
+
+          {description && (
+            <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed whitespace-pre-line">
+              {description}
+            </p>
+          )}
+
+          {bullets.length > 0 && (
+            <ul className="space-y-2.5 pt-2">
+              {bullets.map((bullet, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 font-semibold">
+                  <CheckCircle2 className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={handleCtaClick}
+              className="w-full sm:w-auto px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            >
+              <span>{ctaText}</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
 
 function getFallbackMedia(slug: string, title: string) {
   let heroImg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
@@ -91,6 +360,272 @@ function getFallbackMedia(slug: string, title: string) {
     faqs: []
   };
 }
+
+interface PremiumMedicalCardProps {
+  icon?: React.ReactNode;
+  title?: string;
+  children: React.ReactNode;
+  imageUrl?: string;
+}
+
+export const PremiumMedicalCard: React.FC<PremiumMedicalCardProps> = ({ icon, title, children, imageUrl }) => {
+  return (
+    <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
+      {/* Left accent line */}
+      <div className="absolute left-0 top-[36px] bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+      
+      {/* Icon */}
+      {icon && (
+        <div className="text-[#14B8A6] w-[30px] h-[30px] flex items-center justify-start shrink-0">
+          {React.cloneElement(icon as React.ReactElement, { className: "h-[30px] w-[30px] text-[#14B8A6]" })}
+        </div>
+      )}
+      
+      {/* Title */}
+      {title && title.trim() !== '' && (
+        <h3 className="font-sans font-bold text-[#081C3A] text-[24px] sm:text-[30px] tracking-tight mt-6 mb-4 leading-tight">
+          {title}
+        </h3>
+      )}
+      
+      {/* Body Content */}
+      <div className="text-[#475569] text-[17px] leading-[1.8] font-medium flex-1">
+        {children}
+      </div>
+
+      {/* Optional Card Image */}
+      {imageUrl && imageUrl.trim() !== '' && (
+        <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
+          <img
+            src={imageUrl}
+            alt={title || "Card illustration"}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const getServiceSEO = (slug: string, title: string, fallbackDesc: string) => {
+  const canonicalUrl = `https://www.pateldentalhospital.com/#services/${slug}`;
+
+  const createSchema = (srvTitle: string, srvDesc: string) => {
+    return [
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.pateldentalhospital.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Services",
+            "item": "https://www.pateldentalhospital.com/#treatments"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": srvTitle,
+            "item": canonicalUrl
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Dentist",
+        "name": "Patel Dental Hospital",
+        "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200",
+        "@id": "https://www.pateldentalhospital.com/#dentist",
+        "url": "https://www.pateldentalhospital.com/",
+        "telephone": "+919510397046",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Gayatrinagar Main Road & Amin Marg",
+          "addressLocality": "Rajkot",
+          "addressRegion": "Gujarat",
+          "postalCode": "360005",
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "22.2856",
+          "longitude": "70.7912"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "opens": "09:00",
+          "closes": "20:00"
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Dental Services",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "MedicalSpecialty",
+                "name": srvTitle,
+                "description": srvDesc
+              }
+            }
+          ]
+        }
+      }
+    ];
+  };
+
+  switch (slug) {
+    case 'dental-implants': {
+      const sTitle = 'Best Dental Implants in Rajkot | Tooth Implant Specialist';
+      const sDesc = 'Get lifetime-warranty dental implants in Rajkot at Patel Dental Hospital. Permanent tooth replacement, painless 3D CBCT guided surgery by Dr. Vipul Patel.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Dental Implants, Best Dental Implants in Rajkot, Dental Implant Specialist, Implantology Rajkot, Same Day Dental Implants, Full Mouth Rehabilitation, Tooth Replacement, Missing Tooth Replacement, Single Tooth Implant, Full Mouth Dental Implants',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'root-canal-treatment': {
+      const sTitle = 'Painless Single Sitting Root Canal Treatment in Rajkot | RCT Specialist';
+      const sDesc = 'Experience comfortable, single-sitting Root Canal Treatment (RCT) in Rajkot at Patel Dental Hospital. Endodontic specialist care to resolve tooth pain & save natural teeth.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Root Canal Treatment, RCT, Single Sitting RCT, Root Canal Specialist, Tooth Pain Treatment, Endodontic Treatment, Best Dentist in Rajkot, Dental Clinic in Rajkot, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'full-mouth-rehabilitation': {
+      const sTitle = 'Full Mouth Rehabilitation & Restoration in Rajkot | Patel Dental Hospital';
+      const sDesc = 'Complete smile reconstruction and bite correction with full mouth rehabilitation in Rajkot. Painless restorative procedures by specialist clinicians at Patel Dental Hospital.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Full Mouth Rehabilitation, Full Mouth Restoration, Complete Dental Rehabilitation, Full Mouth Reconstruction, Restorative Dentistry, Advanced Dental Care in Rajkot, Dentist in Rajkot',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'invisible-aligners': {
+      const sTitle = 'Invisible Aligners & Clear Aligners in Rajkot | Clear Braces Specialist';
+      const sDesc = 'Straighten your teeth discreetly with invisible aligners & clear aligners in Rajkot. Get comfortable orthodontic treatment customized by experts at Patel Dental Hospital.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Invisible Aligners, Clear Aligners, Invisible Braces, Teeth Straightening, Orthodontic Treatment, Clear Aligners Rajkot, Clear Braces Rajkot, Best Dentist in Rajkot, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'smile-makeover': {
+      const sTitle = 'Smile Makeover & Cosmetic Smile Designing in Rajkot | Patel Dental Hospital';
+      const sDesc = 'Get your dream smile designed by expert cosmetic dentists in Rajkot. Patel Dental Hospital offers professional smile correction, veneers, and aesthetic smile makeovers.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Smile Makeover, Smile Designing, Cosmetic Dentistry, Smile Correction, Aesthetic Dentistry, Cosmetic Dentist Rajkot, Porcelain Veneers, Digital Smile Design, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'crowns-bridges': {
+      const sTitle = 'Premium Dental Crowns & Bridges in Rajkot | Zirconia & Ceramic Caps';
+      const sDesc = 'Restore damaged or missing teeth with high-durability Zirconia and Ceramic dental crowns and bridges in Rajkot at Patel Dental Hospital. CAD/CAM custom restorations.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Crowns and Bridges, Dental Crown, Zirconia Crown, Ceramic Crown, Dental Bridge, Tooth Cap, Best Dentist in Rajkot, Dental Clinic Rajkot, Restorative Dentistry, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'teeth-whitening': {
+      const sTitle = 'Professional Laser Teeth Whitening in Rajkot | Instant Bright Smile';
+      const sDesc = 'Get a sparkling white smile in under 60 minutes with advanced laser teeth whitening in Rajkot at Patel Dental Hospital. Safe, painless, and highly effective shade brightening.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Teeth Whitening, Laser Teeth Whitening, Professional Teeth Whitening, Tooth Whitening, Cosmetic Dentist Rajkot, Best Dental Hospital in Rajkot, Instant Teeth Brightening, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'pediatric-dentistry': {
+      const sTitle = 'Best Pediatric Dentist in Rajkot | Child & Kids Dental Clinic';
+      const sDesc = 'Warm, gentle, and pain-free children\'s dental care in Rajkot. Patel Dental Hospital offers expert pediatric dentistry, cavity prevention, fluoride therapy, and dental sealants.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Child Dentist, Kids Dentist, Pediatric Dentist, Children\'s Dental Care, Kids Dentist Rajkot, Pediatric Dentist Rajkot, Cavity Prevention, Preventive Dentistry, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'braces-treatment': {
+      const sTitle = 'Orthodontic Braces Treatment in Rajkot | Metal & Ceramic Braces';
+      const sDesc = 'Align your crooked or crowded teeth perfectly with metal, ceramic, or self-ligating dental braces in Rajkot. Comprehensive orthodontic solutions under senior consultants.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Braces Treatment, Metal Braces, Ceramic Braces, Orthodontics, Teeth Alignment, Orthodontic Treatment Rajkot, Best Orthodontist Rajkot, Teeth Straightening Rajkot, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'wisdom-tooth-surgery': {
+      const sTitle = 'Painless Wisdom Tooth Surgery & Removal in Rajkot | Patel Dental Hospital';
+      const sDesc = 'Safe, comfortable, and pain-free wisdom tooth removal and impacted tooth surgery in Rajkot at Patel Dental Hospital. Advanced micromotor systems for fast post-op recovery.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Wisdom Tooth Removal, Wisdom Tooth Surgery, Impacted Tooth Surgery, Tooth Extraction, Best Dentist in Rajkot, Oral Surgeon Rajkot, Painless Extraction Rajkot, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    case 'tooth-coloured-filling': {
+      const sTitle = 'Biocompatible Tooth Coloured Fillings in Rajkot | Composite Restoration';
+      const sDesc = 'Restore cavities naturally with dental composite fillings in Rajkot. Patel Dental Hospital offers durable, aesthetic, and metal-free tooth-coloured tooth restorations.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Tooth Filling, Composite Filling, Tooth Coloured Filling, Dental Filling, Cavity Restoration, Best Dentist in Rajkot, Dental Clinic Rajkot, Preventive Dentistry, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+    default: {
+      const sTitle = `${title} | Advanced Dental Treatment in Rajkot`;
+      const sDesc = fallbackDesc || `Advanced, reliable ${title} at Patel Dental Hospital, Rajkot. Led by expert senior dentists using world-class technologies and safe sterile guidelines.`;
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: `${title}, Best Dentist in Rajkot, Dental Clinic in Rajkot, Patel Dental Hospital, Dental Treatment, Rajkot Dentist`,
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
+  }
+};
 
 interface ServiceDetailProps {
   slug: string;
@@ -198,6 +733,103 @@ export default function ServiceDetail({
   const fallback = React.useMemo(() => {
     return getFallbackMedia(slug, service?.title || '');
   }, [slug, service?.title]);
+
+  const seoHeadings = React.useMemo(() => {
+    let kw = 'Dental Care';
+    let kwPlural = 'Dental Care';
+    
+    if (isDentalImplants) {
+      kw = 'Dental Implant';
+      kwPlural = 'Dental Implants';
+    } else if (isRootCanal) {
+      kw = 'Root Canal Treatment';
+      kwPlural = 'Root Canal Treatment';
+    } else if (isFullMouth) {
+      kw = 'Full Mouth Rehabilitation';
+      kwPlural = 'Full Mouth Rehabilitation';
+    } else if (isInvisibleAligners) {
+      kw = 'Invisible Aligners';
+      kwPlural = 'Invisible Aligners';
+    } else if (isSmileMakeover) {
+      kw = 'Smile Makeover';
+      kwPlural = 'Smile Makeover';
+    } else if (isCrownsAndBridges) {
+      kw = 'Crowns & Bridges';
+      kwPlural = 'Crowns & Bridges';
+    } else if (isTeethWhitening) {
+      kw = 'Teeth Whitening';
+      kwPlural = 'Teeth Whitening';
+    } else if (isPediatricDentistry) {
+      kw = 'Pediatric Dentistry';
+      kwPlural = 'Pediatric Dentistry';
+    } else if (isBracesTreatment) {
+      kw = 'Braces Treatment';
+      kwPlural = 'Braces Treatment';
+    } else if (isWisdomToothSurgery) {
+      kw = 'Wisdom Tooth Surgery';
+      kwPlural = 'Wisdom Tooth Surgery';
+    } else if (isToothColouredFilling) {
+      kw = 'Composite Filling';
+      kwPlural = 'Composite Filling';
+    } else {
+      kw = service?.title || 'Dental Care';
+      kwPlural = service?.title || 'Dental Care';
+    }
+
+    return {
+      keyword: kw,
+      keywordPlural: kwPlural,
+      intro: isDentalImplants ? 'What is a Dental Implant?'
+           : isRootCanal ? 'What is Single Sitting Root Canal Treatment?'
+           : isFullMouth ? 'What is Full Mouth Rehabilitation?'
+           : isInvisibleAligners ? 'What are Invisible Aligners?'
+           : isSmileMakeover ? 'What is a Smile Makeover?'
+           : isCrownsAndBridges ? 'What are Dental Crowns & Bridges?'
+           : isTeethWhitening ? 'What is Laser Teeth Whitening?'
+           : isPediatricDentistry ? 'What is Pediatric Dentistry?'
+           : isBracesTreatment ? 'What is Braces Treatment?'
+           : isWisdomToothSurgery ? 'What is Wisdom Tooth Surgery?'
+           : isToothColouredFilling ? 'What is a Composite Filling?'
+           : `About ${kw}`,
+      process: isDentalImplants ? 'Dental Implant Treatment Procedure'
+             : isRootCanal ? 'Root Canal Treatment Process & Timeline'
+             : isFullMouth ? 'Full Mouth Rehabilitation Treatment Process'
+             : isInvisibleAligners ? 'Invisible Aligners Treatment Process'
+             : isSmileMakeover ? 'Smile Makeover Treatment Process'
+             : isCrownsAndBridges ? 'Crowns & Bridges Treatment Process'
+             : isTeethWhitening ? 'Teeth Whitening Treatment Process'
+             : isPediatricDentistry ? 'Pediatric Dentistry Treatment Process'
+             : isBracesTreatment ? 'Braces Treatment Process'
+             : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Process'
+             : isToothColouredFilling ? 'Composite Filling Treatment Process'
+             : `${kw} Treatment Process`,
+      whyChooseUs: `Why Choose Patel Dental Hospital for ${kwPlural} in Rajkot`,
+      benefits: `Benefits of ${kwPlural}`,
+      candidate: isDentalImplants ? 'Who Is a Candidate for Dental Implants?'
+               : isRootCanal ? 'Who Needs Root Canal Treatment?'
+               : isFullMouth ? 'Who Is a Candidate for Full Mouth Rehabilitation?'
+               : isInvisibleAligners ? 'Who Is a Candidate for Invisible Aligners?'
+               : isSmileMakeover ? 'Who Is a Candidate for a Smile Makeover?'
+               : isCrownsAndBridges ? 'Who Needs Dental Crowns & Bridges?'
+               : isTeethWhitening ? 'Who Is a Candidate for Teeth Whitening?'
+               : isPediatricDentistry ? 'Specialized Pediatric Dentistry Services'
+               : isBracesTreatment ? 'Who Needs Braces Treatment?'
+               : isWisdomToothSurgery ? 'Who Needs Wisdom Tooth Surgery?'
+               : isToothColouredFilling ? 'Who Needs a Composite Filling?'
+               : `Candidates for ${kw}`,
+      transformations: `Before & After ${kwPlural} Transformations`,
+      caseGallery: `${kw} Clinical Case Gallery`,
+      video: `${kw} Treatment Procedure Video`,
+      cost: `${kw} Cost & Special Treatment Offers`,
+      reviews: `Google Patient Reviews for ${kwPlural}`,
+      bottomCta: `Why Choose Patel Dental Hospital for ${kwPlural} in Rajkot`,
+      faq: `Frequently Asked Questions about ${kwPlural}`
+    };
+  }, [
+    isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners,
+    isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry,
+    isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling, service
+  ]);
 
   const heroImage = service?.hero_image || fallback.hero_image;
   const heroImageCaption = service?.hero_image_caption || fallback.hero_image_caption;
@@ -692,40 +1324,38 @@ export default function ServiceDetail({
     return hasHeroTitle || hasHeroDesc || hasHeroImgCap || hasIntroTitle || hasIntroDesc || hasSteps || hasFeats || hasMedia;
   }, [service]);
 
-  // Update page title & meta description for SEO
-  useEffect(() => {
-    if (service) {
-      const originalTitle = document.title;
-      let metaDescription = document.querySelector('meta[name="description"]');
-      const originalDescription = metaDescription ? metaDescription.getAttribute('content') : '';
-
-      // Set new Title
-      const newTitle = service.seo_title || `${service.title} | Patel Dental Hospital`;
-      document.title = newTitle;
-
-      // Set new Description
-      const newDescription = service.seo_description || service.short_description;
-      if (newDescription) {
-        if (!metaDescription) {
-          metaDescription = document.createElement('meta');
-          metaDescription.setAttribute('name', 'description');
-          document.head.appendChild(metaDescription);
-        }
-        metaDescription.setAttribute('content', newDescription);
-      }
-
-      return () => {
-        document.title = originalTitle;
-        if (metaDescription) {
-          if (originalDescription) {
-            metaDescription.setAttribute('content', originalDescription);
-          } else {
-            metaDescription.remove();
-          }
-        }
+  const seoData = React.useMemo(() => {
+    if (!service) {
+      return {
+        title: 'Advanced Dental Care & Treatment in Rajkot | Patel Dental Hospital',
+        description: 'Patel Dental Hospital offers state-of-the-art dental care in Rajkot, Gujarat. Painless implants, smile makeovers, root canals, braces, and full mouth rehabilitation.',
+        keywords: 'Best Dental Hospital in Rajkot, Dental Clinic in Rajkot, Dentist in Rajkot',
+        ogImage: undefined,
+        canonicalUrl: undefined,
+        schema: undefined
       };
     }
+
+    const dynamicSEO = getServiceSEO(service.slug, service.title, service.short_description || '');
+
+    return {
+      title: service.seo_title || dynamicSEO.title,
+      description: service.seo_description || dynamicSEO.description,
+      keywords: dynamicSEO.keywords,
+      ogImage: service.hero_image || undefined,
+      canonicalUrl: dynamicSEO.canonicalUrl,
+      schema: dynamicSEO.schema
+    };
   }, [service]);
+
+  useSEO({
+    title: seoData.title,
+    description: seoData.description,
+    keywords: seoData.keywords,
+    ogImage: seoData.ogImage,
+    canonicalUrl: seoData.canonicalUrl,
+    schema: seoData.schema
+  });
 
   const displaySteps: any[] = React.useMemo(() => {
     if (!service) return [];
@@ -937,9 +1567,9 @@ export default function ServiceDetail({
 
   // Handle navigating to back / treatment page
   const handleBackToServices = () => {
-    window.location.hash = '#treatments';
+    window.location.hash = '#home';
     if (setCurrentPage) {
-      setCurrentPage('treatments');
+      setCurrentPage('home');
     }
   };
 
@@ -1189,22 +1819,7 @@ export default function ServiceDetail({
     <div className="min-h-screen bg-slate-50 pt-[108px] sm:pt-[124px] lg:pt-[140px] pb-5 sm:pb-12 px-4 sm:px-6 lg:px-8 selection:bg-[#0D9488]/20 selection:text-[#081C3A]">
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-16 lg:space-y-20">
         
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={handleBackToServices}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-[#0D9488] transition-colors py-2 px-4 bg-white border border-slate-200/80 rounded-xl shadow-2xs hover:shadow-xs cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            Back to Treatments
-          </button>
-          
-          <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-            <span className="cursor-pointer hover:text-slate-600 transition-colors" onClick={handleBackToServices}>Treatments</span>
-            <span>/</span>
-            <span className="text-[#0D9488] font-black">{service.title}</span>
-          </div>
-        </div>
+        {/* Service Hero Section */}
 
         {/* Dynamic Offer Banner (Promotional Section) */}
         {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false && !isNewArchitecture) && (
@@ -1413,6 +2028,14 @@ export default function ServiceDetail({
             )
           ) : null;
 
+          const featuredVideoElement = (
+            <FeaturedTreatmentVideo
+              mConfig={mConfig}
+              serviceTitle={service.title}
+              openAppointmentModal={openAppointmentModal}
+            />
+          );
+
           const introElement = (mConfig.show_introduction !== false) ? (
             isNewArchitecture ? (
               <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs space-y-8" id="service-treatment-overview">
@@ -1424,7 +2047,7 @@ export default function ServiceDetail({
                   
                   {/* Section Heading */}
                   <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-                    {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : (isToothColouredFilling ? 'What is Tooth Coloured Filling?' : isWisdomToothSurgery ? 'What is Wisdom Tooth Surgery?' : isBracesTreatment ? 'What is Braces Treatment?' : isInvisibleAligners ? 'What is Invisible Aligners?' : isRootCanal ? 'What is Single Sitting Root Canal?' : isFullMouth ? 'What is Full Mouth Rehabilitation?' : 'About the Treatment')}
+                    {seoHeadings.intro}
                   </h2>
                   
                   {/* Subtle divider line */}
@@ -1447,7 +2070,7 @@ export default function ServiceDetail({
                       Advanced Dental Care
                     </h2>
                     <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                      {service.intro_title && service.intro_title.trim() !== '' ? service.intro_title : 'About the Treatment'}
+                      {seoHeadings.intro}
                     </h3>
                   </div>
                 </div>
@@ -1482,7 +2105,7 @@ export default function ServiceDetail({
           ) : null;
 
           const processElement = (mConfig.show_process !== false && displaySteps.length > 0) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 md:p-10 shadow-3xs space-y-6 animate-fade-in" id="cms-section-process">
+            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 animate-fade-in" id="cms-section-process">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                 <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
                   <Activity className="h-4.5 w-4.5" />
@@ -1492,35 +2115,27 @@ export default function ServiceDetail({
                     Methodical Procedures
                   </h2>
                   <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    Treatment Process & Timeline
+                    {seoHeadings.process}
                   </h3>
                 </div>
               </div>
 
-              <div className="relative border-l border-slate-150 pl-6 ml-3 space-y-8 py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                 {displaySteps.map((step, idx) => (
-                  <div key={idx} className="relative">
-                    {/* Step Bubble */}
-                    <span className="absolute -left-[35px] top-0.5 h-6 w-6 rounded-full bg-white border-2 border-[#0D9488] flex items-center justify-center text-[10px] font-black text-[#0D9488] shadow-3xs">
-                      {idx + 1}
-                    </span>
-                    
-                    <div className="space-y-1.5">
-                      <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                        {step.title}
-                      </h4>
-                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
+                  <PremiumMedicalCard
+                    key={idx}
+                    icon={<Activity />}
+                    title={step.title}
+                  >
+                    {step.description}
+                  </PremiumMedicalCard>
                 ))}
               </div>
             </div>
           ) : null;
 
           const benefitsElement = (mConfig.show_benefits !== false && displayFeatures.length > 0) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 md:p-10 shadow-3xs space-y-6 animate-fade-in" id="cms-section-benefits">
+            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 animate-fade-in" id="cms-section-benefits">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                 <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
                   <Sparkles className="h-4.5 w-4.5" />
@@ -1530,26 +2145,20 @@ export default function ServiceDetail({
                     Premium Highlights
                   </h2>
                   <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    Why Choose This Treatment
+                    {seoHeadings.whyChooseUs}
                   </h3>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
                 {displayFeatures.map((feat, idx) => (
-                  <div key={idx} className="p-5 bg-slate-50/50 border border-slate-150 rounded-2xl space-y-2 flex flex-col justify-between">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                          {feat.title}
-                        </h4>
-                      </div>
-                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                        {feat.description}
-                      </p>
-                    </div>
-                  </div>
+                  <PremiumMedicalCard
+                    key={idx}
+                    icon={<Sparkles />}
+                    title={feat.title}
+                  >
+                    {feat.description}
+                  </PremiumMedicalCard>
                 ))}
               </div>
             </div>
@@ -1567,7 +2176,7 @@ export default function ServiceDetail({
                       Patient Transformations
                     </h4>
                     <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                      Treatment Gallery
+                      {seoHeadings.caseGallery}
                     </h3>
                   </div>
                 </div>
@@ -1614,40 +2223,7 @@ export default function ServiceDetail({
             : (fallback?.procedure_video_url || fallback?.marketing_config?.procedure_video_url || '');
           const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultVideoUrl || '').trim();
           
-          let effectiveVideoTitle = '';
-          const pVideoTitleVal = isNewArchitecture
-            ? (service?.procedure_video_title !== undefined && service?.procedure_video_title !== '' ? service.procedure_video_title : mConfig.procedure_video_title)
-            : (service?.procedure_video_title || mConfig.procedure_video_title || mConfig.video_heading);
-
-          if (!pVideoTitleVal) {
-            if (isDentalImplants) {
-              effectiveVideoTitle = 'Screw Retained Prosthesis Procedure';
-            } else if (isRootCanal) {
-              effectiveVideoTitle = 'Single Sitting Root Canal Procedure';
-            } else if (isFullMouth) {
-              effectiveVideoTitle = 'Full Mouth Rehabilitation Procedure';
-            } else if (isInvisibleAligners) {
-              effectiveVideoTitle = 'Invisible Aligners Procedure';
-            } else if (isSmileMakeover) {
-              effectiveVideoTitle = 'Smile Makeover Procedure';
-            } else if (isCrownsAndBridges) {
-              effectiveVideoTitle = 'Crown & Bridges Procedure Video';
-            } else if (isTeethWhitening) {
-              effectiveVideoTitle = 'Teeth Whitening Procedure Video';
-            } else if (isPediatricDentistry) {
-              effectiveVideoTitle = 'Pediatric Dentistry Procedure Video';
-            } else if (isBracesTreatment) {
-              effectiveVideoTitle = 'Braces Treatment Procedure Video';
-            } else if (isWisdomToothSurgery) {
-              effectiveVideoTitle = 'Wisdom Tooth Surgery Procedure Video';
-            } else if (isToothColouredFilling) {
-              effectiveVideoTitle = 'Tooth Coloured Filling Procedure Video';
-            } else {
-              effectiveVideoTitle = fallback.procedure_video_title || 'Procedure Video';
-            }
-          } else {
-            effectiveVideoTitle = typeof pVideoTitleVal === 'string' ? pVideoTitleVal.trim() : '';
-          }
+          const effectiveVideoTitle = seoHeadings.video;
 
           const videoElement = (mConfig.show_procedure_video !== false && effectiveVideoUrl) ? (
             <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-video">
@@ -1688,7 +2264,7 @@ export default function ServiceDetail({
           const renderCombinedGallery = () => {
             const isSectionEnabled = mConfig.show_hospital_photos !== false && mConfig.show_hospital_team_photos !== false;
             const hasCmsImages = displayTeamPhotos.length > 0;
-            const sectionTitle = (mConfig.hospital_team_title || mConfig.hospital_section_title || mConfig.hospital_photos_title || service?.hospital_team_title || 'Hospital & Team Gallery').trim();
+            const sectionTitle = "Patel Dental Hospital " + seoHeadings.keywordPlural + " Clinical Facility & Team Gallery";
 
             if (!isSectionEnabled || !hasCmsImages) return null;
 
@@ -1712,7 +2288,7 @@ export default function ServiceDetail({
                     return (
                       <div 
                         key={p.id || idx} 
-                        className="group bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col"
+                        className="group bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col hover:-translate-y-1"
                       >
                         <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
                           <img
@@ -1724,7 +2300,7 @@ export default function ServiceDetail({
                           />
                         </div>
                         {titleText && (
-                          <div className="p-4 bg-slate-50/50 border-t border-slate-100 text-center">
+                          <div className="p-4 bg-slate-50/50 border-t border-[#E5EEF5] text-center">
                             <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
                               {titleText}
                             </h4>
@@ -1743,20 +2319,7 @@ export default function ServiceDetail({
             return url !== '';
           });
 
-          let testimonialsTitle = '';
-          const pTestimonialsTitleVal = isNewArchitecture
-            ? (mConfig.testimonials_section_title !== undefined ? mConfig.testimonials_section_title : mConfig.testimonial_section_title)
-            : (mConfig.testimonials_section_title || mConfig.testimonial_section_title);
-
-          if (pTestimonialsTitleVal === undefined || pTestimonialsTitleVal === null) {
-            if (isNewArchitecture) {
-              testimonialsTitle = 'Patient Testimonial Reels';
-            } else {
-              testimonialsTitle = 'Patient Testimonial Videos';
-            }
-          } else {
-            testimonialsTitle = typeof pTestimonialsTitleVal === 'string' ? pTestimonialsTitleVal.trim() : '';
-          }
+          const testimonialsTitle = seoHeadings.keywordPlural + " Patient Testimonials & Success Stories";
 
           const testimonialsElement = (mConfig.show_testimonials !== false && validTestimonialVideos.length > 0) ? (
             <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-testimonials">
@@ -1818,7 +2381,7 @@ export default function ServiceDetail({
                     Patient Support Hub
                   </h4>
                   <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    Treatment FAQs
+                    {seoHeadings.faq}
                   </h3>
                 </div>
               </div>
@@ -1897,23 +2460,24 @@ export default function ServiceDetail({
                 {relatedServices.map((item) => (
                   <motion.div
                     key={item.id}
-                    whileHover={{ y: -3 }}
-                    className="bg-white border border-slate-150 rounded-2xl overflow-hidden shadow-3xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between"
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
                           src={item.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600'} 
                           alt={item.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
                         />
                       </div>
-                      <div className="p-5 space-y-2">
-                        <h3 className="font-display font-bold text-sm text-[#081C3A] line-clamp-1 tracking-tight">
+                      <div className="p-6 space-y-2.5">
+                        <h3 className="font-display font-extrabold text-base text-[#081C3A] line-clamp-1 tracking-tight group-hover:text-[#0D9488] transition-colors">
                           {item.title}
                         </h3>
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                        <p className="text-slate-500 text-xs leading-relaxed line-clamp-2">
                           {item.short_description}
                         </p>
                       </div>
@@ -1941,7 +2505,7 @@ export default function ServiceDetail({
                   Consultation Booking
                 </span>
                 <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                  {mConfig.bottom_cta_heading || "Ready to Transform Your Smile?"}
+                  {seoHeadings.bottomCta}
                 </h2>
                 <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
                   {mConfig.bottom_cta_description || `Book a pain-free diagnostic consultation with our specialists in Rajkot. Experience high-end treatment tailored exactly to your clinical expectations.`}
@@ -1987,6 +2551,8 @@ export default function ServiceDetail({
             switch (key) {
               case 'hero':
                 return heroElement;
+              case 'featured_video':
+                return featuredVideoElement;
               case 'intro':
                 return introElement;
               case 'process':
@@ -2017,6 +2583,7 @@ export default function ServiceDetail({
           // Formulate order lists
           const defaultOrder = [
             'hero',
+            'featured_video',
             'intro',
             'process',
             'benefits',
@@ -2064,65 +2631,29 @@ export default function ServiceDetail({
             return (
               <div className="space-y-8 sm:space-y-16 lg:space-y-20">
                 {heroElement}
+                {featuredVideoElement}
                 {introElement}
 
                 {/* Section 3: How We Perform Treatment (Clinical Workflow Steps) */}
                 {mConfig.show_process !== false && (
-                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="service-workflow">
+                  <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="service-workflow">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                        <Activity className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        Clinical Workflow
-                      </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.process_section_title || (isToothColouredFilling ? 'Composite Filling Treatment Planning' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Treatment Planning' : isBracesTreatment ? 'Braces Treatment Planning' : isPediatricDentistry ? 'Pediatric Dentistry Treatment Planning' : isTeethWhitening ? 'Teeth Whitening Treatment Planning' : isCrownsAndBridges ? 'Crown & Bridges Treatment Planning' : isSmileMakeover ? 'Smile Makeover Treatment Planning' : isInvisibleAligners ? 'Invisible Aligners Treatment Planning' : isRootCanal ? 'How We Perform Single Sitting Root Canal' : isFullMouth ? 'How We Perform Full Mouth Rehabilitation' : 'How We Perform Dental Implants')}
+                        {seoHeadings.process}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className={`grid grid-cols-1 ${displaySteps.length === 1 ? 'max-w-2xl' : displaySteps.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-stretch mx-auto`}>
+                    <div className={`grid grid-cols-1 ${displaySteps.length === 1 ? 'max-w-2xl' : displaySteps.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-start mx-auto`}>
                       {displaySteps.map((step, idx) => (
-                        <div 
-                          key={step.id || idx} 
-                          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                        <PremiumMedicalCard
+                          key={step.id || idx}
+                          icon={<Activity />}
+                          title={step.title}
+                          imageUrl={step.image_url}
                         >
-                          {/* Step Number inside the same card */}
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="font-mono text-3xl sm:text-4xl font-black text-[#0D9488]/30 group-hover:text-[#0D9488]/60 transition-colors leading-none select-none">
-                              {String(idx + 1).padStart(2, '0')}
-                            </span>
-                            {step.phase && (
-                              <span className="inline-block text-[11px] font-extrabold text-[#0D9488] bg-teal-50 px-3 py-1 rounded-full uppercase tracking-wider shrink-0 border border-teal-100/80">
-                                {step.phase}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Optional Step Title from CMS (if any) */}
-                          {step.title && step.title.trim() !== '' && (
-                            <h3 className="font-sans font-black text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
-                              {step.title}
-                            </h3>
-                          )}
-
-                          {/* Step Description */}
-                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                            {step.description}
-                          </p>
-
-                          {/* Optional Step Image */}
-                          {step.image_url && step.image_url.trim() !== '' && (
-                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
-                              <img
-                                src={step.image_url}
-                                alt={step.title || `Workflow step ${idx + 1}`}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                loading="lazy"
-                                referrerPolicy="no-referrer"
-                              />
-                            </div>
-                          )}
-                        </div>
+                          {step.description}
+                        </PremiumMedicalCard>
                       ))}
                     </div>
                   </div>
@@ -2130,48 +2661,24 @@ export default function ServiceDetail({
 
                 {/* Section 4: Why Our Method Is Superior (Dynamic Comparison Cards) */}
                 {(mConfig.show_benefits !== false && !isInvisibleAligners && !isSmileMakeover && !isCrownsAndBridges && !isTeethWhitening && !isPediatricDentistry && !isBracesTreatment && !isWisdomToothSurgery && !isToothColouredFilling) && (
-                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-superior">
+                  <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="dental-implants-superior">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                        <Award className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        Clinical Advantages
-                      </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.benefits_section_title || (isInvisibleAligners ? 'Why Choose Our Invisible Aligners' : isRootCanal ? 'Why Our Modern Root Canal Method is Superior' : isFullMouth ? 'Treatment Planning Includes' : 'Why Our Method Is Superior')}
+                        {seoHeadings.whyChooseUs}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
                       {displayFeatures.map((card, idx) => (
-                        <div 
-                          key={card.id || idx} 
-                          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                        <PremiumMedicalCard
+                          key={card.id || idx}
+                          icon={<CheckCircle2 />}
+                          title={card.title}
+                          imageUrl={card.image_url || card.image}
                         >
-                          <div className="flex items-center gap-2 mb-3">
-                            <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                              Benefit {idx + 1}
-                            </span>
-                          </div>
-                          {/* Card Description / Doctor's Original Description */}
-                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                            {card.description}
-                          </p>
-
-                          {/* Optional Card Image (if available) */}
-                          {(card.image_url || card.image) && (card.image_url || card.image).trim() !== '' && (
-                            <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
-                              <img
-                                src={card.image_url || card.image}
-                                alt={`Superiority feature ${idx + 1}`}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                loading="lazy"
-                                referrerPolicy="no-referrer"
-                              />
-                            </div>
-                          )}
-                        </div>
+                          {card.description}
+                        </PremiumMedicalCard>
                       ))}
                     </div>
                   </div>
@@ -2179,41 +2686,25 @@ export default function ServiceDetail({
 
                 {/* Section 5: Who Is a Candidate for Full Mouth Rehabilitation */}
                 {(mConfig.show_candidate !== false && displayCandidateItems.length > 0) && (
-                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="candidate-section">
+                  <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="candidate-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                        <Users className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        {isToothColouredFilling ? 'Clinical Benefits' : isBracesTreatment ? 'Treatment Planning' : isWisdomToothSurgery ? 'Surgical Technology' : isPediatricDentistry ? 'Pediatric Services' : isTeethWhitening ? 'Whitening Methods' : isCrownsAndBridges ? 'Materials & Options' : 'Candidate Profile'}
-                      </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.candidate_section_title || (isToothColouredFilling ? 'Benefits of Composite Filling' : isWisdomToothSurgery ? 'Advanced Surgical Technology' : isBracesTreatment ? 'Treatment Planning Includes' : isPediatricDentistry ? 'Pediatric Dental Services' : isTeethWhitening ? 'Teeth Whitening Methods' : isCrownsAndBridges ? 'Crown & Bridge Materials' : isSmileMakeover ? 'Smile Makeover Options' : isFullMouth ? 'Who Is a Candidate for Full Mouth Rehabilitation' : 'Options & Candidates')}
+                        {seoHeadings.candidate}
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className={`grid grid-cols-1 ${displayCandidateItems.length === 1 ? 'max-w-2xl' : displayCandidateItems.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-stretch mx-auto`}>
+                    <div className={`grid grid-cols-1 ${displayCandidateItems.length === 1 ? 'max-w-2xl' : displayCandidateItems.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-start mx-auto`}>
                       {[...displayCandidateItems]
                         .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
                         .map((cand: any, idx: number) => (
-                          <div 
-                            key={cand.id || idx} 
-                            className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col h-full group hover:-translate-y-1"
+                          <PremiumMedicalCard
+                            key={cand.id || idx}
+                            icon={<CheckCircle2 />}
+                            title={cand.title}
                           >
-                            <div className="flex items-center gap-2 mb-3">
-                              <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0" />
-                              <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                                {isToothColouredFilling ? `Benefit ${idx + 1}` : isBracesTreatment ? `Item ${idx + 1}` : isPediatricDentistry ? `Service ${idx + 1}` : isTeethWhitening ? `Method ${idx + 1}` : isCrownsAndBridges ? `Material ${idx + 1}` : `Indication ${idx + 1}`}
-                              </span>
-                            </div>
-                            {cand.title && cand.title.trim() !== '' && (
-                              <h3 className="font-sans font-black text-base sm:text-lg text-[#081C3A] tracking-tight mb-2">
-                                {cand.title}
-                              </h3>
-                            )}
-                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium flex-1">
-                              {cand.description}
-                            </p>
-                          </div>
+                            {cand.description}
+                          </PremiumMedicalCard>
                         ))}
                     </div>
                   </div>
@@ -2228,7 +2719,7 @@ export default function ServiceDetail({
                         Transformations
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {mConfig.before_after_heading || 'Before & After Smile Transformations'}
+                        {seoHeadings.transformations}
                       </h2>
                       <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
                         {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
@@ -2240,7 +2731,7 @@ export default function ServiceDetail({
                       {beforeAfterPairs.map((pair, pIdx) => (
                         <div 
                           key={pair.id || pIdx} 
-                          className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-all duration-300 hover:border-slate-300"
+                          className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
                         >
                           <BeforeAfterSlider
                             beforeImage={pair.before_image}
@@ -2256,7 +2747,7 @@ export default function ServiceDetail({
                 {/* Section 6: Clinical Case Gallery */}
                 {mConfig.show_gallery !== false && (
                   <ClinicalCaseGallery
-                    heading={mConfig.gallery_heading || 'Clinical Case Gallery'}
+                    heading={seoHeadings.caseGallery}
                     description={mConfig.gallery_description}
                     items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
                     singleGallery={isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling}
@@ -2345,7 +2836,7 @@ export default function ServiceDetail({
                 {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
                 {mConfig.show_google_reviews !== false && (
                   <GooglePatientReviews
-                    heading={mConfig.google_reviews_heading || 'Google Patient Reviews'}
+                    heading={seoHeadings.reviews}
                     reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
                   />
                 )}
@@ -2372,7 +2863,7 @@ export default function ServiceDetail({
                           Clinical Consultation
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                          {mConfig.sec11_heading || (isToothColouredFilling ? 'Book Your Tooth Coloured Filling Consultation' : isWisdomToothSurgery ? 'Book Your Wisdom Tooth Surgery Consultation' : isBracesTreatment ? 'Book Your Braces Treatment Consultation' : isPediatricDentistry ? 'Book Your Pediatric Dentistry Consultation' : isTeethWhitening ? 'Book Your Teeth Whitening Consultation' : isCrownsAndBridges ? 'Book Your Crown & Bridges Consultation' : isSmileMakeover ? 'Book Your Smile Makeover Consultation' : isInvisibleAligners ? 'Book Your Invisible Aligners Consultation' : isRootCanal ? 'Book Your Single Sitting Root Canal Free Consultation' : isFullMouth ? 'Book Your Full Mouth Rehabilitation Consultation' : 'Book Your Dental Consultation')}
+                          {seoHeadings.bottomCta}
                         </h2>
                         {mConfig.sec11_description && mConfig.sec11_description.trim() !== '' && (
                           <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
@@ -2417,7 +2908,7 @@ export default function ServiceDetail({
                           Patient Support & Info
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                          {mConfig.faq_sec_heading || 'Frequently Asked Questions'}
+                          {seoHeadings.faq}
                         </h2>
                         <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                       </div>

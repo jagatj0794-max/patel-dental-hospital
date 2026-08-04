@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Maximize2, Eye, X, ChevronLeft, ChevronRight, ImageIcon, Sparkles } from 'lucide-react';
 import { PatientMoment } from '../types';
 import PatientMomentsGallery from '../components/PatientMomentsGallery';
+import { useSEO } from '../utils/seo';
 
 export interface MediaImage {
   id: string;
@@ -27,6 +28,12 @@ interface SmileGalleryProps {
 }
 
 export default function SmileGallery({ patientMoments, mediaImages = [] }: SmileGalleryProps) {
+  useSEO({
+    title: 'Patient Smile & Clinical Gallery | Patel Dental Hospital Rajkot',
+    description: 'Browse our smile gallery at Patel Dental Hospital, Rajkot. View life-changing smile makeovers, clinical cases, and state-of-the-art infrastructure of our advanced dental clinics.',
+    keywords: 'Smile Gallery, Dental Clinic in Rajkot, Smile Makeover in Rajkot, Smile Designing, Before After Dental, Patient Moments, Dental Hospital Rajkot, Patel Dental Hospital Gallery'
+  });
+
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 

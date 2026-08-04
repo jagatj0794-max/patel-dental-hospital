@@ -19,46 +19,208 @@ interface GooglePatientReviewsProps {
 }
 
 export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsProps) {
-  // Filter out disabled or unnamed reviews, then sort by display_order (ascending)
-  const activeReviews = reviews
-    .filter(r => r.enabled !== false && r.patient_name?.trim() !== '')
-    .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const isFirstRender = useRef(true);
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % activeReviews.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + activeReviews.length) % activeReviews.length);
-  };
-
-  // Synchronize horizontal slider container scroll on slide change
-  const scrollToReview = (index: number) => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const cards = container.querySelectorAll('.review-card-item');
-      if (cards[index]) {
-        const cardEl = cards[index] as HTMLElement;
-        container.scrollTo({
-          left: cardEl.offsetLeft - container.offsetLeft,
-          behavior: 'smooth',
-        });
-      }
-    }
-  };
+  const [apiReviews, setApiReviews] = useState<Review[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    let isMounted = true;
+    setIsFetching(true);
+    fetch('/api/google-reviews')
+      .then((res) => {
+        if (!res.ok) throw new Error('API response not OK');
+        return res.json();
+      })
+      .then((data) => {
+        if (isMounted && data && Array.isArray(data.reviews) && data.reviews.length > 0) {
+          setApiReviews(data.reviews);
+        }
+      })
+      .catch((err) => {
+        console.log('[GooglePatientReviews] Using local CMS reviews fallback:', err);
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsFetching(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Use dynamically fetched reviews if available, otherwise fall back to CMS reviews
+  const activeReviews = apiReviews.length > 0
+    ? apiReviews
+    : reviews
+        .filter(r => r.enabled !== false && r.patient_name?.trim() !== '')
+        .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [transitionDuration, setTransitionDuration] = useState(600);
+  const [isHovered, setIsHovered] = useState(false);
+  const [visibleCards, setVisibleCards] = useState(3);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  const isResetting = useRef(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
+
+  // Detect prefers-reduced-motion
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setIsReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Detect visible cards based on breakpoint
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setVisibleCards(3);
+      } else if (window.innerWidth >= 640) {
+        setVisibleCards(2);
+      } else {
+        setVisibleCards(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Reset index when activeReviews length changes
+  useEffect(() => {
+    setCurrentIndex(0);
+    setTransitionDuration(0);
+  }, [activeReviews.length]);
+
+  // Autoplay logic
+  useEffect(() => {
+    if (isReducedMotion || isHovered || activeReviews.length <= 1) {
       return;
     }
-    scrollToReview(currentIndex);
-  }, [currentIndex]);
+
+    const interval = setInterval(() => {
+      if (isResetting.current) return;
+      setTransitionDuration(600);
+      setCurrentIndex((prev) => prev + 1);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex, isHovered, isReducedMotion, activeReviews.length]);
+
+  // Restore transition duration after a reset jump
+  useEffect(() => {
+    if (transitionDuration === 0) {
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTransitionDuration(600);
+        });
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [transitionDuration]);
+
+  const handleNext = () => {
+    if (activeReviews.length <= 1 || isResetting.current) return;
+    setTransitionDuration(600);
+    setCurrentIndex((prev) => {
+      const nextVal = prev + 1;
+      if (nextVal >= activeReviews.length) {
+        isResetting.current = true;
+      }
+      return nextVal;
+    });
+  };
+
+  const handlePrev = () => {
+    if (activeReviews.length <= 1 || isResetting.current) return;
+    setTransitionDuration(600);
+    setCurrentIndex((prev) => {
+      const prevVal = prev - 1;
+      if (prevVal < 0) {
+        isResetting.current = true;
+      }
+      return prevVal;
+    });
+  };
+
+  const handleTransitionEnd = () => {
+    if (currentIndex >= activeReviews.length) {
+      setTransitionDuration(0);
+      setCurrentIndex(0);
+      isResetting.current = false;
+    } else if (currentIndex < 0) {
+      setTransitionDuration(0);
+      setCurrentIndex(activeReviews.length - 1);
+      isResetting.current = false;
+    } else {
+      isResetting.current = false;
+    }
+  };
+
+  // Touch event handlers for swipe gesture
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchCurrentX.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current !== null && e.touches.length === 1) {
+      touchCurrentX.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current !== null && touchCurrentX.current !== null) {
+      const diff = touchStartX.current - touchCurrentX.current;
+      const swipeThreshold = 50; // minimum 50px swipe
+      if (diff > swipeThreshold) {
+        handleNext();
+      } else if (diff < -swipeThreshold) {
+        handlePrev();
+      }
+    }
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  };
+
+  const displayReviews = activeReviews.length > 0
+    ? [
+        ...activeReviews.slice(-Math.min(3, activeReviews.length)),
+        ...activeReviews,
+        ...activeReviews.slice(0, Math.min(3, activeReviews.length)),
+      ]
+    : [];
+
+  let stepPercent = '33.3333%';
+  let stepPx = 8;
+  if (visibleCards === 2) {
+    stepPercent = '50%';
+    stepPx = 12;
+  } else if (visibleCards === 1) {
+    stepPercent = '100%';
+    stepPx = 24;
+  }
+
+  const translateOffset = `calc(-1 * (${currentIndex + 3}) * (${stepPercent} + ${stepPx}px))`;
+
+  const trackStyle: React.CSSProperties = {
+    transform: `translate3d(${translateOffset}, 0, 0)`,
+    transitionProperty: 'transform',
+    transitionDuration: `${isReducedMotion ? 0 : transitionDuration}ms`,
+    transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    willChange: 'transform',
+  };
 
   return (
     <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="google-patient-reviews-section">
@@ -80,7 +242,7 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
         {activeReviews.length > 1 && (
           <div className="flex items-center justify-center gap-2.5">
             <button
-              onClick={prevSlide}
+              onClick={handlePrev}
               className="p-3 rounded-full border border-slate-200/80 hover:border-[#0D9488] bg-white text-slate-700 hover:text-[#0D9488] hover:bg-teal-50/30 shadow-xs transition-all duration-300 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
               aria-label="Previous Review"
               title="Previous Review"
@@ -88,7 +250,7 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
               <ChevronLeft className="h-4.5 w-4.5" />
             </button>
             <button
-              onClick={nextSlide}
+              onClick={handleNext}
               className="p-3 rounded-full border border-slate-200/80 hover:border-[#0D9488] bg-white text-slate-700 hover:text-[#0D9488] hover:bg-teal-50/30 shadow-xs transition-all duration-300 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
               aria-label="Next Review"
               title="Next Review"
@@ -101,16 +263,23 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
 
       {/* Cards Sliders: Desktop (3), Tablet (2), Mobile (1) */}
       {activeReviews.length > 0 && (
-        <div className="relative max-w-7xl mx-auto overflow-hidden">
+        <div 
+          className="relative max-w-7xl mx-auto overflow-hidden px-1 py-4"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           <div 
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory cursor-grab active:cursor-grabbing"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex gap-6 items-stretch"
+            style={trackStyle}
+            onTransitionEnd={handleTransitionEnd}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            {activeReviews.map((review, idx) => (
+            {displayReviews.map((review, idx) => (
               <div
-                key={review.id || idx}
-                className="review-card-item shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] snap-start"
+                key={`${review.id || idx}-cloned-${idx}`}
+                className="review-card-item shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
               >
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 h-full flex flex-col justify-between shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300">
                   <div className="space-y-4">

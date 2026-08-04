@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CmsSectionToggle from './CmsSectionToggle';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart,
@@ -8,6 +9,7 @@ import { Service } from '../types';
 import { serviceService } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
+import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
 
 interface SmileMakeoverCmsProps {
   onSaveSuccess?: () => void;
@@ -617,21 +619,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.hero && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Hero block visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hero !== false}
-                    onChange={(e) => updateMConfigField('show_hero', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hero !== false}
+                onChange={(checked) => updateMConfigField('show_hero', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -694,7 +685,16 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
           )}
         </div>
 
-        {/* 2. WHAT IS SMILE MAKEOVER? */}
+        {/* FEATURED TREATMENT VIDEO */}
+        <FeaturedVideoCmsSection
+          mConfig={mConfig}
+          updateMConfigField={updateMConfigField}
+          isExpanded={!!expandedSections.featuredVideo}
+          onToggle={() => toggleSection('featuredVideo')}
+          sectionNumber="2"
+        />
+
+        {/* 3. WHAT IS SMILE MAKEOVER? */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -704,7 +704,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. What is Smile Makeover?</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. What is Smile Makeover?</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introduction text, clinical overview, and highlight banner</span>
               </div>
             </div>
@@ -713,21 +713,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.about && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle What is Smile Makeover section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_introduction !== false}
-                    onChange={(e) => updateMConfigField('show_introduction', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_introduction !== false}
+                onChange={(checked) => updateMConfigField('show_introduction', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -764,7 +753,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Smile Makeover Treatment Planning</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Smile Makeover Treatment Planning</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure treatment steps, phases, and technology details</span>
               </div>
             </div>
@@ -773,21 +762,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.process && (
             <div className="p-6 border-t border-slate-100 space-y-6">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Treatment Planning section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_process !== false}
-                    onChange={(e) => updateMConfigField('show_process', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_process !== false}
+                onChange={(checked) => updateMConfigField('show_process', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Process Section Heading</label>
@@ -900,7 +878,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Smile Makeover Options</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Smile Makeover Options</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure options cards for Smile Makeover treatments</span>
               </div>
             </div>
@@ -909,21 +887,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.candidate && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Smile Makeover Options section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_candidate !== false}
-                    onChange={(e) => updateMConfigField('show_candidate', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_candidate !== false}
+                onChange={(checked) => updateMConfigField('show_candidate', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Options Section Heading</label>
@@ -988,7 +955,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Before & After Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Before & After Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage Before & After image pairs for smile transformations</span>
               </div>
             </div>
@@ -997,21 +964,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
           
           {expandedSections.beforeAfter && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400 font-normal">Toggle the entire Before & After Smile Transformation section</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_before_after !== false}
-                    onChange={(e) => updateMConfigField('show_before_after', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_before_after !== false}
+                onChange={(checked) => updateMConfigField('show_before_after', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1108,7 +1064,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure gallery heading and individual clinical case photos</span>
               </div>
             </div>
@@ -1117,21 +1073,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.gallery && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Clinical Case Gallery section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_gallery !== false}
-                    onChange={(e) => updateMConfigField('show_gallery', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_gallery !== false}
+                onChange={(checked) => updateMConfigField('show_gallery', checked)}
+              />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -1210,7 +1155,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Embed procedure demonstration video link (YouTube / Instagram / Direct MP4)</span>
               </div>
             </div>
@@ -1219,21 +1164,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.video && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Procedure Video section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_procedure_video !== false}
-                    onChange={(e) => updateMConfigField('show_procedure_video', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_procedure_video !== false}
+                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1271,7 +1205,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage video testimonials and patient stories</span>
               </div>
             </div>
@@ -1280,21 +1214,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.testimonials && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Testimonials section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_testimonials !== false}
-                    onChange={(e) => updateMConfigField('show_testimonials', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_testimonials !== false}
+                onChange={(checked) => updateMConfigField('show_testimonials', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Testimonials Section Title</label>
@@ -1352,7 +1275,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Showcase hospital infrastructure and clinical team photos</span>
               </div>
             </div>
@@ -1361,21 +1284,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.hospital && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Hospital & Team Gallery section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hospital_photos !== false}
-                    onChange={(e) => updateMConfigField('show_hospital_photos', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hospital_photos !== false}
+                onChange={(checked) => updateMConfigField('show_hospital_photos', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Title</label>
@@ -1443,7 +1355,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Shield className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Call Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Call Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure promotional pricing banner, contact numbers, and offers</span>
               </div>
             </div>
@@ -1452,21 +1364,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.cost && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Cost / Call section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_cost !== false}
-                    onChange={(e) => updateMConfigField('show_cost', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_cost !== false}
+                onChange={(checked) => updateMConfigField('show_cost', checked)}
+              />
 
               <div className="space-y-4">
                 <div className="space-y-1">
@@ -1524,7 +1425,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage Google patient review cards, star ratings, and links</span>
               </div>
             </div>
@@ -1533,21 +1434,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.reviews && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Google Patient Reviews section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_google_reviews !== false}
-                    onChange={(e) => updateMConfigField('show_google_reviews', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_google_reviews !== false}
+                onChange={(checked) => updateMConfigField('show_google_reviews', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Reviews Section Title</label>
@@ -1610,7 +1500,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Heart className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA Banner</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA Banner</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom call-to-action title and appointment buttons</span>
               </div>
             </div>
@@ -1619,21 +1509,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.cta && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle Bottom CTA section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_bottom_cta !== false}
-                    onChange={(e) => updateMConfigField('show_bottom_cta', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_bottom_cta !== false}
+                onChange={(checked) => updateMConfigField('show_bottom_cta', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">CTA Banner Heading</label>
@@ -1658,7 +1537,7 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. FAQ Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. FAQ Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure frequently asked questions and answers</span>
               </div>
             </div>
@@ -1667,21 +1546,10 @@ export default function SmileMakeoverCms({ onSaveSuccess }: SmileMakeoverCmsProp
 
           {expandedSections.faqs && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle FAQ section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_faqs !== false}
-                    onChange={(e) => updateMConfigField('show_faqs', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_faqs !== false}
+                onChange={(checked) => updateMConfigField('show_faqs', checked)}
+              />
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-between">

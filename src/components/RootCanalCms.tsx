@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CmsSectionToggle from './CmsSectionToggle';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart,
@@ -8,6 +9,8 @@ import { Service } from '../types';
 import { serviceService, DEFAULT_RCT_GOOGLE_REVIEWS } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
+import VideoUploadCmsField from './VideoUploadCmsField';
+import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
 
 interface RootCanalCmsProps {
   onSaveSuccess?: () => void;
@@ -800,21 +803,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
                 </div>
               </div>
               
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Hero Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle whether the top Hero Header should be visible on the live page</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hero !== false}
-                    onChange={(e) => updateMConfigField('show_hero', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hero !== false}
+                onChange={(checked) => updateMConfigField('show_hero', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Service Title</label>
@@ -891,7 +883,16 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 2. TREATMENT OVERVIEW */}
+        {/* FEATURED TREATMENT VIDEO */}
+        <FeaturedVideoCmsSection
+          mConfig={mConfig}
+          updateMConfigField={updateMConfigField}
+          isExpanded={!!expandedSections.featuredVideo}
+          onToggle={() => toggleSection('featuredVideo')}
+          sectionNumber="2"
+        />
+
+        {/* 3. TREATMENT OVERVIEW */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -901,7 +902,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. Treatment Overview</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Treatment Overview</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section visibility, title, and descriptive introduction</span>
               </div>
             </div>
@@ -910,21 +911,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.intro && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle whether the Treatment Overview section is active</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_introduction !== false}
-                    onChange={(e) => updateMConfigField('show_introduction', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_introduction !== false}
+                onChange={(checked) => updateMConfigField('show_introduction', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
@@ -960,7 +950,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. How We Perform Root Canal Treatment</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. How We Perform Root Canal Treatment</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage advanced clinical workflow stages and step-by-step descriptions</span>
               </div>
             </div>
@@ -969,21 +959,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.process && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle clinical steps workflow section active/inactive</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_process !== false}
-                    onChange={(e) => updateMConfigField('show_process', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_process !== false}
+                onChange={(checked) => updateMConfigField('show_process', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
@@ -1056,7 +1035,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Heart className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Why Our Method Is Superior</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Why Our Method Is Superior</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section headline and add/reorder feature cards</span>
               </div>
             </div>
@@ -1065,21 +1044,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.superior && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle whether this superior features block is displayed</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_benefits !== false}
-                    onChange={(e) => updateMConfigField('show_benefits', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_benefits !== false}
+                onChange={(checked) => updateMConfigField('show_benefits', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
@@ -1147,7 +1115,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section show/hide and manage gallery images</span>
               </div>
             </div>
@@ -1156,21 +1124,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.gallery && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle case transformations gallery block visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_gallery !== false}
-                    onChange={(e) => updateMConfigField('show_gallery', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_gallery !== false}
+                onChange={(checked) => updateMConfigField('show_gallery', checked)}
+              />
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 {galleryItems.length === 0 ? (
@@ -1260,7 +1217,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Procedure Video</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure video title, URL, and summary text</span>
               </div>
             </div>
@@ -1269,21 +1226,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.video && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle procedure video guide active/inactive</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_procedure_video !== false}
-                    onChange={(e) => updateMConfigField('show_procedure_video', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_procedure_video !== false}
+                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
@@ -1329,7 +1275,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage video & written patient testimonials</span>
               </div>
             </div>
@@ -1338,21 +1284,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.testimonials && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle patient testimonials section active/inactive</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_testimonials !== false}
-                    onChange={(e) => updateMConfigField('show_testimonials', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_testimonials !== false}
+                onChange={(checked) => updateMConfigField('show_testimonials', checked)}
+              />
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
@@ -1394,7 +1329,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Upload hospital premises and clinical team photo collections dynamically</span>
               </div>
             </div>
@@ -1403,21 +1338,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.hospital && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle hospital Premise & clinical team split image section visible/hidden</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hospital_photos !== false}
-                    onChange={(e) => updateMConfigField('show_hospital_photos', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hospital_photos !== false}
+                onChange={(checked) => updateMConfigField('show_hospital_photos', checked)}
+              />
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
@@ -1543,7 +1467,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Cost Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure pricing details, saving highlight, call/WhatsApp numbers, and offer actions</span>
               </div>
             </div>
@@ -1552,21 +1476,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.cost && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle the entire pricing/cost CTA card active/inactive</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_cost !== false}
-                    onChange={(e) => updateMConfigField('show_cost', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_cost !== false}
+                onChange={(checked) => updateMConfigField('show_cost', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
@@ -1654,7 +1567,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4 fill-teal-500 text-teal-500" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient Google Reviews cards, ratings, descriptions, photos, and links</span>
               </div>
             </div>
@@ -1663,21 +1576,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.googleReviews && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle the entire Google Patient Reviews section</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_google_reviews !== false}
-                    onChange={(e) => updateMConfigField('show_google_reviews', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_google_reviews !== false}
+                onChange={(checked) => updateMConfigField('show_google_reviews', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
@@ -1902,7 +1804,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4 fill-teal-500 text-teal-500" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Bottom Call To Action</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom Call To Action</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure premium full-width CTA block with section heading, short description, action buttons, and background image</span>
               </div>
             </div>
@@ -1911,21 +1813,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.bottomCtaNew && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle the entire Bottom Call To Action section</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_sec11_cta !== false}
-                    onChange={(e) => updateMConfigField('show_sec11_cta', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_sec11_cta !== false}
+                onChange={(checked) => updateMConfigField('show_sec11_cta', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
@@ -2054,7 +1945,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Frequently Asked Questions (FAQ)</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Frequently Asked Questions (FAQ)</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure custom Frequently Asked Questions with questions, answers, and display ordering</span>
               </div>
             </div>
@@ -2063,21 +1954,10 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           
           {expandedSections.faqs && (
             <div className="p-6 border-t border-slate-100 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[9px] text-slate-400">Toggle the entire FAQ section on the frontend page</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_faq_sec !== false}
-                    onChange={(e) => updateMConfigField('show_faq_sec', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_faq_sec !== false}
+                onChange={(checked) => updateMConfigField('show_faq_sec', checked)}
+              />
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>

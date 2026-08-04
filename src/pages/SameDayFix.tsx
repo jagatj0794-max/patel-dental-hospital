@@ -8,6 +8,7 @@ import { Calendar, CheckCircle2, ChevronDown, ChevronUp, Clock, ShieldCheck, Sta
 import { motion } from 'motion/react';
 import samedayFix from '../assets/images/sameday_fix_1780608011497.png';
 import { ContactInfo } from '../types';
+import { useSEO } from '../utils/seo';
 
 interface SameDayFixProps {
   openAppointmentModal: (preselectedTreatment?: string) => void;
@@ -15,6 +16,13 @@ interface SameDayFixProps {
 }
 
 export default function SameDayFix({ openAppointmentModal, contactInfo }: SameDayFixProps) {
+  useSEO({
+    title: 'Same Day Fixed Teeth & Implants in Rajkot | Patel Dental Hospital',
+    description: 'Get permanent, strong fixed teeth in just 24 hours at Patel Dental Hospital, Rajkot. Enjoy single-visit smile restoration with advanced immediate loading dental implants and FDA-approved materials.',
+    keywords: 'Same Day Fix Teeth, Same Day Dental Implants, Dental Implant in Rajkot, Best Dental Hospital in Rajkot, Immediate Loading Implants, Teeth in a Day Rajkot, Full Mouth Rehabilitation',
+    ogImage: samedayFix
+  });
+
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const phoneRaw = contactInfo?.phoneRaw || '+919510397046';
 

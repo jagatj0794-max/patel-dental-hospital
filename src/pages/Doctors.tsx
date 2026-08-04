@@ -9,6 +9,7 @@ import {
   Clock, Microscope, BookOpen, Quote, ShieldCheck, HeartHandshake, UserCheck, CheckCircle2, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useSEO } from '../utils/seo';
 
 // Unified images with clear paths
 const drKinjalPatelImg = '/Dr kinjal patel 2.png';
@@ -23,6 +24,13 @@ interface DoctorsProps {
 }
 
 export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsProps) {
+  useSEO({
+    title: 'Meet Our Specialist Doctors | Best Dentist in Rajkot',
+    description: 'Get treated by the best dentists in Rajkot. Meet our senior dental specialists, Dr. Vipul Patel and Dr. Kinjal Patel, at Patel Dental Hospital. Expert care in dental implants, RCT, and smile design.',
+    keywords: 'Best Dentist in Rajkot, Dentist in Rajkot, Dental Surgeon in Rajkot, Dr Vipul Patel, Dr Kinjal Patel, Dental Specialist, Patel Dental Hospital Doctors, Dental Clinic in Rajkot',
+    ogImage: drVipulPatelImg
+  });
+
   const [activeDoctor, setActiveDoctor] = useState<Doctor | null>(null);
 
   // Ensure Dr. Vipul Patel appears first, followed by Dr. Kinjal Patel, then any other doctors

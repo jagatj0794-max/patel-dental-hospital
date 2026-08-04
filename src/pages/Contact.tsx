@@ -8,6 +8,7 @@ import { Calendar, Phone, MapPin, Clock, MessageSquare, Check, Sparkles, Send } 
 import { motion, AnimatePresence } from 'motion/react';
 import { TREATMENTS } from '../data/treatments';
 import { appointmentService } from '../utils/appointmentData';
+import { useSEO } from '../utils/seo';
 
 import { ContactInfo } from '../types';
 
@@ -30,6 +31,12 @@ export default function Contact({
   onBookAppointment, 
   contactInfo 
 }: ContactProps) {
+  useSEO({
+    title: 'Contact & Book Appointment | Patel Dental Hospital Rajkot',
+    description: 'Get in touch or book your dental appointment online at Patel Dental Hospital, Rajkot. Visit our Amin Marg or Gayatrinagar branch for the best dental care, consultations, and emergency dental services.',
+    keywords: 'Contact Patel Dental Hospital, Book Dentist Appointment Rajkot, Dental Clinic in Rajkot, Best Dentist in Rajkot, Dental Hospital in Rajkot, Emergency Dentist Rajkot, Dental Consultation Rajkot'
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',

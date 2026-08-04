@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CmsSectionToggle from './CmsSectionToggle';
 import { 
   Plus, Trash2, ChevronDown, ChevronUp, Save, Check, 
   Image as ImageIcon, Video, Sliders, Shield, Heart,
@@ -8,6 +9,7 @@ import { Service } from '../types';
 import { serviceService } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
+import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
 
 interface WisdomToothSurgeryCmsProps {
   onSaveSuccess?: () => void;
@@ -610,21 +612,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.hero && (
             <div className="p-6 border-t border-slate-100 space-y-4">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-800 block">Enable / Disable Section</span>
-                  <span className="text-[10px] text-slate-400">Toggle Hero block visible/hidden on frontend</span>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={mConfig.show_hero !== false}
-                    onChange={(e) => updateMConfigField('show_hero', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                </label>
-              </div>
+              <CmsSectionToggle
+                checked={mConfig.show_hero !== false}
+                onChange={(checked) => updateMConfigField('show_hero', checked)}
+              />
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Service Title</label>
@@ -691,7 +682,16 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
           )}
         </div>
 
-        {/* 2. WHAT IS WISDOM TOOTH SURGERY */}
+        {/* FEATURED TREATMENT VIDEO */}
+        <FeaturedVideoCmsSection
+          mConfig={mConfig}
+          updateMConfigField={updateMConfigField}
+          isExpanded={!!expandedSections.featuredVideo}
+          onToggle={() => toggleSection('featuredVideo')}
+          sectionNumber="2"
+        />
+
+        {/* 3. WHAT IS WISDOM TOOTH SURGERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -701,7 +701,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. What is Wisdom Tooth Surgery?</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. What is Wisdom Tooth Surgery?</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introductory section title and full procedure details</span>
               </div>
             </div>
@@ -710,6 +710,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.whatIs && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_introduction !== false}
+                onChange={(checked) => updateMConfigField('show_introduction', checked)}
+              />
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Title</label>
                 <input
@@ -745,7 +749,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Layers className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Wisdom Tooth Surgery Treatment Planning</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Wisdom Tooth Surgery Treatment Planning</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure treatment procedure stages and step descriptions</span>
               </div>
             </div>
@@ -754,6 +758,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.planning && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_process !== false}
+                onChange={(checked) => updateMConfigField('show_process', checked)}
+              />
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Process Section Title</label>
                 <input
@@ -853,7 +861,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Advanced Surgical Technology</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Advanced Surgical Technology</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure surgical devices and technology cards</span>
               </div>
             </div>
@@ -862,6 +870,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.methods && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_candidate !== false}
+                onChange={(checked) => updateMConfigField('show_candidate', checked)}
+              />
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Title</label>
                 <input
@@ -954,7 +966,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Before & After Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Before & After Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure before/after comparison photo pairs and captions</span>
               </div>
             </div>
@@ -963,6 +975,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.beforeAfter && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_before_after !== false}
+                onChange={(checked) => updateMConfigField('show_before_after', checked)}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Section Heading</label>
@@ -1088,7 +1104,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure surgical case gallery photos and descriptions</span>
               </div>
             </div>
@@ -1097,6 +1113,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.clinicalGallery && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_gallery !== false}
+                onChange={(checked) => updateMConfigField('show_gallery', checked)}
+              />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Clinical Case Images ({galleryItems.length})</span>
                 <button
@@ -1169,7 +1189,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure walkthrough video link and thumbnail</span>
               </div>
             </div>
@@ -1178,6 +1198,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.procedureVideo && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_procedure_video !== false}
+                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
+              />
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Section Title</label>
                 <input
@@ -1256,7 +1280,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient experience stories and video reviews</span>
               </div>
             </div>
@@ -1265,6 +1289,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.testimonials && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_testimonials !== false}
+                onChange={(checked) => updateMConfigField('show_testimonials', checked)}
+              />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Testimonials ({testimonials.length})</span>
                 <button
@@ -1330,7 +1358,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure facility, infrastructure, and specialist doctor photos</span>
               </div>
             </div>
@@ -1339,6 +1367,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.hospitalTeam && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_hospital_photos !== false}
+                onChange={(checked) => updateMConfigField('show_hospital_photos', checked)}
+              />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Hospital & Team Photos ({hostPhotos.length})</span>
                 <button
@@ -1411,7 +1443,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><DollarSign className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Offer</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure transparency pricing, discounts, and consultation offers</span>
               </div>
             </div>
@@ -1420,6 +1452,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.costOffer && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_cost !== false}
+                onChange={(checked) => updateMConfigField('show_cost', checked)}
+              />
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Cost Section Heading</label>
                 <input
@@ -1474,7 +1510,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure authentic Google patient star ratings and feedback</span>
               </div>
             </div>
@@ -1483,6 +1519,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.googleReviews && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_google_reviews !== false}
+                onChange={(checked) => updateMConfigField('show_google_reviews', checked)}
+              />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Google Reviews ({googleReviews.length})</span>
                 <button
@@ -1558,7 +1598,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Phone className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure footer conversion banner buttons and contact channels</span>
               </div>
             </div>
@@ -1567,6 +1607,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.bottomCta && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_bottom_cta !== false}
+                onChange={(checked) => updateMConfigField('show_bottom_cta', checked)}
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Phone Number</label>
@@ -1629,7 +1673,7 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. FAQ Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. FAQ Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient questions and detailed answers accordion</span>
               </div>
             </div>
@@ -1638,6 +1682,10 @@ export default function WisdomToothSurgeryCms({ onSaveSuccess }: WisdomToothSurg
 
           {expandedSections.faq && (
             <div className="p-6 border-t border-slate-100 space-y-4">
+              <CmsSectionToggle
+                checked={mConfig.show_faq_sec !== false}
+                onChange={(checked) => updateMConfigField('show_faq_sec', checked)}
+              />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Frequently Asked Questions ({faqs.length})</span>
                 <button

@@ -8703,6 +8703,236 @@ export default function Admin({
                   </div>
                 </div>
 
+                {/* FEATURED TREATMENT VIDEO */}
+                {(() => {
+                  const mConfig = typeof editingService.marketing_config === 'string'
+                    ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
+                    : (editingService.marketing_config || {});
+                  return (
+                    <div className="border-t border-slate-100 pt-6 space-y-4">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <Video className="h-4 w-4 text-[#0D9488]" />
+                          <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Featured Treatment Video</h4>
+                        </div>
+                        {/* Enable / Disable Checkbox */}
+                        <label className="relative inline-flex items-center cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={mConfig.featured_video_enabled !== false}
+                            onChange={(e) => updateMarketingConfig('featured_video_enabled', e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                          <span className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-wider">Enable Section</span>
+                        </label>
+                      </div>
+
+                      {mConfig.featured_video_enabled !== false && (
+                        <div className="space-y-4 animate-fade-in">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Section Heading</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Watch Our Treatment Procedure In Action"
+                                value={mConfig.featured_video_heading || ''}
+                                onChange={(e) => updateMarketingConfig('featured_video_heading', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Video Source</label>
+                              <select
+                                value={mConfig.featured_video_source || 'youtube'}
+                                onChange={(e) => updateMarketingConfig('featured_video_source', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              >
+                                <option value="youtube">YouTube (Embedded)</option>
+                                <option value="upload">Direct Uploaded Video File</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Rich Description</label>
+                            <textarea
+                              rows={3}
+                              placeholder="Write a compelling summary of what the video shows and how it educates the patient..."
+                              value={mConfig.featured_video_description || ''}
+                              onChange={(e) => updateMarketingConfig('featured_video_description', e.target.value)}
+                              className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
+                            />
+                          </div>
+
+                          {/* Video URLs based on selected source */}
+                          {mConfig.featured_video_source === 'upload' ? (
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Direct Video File URL</label>
+                              <input
+                                type="text"
+                                placeholder="https://example.com/videos/treatment.mp4"
+                                value={mConfig.featured_video_upload_url || ''}
+                                onChange={(e) => updateMarketingConfig('featured_video_upload_url', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              />
+                            </div>
+                          ) : (
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">YouTube Video URL</label>
+                              <input
+                                type="text"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                value={mConfig.featured_video_youtube_url || ''}
+                                onChange={(e) => updateMarketingConfig('featured_video_youtube_url', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              />
+                            </div>
+                          )}
+
+                          {/* Thumbnail configuration */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Thumbnail Source</label>
+                              <select
+                                value={mConfig.featured_video_thumbnail_source || 'auto'}
+                                onChange={(e) => updateMarketingConfig('featured_video_thumbnail_source', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              >
+                                <option value="auto">Auto Generate (First Frame / YouTube Cover)</option>
+                                <option value="custom">Upload Custom Thumbnail</option>
+                              </select>
+                            </div>
+
+                            {mConfig.featured_video_thumbnail_source === 'custom' && (
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Custom Thumbnail Image URL</label>
+                                <input
+                                  type="text"
+                                  placeholder="https://images.unsplash.com/photo-..."
+                                  value={mConfig.featured_video_custom_thumbnail || ''}
+                                  onChange={(e) => updateMarketingConfig('featured_video_custom_thumbnail', e.target.value)}
+                                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Dynamic Bullet Points (Add / Remove) */}
+                          <div className="space-y-2 border border-slate-100 p-4 rounded-2xl bg-slate-50/30">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Featured Video Bullet Points</label>
+                            <div className="space-y-2">
+                              {(mConfig.featured_video_bullets || []).map((bullet: string, index: number) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={bullet}
+                                    onChange={(e) => {
+                                      const list = [...(mConfig.featured_video_bullets || [])];
+                                      list[index] = e.target.value;
+                                      updateMarketingConfig('featured_video_bullets', list);
+                                    }}
+                                    className="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                                    placeholder={`Bullet point #${index + 1}`}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const list = (mConfig.featured_video_bullets || []).filter((_: any, i: number) => i !== index);
+                                      updateMarketingConfig('featured_video_bullets', list);
+                                    }}
+                                    className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl cursor-pointer"
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const list = [...(mConfig.featured_video_bullets || []), ''];
+                                  updateMarketingConfig('featured_video_bullets', list);
+                                }}
+                                className="text-xs text-[#0D9488] hover:text-[#0F766E] font-bold flex items-center gap-1 mt-1 cursor-pointer"
+                              >
+                                + Add Bullet Point
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* CTA button settings */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">CTA Button Text</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Book Clinic Slot"
+                                value={mConfig.featured_video_cta_text || ''}
+                                onChange={(e) => updateMarketingConfig('featured_video_cta_text', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">CTA Button Link</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. #appointment, or a full URL"
+                                value={mConfig.featured_video_cta_link || ''}
+                                onChange={(e) => updateMarketingConfig('featured_video_cta_link', e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Video Player Settings (Autoplay, Mute, Loop) */}
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
+                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Autoplay After Click</span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={mConfig.featured_video_autoplay !== false}
+                                  onChange={(e) => updateMarketingConfig('featured_video_autoplay', e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                              </label>
+                            </div>
+
+                            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
+                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Mute Video</span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={!!mConfig.featured_video_mute}
+                                  onChange={(e) => updateMarketingConfig('featured_video_mute', e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                              </label>
+                            </div>
+
+                            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
+                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Loop Video</span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={!!mConfig.featured_video_loop}
+                                  onChange={(e) => updateMarketingConfig('featured_video_loop', e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
                 {/* 2. INTRODUCTION SECTION */}
                 <div className="border-t border-slate-100 pt-6 space-y-4">
                   <div className="flex items-center gap-2 mb-2">

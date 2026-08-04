@@ -8,8 +8,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Maximize2, X, ChevronLeft, ChevronRight, ImageIcon, Sparkles, Heart } from 'lucide-react';
 import { SocialServiceItem } from '../types';
 import { socialServiceService } from '../utils/socialServiceData';
+import { useSEO } from '../utils/seo';
 
 export default function SocialService() {
+  useSEO({
+    title: 'Social Service & Community Dental Camps | Patel Dental Hospital',
+    description: 'Explore the social responsibility and community welfare programs run by Patel Dental Hospital in Rajkot, Gujarat. Providing free dental checkups, rural health awareness, and school dental camps.',
+    keywords: 'Social Service Dental, Free Dental Camp Rajkot, Dental Clinic in Rajkot, Patel Dental Hospital Social Service, Oral Health Awareness Gujarat, Community Outreach'
+  });
+
   const [items, setItems] = useState<SocialServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);

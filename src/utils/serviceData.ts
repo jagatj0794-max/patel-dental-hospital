@@ -12,91 +12,199 @@ export const DEFAULT_RCT_GREEN_HIGHLIGHT_LINE = "At Patel Dental Hospital, one o
 export const DEFAULT_FMR_GREEN_HIGHLIGHT_LINE = "The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called as Full Mouth Rehabilitation or Reconstruction or Restoration.";
 export const DEFAULT_ALIGNERS_GREEN_HIGHLIGHT_LINE = "A modern approach to straighten and align your teeth with the help of Custom made series of aligners created for you with help of expert and advanced software.";
 
-export const DEFAULT_ALIGNERS_GOOGLE_REVIEWS = [
+export const UNIVERSAL_GOOGLE_REVIEWS = [
   {
-    id: 'aligners-review-1',
-    patient_name: 'Patient Transformation Review',
-    patient_photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    id: 'google-review-1',
+    patient_name: 'Mihir Mirani',
+    patient_photo_url: '',
     rating: 5,
-    review_text: 'I was highly conscious of my crowded teeth, but I didn\'t want to wear metal braces at my job. Dr. Kinjal Patel designed a set of completely invisible aligners for me. I wore them easily every day, and within 10 months my smile became perfectly straight! Highly recommended.',
-    review_date: '1 month ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
+    review_text: "My mother haven’t a single teeth in her mouth so she not chewing everything and properly. After then we visit PATEL DENTAL HOSPITAL and Dr. VIPUL PATEL advise to implant supported teeth in lower and upper complete denture. Now today 11 month complete and she eat everything thing even also hard food. Her smile is so beautiful after the treatment. We all are so satisfied with hospitality to hospital. Thank you Dr. Vipul Patel and they entire team.",
+    review_date: '3 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 1,
+    enabled: true
+  },
+  {
+    id: 'google-review-2',
+    patient_name: 'Chetan Gohel',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have pain and cheek biting problem in my upper wisdom teeth so I visit patel dental hospital so where dr done check up very well after that he advised me to remove that wisdom teeth so that I removed my that teeth and dr removed that teeth in couple of minute without any pain and I feel very comfort in this procedure. I'm very thankful to team patel dental hospital.",
+    review_date: '6 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 2,
+    enabled: true
+  },
+  {
+    id: 'google-review-3',
+    patient_name: 'Ladva Hiren',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have pain in my lower teeth so that I came to Patel dental hospital. After thorough check up dr suggest me to do one root canal treatment and wisdom teeth removal. So in first sitting I have done my root canal treatment in single sitting after that in second visit Dr removed my one wisdom teeth and after 1 week they placed cap on my root canal treated teeth and removed remaining two wisdom teeth. I'm very happy with all the doctor teams works and hospital staff are also very kind in nature and atmosphere of clinic is very sound full so that I'm very thankful to team Patel dental hospital.",
+    review_date: '6 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 3,
+    enabled: true
+  },
+  {
+    id: 'google-review-4',
+    patient_name: 'Amit Pabari',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "Hello people, I connected with Patel Dental Hospital since 2 years and I had take a treatment of root canal and wisdom tooth removal. I had a great experience with Patel Dental Hospital. Staff are very helpful and doctors are also very accurate with their knowledge. Thank you Dr. Kinjal Patel for your great support.",
+    review_date: '6 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 4,
+    enabled: true
+  },
+  {
+    id: 'google-review-5',
+    patient_name: 'Bhakhar Gaming',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have unbearable wisdom tooth pain in upper left jaw side so I came to Patel Dental Hospital with reference of my friend where Dr. Vipul Patel take big x ray of whole mouth and explain me the cause of tooth pain then he advised me for removal of wisdom tooth. He has removed it just in second and it's totally painless so I'm very impressed with skill of doctor. Hospital is neat and clean and very hygienic. I'm impressed with big batrishi x ray which is taken at Patel Dental Hospital. Very hi-tech hospital. Best dental clinic in Rajkot I have ever seen yet. Highly recommended for any dental treatment.",
+    review_date: '5 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 5,
+    enabled: true
+  },
+  {
+    id: 'google-review-6',
+    patient_name: 'Dinesh Trivedi',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "Dr. Vipul Patel and staff are friendly and caring professionals. Over the years I have crowns, root canal treatment and cleanings done without any problems and stress. They also make use of the latest technologies and enhance the service. I would recommend the clinic for every dental treatment or diagnosis.",
+    review_date: '1 year ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 6,
+    enabled: true
+  },
+  {
+    id: 'google-review-7',
+    patient_name: 'Denish Rajput',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have severe pain in my tooth even swelling is also on my face when I came to PDH where Dr give me advice of root canal treatment in my tooth just after one sitting my pain and swelling gone. Today my dental treatment is completed. Very happy. Dr is soft handed and highly skillful and hospital is advanced. Best dentist I have ever met. Best dental clinic and maybe topmost dental hospital in Gujarat having so advanced technology. Highly recommend.",
+    review_date: '3 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 7,
+    enabled: true
+  },
+  {
+    id: 'google-review-8',
+    patient_name: 'Bhupat Sojitra',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I had a lot of pain in my teeth. I took an emergency appointment for Dr. Vipul Patel and saw him. He took x-ray and told me that my tooth is still not bad that I have go for root canal. I had done root canal treatment and I'm very impressed to Dr. Vipul Patel and entire staff. Best dental hospital.",
+    review_date: '3 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 8,
+    enabled: true
+  },
+  {
+    id: 'google-review-9',
+    patient_name: 'Jagdish Patel',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "My had teeth problem so visited at Patel Dental Hospital. Dr. Vipul Patel checked and advised root canal treatment and removal of cyst. Treatment is excellent and hospital atmosphere is very positive and friendly. Best dental hospital.",
+    review_date: '4 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 9,
+    enabled: true
+  },
+  {
+    id: 'google-review-10',
+    patient_name: 'Sabudin Thobhani',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have 3 missing teeth in my mouth and that's why I don't eat properly so I visit Patel Dental Hospital to Dr. Vipul Patel and they advise me to implant supported teeth. Done my treatment and now today I have implant supported teeth, it's look like totally natural teeth. I eat even hard food, now no need to worry about my teeth because Dr. Vipul Patel is always there for my oral hygiene care. Thanks to Dr. Vipul Patel and they entire team.",
+    review_date: '3 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
     display_order: 10,
+    enabled: true
+  },
+  {
+    id: 'google-review-11',
+    patient_name: 'Kalpesh Patel',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "Implant supported fix teeth treatment done in Patel Dental Hospital. I enjoyed a lot like a natural teeth. Really amazing work with soft hand skill. Today I completed 2 year of my treatment. I'm very satisfied with my treatment. Highly recommend Patel Dental Hospital.",
+    review_date: '5 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 11,
+    enabled: true
+  },
+  {
+    id: 'google-review-12',
+    patient_name: 'Hitesh Korat',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "3 ago my wife got implant supported teeth at Patel Hospital. She is very satisfied with the treatment. Teeth look like natural teeth. She can eat properly with them. After 3 year teeth are as it is. Thank you Dr. Vipul Patel.",
+    review_date: 'Edited 3 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 12,
+    enabled: true
+  },
+  {
+    id: 'google-review-13',
+    patient_name: 'Jayanti Thanki',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "Best dentist in Rajkot. I have pain in teeth and Dr Vipul Patel give advise for implant supported fix teeth and really enjoy like a natural teeth. Thank you so much for my treatment.",
+    review_date: '5 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 13,
+    enabled: true
+  },
+  {
+    id: 'google-review-14',
+    patient_name: 'Devshibhai Sardhara',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "Experience is nice. Hospital is neat and clean. High-tech instruments like CT scan and laser. By this fixed teeth I can chew anything. Today have completed 4.5 years after fixing of teeth. I'm so satisfied. Highly recommended.",
+    review_date: 'Edited 3 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 14,
+    enabled: true
+  },
+  {
+    id: 'google-review-15',
+    patient_name: 'Dev Busa',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have taken treatment of dental implant supported fix teeth before five year, it's still working. Doctor's work is very neat and clean. Happy with work. Best dental implant hospital in Gujarat.",
+    review_date: '5 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 15,
+    enabled: true
+  },
+  {
+    id: 'google-review-16',
+    patient_name: 'Kishor Sakhiya',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "Good doctors with best knowledge. Thank you Dr. Vipul Patel for my fix teeth treatment. Very friendly atmosphere and supportive staff during my treatment. Highly recommend for Patel Dental Hospital.",
+    review_date: '5 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 16,
+    enabled: true
+  },
+  {
+    id: 'google-review-17',
+    patient_name: 'Bhikhabhai Patel',
+    patient_photo_url: '',
+    rating: 5,
+    review_text: "I have taken treatment of fix dentures. Nice clinic, very well equipped, highly appreciated dental hospital in Rajkot, maybe in Gujarat.",
+    review_date: '5 years ago',
+    review_url: 'https://www.google.com/maps?cid=8837447286611548556',
+    display_order: 17,
     enabled: true
   }
 ];
 
-export const DEFAULT_RCT_GOOGLE_REVIEWS = [
-  {
-    id: 'rct-review-1',
-    patient_name: 'Ramesh Patel',
-    patient_photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-    rating: 5,
-    review_text: 'Got my root canal done in a single sitting by Dr. Vipul Patel. Completely painless experience with modern Endo Motor technology. Highly recommend Patel Dental Hospital in Rajkot!',
-    review_date: '1 month ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
-    display_order: 10,
-    enabled: true
-  },
-  {
-    id: 'rct-review-2',
-    patient_name: 'Priya Shah',
-    patient_photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
-    rating: 5,
-    review_text: 'I was very scared of root canal treatment pain, but Dr. Vipul Patel completed the entire RCT in just one visit using digital Apex Locator and X-ray. Zero pain during and after the procedure!',
-    review_date: '2 weeks ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
-    display_order: 20,
-    enabled: true
-  },
-  {
-    id: 'rct-review-3',
-    patient_name: 'Amit Trivedi',
-    patient_photo_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
-    rating: 5,
-    review_text: 'Excellent single sitting root canal treatment at an affordable price. Biocompatible MTA sealer and Japanese Endo Motor equipment made the treatment very quick and comfortable.',
-    review_date: '3 weeks ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
-    display_order: 30,
-    enabled: true
-  },
-  {
-    id: 'rct-review-4',
-    patient_name: 'Neha Mehta',
-    patient_photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-    rating: 5,
-    review_text: 'Best dental hospital in Rajkot for Single Sitting Root Canal. Saved so much of my time and the doctor explained everything very clearly before starting.',
-    review_date: '1 month ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
-    display_order: 40,
-    enabled: true
-  }
-];
-
-export const DEFAULT_FMR_GOOGLE_REVIEWS = [
-  {
-    id: 'fmr-review-1',
-    patient_name: 'Suresh Patel',
-    patient_photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-    rating: 5,
-    review_text: 'Had my Full Mouth Rehabilitation done by Dr. Vipul Patel. Completely transformed my smile and chewing ability. Outstanding care and precision at Patel Dental Hospital!',
-    review_date: '1 month ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
-    display_order: 10,
-    enabled: true
-  },
-  {
-    id: 'fmr-review-2',
-    patient_name: 'Bhavna Joshi',
-    patient_photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
-    rating: 5,
-    review_text: 'I had severe bite issues and multiple worn out teeth. The full mouth reconstruction treatment was planned meticulously and executed flawlessly. Extremely satisfied!',
-    review_date: '2 weeks ago',
-    review_url: 'https://maps.google.com/?cid=pateldentalhospital',
-    display_order: 20,
-    enabled: true
-  }
-];
+export const DEFAULT_ALIGNERS_GOOGLE_REVIEWS = UNIVERSAL_GOOGLE_REVIEWS;
+export const DEFAULT_RCT_GOOGLE_REVIEWS = UNIVERSAL_GOOGLE_REVIEWS;
+export const DEFAULT_FMR_GOOGLE_REVIEWS = UNIVERSAL_GOOGLE_REVIEWS;
 
 export const DEFAULT_SERVICES: Service[] = [
   {
@@ -790,7 +898,7 @@ export const DEFAULT_SERVICES: Service[] = [
       procedure_video_url: '',
       sec11_heading: 'Book Your Smile Makeover Consultation',
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       before_after_heading: 'Before & After Smile Transformations',
       before_after_description: 'See real smile transformations of our smile makeover patients.',
       before_after_pairs: [],
@@ -888,7 +996,7 @@ export const DEFAULT_SERVICES: Service[] = [
       cost_starting_price: '',
       cost_cards: [],
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       sec11_heading: 'Book Your Crown & Bridges Consultation',
       phone_number: '+91 9510397046',
       whatsapp_number: '+91 9510397046',
@@ -967,7 +1075,7 @@ export const DEFAULT_SERVICES: Service[] = [
       cost_starting_price: '',
       cost_cards: [],
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       sec11_heading: 'Patel Dental Hospital',
       phone_number: '9510397046',
       whatsapp_number: '9510397046',
@@ -1165,7 +1273,7 @@ export const DEFAULT_SERVICES: Service[] = [
       cost_starting_price: '',
       cost_cards: [],
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       sec11_heading: 'Patel Dental Hospital',
       sec11_sub: 'Call or WhatsApp: 9510397946 | Follow Us on Social Media',
       phone_number: '9510397946',
@@ -1283,7 +1391,7 @@ export const DEFAULT_SERVICES: Service[] = [
       cost_starting_price: '',
       cost_cards: [],
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       sec11_heading: 'Patel Dental Hospital',
       phone_number: '9510397946',
       whatsapp_number: '9510397046',
@@ -1395,7 +1503,7 @@ export const DEFAULT_SERVICES: Service[] = [
       cost_starting_price: '',
       cost_cards: [],
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       sec11_heading: 'Patel Dental Hospital',
       sec11_sub: 'Call or WhatsApp: 9510397046 | Follow Us on Social Media',
       phone_number: '9510397046',
@@ -1520,7 +1628,7 @@ export const DEFAULT_SERVICES: Service[] = [
       cost_starting_price: '',
       cost_cards: [],
       google_reviews_heading: 'Google Patient Reviews',
-      google_reviews: [],
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
       sec11_heading: 'Patel Dental Hospital',
       sec11_sub: 'Call or WhatsApp: 9510397046 | Follow Us on Social Media',
       phone_number: '9510397046',
@@ -2706,7 +2814,12 @@ export const serviceService = {
         const mConfigObj = typeof data.marketing_config === 'string'
           ? JSON.parse(data.marketing_config)
           : (data.marketing_config || {});
-        if (defaultCrowns) {
+        if (defaultCrowns && (
+          !mConfigObj.candidate_items ||
+          !Array.isArray(mConfigObj.candidate_items) ||
+          mConfigObj.candidate_items.length === 0 ||
+          mConfigObj.cost_heading !== (defaultCrowns.marketing_config as MarketingConfig)?.cost_heading
+        )) {
           const defaultMCfg = (defaultCrowns.marketing_config as MarketingConfig) || {};
           const updatedCrowns = {
             ...data,
@@ -2722,19 +2835,19 @@ export const serviceService = {
             marketing_config: {
               ...defaultMCfg,
               ...mConfigObj,
-              green_highlight_line: defaultMCfg.green_highlight_line,
-              process_section_title: 'Crown & Bridges Treatment Planning',
-              candidate_section_title: 'Crown & Bridge Materials',
-              candidate_items: defaultMCfg.candidate_items,
-              procedure_video_title: 'Crown & Bridges Procedure Video',
-              procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
-              cost_heading: 'Crown & Bridges Cost & Offer',
-              sec11_heading: 'Book Your Crown & Bridges Consultation',
-              phone_number: '+91 9510397046',
-              whatsapp_number: '+91 9510397046',
-              show_benefits: false,
-              show_candidate: true,
-              show_procedure_video: true
+              green_highlight_line: mConfigObj.green_highlight_line ?? defaultMCfg.green_highlight_line,
+              process_section_title: mConfigObj.process_section_title ?? 'Crown & Bridges Treatment Planning',
+              candidate_section_title: mConfigObj.candidate_section_title ?? 'Crown & Bridge Materials',
+              candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
+              procedure_video_title: mConfigObj.procedure_video_title ?? 'Crown & Bridges Procedure Video',
+              procedure_video_url: mConfigObj.procedure_video_url ?? 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+              cost_heading: mConfigObj.cost_heading ?? 'Crown & Bridges Cost & Offer',
+              sec11_heading: mConfigObj.sec11_heading ?? 'Book Your Crown & Bridges Consultation',
+              phone_number: mConfigObj.phone_number ?? '+91 9510397046',
+              whatsapp_number: mConfigObj.whatsapp_number ?? '+91 9510397046',
+              show_benefits: mConfigObj.show_benefits !== undefined ? mConfigObj.show_benefits : false,
+              show_candidate: mConfigObj.show_candidate !== undefined ? mConfigObj.show_candidate : true,
+              show_procedure_video: mConfigObj.show_procedure_video !== undefined ? mConfigObj.show_procedure_video : true
             }
           };
           await serviceService.saveService(updatedCrowns);
@@ -2747,7 +2860,11 @@ export const serviceService = {
         const mConfigObj = typeof data.marketing_config === 'string'
           ? JSON.parse(data.marketing_config)
           : (data.marketing_config || {});
-        if (defaultBraces) {
+        if (defaultBraces && (
+          !mConfigObj.candidate_items ||
+          !Array.isArray(mConfigObj.candidate_items) ||
+          mConfigObj.candidate_items.length === 0
+        )) {
           const defaultMCfg = (defaultBraces.marketing_config as MarketingConfig) || {};
           const updatedBraces = {
             ...data,
@@ -2761,17 +2878,17 @@ export const serviceService = {
             marketing_config: {
               ...defaultMCfg,
               ...mConfigObj,
-              process_section_title: 'Braces Treatment Planning',
-              candidate_section_title: 'Treatment Planning Includes',
+              process_section_title: mConfigObj.process_section_title ?? 'Braces Treatment Planning',
+              candidate_section_title: mConfigObj.candidate_section_title ?? 'Treatment Planning Includes',
               candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
               before_after_pairs: (Array.isArray(mConfigObj.before_after_pairs) && mConfigObj.before_after_pairs.length > 0) ? mConfigObj.before_after_pairs : defaultMCfg.before_after_pairs,
               patient_testimonials: (Array.isArray(mConfigObj.patient_testimonials) && mConfigObj.patient_testimonials.length > 0) ? mConfigObj.patient_testimonials : (mConfigObj.patient_testimonials || defaultMCfg.patient_testimonials),
               cost_description: mConfigObj.cost_description || 'Call: 9510397046',
               phone_number: mConfigObj.phone_number || '9510397946',
               faqs: [],
-              show_candidate: true,
-              show_before_after: true,
-              show_testimonials: true
+              show_candidate: mConfigObj.show_candidate !== undefined ? mConfigObj.show_candidate : true,
+              show_before_after: mConfigObj.show_before_after !== undefined ? mConfigObj.show_before_after : true,
+              show_testimonials: mConfigObj.show_testimonials !== undefined ? mConfigObj.show_testimonials : true
             }
           };
           await serviceService.saveService(updatedBraces);
