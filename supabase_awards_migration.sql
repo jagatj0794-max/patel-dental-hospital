@@ -5,6 +5,7 @@ CREATE TABLE public.awards (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   image_url text NOT NULL,
   display_order integer DEFAULT 0,
+  orientation text NOT NULL DEFAULT 'horizontal',
   is_active boolean DEFAULT true,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL

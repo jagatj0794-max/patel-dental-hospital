@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /sitemap.xml
+Disallow: /admin/
+Disallow: /admin-login
+Disallow: /#admin/
+Disallow: /#admin-login
+Disallow: /api/
+
+Sitemap: https://www.pateldentalhospital.com/sitemap.xml

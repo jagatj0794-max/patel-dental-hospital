@@ -65,9 +65,11 @@ export default function SmileGallery({ patientMoments, mediaImages = [] }: Smile
 
   return (
     <div id="smile-gallery-page-view" className="bg-[#FAFAFC] min-h-screen">
+      {/* Patient Smile Moments Gallery */}
+      <PatientMomentsGallery patientMoments={patientMoments} isStandalonePage={true} />
       
       {/* About Us Hospital & Clinical Gallery Header */}
-      <section className="pt-[108px] sm:pt-[124px] lg:pt-[140px] pb-12 bg-white border-b border-slate-100 relative">
+      <section className="pt-16 sm:pt-20 pb-12 bg-white border-t border-b border-slate-100 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block">
@@ -244,9 +246,6 @@ export default function SmileGallery({ patientMoments, mediaImages = [] }: Smile
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Patient Smile Moments Gallery */}
-      <PatientMomentsGallery patientMoments={patientMoments} isStandalonePage={true} />
     </div>
   );
 }

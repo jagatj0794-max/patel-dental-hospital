@@ -16,9 +16,11 @@ interface Review {
 interface GooglePatientReviewsProps {
   heading?: string;
   reviews: Review[];
+  label?: string;
+  description?: string;
 }
 
-export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsProps) {
+export function GooglePatientReviews({ heading, reviews, label, description }: GooglePatientReviewsProps) {
   const [apiReviews, setApiReviews] = useState<Review[]>([]);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -229,12 +231,17 @@ export function GooglePatientReviews({ heading, reviews }: GooglePatientReviewsP
         <div className="space-y-3 text-center sm:text-left">
           <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
             <Star className="h-3.5 w-3.5 text-[#0D9488] fill-[#0D9488] shrink-0" />
-            Google Reviews
+            {label || "Google Reviews"}
           </span>
           {heading && heading.trim() !== '' && (
             <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
               {heading}
             </h2>
+          )}
+          {description && description.trim() !== '' && (
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl font-medium mt-1">
+              {description}
+            </p>
           )}
           <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto sm:mx-0 mt-3" />
         </div>

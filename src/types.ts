@@ -79,6 +79,7 @@ export interface AwardItem {
   id: string;
   image_url: string;
   display_order: number;
+  orientation?: 'horizontal' | 'vertical';
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -356,7 +357,13 @@ export interface TechnologyItem {
   updated_at?: string;
 }
 
-
-
-
-
+export interface InternationalPatientImage {
+  id: string;
+  image_url: string;
+  storage_path?: string;
+  alt_text?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}

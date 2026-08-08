@@ -34,13 +34,8 @@ const navHierarchy = [
   },
 
   {
-    label: 'Visiting From Abroad?',
+    label: 'Dental Tourism',
     id: 'international',
-    dropdown: [
-      { label: 'International Patients', id: 'intl-patients' },
-      { label: 'Travel Assistance', id: 'travel' },
-      { label: 'Treatment Process', id: 'process' },
-    ]
   },
   {
     label: 'Services',
@@ -48,22 +43,12 @@ const navHierarchy = [
     dropdown: []
   },
   {
-    label: 'Academy',
+    label: 'Dental Blog',
     id: 'academy',
-    dropdown: [
-      { label: 'Dental Blogs', id: 'blogs' },
-      { label: 'Patient Education', id: 'education' },
-      { label: 'Case Studies', id: 'cases' },
-    ]
   },
   {
     label: 'Contact Us',
-    id: 'contact',
-    dropdown: [
-      { label: 'Contact Information', id: 'contact-info' },
-      { label: 'Free Consultation', id: 'book-now' },
-      { label: 'Location Map', id: 'map' },
-    ]
+    id: 'contact'
   }
 ];
 

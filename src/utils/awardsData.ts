@@ -20,6 +20,28 @@ export function generateUUID(): string {
 
 export const awardsService = {
   lastError: null as string | null,
+  hasOrientationColumn: null as boolean | null,
+
+  checkOrientationColumn: async (): Promise<boolean> => {
+    if (awardsService.hasOrientationColumn !== null) {
+      return awardsService.hasOrientationColumn;
+    }
+    try {
+      const { error } = await supabase.client
+        .from('awards')
+        .select('orientation')
+        .limit(1);
+      
+      if (error && error.code === '42703') {
+        awardsService.hasOrientationColumn = false;
+      } else {
+        awardsService.hasOrientationColumn = true;
+      }
+    } catch {
+      awardsService.hasOrientationColumn = false;
+    }
+    return awardsService.hasOrientationColumn;
+  },
 
   /**
    * Fetches all award items directly from public.awards table sorted by display_order ASC.
@@ -50,10 +72,13 @@ export const awardsService = {
       console.log('[Fetch Success] Successfully fetched awards from public.awards');
       console.log('[Records Returned] Records returned from Supabase public.awards:', data);
 
+      const hasCol = await awardsService.checkOrientationColumn();
+
       const mapped = data.map((row: any) => ({
         id: row.id,
         image_url: row.image_url || '',
         display_order: Number(row.display_order) || 0,
+        orientation: hasCol ? (row.orientation || 'horizontal') : 'horizontal',
         is_active: row.is_active !== false,
         created_at: row.created_at,
         updated_at: row.updated_at
@@ -83,13 +108,18 @@ export const awardsService = {
       awardsService.lastError = null;
       const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
       const itemId = isValidUUID ? item.id : generateUUID();
-      const row = {
+      const hasCol = await awardsService.checkOrientationColumn();
+
+      const row: any = {
         id: itemId,
         image_url: item.image_url || '',
         display_order: item.display_order || 0,
         is_active: item.is_active !== false,
         created_at: item.created_at || new Date().toISOString()
       };
+      if (hasCol) {
+        row.orientation = item.orientation || 'horizontal';
+      }
 
       // Check if item already exists
       const { data: existing, error: checkErr } = await supabase.client
@@ -147,10 +177,12 @@ export const awardsService = {
   updateAward: async (id: string, updates: Partial<AwardItem>): Promise<boolean> => {
     try {
       awardsService.lastError = null;
+      const hasCol = await awardsService.checkOrientationColumn();
       const row: any = { updated_at: new Date().toISOString() };
       if (updates.image_url !== undefined) row.image_url = updates.image_url;
       if (updates.display_order !== undefined) row.display_order = updates.display_order;
       if (updates.is_active !== undefined) row.is_active = updates.is_active;
+      if (hasCol && updates.orientation !== undefined) row.orientation = updates.orientation;
 
       const { error } = await supabase.client
         .from('awards')
@@ -252,17 +284,23 @@ export const awardsService = {
         }
       }
 
+      const hasCol = await awardsService.checkOrientationColumn();
+
       // 2. Map and Upsert
       const rowsToUpsert = items.map((item, index) => {
         const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
         const itemId = isValidUUID ? item.id : generateUUID();
-        return {
+        const row: any = {
           id: itemId,
           image_url: item.image_url || '',
           display_order: index,
           is_active: item.is_active !== false,
           created_at: item.created_at || new Date().toISOString()
         };
+        if (hasCol) {
+          row.orientation = item.orientation || 'horizontal';
+        }
+        return row;
       });
 
       if (rowsToUpsert.length > 0) {

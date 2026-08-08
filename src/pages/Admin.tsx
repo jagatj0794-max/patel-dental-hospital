@@ -44,7 +44,7 @@ import {
   Bell,
   BellRing
 } from 'lucide-react';
-import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, SocialServiceItem, TechnologyItem, AwardItem } from '../types';
+import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, SocialServiceItem, TechnologyItem, AwardItem, InternationalPatientImage } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
@@ -59,6 +59,7 @@ import { contactService } from '../utils/contactData';
 import { socialServiceService, generateUUID } from '../utils/socialServiceData';
 import { technologyService } from '../utils/technologyData';
 import { awardsService } from '../utils/awardsData';
+import { internationalPatientsService } from '../utils/internationalPatientsData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
@@ -96,6 +97,32 @@ interface AdminProps {
 }
 
 type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services' | 'implants-cms';
+
+const detectImageOrientation = (file: File): Promise<'horizontal' | 'vertical'> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        if (width >= height) {
+          resolve('horizontal');
+        } else {
+          resolve('vertical');
+        }
+      };
+      img.onerror = () => {
+        resolve('horizontal'); // fallback
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => {
+      resolve('horizontal'); // fallback
+    };
+    reader.readAsDataURL(file);
+  });
+};
 
 export default function Admin({ 
   setCurrentPage, 
@@ -203,8 +230,91 @@ export default function Admin({
 
   // Awards local draft states
   const [draftAwards, setDraftAwards] = useState<AwardItem[]>([]);
+  const [detectedAdminOrientations, setDetectedAdminOrientations] = useState<Record<string, 'horizontal' | 'vertical'>>({});
+
+  useEffect(() => {
+    if (!draftAwards || draftAwards.length === 0) return;
+    
+    draftAwards.forEach(item => {
+      if (!item.image_url) return;
+      if (detectedAdminOrientations[item.id]) return;
+
+      const img = new window.Image();
+      img.referrerPolicy = "no-referrer";
+      img.onload = () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        const orientation = height > width ? 'vertical' : 'horizontal';
+        setDetectedAdminOrientations(prev => ({
+          ...prev,
+          [item.id]: orientation
+        }));
+      };
+      img.onerror = () => {
+        setDetectedAdminOrientations(prev => ({
+          ...prev,
+          [item.id]: item.orientation || 'horizontal'
+        }));
+      };
+      img.src = item.image_url;
+    });
+  }, [draftAwards]);
+
+  const getItemOrientation = (item: AwardItem): 'horizontal' | 'vertical' => {
+    return detectedAdminOrientations[item.id] || item.orientation || 'horizontal';
+  };
+
+  const [awardsOrientationTab, setAwardsOrientationTab] = useState<'horizontal' | 'vertical'>('horizontal');
   const [awardToDelete, setAwardToDelete] = useState<string | null>(null);
+  const [previewAwardUrl, setPreviewAwardUrl] = useState<string | null>(null);
   const [isLoadingAwards, setIsLoadingAwards] = useState(false);
+
+  const handleMoveAward = async (id: string, direction: 'up' | 'down') => {
+    // Find the current filtered items (by orientation tab)
+    const currentTabItems = (draftAwards || []).filter(item => {
+      const orientation = getItemOrientation(item);
+      if (awardsOrientationTab === 'horizontal') {
+        return orientation === 'horizontal';
+      } else {
+        return orientation === 'vertical';
+      }
+    });
+
+    const indexInTab = currentTabItems.findIndex(item => item.id === id);
+    if (indexInTab === -1) return;
+
+    let targetIndexInTab = indexInTab + (direction === 'down' ? 1 : -1);
+    if (targetIndexInTab < 0 || targetIndexInTab >= currentTabItems.length) return;
+
+    // We swap the elements in the overall list
+    const originalItem = currentTabItems[indexInTab];
+    const targetItem = currentTabItems[targetIndexInTab];
+
+    const idxInOverall = draftAwards.findIndex(item => item.id === originalItem.id);
+    const targetIdxInOverall = draftAwards.findIndex(item => item.id === targetItem.id);
+
+    if (idxInOverall === -1 || targetIdxInOverall === -1) return;
+
+    const newAwards = [...draftAwards];
+    // Swap
+    newAwards[idxInOverall] = targetItem;
+    newAwards[targetIdxInOverall] = originalItem;
+
+    // Re-index display_order for all to be safe
+    newAwards.forEach((item, index) => {
+      item.display_order = index;
+    });
+
+    setDraftAwards(newAwards);
+    setSaveMessage('Saving reordered awards...');
+    const success = await awardsService.saveAwardsList(newAwards);
+    if (success) {
+      setSaveMessage('Awards reordered successfully!');
+    } else {
+      setSaveMessage('Failed to save reordered awards.');
+    }
+    setTimeout(() => setSaveMessage(null), 2500);
+  };
 
   const loadAwardsList = async () => {
     setIsLoadingAwards(true);
@@ -218,11 +328,30 @@ export default function Admin({
     }
   };
 
+  // International Patients Gallery draft states
+  const [draftInternationalPatients, setDraftInternationalPatients] = useState<InternationalPatientImage[]>([]);
+  const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
+  const [isLoadingInternationalPatients, setIsLoadingInternationalPatients] = useState(false);
+  const [editingInternationalPatient, setEditingInternationalPatient] = useState<InternationalPatientImage | null>(null);
+
+  const loadInternationalPatientsList = async () => {
+    setIsLoadingInternationalPatients(true);
+    try {
+      const freshItems = await internationalPatientsService.getInternationalPatients();
+      setDraftInternationalPatients(freshItems);
+    } catch (err) {
+      console.error('Error loading international patients from public.international_patients_gallery:', err);
+    } finally {
+      setIsLoadingInternationalPatients(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'media') {
       loadSocialServicesList();
       loadTechnologyList();
       loadAwardsList();
+      loadInternationalPatientsList();
     }
   }, [activeTab]);
 
@@ -2647,7 +2776,7 @@ export default function Admin({
   };
 
   // Media local interactive states
-  const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'smiles' | 'videos' | 'social-service' | 'technology' | 'awards'>('gallery');
+  const [activeMediaTab, setActiveMediaTab] = useState<'gallery' | 'smiles' | 'videos' | 'social-service' | 'technology' | 'awards' | 'international-patients'>('gallery');
   const [categories, setCategories] = useState<string[]>([
     'Homepage Slider',
     'Homepage Gallery',
@@ -4554,6 +4683,17 @@ export default function Admin({
                 >
                   <span className="text-sm">🏆</span> Awards
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab('international-patients')}
+                  className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all duration-150 cursor-pointer ${
+                    activeMediaTab === 'international-patients'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span className="text-sm">🌍</span> International Patients
+                </button>
               </div>
             </div>
 
@@ -5478,171 +5618,371 @@ export default function Admin({
             {activeMediaTab === 'awards' && (
               <div className="space-y-6" id="awards-tab-content">
                 {/* Actions row */}
-                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
                   <div className="text-xs text-slate-500 font-medium">
-                    Showing <span className="font-bold text-slate-800">{(draftAwards || []).length}</span> awards photos
+                    Showing <span className="font-bold text-slate-800">
+                      {(draftAwards || []).filter(item => {
+                        const orientation = getItemOrientation(item);
+                        if (awardsOrientationTab === 'horizontal') {
+                          return orientation === 'horizontal';
+                        } else {
+                          return orientation === 'vertical';
+                        }
+                      }).length}
+                    </span> {awardsOrientationTab === 'horizontal' ? 'horizontal (landscape)' : 'vertical (portrait)'} awards
                   </div>
                   
-                  <div>
-                    <label
-                      htmlFor="awards-upload-file-trigger"
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Upload Award Image</span>
-                    </label>
-                    <input
-                      type="file"
-                      id="awards-upload-file-trigger"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          const file = e.target.files[0];
-                          console.log('[Awards] Upload Started:', file.name);
-                          setSaveMessage('Uploading award image to Supabase...');
-                          try {
-                            const imageUrl = await uploadImage(file);
-                            console.log('[Awards] Upload Success:', imageUrl);
-                            const updated = [
-                              {
-                                id: generateUUID(),
-                                image_url: imageUrl,
-                                display_order: draftAwards.length,
-                                is_active: true
-                              },
-                              ...(draftAwards || [])
-                            ];
-                            setDraftAwards(updated);
-                            setSaveMessage('Saving award image to Supabase...');
-                            const success = await awardsService.saveAwardsList(updated);
-                            if (success) {
-                              setSaveMessage('Award image uploaded and saved to Supabase successfully!');
-                            } else {
-                              setSaveMessage('Failed to save award image to database.');
-                            }
-                          } catch (err: any) {
-                            console.warn('Upload failed, falling back to local Base64:', err);
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* Vertical (Portrait) Upload Option */}
+                    <div>
+                      <label
+                        htmlFor="awards-upload-file-trigger-vertical"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>Upload Vertical Image</span>
+                      </label>
+                      <input
+                        type="file"
+                        id="awards-upload-file-trigger-vertical"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            const file = e.target.files[0];
+                            console.log('[Awards] Vertical Upload Started:', file.name);
+                            setSaveMessage('Detecting orientation and uploading...');
                             try {
-                              const dataUrl = await new Promise<string>((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = () => resolve(reader.result as string);
-                                reader.onerror = reject;
-                                reader.readAsDataURL(file);
-                              });
+                              const orientation = await detectImageOrientation(file);
+                              console.log('[Awards] Auto-classified orientation:', orientation);
+
+                              let feedbackMsg = `Award uploaded successfully!`;
+                              if (orientation !== 'vertical') {
+                                feedbackMsg = `Image was detected as landscape. Saved as Horizontal Award.`;
+                              } else {
+                                feedbackMsg = `Award uploaded & classified as VERTICAL!`;
+                              }
+
+                              const imageUrl = await uploadImage(file);
                               const updated = [
                                 {
                                   id: generateUUID(),
-                                  image_url: dataUrl,
+                                  image_url: imageUrl,
                                   display_order: draftAwards.length,
+                                  orientation: orientation,
                                   is_active: true
                                 },
                                 ...(draftAwards || [])
                               ];
                               setDraftAwards(updated);
-                              await awardsService.saveAwardsList(updated);
-                              setSaveMessage('Award image loaded locally and saved.');
-                            } catch (fallbackErr) {
-                              console.error(fallbackErr);
+                              const success = await awardsService.saveAwardsList(updated);
+                              if (success) {
+                                setSaveMessage(feedbackMsg);
+                                setAwardsOrientationTab(orientation);
+                              } else {
+                                setSaveMessage('Failed to save award image to database.');
+                              }
+                            } catch (err: any) {
+                              console.warn('Upload failed, falling back to local Base64:', err);
+                              try {
+                                const orientation = await detectImageOrientation(file);
+                                const dataUrl = await new Promise<string>((resolve, reject) => {
+                                  const reader = new FileReader();
+                                  reader.onload = () => resolve(reader.result as string);
+                                  reader.onerror = reject;
+                                  reader.readAsDataURL(file);
+                                });
+                                let feedbackMsg = `Award loaded locally!`;
+                                if (orientation !== 'vertical') {
+                                  feedbackMsg = `Image detected as landscape. Loaded as Horizontal Award.`;
+                                }
+                                const updated = [
+                                  {
+                                    id: generateUUID(),
+                                    image_url: dataUrl,
+                                    display_order: draftAwards.length,
+                                    orientation: orientation,
+                                    is_active: true
+                                  },
+                                  ...(draftAwards || [])
+                                ];
+                                setDraftAwards(updated);
+                                await awardsService.saveAwardsList(updated);
+                                setSaveMessage(feedbackMsg);
+                                setAwardsOrientationTab(orientation);
+                              } catch (fallbackErr) {
+                                console.error(fallbackErr);
+                              }
+                            } finally {
+                              setTimeout(() => setSaveMessage(null), 4000);
                             }
-                          } finally {
-                            setTimeout(() => setSaveMessage(null), 3500);
                           }
-                        }
-                      }}
-                    />
+                        }}
+                      />
+                    </div>
+
+                    {/* Horizontal (Landscape) Upload Option */}
+                    <div>
+                      <label
+                        htmlFor="awards-upload-file-trigger-horizontal"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>Upload Horizontal Image</span>
+                      </label>
+                      <input
+                        type="file"
+                        id="awards-upload-file-trigger-horizontal"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            const file = e.target.files[0];
+                            console.log('[Awards] Horizontal Upload Started:', file.name);
+                            setSaveMessage('Detecting orientation and uploading...');
+                            try {
+                              const orientation = await detectImageOrientation(file);
+                              console.log('[Awards] Auto-classified orientation:', orientation);
+
+                              let feedbackMsg = `Award uploaded successfully!`;
+                              if (orientation !== 'horizontal') {
+                                feedbackMsg = `Image was detected as portrait. Saved as Vertical Award.`;
+                              } else {
+                                feedbackMsg = `Award uploaded & classified as HORIZONTAL!`;
+                              }
+
+                              const imageUrl = await uploadImage(file);
+                              const updated = [
+                                {
+                                  id: generateUUID(),
+                                  image_url: imageUrl,
+                                  display_order: draftAwards.length,
+                                  orientation: orientation,
+                                  is_active: true
+                                },
+                                ...(draftAwards || [])
+                              ];
+                              setDraftAwards(updated);
+                              const success = await awardsService.saveAwardsList(updated);
+                              if (success) {
+                                setSaveMessage(feedbackMsg);
+                                setAwardsOrientationTab(orientation);
+                              } else {
+                                setSaveMessage('Failed to save award image to database.');
+                              }
+                            } catch (err: any) {
+                              console.warn('Upload failed, falling back to local Base64:', err);
+                              try {
+                                const orientation = await detectImageOrientation(file);
+                                const dataUrl = await new Promise<string>((resolve, reject) => {
+                                  const reader = new FileReader();
+                                  reader.onload = () => resolve(reader.result as string);
+                                  reader.onerror = reject;
+                                  reader.readAsDataURL(file);
+                                });
+                                let feedbackMsg = `Award loaded locally!`;
+                                if (orientation !== 'horizontal') {
+                                  feedbackMsg = `Image detected as portrait. Loaded as Vertical Award.`;
+                                }
+                                const updated = [
+                                  {
+                                    id: generateUUID(),
+                                    image_url: dataUrl,
+                                    display_order: draftAwards.length,
+                                    orientation: orientation,
+                                    is_active: true
+                                  },
+                                  ...(draftAwards || [])
+                                ];
+                                setDraftAwards(updated);
+                                await awardsService.saveAwardsList(updated);
+                                setSaveMessage(feedbackMsg);
+                                setAwardsOrientationTab(orientation);
+                              } catch (fallbackErr) {
+                                console.error(fallbackErr);
+                              }
+                            } finally {
+                              setTimeout(() => setSaveMessage(null), 4000);
+                            }
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
 
+                {/* Sub-tabs Row */}
+                <div className="flex border-b border-slate-100 bg-white px-6 py-2 rounded-xl border shadow-3xs gap-6">
+                  <button
+                    type="button"
+                    onClick={() => setAwardsOrientationTab('horizontal')}
+                    className={`pb-3 pt-2 text-xs font-bold border-b-2 transition-all relative ${
+                      awardsOrientationTab === 'horizontal'
+                        ? 'border-amber-600 text-amber-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Horizontal Images ({(draftAwards || []).filter(a => getItemOrientation(a) === 'horizontal').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAwardsOrientationTab('vertical')}
+                    className={`pb-3 pt-2 text-xs font-bold border-b-2 transition-all relative ${
+                      awardsOrientationTab === 'vertical'
+                        ? 'border-amber-600 text-amber-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Vertical Images ({(draftAwards || []).filter(a => getItemOrientation(a) === 'vertical').length})
+                  </button>
+                </div>
+
                 {/* Grid */}
-                {(!draftAwards || draftAwards.length === 0) ? (
+                {(!draftAwards || draftAwards.filter(item => {
+                  const orientation = getItemOrientation(item);
+                  if (awardsOrientationTab === 'horizontal') {
+                    return orientation === 'horizontal';
+                  } else {
+                    return orientation === 'vertical';
+                  }
+                }).length === 0) ? (
                   <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
-                    No award photos uploaded yet. Add your accolades and recognitions!
+                    No {awardsOrientationTab === 'horizontal' ? 'horizontal' : 'vertical'} award photos uploaded yet.
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {draftAwards.map((item) => (
-                      <div 
-                        key={item.id}
-                        id={`admin-award-card-${item.id}`}
-                        className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-amber-100 transition-all duration-200 shadow-3xs"
-                      >
-                        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
-                          <img 
-                            src={item.image_url} 
-                            alt="Award Recognition" 
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        </div>
+                    {draftAwards
+                      .filter(item => {
+                        const orientation = getItemOrientation(item);
+                        if (awardsOrientationTab === 'horizontal') {
+                          return orientation === 'horizontal';
+                        } else {
+                          return orientation === 'vertical';
+                        }
+                      })
+                      .map((item) => (
+                        <div 
+                          key={item.id}
+                          id={`admin-award-card-${item.id}`}
+                          className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-amber-100 transition-all duration-200 shadow-3xs"
+                        >
+                          {/* Order & Preview Controls */}
+                          <div className="flex items-center justify-between gap-2 border-b border-slate-50 pb-2">
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleMoveAward(item.id, 'up')}
+                                className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                title="Move Left / Backwards"
+                              >
+                                <ChevronUp className="h-3.5 w-3.5 -rotate-90" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleMoveAward(item.id, 'down')}
+                                className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                title="Move Right / Forwards"
+                              >
+                                <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
+                              </button>
+                            </div>
+                            
+                            <button
+                              type="button"
+                              onClick={() => setPreviewAwardUrl(item.image_url)}
+                              className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition flex items-center gap-1 text-[11px] font-bold"
+                              title="Preview Full Image"
+                            >
+                              <Eye className="h-3.5 w-3.5 text-slate-400 group-hover:text-amber-600" />
+                              <span>Preview</span>
+                            </button>
+                          </div>
 
-                        {/* Replace & Delete Actions */}
-                        <div className="flex items-center justify-between gap-2 mt-auto">
-                          <label
-                            htmlFor={`awards-replace-trigger-${item.id}`}
-                            className="font-bold text-xs text-amber-600 hover:text-amber-700 bg-amber-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-amber-100 transition select-none flex-1 text-center cursor-pointer"
-                          >
-                            <Upload className="h-3 w-3 shrink-0" />
-                            <span>Replace</span>
-                          </label>
-                          <input
-                            type="file"
-                            id={`awards-replace-trigger-${item.id}`}
-                            className="hidden"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                const file = e.target.files[0];
-                                console.log('[Awards] Upload Started:', file.name);
-                                setSaveMessage('Replacing award photo on Supabase...');
-                                try {
-                                  const imageUrl = await uploadImage(file);
-                                  console.log('[Awards] Upload Success:', imageUrl);
-                                  const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: imageUrl } : award);
-                                  setDraftAwards(updated);
-                                  setSaveMessage('Saving updated award photo to Supabase...');
-                                  const success = await awardsService.saveAwardsList(updated);
-                                  if (success) {
-                                    setSaveMessage('Award photo replaced and saved successfully!');
-                                  } else {
-                                    setSaveMessage('Failed to save replacement to database.');
-                                  }
-                                } catch (err: any) {
-                                  console.warn('Upload failed, falling back to local Base64:', err);
+                          <div className={`relative w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0 ${
+                            awardsOrientationTab === 'horizontal' ? 'aspect-[16/10]' : 'aspect-[3/4]'
+                          }`}>
+                            <img 
+                              src={item.image_url} 
+                              alt="Award Recognition" 
+                              className="w-full h-full object-contain bg-slate-50/50 cursor-zoom-in"
+                              onClick={() => setPreviewAwardUrl(item.image_url)}
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+
+                          {/* Replace & Delete Actions */}
+                          <div className="flex items-center justify-between gap-2 mt-auto">
+                            <label
+                              htmlFor={`awards-replace-trigger-${item.id}`}
+                              className="font-bold text-xs text-amber-600 hover:text-amber-700 bg-amber-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-amber-100 transition select-none flex-1 text-center cursor-pointer"
+                            >
+                              <Upload className="h-3 w-3 shrink-0" />
+                              <span>Replace</span>
+                            </label>
+                            <input
+                              type="file"
+                              id={`awards-replace-trigger-${item.id}`}
+                              className="hidden"
+                              accept="image/*"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const file = e.target.files[0];
+                                  console.log('[Awards] Upload Started:', file.name);
+                                  setSaveMessage('Detecting orientation and replacing on Supabase...');
                                   try {
-                                    const dataUrl = await new Promise<string>((resolve, reject) => {
-                                      const reader = new FileReader();
-                                      reader.onload = () => resolve(reader.result as string);
-                                      reader.onerror = reject;
-                                      reader.readAsDataURL(file);
-                                    });
-                                    const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: dataUrl } : award);
-                                    setDraftAwards(updated);
-                                    await awardsService.saveAwardsList(updated);
-                                    setSaveMessage('Award photo replaced locally.');
-                                  } catch (fallbackErr) {
-                                    console.error(fallbackErr);
-                                  }
-                                } finally {
-                                  setTimeout(() => setSaveMessage(null), 3500);
-                                }
-                              }
-                            }}
-                          />
+                                    const orientation = await detectImageOrientation(file);
+                                    console.log('[Awards] Auto-classified replacement orientation:', orientation);
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAwardToDelete(item.id);
-                            }}
-                            className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
-                            aria-label="Delete Award Photo"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                                    const imageUrl = await uploadImage(file);
+                                    console.log('[Awards] Upload Success:', imageUrl);
+                                    const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: imageUrl, orientation: orientation } : award);
+                                    setDraftAwards(updated);
+                                    setSaveMessage('Saving updated award photo to Supabase...');
+                                    const success = await awardsService.saveAwardsList(updated);
+                                    if (success) {
+                                      setSaveMessage(`Award photo replaced and classified as ${orientation.toUpperCase()}!`);
+                                      setAwardsOrientationTab(orientation);
+                                    } else {
+                                      setSaveMessage('Failed to save replacement to database.');
+                                    }
+                                  } catch (err: any) {
+                                    console.warn('Upload failed, falling back to local Base64:', err);
+                                    try {
+                                      const orientation = await detectImageOrientation(file);
+                                      const dataUrl = await new Promise<string>((resolve, reject) => {
+                                        const reader = new FileReader();
+                                        reader.onload = () => resolve(reader.result as string);
+                                        reader.onerror = reject;
+                                        reader.readAsDataURL(file);
+                                      });
+                                      const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: dataUrl, orientation: orientation } : award);
+                                      setDraftAwards(updated);
+                                      await awardsService.saveAwardsList(updated);
+                                      setSaveMessage(`Award photo replaced locally and classified as ${orientation.toUpperCase()}.`);
+                                      setAwardsOrientationTab(orientation);
+                                    } catch (fallbackErr) {
+                                      console.error(fallbackErr);
+                                    }
+                                  } finally {
+                                    setTimeout(() => setSaveMessage(null), 3500);
+                                  }
+                                }
+                              }}
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAwardToDelete(item.id);
+                              }}
+                              className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
+                              aria-label="Delete Award Photo"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
 
@@ -5686,6 +6026,258 @@ export default function Admin({
                             } finally {
                               setTimeout(() => setSaveMessage(null), 3500);
                             }
+                          }}
+                          className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Award Image Preview Modal */}
+                {previewAwardUrl && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xs">
+                    {/* Backdrop click to close */}
+                    <div className="absolute inset-0 cursor-zoom-out" onClick={() => setPreviewAwardUrl(null)} />
+                    
+                    {/* Image container */}
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-3xl w-full p-6 text-slate-800 z-10 animate-fade-in flex flex-col items-center">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewAwardUrl(null)}
+                        className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-2 rounded-full transition"
+                        aria-label="Close Preview"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                      <h3 className="text-sm font-extrabold text-[#081C3A] mb-4 self-start">Award Image Preview</h3>
+                      <div className="w-full max-h-[70vh] overflow-hidden flex items-center justify-center bg-slate-50 rounded-xl border border-slate-100">
+                        <img
+                          src={previewAwardUrl}
+                          alt="Award Full View"
+                          className="max-h-[65vh] max-w-full object-contain"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* International Patients Gallery Tab Content */}
+            {activeMediaTab === 'international-patients' && (
+              <div className="space-y-6" id="international-patients-tab-content">
+                {/* Actions row */}
+                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs animate-fade-in">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Showing <span className="font-bold text-slate-800">{(draftInternationalPatients || []).length}</span> international patient photos
+                  </div>
+                  
+                  <div>
+                    <label
+                      htmlFor="international-patient-upload-file-trigger"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Upload International Patient Image</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="international-patient-upload-file-trigger"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const file = e.target.files[0];
+                          console.log('[InternationalPatient] Upload Started:', file.name);
+                          setSaveMessage('Uploading international patient image to Supabase...');
+                          try {
+                            const imageUrl = await uploadImage(file);
+                            console.log('[InternationalPatient] Upload Success:', imageUrl);
+                            const updated = [
+                              {
+                                id: generateUUID(),
+                                image_url: imageUrl,
+                                display_order: draftInternationalPatients.length,
+                                is_active: true
+                              },
+                              ...(draftInternationalPatients || [])
+                            ];
+                            setDraftInternationalPatients(updated);
+                            setSaveMessage('Saving international patient image to Supabase...');
+                            const success = await internationalPatientsService.saveInternationalPatientsList(updated);
+                            if (success) {
+                              setSaveMessage('International patient image uploaded and saved successfully!');
+                              await loadInternationalPatientsList();
+                            } else {
+                              setSaveMessage('Failed to save international patient image to database.');
+                            }
+                          } catch (err: any) {
+                            console.warn('Upload failed, falling back to local Base64:', err);
+                            try {
+                              const dataUrl = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              });
+                              const updated = [
+                                {
+                                  id: generateUUID(),
+                                  image_url: dataUrl,
+                                  display_order: draftInternationalPatients.length,
+                                  is_active: true
+                                },
+                                ...(draftInternationalPatients || [])
+                              ];
+                              setDraftInternationalPatients(updated);
+                              await internationalPatientsService.saveInternationalPatientsList(updated);
+                              setSaveMessage('International patient image loaded locally and saved.');
+                              await loadInternationalPatientsList();
+                            } catch (fallbackErr) {
+                              console.error(fallbackErr);
+                            }
+                          } finally {
+                            setTimeout(() => setSaveMessage(null), 3500);
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Grid */}
+                {(!draftInternationalPatients || draftInternationalPatients.length === 0) ? (
+                  <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm animate-fade-in">
+                    No international patient photos uploaded yet. Add some moments!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in">
+                    {draftInternationalPatients.map((item) => (
+                      <div 
+                        key={item.id}
+                        id={`admin-intl-patient-card-${item.id}`}
+                        className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-teal-100 transition-all duration-200 shadow-3xs"
+                      >
+                        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
+                          <img 
+                            src={item.image_url} 
+                            alt="International Patient Moment" 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Replace & Delete Actions */}
+                        <div className="flex items-center justify-between gap-2 mt-auto">
+                          <label
+                            htmlFor={`intl-patient-replace-trigger-${item.id}`}
+                            className="font-bold text-xs text-teal-600 hover:text-teal-700 bg-teal-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-teal-100 transition select-none flex-1 text-center cursor-pointer"
+                          >
+                            <Upload className="h-3 w-3 shrink-0" />
+                            <span>Replace</span>
+                          </label>
+                          <input
+                            type="file"
+                            id={`intl-patient-replace-trigger-${item.id}`}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                const file = e.target.files[0];
+                                console.log('[InternationalPatient] Replace Started:', file.name);
+                                setSaveMessage('Replacing international patient photo on Supabase...');
+                                try {
+                                  const imageUrl = await uploadImage(file);
+                                  console.log('[InternationalPatient] Replace Success:', imageUrl);
+                                  const updated = (draftInternationalPatients || []).map(moment => moment.id === item.id ? { ...moment, image_url: imageUrl } : moment);
+                                  setDraftInternationalPatients(updated);
+                                  setSaveMessage('Saving updated international patient photo to Supabase...');
+                                  const success = await internationalPatientsService.saveInternationalPatientsList(updated);
+                                  if (success) {
+                                    setSaveMessage('International patient photo replaced and saved successfully!');
+                                    await loadInternationalPatientsList();
+                                  } else {
+                                    setSaveMessage('Failed to save replacement to database.');
+                                  }
+                                } catch (err: any) {
+                                  console.warn('Replace failed, falling back to local Base64:', err);
+                                  try {
+                                    const dataUrl = await new Promise<string>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve(reader.result as string);
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    });
+                                    const updated = (draftInternationalPatients || []).map(moment => moment.id === item.id ? { ...moment, image_url: dataUrl } : moment);
+                                    setDraftInternationalPatients(updated);
+                                    await internationalPatientsService.saveInternationalPatientsList(updated);
+                                    setSaveMessage('International patient photo replaced locally.');
+                                    await loadInternationalPatientsList();
+                                  } catch (fallbackErr) {
+                                    console.error(fallbackErr);
+                                  }
+                                } finally {
+                                  setTimeout(() => setSaveMessage(null), 3500);
+                                }
+                              }
+                            }}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPatientToDelete(item.id);
+                            }}
+                            className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
+                            aria-label="Delete International Patient Photo"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Patient Delete Confirmation Dialog Modal */}
+                {patientToDelete && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+                    {/* Backdrop click to close */}
+                    <div className="absolute inset-0" onClick={() => setPatientToDelete(null)} />
+                    
+                    {/* Card container */}
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Image</h3>
+                      <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                        Are you sure you want to delete this image?
+                      </p>
+                      <div className="flex items-center justify-end gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setPatientToDelete(null)}
+                          className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const updated = (draftInternationalPatients || []).filter(p => p.id !== patientToDelete);
+                            setDraftInternationalPatients(updated);
+                            setPatientToDelete(null);
+                            setSaveMessage('Deleting photo and syncing with Supabase...');
+                            const success = await internationalPatientsService.saveInternationalPatientsList(updated);
+                            if (success) {
+                              setSaveMessage('Photo deleted successfully!');
+                              await loadInternationalPatientsList();
+                            } else {
+                              setSaveMessage('Failed to delete photo on Supabase.');
+                            }
+                            setTimeout(() => setSaveMessage(null), 3000);
                           }}
                           className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
                         >

@@ -38,6 +38,8 @@ import SupabaseTest from './pages/SupabaseTest';
 import ServiceDetail from './pages/ServiceDetail';
 import SocialService from './pages/SocialService';
 import Technology from './pages/Technology';
+import DentalTourism from './pages/DentalTourism';
+import Blogs from './pages/Blogs';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
@@ -52,8 +54,8 @@ export default function App() {
     if (hash === 'admin-login') {
       hash = 'admin/login';
     }
-    const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology'];
-    if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
+    const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs'];
+    if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/') || hash.startsWith('blog/'))) {
       return hash as PageId;
     }
     return 'home';
@@ -386,8 +388,8 @@ export default function App() {
       if (hash === 'admin-login') {
         hash = 'admin/login';
       }
-      const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'social-service', 'technology'];
-      if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/'))) {
+      const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'social-service', 'technology', 'international', 'academy', 'blogs'];
+      if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/') || hash.startsWith('blog/'))) {
         setCurrentPage(hash as PageId);
         window.scrollTo({ top: 0 });
       }
@@ -691,6 +693,15 @@ export default function App() {
       );
     }
 
+    if (currentPage.startsWith('blog/')) {
+      return (
+        <Blogs
+          openAppointmentModal={openAppointmentModal}
+          setCurrentPage={setCurrentPage}
+        />
+      );
+    }
+
     switch (currentPage) {
       case 'home':
         return (
@@ -762,6 +773,16 @@ export default function App() {
         return <SocialService />;
       case 'technology':
         return <Technology />;
+      case 'international':
+        return <DentalTourism openAppointmentModal={openAppointmentModal} />;
+      case 'academy':
+      case 'blogs':
+        return (
+          <Blogs
+            openAppointmentModal={openAppointmentModal}
+            setCurrentPage={setCurrentPage}
+          />
+        );
       case 'doctors':
         return <Doctors openAppointmentModal={openAppointmentModal} doctorsList={doctorsList} />;
       case 'contact':

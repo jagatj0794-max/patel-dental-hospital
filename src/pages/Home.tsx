@@ -352,6 +352,52 @@ export default function Home({
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
   const [awardsList, setAwardsList] = useState<AwardItem[]>([]);
+  const [detectedOrientations, setDetectedOrientations] = useState<Record<string, 'horizontal' | 'vertical'>>({});
+
+  useEffect(() => {
+    if (!awardsList || awardsList.length === 0) return;
+    
+    awardsList.forEach(item => {
+      if (!item.image_url) return;
+      if (detectedOrientations[item.id]) return;
+
+      const img = new window.Image();
+      img.referrerPolicy = "no-referrer";
+      img.onload = () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        const orientation = height > width ? 'vertical' : 'horizontal';
+        setDetectedOrientations(prev => ({
+          ...prev,
+          [item.id]: orientation
+        }));
+      };
+      img.onerror = () => {
+        setDetectedOrientations(prev => ({
+          ...prev,
+          [item.id]: item.orientation || 'horizontal'
+        }));
+      };
+      img.src = item.image_url;
+    });
+  }, [awardsList]);
+
+  const horizontalAwards = awardsList.filter(item => {
+    const detected = detectedOrientations[item.id];
+    if (detected) {
+      return detected === 'horizontal';
+    }
+    return item.orientation === 'horizontal' || !item.orientation;
+  });
+
+  const verticalAwards = awardsList.filter(item => {
+    const detected = detectedOrientations[item.id];
+    if (detected) {
+      return detected === 'vertical';
+    }
+    return item.orientation === 'vertical';
+  });
+
   const [selectedAward, setSelectedAward] = useState<AwardItem | null>(null);
 
   useEffect(() => {
@@ -1110,33 +1156,126 @@ export default function Home({
           </div>
 
           {awardsList && awardsList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
-              {awardsList.map((item, idx) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 25 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.08 }}
-                  onClick={() => setSelectedAward(item)}
-                  className="bg-white rounded-[20px] overflow-hidden border border-slate-100 shadow-[0_4px_24px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_40px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer flex flex-col justify-between"
-                >
-                  <div className="aspect-[4/3] w-full bg-slate-50/40 relative flex items-center justify-center p-4 sm:p-5 overflow-hidden">
-                    <img
-                      src={item.image_url}
-                      alt="Award & Recognition"
-                      className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-102"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-[#081C3A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="w-11 h-11 rounded-full bg-white/95 shadow-md flex items-center justify-center text-[#0D9488] scale-75 group-hover:scale-100 transition-all duration-300">
-                        <Maximize2 className="w-5 h-5" />
+            <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto" id="awards-rows-container">
+              {/* Row 1: Portrait/Vertical Awards */}
+              <div className="w-full" id="awards-row-vertical">
+                <div className="flex gap-6 sm:gap-8 overflow-x-auto pb-4 pt-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                  {verticalAwards.map((item, idx) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: idx * 0.05 }}
+                      onClick={() => setSelectedAward(item)}
+                      className="flex-shrink-0 cursor-pointer h-44 sm:h-56 md:h-64 lg:h-72 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                      id={`home-award-vertical-${item.id}`}
+                    >
+                      <img
+                        src={item.image_url}
+                        alt="Award & Recognition Vertical"
+                        className="h-full w-auto object-contain object-center rounded-lg"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                      />
+                    </motion.div>
+                  ))}
+                  {verticalAwards.length === 0 && (
+                    <div className="text-center py-6 text-slate-400 text-xs w-full">
+                      No portrait awards available.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Row 2: Landscape/Horizontal Awards */}
+              <div className="w-full overflow-hidden" id="awards-row-horizontal">
+                {horizontalAwards.length > 0 ? (
+                  <div className="relative w-full">
+                    {/* Style block for continuous smooth scrolling */}
+                    <style dangerouslySetInnerHTML={{__html: `
+                      @keyframes marquee-horizontal {
+                        0% {
+                          transform: translate3d(0, 0, 0);
+                        }
+                        100% {
+                          transform: translate3d(-50%, 0, 0);
+                        }
+                      }
+                      .animate-marquee-horizontal {
+                        animation: marquee-horizontal 38s linear infinite;
+                      }
+                      @media (prefers-reduced-motion: reduce) {
+                        .animate-marquee-horizontal {
+                          animation: none !important;
+                          overflow-x: auto !important;
+                          display: flex !important;
+                          width: 100% !important;
+                        }
+                      }
+                    `}} />
+                    
+                    {/* The marquee wrapper with hidden overflow */}
+                    <div className="flex overflow-hidden w-full select-none pb-4 pt-2">
+                      <div className="flex flex-nowrap w-max animate-marquee-horizontal hover:[animation-play-state:paused]">
+                        {/* Track 1 */}
+                        <div className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8">
+                          {(() => {
+                            // Replicate the list if it has too few items to span the screen seamlessly
+                            const items = horizontalAwards.length < 5
+                              ? [...horizontalAwards, ...horizontalAwards, ...horizontalAwards, ...horizontalAwards]
+                              : horizontalAwards;
+                            return items.map((item, idx) => (
+                              <motion.div
+                                key={`track1-${item.id}-${idx}`}
+                                onClick={() => setSelectedAward(item)}
+                                className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                                id={`home-award-horizontal-t1-${item.id}-${idx}`}
+                              >
+                                <img
+                                  src={item.image_url}
+                                  alt="Award & Recognition Horizontal"
+                                  className="h-full w-auto object-contain object-center rounded-lg"
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </motion.div>
+                            ));
+                          })()}
+                        </div>
+                        {/* Track 2 - Identical clone for seamless loop */}
+                        <div className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8" aria-hidden="true">
+                          {(() => {
+                            const items = horizontalAwards.length < 5
+                              ? [...horizontalAwards, ...horizontalAwards, ...horizontalAwards, ...horizontalAwards]
+                              : horizontalAwards;
+                            return items.map((item, idx) => (
+                              <motion.div
+                                key={`track2-${item.id}-${idx}`}
+                                onClick={() => setSelectedAward(item)}
+                                className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                                id={`home-award-horizontal-t2-${item.id}-${idx}`}
+                              >
+                                <img
+                                  src={item.image_url}
+                                  alt="Award & Recognition Horizontal"
+                                  className="h-full w-auto object-contain object-center rounded-lg"
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </motion.div>
+                            ));
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              ))}
+                ) : (
+                  <div className="text-center py-6 text-slate-400 text-xs w-full">
+                    No landscape awards available.
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-3xs max-w-2xl mx-auto">

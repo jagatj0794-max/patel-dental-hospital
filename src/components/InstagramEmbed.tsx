@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Instagram, ExternalLink } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Instagram, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react';
 
 interface InstagramEmbedProps {
   url: string;
   title?: string;
+  onLoad?: () => void;
 }
 
-export const InstagramEmbed: React.FC<InstagramEmbedProps> = ({
-  url,
-  title
+export const InstagramEmbed: React.FC<InstagramEmbedProps> = ({ 
+  url, 
+  title,
+  onLoad 
 }) => {
   const [iframeError, setIframeError] = useState(false);
-  const [mountKey, setMountKey] = useState(() => Math.random().toString(36).substring(2, 9));
+  const [mountKey, setMountKey] = useState(0);
 
   // Helper to extract Reel/Post ID from Instagram URL
   const getInstagramId = (link: string): string | null => {
@@ -25,87 +27,79 @@ export const InstagramEmbed: React.FC<InstagramEmbedProps> = ({
   useEffect(() => {
     if (!reelId) return;
 
-    // Handle bfcache (Back/Forward Cache) restorations by forcing a fresh mount key
-    const handlePageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        setMountKey(Math.random().toString(36).substring(2, 9));
-      }
-    };
-    window.addEventListener('pageshow', handlePageShow);
-
-    // Dynamic execution / reinitialization of official Instagram embed script
+    // Standard Instagram embeds script injection
     const scriptId = 'instagram-embed-script';
     let script = document.getElementById(scriptId) as HTMLScriptElement | null;
-
-    const runProcess = () => {
-      if ((window as any).instgrm) {
-        try {
-          (window as any).instgrm.Embeds.process();
-        } catch (err) {
-          console.error('Error re-processing Instagram embeds:', err);
-        }
-      }
-    };
 
     if (!script) {
       script = document.createElement('script');
       script.id = scriptId;
       script.src = 'https://www.instagram.com/embed.js';
       script.async = true;
-      script.onload = () => {
-        setTimeout(runProcess, 50);
-      };
-      script.onerror = (e) => {
-        console.warn('Instagram embed script failed to load:', e);
-        setIframeError(true);
-      };
+      script.defer = true;
       document.body.appendChild(script);
+    }
+
+    const handleProcess = () => {
+      if ((window as any).instgrm?.Embeds) {
+        try {
+          (window as any).instgrm.Embeds.process();
+          if (onLoad) onLoad();
+        } catch (e) {
+          console.error("Failed to process Instagram embed:", e);
+        }
+      }
+    };
+
+    if ((window as any).instgrm?.Embeds) {
+      handleProcess();
     } else {
-      // Script exists, trigger the process call after a short delay
-      // to let React finish rendering the new iframe in the DOM.
-      setTimeout(runProcess, 100);
+      script.addEventListener('load', handleProcess);
     }
 
     return () => {
-      window.removeEventListener('pageshow', handlePageShow);
+      if (script) {
+        script.removeEventListener('load', handleProcess);
+      }
     };
   }, [url, reelId]);
 
   if (!reelId) {
-    return null;
+    return (
+      <div className="p-4 bg-amber-50 text-amber-800 text-xs rounded-xl flex items-center gap-2">
+        <AlertCircle className="h-4 w-4 shrink-0" />
+        <span>Invalid Instagram URL provided. Please check the URL format.</span>
+      </div>
+    );
   }
 
-  // Use the canonical trailing slash '/embed/' to prevent Instagram's servers 
-  // from redirecting (which would cause the browser to cache the parameter-less URL).
-  // Include 'rd' and 'rp' so the iframe registers its parent domain & path for security handshakes.
   const embedUrl = `https://www.instagram.com/reel/${reelId}/embed/?cr=1&v=12&rd=${encodeURIComponent(window.location.origin)}&rp=${encodeURIComponent(window.location.pathname)}&cb=${mountKey}`;
   const cleanReelUrl = `https://www.instagram.com/reel/${reelId}/`;
 
   if (iframeError) {
     return (
-      <div 
-        className="relative aspect-[9/16] w-full max-h-[500px] sm:max-h-[540px] overflow-hidden rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.03)] flex flex-col items-center justify-center p-6 text-center space-y-4 mx-auto"
-        style={{ background: 'transparent', backgroundColor: 'transparent' }}
-      >
-        <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center text-white shadow-lg">
-          <Instagram className="h-8 w-8" />
+      <div className="p-5 bg-slate-100 text-slate-700 text-center rounded-xl border border-slate-200 shadow-2xs max-w-[430px] mx-auto">
+        <AlertCircle className="h-5 w-5 text-slate-500 mx-auto mb-2" />
+        <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider mb-1">Unable to Load Embed</h4>
+        <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">
+          Due to privacy settings or cross-origin restrictions, this Instagram reel could not load in the frame.
+        </p>
+        <div className="flex items-center justify-center gap-2">
+          <button 
+            onClick={() => { setIframeError(false); setMountKey(prev => prev + 1); }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-[#0D9488] text-white rounded-lg hover:bg-[#0F766E] transition-colors shadow-2xs cursor-pointer"
+          >
+            <RefreshCw className="h-3 w-3" /> Retry
+          </button>
+          <a 
+            href={cleanReelUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-2xs"
+          >
+            Watch on Instagram <ExternalLink className="h-3 w-3" />
+          </a>
         </div>
-        <div className="space-y-1.5">
-          <h4 className="text-sm font-black text-[#081C3A]">{title || "Clinical Procedure Reel"}</h4>
-          <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
-            Watch Dr. Vipul Patel's procedure video directly on Instagram.
-          </p>
-        </div>
-        <a
-          href={cleanReelUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E1306C] hover:bg-[#C13584] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-md hover:shadow-lg active:scale-95 cursor-pointer mt-2"
-        >
-          <Instagram className="h-4 w-4" />
-          <span>Open in Instagram</span>
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
       </div>
     );
   }
