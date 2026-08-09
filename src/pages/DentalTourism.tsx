@@ -35,6 +35,7 @@ import { useSEO } from '../utils/seo';
 import { internationalPatientsService } from '../utils/internationalPatientsData';
 import { InternationalPatientImage } from '../types';
 import { GooglePatientReviews } from '../components/GooglePatientReviews';
+import { UNIVERSAL_GOOGLE_REVIEWS } from '../utils/serviceData';
 
 const gujaratDestinations = [
   {
@@ -1190,7 +1191,7 @@ export default function DentalTourism({ openAppointmentModal }: DentalTourismPro
             label="PATIENT TESTIMONIALS"
             heading="What Our International Patients Say"
             description="Real experiences from patients who travelled to Patel Dental Hospital, Rajkot for world-class dental treatment."
-            reviews={[]}
+            reviews={UNIVERSAL_GOOGLE_REVIEWS}
           />
         </div>
       </section>

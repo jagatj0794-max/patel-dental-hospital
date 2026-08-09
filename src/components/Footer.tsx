@@ -315,14 +315,16 @@ Rajkot – 360001, Gujarat, India.`}
               <p>Designed under clean sanitization protocols in Rajkot.</p>
               <p>Chief Dental Surgeon: <span className="text-brand-cyan font-bold">Dr. Vipul Patel (MDS)</span></p>
             </div>
-            <button
-              type="button"
-              onClick={() => handleLinkClick('admin')}
-              className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700"
-              id="admin-demo-access-btn"
-            >
-              <span>🔐 Admin Demo</span>
-            </button>
+            {isDev && (
+              <button
+                type="button"
+                onClick={() => handleLinkClick('admin')}
+                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 border border-slate-700"
+                id="admin-demo-access-btn"
+              >
+                <span>🔐 Admin Demo</span>
+              </button>
+            )}
           </div>
         </div>
 

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
-import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, UNIVERSAL_GOOGLE_REVIEWS } from '../utils/serviceData';
 import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
@@ -2837,7 +2837,7 @@ export default function ServiceDetail({
                 {mConfig.show_google_reviews !== false && (
                   <GooglePatientReviews
                     heading={seoHeadings.reviews}
-                    reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+                    reviews={UNIVERSAL_GOOGLE_REVIEWS}
                   />
                 )}
 

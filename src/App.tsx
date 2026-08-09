@@ -45,20 +45,50 @@ import { GALLERY_ITEMS } from './data/gallery';
 
 const DOCTOR_WHATSAPP_NUMBER = "919510397046";
 
+const getPageFromUrl = (): PageId => {
+  // First check hash
+  let page = window.location.hash.replace('#', '');
+  if (page.startsWith('/')) {
+    page = page.substring(1);
+  }
+  
+  // If no hash, check pathname
+  if (!page) {
+    let path = window.location.pathname;
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
+    if (path.endsWith('/')) {
+      path = path.slice(0, -1);
+    }
+    page = path;
+  }
+
+  if (page === 'admin-login') {
+    page = 'admin/login';
+  }
+
+  // If page is admin/login, return it
+  if (page === 'admin/login') {
+    return 'admin/login';
+  }
+
+  // If page is admin or any sub-path of admin, treat as 'admin' page
+  if (page === 'admin' || page.startsWith('admin/')) {
+    return 'admin';
+  }
+
+  const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs'];
+  if (page && (validPages.includes(page as PageId) || page.startsWith('services/') || page.startsWith('blog/'))) {
+    return page as PageId;
+  }
+  
+  return 'home';
+};
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageId>(() => {
-    let hash = window.location.hash.replace('#', '');
-    if (hash.startsWith('/')) {
-      hash = hash.substring(1);
-    }
-    if (hash === 'admin-login') {
-      hash = 'admin/login';
-    }
-    const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs'];
-    if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/') || hash.startsWith('blog/'))) {
-      return hash as PageId;
-    }
-    return 'home';
+    return getPageFromUrl();
   });
   const [session, setSession] = useState<any>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -255,52 +285,29 @@ export default function App() {
     let subscription: any = null;
 
     const checkMockSession = () => {
-      try {
-        const mockSessStr = safeStorage.getSessionItem('mock_admin_session') || safeStorage.getItem('mock_admin_session');
-        if (mockSessStr) {
-          return JSON.parse(mockSessStr);
-        }
-      } catch (e) {
-        console.warn('Error parsing mock session:', e);
-      }
       return null;
     };
 
     async function initAuth() {
       try {
-        // Check for mock session to bypass immediately for seamless dev/preview access
-        const mockSess = checkMockSession();
-        if (mockSess) {
-          setSession(mockSess);
-          setIsAuthLoading(false);
-        }
-
         const client = supabase.client;
         // Fetch existing session safely
         const { data: { session: initialSession } } = await client.auth.getSession();
         
         if (initialSession) {
           setSession(initialSession);
-        } else if (mockSess) {
-          setSession(mockSess);
         } else {
           setSession(null);
         }
 
         // Listen for realtime auth changes
         const { data: { subscription: authSubscription } } = client.auth.onAuthStateChange((_event, currentSession) => {
-          if (currentSession) {
-            setSession(currentSession);
-          } else {
-            const activeMock = checkMockSession();
-            setSession(activeMock);
-          }
+          setSession(currentSession || null);
         });
         subscription = authSubscription;
       } catch (err) {
-        console.warn('Supabase auth initialization failed, trying mock fallback:', err);
-        const mockSess = checkMockSession();
-        setSession(mockSess);
+        console.warn('Supabase auth initialization failed:', err);
+        setSession(null);
       } finally {
         setIsAuthLoading(false);
       }
@@ -310,19 +317,14 @@ export default function App() {
 
     // Custom events to force admin session sync/updates across views immediately
     const handleAuthEvent = () => {
-      const activeMock = checkMockSession();
-      if (activeMock) {
-        setSession(activeMock);
-      } else {
-        try {
-          supabase.client.auth.getSession().then(({ data }) => {
-            setSession(data?.session || null);
-          }).catch(() => {
-            setSession(null);
-          });
-        } catch {
+      try {
+        supabase.client.auth.getSession().then(({ data }) => {
+          setSession(data?.session || null);
+        }).catch(() => {
           setSession(null);
-        }
+        });
+      } catch {
+        setSession(null);
       }
     };
 
@@ -378,28 +380,22 @@ export default function App() {
       } as GalleryItem;
     });
 
-  // Synchronize dynamic routing hashes (supports deep-linking & browser backward/forward steps)
+  // Synchronize dynamic routing (supports deep-linking & browser backward/forward steps)
   useEffect(() => {
-    const handleHashChange = () => {
-      let hash = window.location.hash.replace('#', '');
-      if (hash.startsWith('/')) {
-        hash = hash.substring(1);
-      }
-      if (hash === 'admin-login') {
-        hash = 'admin/login';
-      }
-      const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'social-service', 'technology', 'international', 'academy', 'blogs'];
-      if (hash && (validPages.includes(hash as PageId) || hash.startsWith('services/') || hash.startsWith('blog/'))) {
-        setCurrentPage(hash as PageId);
-        window.scrollTo({ top: 0 });
-      }
+    const handleUrlChange = () => {
+      const page = getPageFromUrl();
+      setCurrentPage(page);
     };
 
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    window.addEventListener('popstate', handleUrlChange);
     // Trigger initial on-load check
-    handleHashChange();
+    handleUrlChange();
 
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleUrlChange);
+      window.removeEventListener('popstate', handleUrlChange);
+    };
   }, []);
 
   // Ensure window is always scrolled to top instantly whenever page changes

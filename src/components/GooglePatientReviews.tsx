@@ -21,42 +21,10 @@ interface GooglePatientReviewsProps {
 }
 
 export function GooglePatientReviews({ heading, reviews, label, description }: GooglePatientReviewsProps) {
-  const [apiReviews, setApiReviews] = useState<Review[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-    setIsFetching(true);
-    fetch('/api/google-reviews')
-      .then((res) => {
-        if (!res.ok) throw new Error('API response not OK');
-        return res.json();
-      })
-      .then((data) => {
-        if (isMounted && data && Array.isArray(data.reviews) && data.reviews.length > 0) {
-          setApiReviews(data.reviews);
-        }
-      })
-      .catch((err) => {
-        console.log('[GooglePatientReviews] Using local CMS reviews fallback:', err);
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsFetching(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Use dynamically fetched reviews if available, otherwise fall back to CMS reviews
-  const activeReviews = apiReviews.length > 0
-    ? apiReviews
-    : reviews
-        .filter(r => r.enabled !== false && r.patient_name?.trim() !== '')
-        .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+  // Use CMS/configured reviews directly and filter/sort them
+  const activeReviews = (reviews || [])
+    .filter(r => r.enabled !== false && r.patient_name?.trim() !== '')
+    .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [transitionDuration, setTransitionDuration] = useState(600);

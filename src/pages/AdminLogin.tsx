@@ -181,30 +181,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
     }
   };
 
-  const handleDemoBypass = () => {
-    setLoading(true);
-    setErrorMsg(null);
-    setSuccessMsg('Bypassing authentication and logging in with Demo Session...');
 
-    const demoSession = {
-      user: {
-        id: 'demo-admin-id',
-        email: 'demo-admin@pateldental.com',
-        user_metadata: { name: 'Demo Administrator' }
-      },
-      access_token: 'demo-token-12345'
-    };
-
-    safeStorage.setSessionItem('mock_admin_session', JSON.stringify(demoSession));
-    safeStorage.setItem('mock_admin_session', JSON.stringify(demoSession));
-
-    setTimeout(() => {
-      window.dispatchEvent(new Event('admin-auth-change'));
-      setCurrentPage('admin');
-      window.location.hash = 'admin';
-      setLoading(false);
-    }, 1000);
-  };
 
   const handleBackToSite = () => {
     setCurrentPage('home');
@@ -264,21 +241,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-rose-500" />
                 <span>{errorMsg}</span>
               </div>
-              {errorMsg.toLowerCase().includes('invalid login credentials') && (
-                <div className="pl-6.5 pt-2 border-t border-rose-100 mt-1 space-y-2.5" id="auth-error-suggestions">
-                  <p className="text-[11px] text-rose-600 font-medium leading-relaxed">
-                    Don't have administrator accounts configured in your Supabase Auth yet?
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleDemoBypass}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm cursor-pointer transition-colors"
-                  >
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                    <span>Instant Demo Admin Access</span>
-                  </button>
-                </div>
-              )}
+
             </motion.div>
           )}
 
@@ -362,24 +325,7 @@ export default function AdminLogin({ setCurrentPage, session }: AdminLoginProps)
             </button>
           </form>
 
-          {/* Development Bypass Section */}
-          {!isSignUp && (
-            <div className="mt-5 pt-4 border-t border-slate-100">
-              <p className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest mb-3">
-                Testing & Development Access
-              </p>
-              <button
-                type="button"
-                onClick={handleDemoBypass}
-                disabled={loading}
-                className="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 hover:border-emerald-300 text-emerald-800 text-xs font-bold uppercase tracking-wider py-3 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer"
-                id="demo-bypass-btn"
-              >
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                <span>Bypass with Demo Session</span>
-              </button>
-            </div>
-          )}
+
 
           {/* Sign Up / Sign In Toggle */}
           <div className="mt-4 text-center">
