@@ -52,6 +52,7 @@ export const technologyService = {
       const mapped = data.map((row: any) => ({
         id: row.id,
         title: row.title || '',
+        short_description: row.short_description || row.shortDesc || '',
         description: row.description || '',
         image_url: row.image_url || '',
         display_order: Number(row.display_order) || 0,
@@ -77,10 +78,14 @@ export const technologyService = {
       technologyService.lastError = null;
       const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
       const itemId = isValidUUID ? item.id : generateUUID();
-      const row = {
+      const shortDesc = item.short_description || item.shortDesc || '';
+      const fullDesc = item.description || '';
+      
+      const row: any = {
         id: itemId,
         title: item.title || '',
-        description: item.description || '',
+        short_description: shortDesc,
+        description: fullDesc,
         image_url: item.image_url || '',
         display_order: item.display_order || 0,
         is_active: item.is_active !== false,
@@ -101,11 +106,25 @@ export const technologyService = {
       }
 
       if (existing) {
-        const { data, error } = await supabase.client
+        let { data, error } = await supabase.client
           .from('technology')
           .update(row)
           .eq('id', itemId)
           .select();
+
+        // Fallback if short_description column is not in DB table schema
+        if (error && error.message && error.message.includes('short_description')) {
+          console.warn('short_description column not present, falling back to description field...');
+          delete row.short_description;
+          row.description = shortDesc ? `${shortDesc}\n\n${fullDesc}`.trim() : fullDesc;
+          const res = await supabase.client
+            .from('technology')
+            .update(row)
+            .eq('id', itemId)
+            .select();
+          error = res.error;
+          data = res.data;
+        }
 
         if (error) {
           console.error('Error updating technology in public.technology:', error);
@@ -115,10 +134,23 @@ export const technologyService = {
 
         console.log('[Update Success] Successfully updated technology item in public.technology:', data);
       } else {
-        const { data, error } = await supabase.client
+        let { data, error } = await supabase.client
           .from('technology')
           .insert(row)
           .select();
+
+        // Fallback if short_description column is not in DB table schema
+        if (error && error.message && error.message.includes('short_description')) {
+          console.warn('short_description column not present, falling back to description field...');
+          delete row.short_description;
+          row.description = shortDesc ? `${shortDesc}\n\n${fullDesc}`.trim() : fullDesc;
+          const res = await supabase.client
+            .from('technology')
+            .insert(row)
+            .select();
+          error = res.error;
+          data = res.data;
+        }
 
         if (error) {
           console.error('Error inserting technology into public.technology:', error);
@@ -178,25 +210,17 @@ export const technologyService = {
         .from('technology')
         .select('id');
 
-      console.log("existing database technology rows:", existingData);
-
       if (fetchErr) {
         console.error('[Technology] Save Error / Supabase Error:', fetchErr);
-        console.error('Error fetching existing technology in saveTechnologyList:', fetchErr);
         technologyService.lastError = fetchErr.message;
         return false;
       }
 
-      const existingIds = new Set((existingData || []).map((row: any) => row.id));
-      let idsToDelete: string[] = [];
-
       if (existingData) {
         const currentIds = new Set(items.map(a => a.id));
-        idsToDelete = existingData
+        const idsToDelete = existingData
           .map((row: any) => row.id)
           .filter((id: string) => !currentIds.has(id));
-
-        console.log("technology idsToDelete:", idsToDelete);
 
         if (idsToDelete.length > 0) {
           const { error: deleteErr } = await supabase.client
@@ -206,7 +230,6 @@ export const technologyService = {
 
           if (deleteErr) {
             console.error('[Technology] Save Error / Supabase Error:', deleteErr);
-            console.error('Error deleting removed technology from public.technology:', deleteErr);
             technologyService.lastError = deleteErr.message;
             return false;
           }
@@ -217,37 +240,52 @@ export const technologyService = {
       const rowsToUpsert = items.map((item, index) => {
         const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
         const itemId = isValidUUID ? item.id : generateUUID();
+        const shortDesc = item.short_description || item.shortDesc || '';
+        const fullDesc = item.description || '';
         return {
           id: itemId,
           title: item.title || '',
-          description: item.description || '',
+          short_description: shortDesc,
+          description: fullDesc,
           image_url: item.image_url || '',
-          display_order: index, // automatic ordering based on the passed list order
+          display_order: index,
           is_active: item.is_active !== false,
           created_at: item.created_at || new Date().toISOString()
         };
       });
 
       if (rowsToUpsert.length > 0) {
-        const { error: upsertErr } = await supabase.client
+        let { error: upsertErr } = await supabase.client
           .from('technology')
           .upsert(rowsToUpsert);
 
+        // Fallback if short_description column is missing in schema
+        if (upsertErr && upsertErr.message && upsertErr.message.includes('short_description')) {
+          console.warn('short_description column missing in DB, retrying upsert without short_description...');
+          const fallbackRows = rowsToUpsert.map((r: any) => {
+            const copy = { ...r };
+            const sDesc = copy.short_description;
+            delete copy.short_description;
+            copy.description = sDesc ? `${sDesc}\n\n${copy.description}`.trim() : copy.description;
+            return copy;
+          });
+          const res = await supabase.client
+            .from('technology')
+            .upsert(fallbackRows);
+          upsertErr = res.error;
+        }
+
         if (upsertErr) {
           console.error('[Technology] Save Error / Supabase Error:', upsertErr);
-          console.error('Error upserting technology into public.technology:', upsertErr);
           technologyService.lastError = upsertErr.message;
           return false;
         }
       }
 
       console.log('[Technology] Database insert/update succeeded.');
-      console.log('[Technology] Save Success');
-
       return true;
     } catch (e: any) {
       console.error('[Technology] Save Error:', e);
-      console.error('Exception in saveTechnologyList:', e);
       technologyService.lastError = e?.message || String(e);
       return false;
     }

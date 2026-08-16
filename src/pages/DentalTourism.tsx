@@ -29,13 +29,17 @@ import {
   Maximize2,
   MapPin,
   ChevronDown,
-  HelpCircle
+  HelpCircle,
+  Play
 } from 'lucide-react';
 import { useSEO } from '../utils/seo';
 import { internationalPatientsService } from '../utils/internationalPatientsData';
-import { InternationalPatientImage } from '../types';
+import { InternationalPatientImage, DentalVideo } from '../types';
 import { GooglePatientReviews } from '../components/GooglePatientReviews';
 import { UNIVERSAL_GOOGLE_REVIEWS } from '../utils/serviceData';
+import { InstagramEmbed } from '../components/InstagramEmbed';
+import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
+import { videoService } from '../utils/videoData';
 
 const gujaratDestinations = [
   {
@@ -128,6 +132,29 @@ export default function DentalTourism({ openAppointmentModal }: DentalTourismPro
   const [galleryPatients, setGalleryPatients] = React.useState<InternationalPatientImage[]>([]);
   const [selectedPatient, setSelectedPatient] = React.useState<InternationalPatientImage | null>(null);
   const [expandedFaqId, setExpandedFaqId] = React.useState<number | null>(null);
+  const [tourismVideos, setTourismVideos] = React.useState<DentalVideo[]>([]);
+  const [activeVideos, setActiveVideos] = React.useState<Record<string, boolean>>({});
+
+  React.useEffect(() => {
+    let active = true;
+    const fetchVideos = async () => {
+      try {
+        const dbVideos = await videoService.getVideos();
+        if (active) {
+          const filtered = (dbVideos || []).filter(
+            (v) => v.treatment === 'Dental Tourism' || v.treatment?.toLowerCase() === 'dental tourism'
+          );
+          setTourismVideos(filtered);
+        }
+      } catch (err) {
+        console.error('Error fetching dental tourism videos:', err);
+      }
+    };
+    fetchVideos();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   React.useEffect(() => {
     let active = true;
@@ -258,7 +285,7 @@ export default function DentalTourism({ openAppointmentModal }: DentalTourismPro
                 {/* Main Hero Image */}
                 <div className="aspect-[4/3] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 relative">
                   <img
-                    src="/patel dental image.webp"
+                    src="/NRI.webp"
                     alt="Patel Dental Hospital International Care"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
@@ -551,18 +578,18 @@ export default function DentalTourism({ openAppointmentModal }: DentalTourismPro
                 </span>
               </div>
 
-              {/* Tanzania */}
+              {/* Germany */}
               <div className="bg-white p-8 sm:p-12 flex flex-col items-center justify-center transition-colors duration-300 hover:bg-slate-50/50">
                 <div className="w-16 h-16 rounded-full bg-white border-2 border-white flex items-center justify-center shadow-md overflow-hidden shrink-0 mb-4">
                   <img 
-                    src="https://hatscripts.github.io/circle-flags/flags/tz.svg" 
-                    alt="Tanzania Flag" 
+                    src="https://hatscripts.github.io/circle-flags/flags/de.svg" 
+                    alt="Germany Flag" 
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
                 </div>
                 <span className="font-sans font-bold text-[#081C3A] text-base sm:text-lg tracking-tight">
-                  Tanzania
+                  Germany
                 </span>
               </div>
 
@@ -1183,6 +1210,114 @@ export default function DentalTourism({ openAppointmentModal }: DentalTourismPro
           </div>
         </section>
       )}
+
+      {/* NRI Patient Testimonial Videos Section */}
+      <section className="py-16 md:py-24 bg-white border-t border-slate-100" id="nri-patient-testimonials-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          
+          {/* Section Heading */}
+          <div className="max-w-3xl mx-auto mb-16 space-y-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B1D3A] tracking-tight leading-tight uppercase">
+              NRI PATIENT TESTIMONIAL VIDEOS
+            </h2>
+            <div className="flex items-center justify-center gap-1.5 text-[#00897B] font-bold text-xs sm:text-sm tracking-wider uppercase">
+              <Video className="h-4 w-4" />
+              <span>NRI Patient Testimonials</span>
+            </div>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium">
+              Hear directly from our NRI and international patients about their seamless dental journeys and world-class care at Patel Dental Hospital.
+            </p>
+          </div>
+
+          {/* Video Cards Grid / Empty State */}
+          {tourismVideos && tourismVideos.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-center items-stretch text-left max-w-7xl mx-auto">
+              {tourismVideos.map((video, index) => (
+                <div
+                  key={video.id || index}
+                  className={video.videoPlatform === 'instagram' || video.videoPlatform === 'mp4' ? "w-full max-w-[240px] mx-auto flex flex-col items-center justify-center" : "bg-white rounded-[20px] overflow-hidden border border-slate-100 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col h-full"}
+                >
+                  {video.videoPlatform === 'instagram' ? (
+                    <InstagramEmbed
+                      url={video.url || `https://www.instagram.com/p/${video.id}/`}
+                      title={video.title}
+                      thumbnail={video.thumbnail}
+                    />
+                  ) : video.videoPlatform === 'mp4' ? (
+                    <div className="w-full max-w-[240px] mx-auto flex justify-center">
+                      <Mp4ReelPlayer src={video.url || video.id} />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="aspect-video w-full bg-slate-950 relative overflow-hidden shrink-0">
+                        {activeVideos[video.id] ? (
+                          <iframe
+                            className="w-full h-full border-0 absolute inset-0 z-10"
+                            src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
+                            title={video.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            loading="lazy"
+                          ></iframe>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setActiveVideos(prev => ({ ...prev, [video.id]: true }))}
+                            className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group/video focus:outline-none"
+                            aria-label={`Play ${video.title}`}
+                          >
+                            <img
+                              src={video.thumbnail || `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+                              alt={video.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-[1.03]"
+                              loading="lazy"
+                              referrerPolicy="no-referrer"
+                            />
+                            {/* Centered Play Trigger Icon */}
+                            <div className="absolute z-20 flex items-center justify-center w-14 h-14 rounded-full bg-white/95 text-[#00897B] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#00897B] group-hover/video:text-white transition-all duration-300 pointer-events-none">
+                              <Play className="h-6 w-6 translate-x-0.5 fill-current" />
+                            </div>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Video metadata */}
+                      <div className="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div className="space-y-2">
+                          <span className="inline-block text-[10px] font-black text-[#00897B] bg-[#E6F6F4] border border-[#00897B]/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {video.treatment}
+                          </span>
+                          <h4 className="font-sans font-extrabold text-[#0B1D3A] text-sm sm:text-base leading-snug group-hover:text-[#00897B] transition-colors duration-300">
+                            {video.title}
+                          </h4>
+                        </div>
+                        
+                        <div className="text-slate-400 text-[11px] font-bold uppercase tracking-wider pt-3 border-t border-slate-50 flex items-center justify-between">
+                          <span>Verified NRI Testimonial</span>
+                          <span className="text-[#0ea5e9] flex items-center gap-0.5">
+                            <Star className="h-3 w-3 fill-current text-amber-400" /> Featured
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="max-w-md mx-auto p-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center space-y-3">
+              <Video className="h-8 w-8 text-slate-300" />
+              <p className="text-slate-500 text-sm font-semibold">
+                No patient testimonial videos available yet.
+              </p>
+              <p className="text-slate-400 text-xs font-normal">
+                Testimonial videos added in the Admin CMS under 'Dental Tourism' treatment will automatically appear here.
+              </p>
+            </div>
+          )}
+
+        </div>
+      </section>
 
       {/* Patient Reviews Section */}
       <section className="py-16 md:py-24 bg-white border-t border-slate-100" id="dental-tourism-reviews-section">

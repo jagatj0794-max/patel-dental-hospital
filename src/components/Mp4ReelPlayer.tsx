@@ -2,16 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 
 interface Mp4ReelPlayerProps {
   src: string;
+  poster?: string;
   className?: string;
   containerClassName?: string;
 }
 
 export const Mp4ReelPlayer: React.FC<Mp4ReelPlayerProps> = ({
   src,
+  poster,
   className = "w-full h-full object-cover rounded-xl",
-  containerClassName = "aspect-[9/16] h-[460px] sm:h-[480px] rounded-xl overflow-hidden bg-black border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.03)]"
+  containerClassName = "aspect-[9/16] w-full max-w-[240px] mx-auto rounded-2xl overflow-hidden bg-black border border-slate-100/80 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300"
 }) => {
-  const [posterUrl, setPosterUrl] = useState<string | undefined>(undefined);
+  const [posterUrl, setPosterUrl] = useState<string | undefined>(poster);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
 
@@ -98,7 +100,7 @@ export const Mp4ReelPlayer: React.FC<Mp4ReelPlayerProps> = ({
       <video
         ref={videoRef}
         src={effectiveSrc}
-        poster={posterUrl}
+        poster={poster || posterUrl}
         controls
         playsInline
         className={className}

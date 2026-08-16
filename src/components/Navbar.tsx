@@ -233,7 +233,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             <div className="hidden lg:flex items-center shrink-0">
               <button
                 id="navbar-cta-appointment"
-                onClick={openAppointmentModal}
+                onClick={() => openAppointmentModal()}
                 className="flex items-center text-[13px] xl:text-[14px] font-bold text-white bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] hover:from-[#0F766E] hover:to-[#0284c7] px-5 py-2.5 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] cursor-pointer hover:shadow-lg transition-all duration-300 transform active:scale-95"
               >
                 <Calendar className="h-4 w-4 mr-2" />

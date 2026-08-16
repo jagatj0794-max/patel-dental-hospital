@@ -40,6 +40,7 @@ import SocialService from './pages/SocialService';
 import Technology from './pages/Technology';
 import DentalTourism from './pages/DentalTourism';
 import Blogs from './pages/Blogs';
+import WhyChooseUs from './pages/WhyChooseUs';
 
 import { GALLERY_ITEMS } from './data/gallery';
 
@@ -78,7 +79,7 @@ const getPageFromUrl = (): PageId => {
     return 'admin';
   }
 
-  const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs'];
+  const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
   if (page && (validPages.includes(page as PageId) || page.startsWith('services/') || page.startsWith('blog/'))) {
     return page as PageId;
   }
@@ -193,6 +194,8 @@ export default function App() {
     let active = true;
     const fetchDoctors = async () => {
       try {
+        // Clear cached local storage once to force clean loading of the updated statistics configurations
+        localStorage.removeItem('patel_dental_doctors_list');
         const data = await doctorService.getDoctors();
         if (active) {
           setDoctorsList(data);
@@ -404,12 +407,12 @@ export default function App() {
   }, [currentPage]);
 
   const openAppointmentModal = (preselectedTreatment?: any) => {
-    console.log('[Popup Debug] Popup open function called. Preselected:', preselectedTreatment);
-    if (preselectedTreatment && typeof preselectedTreatment === 'string') {
-      setAppointmentTreatment(preselectedTreatment);
-    } else {
-      setAppointmentTreatment('General Consultation');
-    }
+    // Avoid logging or processing non-string arguments (such as React Event objects) to prevent circular serialization errors
+    const treatmentName = (preselectedTreatment && typeof preselectedTreatment === 'string') 
+      ? preselectedTreatment 
+      : 'General Consultation';
+    console.log('[Popup Debug] Popup open function called. Treatment:', treatmentName);
+    setAppointmentTreatment(treatmentName);
     setIsAppointmentOpen(true);
     safeStorage.setSessionItem('appointment_popup_triggered', 'true');
     console.log('[Popup Debug] sessionStorage set: appointment_popup_triggered = true');
@@ -477,18 +480,24 @@ export default function App() {
     };
   }, []);
 
-  const handleBookAppointment = async (data: {
-    name: string;
-    phone: string;
-    treatment: string;
-    branch: string;
-    date: string;
-    timeSlot: string;
-    message?: string;
-  }): Promise<boolean> => {
+  const handleBookAppointment = async (
+    data: {
+      name: string;
+      phone: string;
+      treatment: string;
+      branch: string;
+      date: string;
+      timeSlot: string;
+      message?: string;
+    },
+    preOpenedWindow?: Window | null
+  ): Promise<boolean> => {
     // 1. Double check availability before inserting to prevent race conditions
     const isAvailable = await appointmentService.isSlotAvailable(data.date, data.timeSlot, data.branch, 'To Be Assigned');
     if (!isAvailable) {
+      if (preOpenedWindow) {
+        preOpenedWindow.close();
+      }
       return false;
     }
 
@@ -560,11 +569,25 @@ export default function App() {
       const messageText = `🏥 Patel Dental Hospital\n\nHello Doctor,\n\nI have successfully booked my appointment.\n\n👤 Patient Name:\n${data.name}\n\n📞 Mobile Number:\n${data.phone}\n\n🦷 Doctor:\n${newAdminApt.doctor}\n\n📅 Appointment Date:\n${formattedDate}\n\n🕒 Appointment Time:\n${data.timeSlot}\n\nThank you.`;
 
       const encodedMsg = encodeURIComponent(messageText);
-      window.open(`https://wa.me/${DOCTOR_WHATSAPP_NUMBER}?text=${encodedMsg}`, '_blank');
+      const whatsappUrl = `https://wa.me/${DOCTOR_WHATSAPP_NUMBER}?text=${encodedMsg}`;
+
+      if (preOpenedWindow) {
+        try {
+          preOpenedWindow.location.href = whatsappUrl;
+        } catch (redirectErr) {
+          console.warn('[WhatsApp Redirect] Failed to redirect pre-opened tab:', redirectErr);
+          window.open(whatsappUrl, '_blank');
+        }
+      } else {
+        window.open(whatsappUrl, '_blank');
+      }
 
       return true;
     } catch (e) {
       console.error('Exception booking appointment:', e);
+      if (preOpenedWindow) {
+        preOpenedWindow.close();
+      }
       return false;
     }
   };
@@ -645,11 +668,14 @@ export default function App() {
       return;
     }
 
+    const whatsappWindow = window.open('about:blank', '_blank');
+
     try {
       // 1. Live database check to prevent booking an already booked slot
       const isAvailable = await appointmentService.isSlotAvailable(modalForm.date, modalForm.timeSlot, modalForm.branch, 'To Be Assigned');
       if (!isAvailable) {
         setBookingError('This time slot is already booked. Please choose another available slot.');
+        if (whatsappWindow) whatsappWindow.close();
         return;
       }
 
@@ -661,7 +687,7 @@ export default function App() {
         date: modalForm.date,
         timeSlot: modalForm.timeSlot,
         message: modalForm.message,
-      });
+      }, whatsappWindow);
 
       if (success) {
         // Refresh available slots immediately
@@ -670,9 +696,11 @@ export default function App() {
         setModalFormSubmitted(true);
       } else {
         setBookingError('This time slot is already booked. Please choose another available slot.');
+        if (whatsappWindow) whatsappWindow.close();
       }
     } catch (err) {
       setBookingError('This time slot is already booked. Please choose another available slot.');
+      if (whatsappWindow) whatsappWindow.close();
     }
   };
 
@@ -769,6 +797,14 @@ export default function App() {
         return <SocialService />;
       case 'technology':
         return <Technology />;
+      case 'why-choose-us':
+        return (
+          <WhyChooseUs 
+            openAppointmentModal={openAppointmentModal}
+            doctorsList={doctorsList}
+            videosList={videosList}
+          />
+        );
       case 'international':
         return <DentalTourism openAppointmentModal={openAppointmentModal} />;
       case 'academy':

@@ -248,7 +248,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
                 className="pt-6 flex flex-wrap gap-4"
               >
                 <button
-                  onClick={openAppointmentModal}
+                  onClick={() => openAppointmentModal()}
                   className="px-8 py-4 bg-[#081C3A] hover:bg-[#0D9488] text-white text-xs font-bold rounded-[16px] shadow-[0_8px_30px_rgba(8,28,58,0.1)] transition-all duration-300 uppercase tracking-wider flex items-center space-x-2 group cursor-pointer"
                 >
                   <span>Free Consultation</span>
@@ -611,7 +611,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
           {/* Action buttons at the bottom of the page */}
           <div className="text-center pt-20 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              onClick={openAppointmentModal}
+              onClick={() => openAppointmentModal()}
               className="w-full sm:w-auto px-8 py-4 bg-[#081C3A] hover:bg-[#0D9488] text-white text-xs font-bold rounded-2xl shadow-lg cursor-pointer transition duration-300 uppercase tracking-widest"
             >
               Free Consultation

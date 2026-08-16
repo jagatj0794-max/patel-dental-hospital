@@ -8,9 +8,9 @@ import { Service } from '../types';
 import { serviceService } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
-import VideoUploadCmsField from './VideoUploadCmsField';
-import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
+import ProcedureVideoCmsSection from './ProcedureVideoCmsSection';
 import CmsSectionToggle from './CmsSectionToggle';
+import TestimonialThumbnailUpload from './TestimonialThumbnailUpload';
 
 interface BracesTreatmentCmsProps {
   onSaveSuccess?: () => void;
@@ -776,17 +776,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* FEATURED TREATMENT VIDEO */}
-        {/* FEATURED TREATMENT VIDEO */}
-        <FeaturedVideoCmsSection
-          mConfig={mConfig}
-          updateMConfigField={updateMConfigField}
-          isExpanded={!!expandedSections.featuredVideo}
-          onToggle={() => toggleSection('featuredVideo')}
-          sectionNumber="2"
-        />
-
-        {/* 3. WHAT IS BRACES TREATMENT? */}
+        {/* 2. WHAT IS BRACES TREATMENT? */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -796,7 +786,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. What is Braces Treatment?</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. What is Braces Treatment?</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure intro section heading and overview content</span>
               </div>
             </div>
@@ -832,7 +822,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 3. BRACES TREATMENT PLANNING */}
+        {/* 2. BRACES TREATMENT PLANNING */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -842,7 +832,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Braces Treatment Planning</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Braces Treatment Planning</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure step-by-step treatment procedure flow</span>
               </div>
             </div>
@@ -944,7 +934,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 4. TREATMENT PLANNING INCLUDES */}
+        {/* 3. TREATMENT PLANNING INCLUDES */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -954,7 +944,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Layers className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Treatment Planning Includes</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Treatment Planning Includes</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure diagnosis, duration, and post-treatment cards</span>
               </div>
             </div>
@@ -1045,7 +1035,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 5. BEFORE & AFTER GALLERY */}
+        {/* 4. BEFORE & AFTER GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1055,7 +1045,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Before & After Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Before & After Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure side-by-side comparison image sliders</span>
               </div>
             </div>
@@ -1180,7 +1170,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 6. CLINICAL CASE GALLERY */}
+        {/* 5. CLINICAL CASE GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1190,7 +1180,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure showcase photo grid of completed clinical cases</span>
               </div>
             </div>
@@ -1290,92 +1280,18 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 7. PROCEDURE VIDEO */}
-        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleSection('procedureVideo')}
-            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
-              <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure walkthrough video link and thumbnail</span>
-              </div>
-            </div>
-            {expandedSections.procedureVideo ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-          </button>
+        {/* 6. PROCEDURE VIDEO */}
+        <ProcedureVideoCmsSection
+          service={service}
+          mConfig={mConfig}
+          updateServiceField={updateServiceField}
+          updateMConfigField={updateMConfigField}
+          sectionNumber={7}
+          isExpanded={!!expandedSections.procedureVideo}
+          onToggle={() => toggleSection('procedureVideo')}
+        />
 
-          {expandedSections.procedureVideo && (
-            <div className="p-6 border-t border-slate-100 space-y-4">
-              <CmsSectionToggle
-                checked={mConfig.show_procedure_video !== false}
-                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
-              />
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Section Title</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_title || 'Braces Treatment Procedure Video'}
-                  onChange={(e) => updateServiceField('procedure_video_title', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video URL (YouTube/MP4)</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_url || ''}
-                  onChange={(e) => updateServiceField('procedure_video_url', e.target.value)}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white font-mono"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Description</label>
-                <textarea
-                  rows={2}
-                  value={service.procedure_video_description || ''}
-                  onChange={(e) => updateServiceField('procedure_video_description', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Custom Thumbnail Image URL</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={service.procedure_video_thumbnail || ''}
-                    onChange={(e) => updateServiceField('procedure_video_thumbnail', e.target.value)}
-                    placeholder="https://..."
-                    className="flex-1 px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white"
-                  />
-                  <label className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1">
-                    <Upload className="h-3.5 w-3.5" />
-                    <span>Upload</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={async (e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          const url = await handleFileUpload(e.target.files[0]);
-                          if (url) updateServiceField('procedure_video_thumbnail', url);
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 8. PATIENT TESTIMONIALS */}
+        {/* 7. PATIENT TESTIMONIALS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1385,7 +1301,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient experience stories and video reviews</span>
               </div>
             </div>
@@ -1448,6 +1364,14 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
                       placeholder="Review text..."
                       className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white"
                     />
+
+                    <TestimonialThumbnailUpload
+                      value={t.thumbnail || t.thumbnail_url || ''}
+                      onChange={(url) => {
+                        updateTestimonialItemField(idx, 'thumbnail', url);
+                        updateTestimonialItemField(idx, 'thumbnail_url', url);
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -1455,7 +1379,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 9. HOSPITAL & TEAM GALLERY */}
+        {/* 8. HOSPITAL & TEAM GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1465,7 +1389,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure facility, infrastructure, and specialist doctor photos</span>
               </div>
             </div>
@@ -1542,7 +1466,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 10. COST / OFFER */}
+        {/* 9. COST / OFFER */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1552,7 +1476,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><DollarSign className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Offer</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure transparency pricing, discounts, and consultation offers</span>
               </div>
             </div>
@@ -1632,7 +1556,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 11. GOOGLE PATIENT REVIEWS */}
+        {/* 10. GOOGLE PATIENT REVIEWS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1642,7 +1566,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure authentic Google patient star ratings and feedback</span>
               </div>
             </div>
@@ -1714,7 +1638,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 12. BOTTOM CTA */}
+        {/* 11. BOTTOM CTA */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1724,7 +1648,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Phone className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure footer conversion banner buttons and contact channels</span>
               </div>
             </div>
@@ -1786,7 +1710,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
           )}
         </div>
 
-        {/* 13. FAQ */}
+        {/* 12. FAQ */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1796,7 +1720,7 @@ export default function BracesTreatmentCms({ onSaveSuccess, serviceSlug = 'brace
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. FAQ Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. FAQ Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient questions and detailed answers accordion</span>
               </div>
             </div>

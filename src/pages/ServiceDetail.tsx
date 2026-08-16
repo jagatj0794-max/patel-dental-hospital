@@ -15,7 +15,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, UNIVERSAL_GOOGLE_REVIEWS } from '../utils/serviceData';
-import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
+import { contactService, DEFAULT_CONTACT_INFO, getWhatsAppUrl as getGlobalWhatsAppUrl } from '../utils/contactData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
 import { InstagramEmbed } from '../components/InstagramEmbed';
@@ -29,7 +29,16 @@ function extractYouTubeId(url: string): string {
   const trimmedUrl = url.trim();
   
   try {
-    // 1. Matches embed URLs like https://www.youtube.com/embed/VIDEO_ID
+    // 1. Matches shorts URLs like https://www.youtube.com/shorts/VIDEO_ID
+    if (trimmedUrl.includes('/shorts/')) {
+      const parts = trimmedUrl.split('/shorts/');
+      if (parts[1]) {
+        const id = parts[1].split(/[?#&]/)[0];
+        if (id.length === 11) return id;
+      }
+    }
+
+    // 2. Matches embed URLs like https://www.youtube.com/embed/VIDEO_ID
     if (trimmedUrl.includes('/embed/')) {
       const parts = trimmedUrl.split('/embed/');
       if (parts[1]) {
@@ -38,7 +47,7 @@ function extractYouTubeId(url: string): string {
       }
     }
     
-    // 2. Matches short URLs like https://youtu.be/VIDEO_ID
+    // 3. Matches short URLs like https://youtu.be/VIDEO_ID
     if (trimmedUrl.includes('youtu.be/')) {
       const parts = trimmedUrl.split('youtu.be/');
       if (parts[1]) {
@@ -47,7 +56,7 @@ function extractYouTubeId(url: string): string {
       }
     }
 
-    // 3. Matches watch URLs like watch?v=VIDEO_ID or watch&v=VIDEO_ID
+    // 4. Matches watch URLs like watch?v=VIDEO_ID or watch&v=VIDEO_ID
     if (trimmedUrl.includes('v=')) {
       const parts = trimmedUrl.split('v=');
       if (parts[1]) {
@@ -87,230 +96,7 @@ function isMp4Url(url: string) {
   return url.endsWith('.mp4') || url.includes('supabase.co');
 }
 
-interface FeaturedTreatmentVideoProps {
-  mConfig: MarketingConfig;
-  serviceTitle: string;
-  openAppointmentModal: (preselectedTreatment?: string) => void;
-}
 
-export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
-  mConfig,
-  serviceTitle,
-  openAppointmentModal
-}) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const defaultYtUrl = 'https://www.youtube.com/watch?v=SnOxxv_S2ew';
-  const source = mConfig.featured_video_source || 'youtube';
-  const youtubeUrl = (mConfig.featured_video_youtube_url || '').trim() || defaultYtUrl;
-  const uploadUrl = (mConfig.featured_video_upload_url || '').trim();
-
-  const hasVideo = source === 'youtube' ? !!youtubeUrl : !!uploadUrl;
-  const isEnabled = mConfig.featured_video_enabled !== false;
-
-  if (!isEnabled || !hasVideo) {
-    return null;
-  }
-
-  const heading = mConfig.featured_video_heading || `Featured ${serviceTitle} Video`;
-  const description = mConfig.featured_video_description || `Learn more about the advanced procedures and clinical excellence of ${serviceTitle} treatment at Patel Dental Hospital. Watch our expert walk-through of the process.`;
-  const bullets = mConfig.featured_video_bullets && mConfig.featured_video_bullets.length > 0 
-    ? mConfig.featured_video_bullets 
-    : [
-        'Advanced state-of-the-art procedure methods',
-        'Minimally invasive and pain-free techniques',
-        'Expert clinical execution and diagnostic precision'
-      ];
-  const ctaText = mConfig.featured_video_cta_text || 'Schedule A Consultation';
-  const ctaLink = mConfig.featured_video_cta_link || '';
-
-  const getYouTubeId = (url: string) => {
-    return extractYouTubeId(url);
-  };
-
-  const buildYouTubeEmbedUrl = () => {
-    const id = getYouTubeId(youtubeUrl);
-    let embedUrl = `https://www.youtube.com/embed/${id}?rel=0`;
-    
-    // Always use autoplay=0, never autoplay=1
-    embedUrl += '&autoplay=0';
-    
-    const loop = !!mConfig.featured_video_loop;
-    if (loop) embedUrl += `&loop=1&playlist=${id}`;
-    
-    return embedUrl;
-  };
-
-  const getThumbnailUrl = () => {
-    if (mConfig.featured_video_thumbnail_source === 'custom' && mConfig.featured_video_custom_thumbnail) {
-      return mConfig.featured_video_custom_thumbnail;
-    }
-    if (source === 'youtube') {
-      const ytId = getYouTubeId(youtubeUrl);
-      if (ytId) {
-        return `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
-      }
-    }
-    return '';
-  };
-
-  const [imgSrc, setImgSrc] = useState(getThumbnailUrl());
-
-  useEffect(() => {
-    setImgSrc(getThumbnailUrl());
-  }, [
-    mConfig.featured_video_thumbnail_source,
-    mConfig.featured_video_custom_thumbnail,
-    source,
-    youtubeUrl
-  ]);
-
-  const handleImgError = () => {
-    if (imgSrc && imgSrc.includes('maxresdefault.jpg')) {
-      const ytId = getYouTubeId(youtubeUrl);
-      if (ytId) {
-        setImgSrc(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
-      }
-    }
-  };
-
-  const handleCtaClick = () => {
-    if (!ctaLink || ctaLink === '#appointment' || ctaLink === 'appointment') {
-      openAppointmentModal(`${serviceTitle} - Featured Video CTA`);
-    } else if (ctaLink.startsWith('http')) {
-      window.open(ctaLink, '_blank', 'noopener,noreferrer');
-    } else {
-      if (ctaLink.startsWith('#')) {
-        const id = ctaLink.substring(1);
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        } else {
-          window.location.hash = ctaLink;
-        }
-      } else {
-        window.location.href = ctaLink;
-      }
-    }
-  };
-
-  return (
-    <div 
-      className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-14 shadow-xs hover:shadow-sm transition-shadow duration-300 relative overflow-hidden" 
-      id="featured-treatment-video-section"
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-        
-        {/* LEFT SIDE: Video Player (First in DOM so mobile/tablet is video first) */}
-        <div className="w-full">
-          <div className="relative aspect-video w-full bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200/60 group">
-            {isPlaying ? (
-              source !== 'upload' ? (
-                <iframe
-                  src={buildYouTubeEmbedUrl()}
-                  title={`${serviceTitle} Featured Video`}
-                  className="w-full h-full border-none"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <video
-                  src={uploadUrl}
-                  className="w-full h-full object-cover"
-                  controls
-                  autoPlay={false}
-                  loop={!!mConfig.featured_video_loop}
-                />
-              )
-            ) : (
-              <button 
-                type="button"
-                onClick={() => setIsPlaying(true)}
-                className="absolute inset-0 w-full h-full cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
-              >
-                {/* Thumbnail Image / Poster */}
-                {imgSrc ? (
-                  <img
-                    src={imgSrc}
-                    alt={`${serviceTitle} Video Thumbnail`}
-                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-                    onError={handleImgError}
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  uploadUrl ? (
-                    <video
-                      src={uploadUrl}
-                      className="w-full h-full object-cover"
-                      preload="metadata"
-                      muted
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#081C3A] to-[#0A264F] flex items-center justify-center">
-                      <Video className="h-12 w-12 text-slate-400" />
-                    </div>
-                  )
-                )}
-
-                {/* Dark Overlay to increase play button contrast */}
-                <div className="absolute inset-0 bg-slate-950/25 group-hover:bg-slate-950/35 transition-colors duration-300" />
-
-                {/* Large Play Button */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-16 w-16 sm:h-20 sm:w-20 bg-white/95 text-[#0D9488] rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-                    <Play className="h-8 w-8 sm:h-10 sm:w-10 fill-current translate-x-0.5" />
-                  </div>
-                </div>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* RIGHT SIDE: Content */}
-        <div className="space-y-4 sm:space-y-6 text-left font-sans">
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-              <Video className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-              Treatment Video
-            </span>
-            <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
-              {heading}
-            </h2>
-            <div className="h-1 w-12 bg-[#0D9488] rounded-full" />
-          </div>
-
-          {description && (
-            <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed whitespace-pre-line">
-              {description}
-            </p>
-          )}
-
-          {bullets.length > 0 && (
-            <ul className="space-y-2.5 pt-2">
-              {bullets.map((bullet, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 font-semibold">
-                  <CheckCircle2 className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={handleCtaClick}
-              className="w-full sm:w-auto px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
-            >
-              <span>{ctaText}</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-};
 
 function getFallbackMedia(slug: string, title: string) {
   let heroImg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
@@ -1520,11 +1306,21 @@ export default function ServiceDetail({
           display_order: 10
         }
       ];
+    } else if (isRootCanal) {
+      list = [
+        {
+          id: 'rct-ba-1',
+          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
+          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
+          caption: 'Single Sitting Root Canal & Cap Restoration',
+          display_order: 10
+        }
+      ];
     }
     return [...list]
       .filter((p: any) => p && p.before_image && p.after_image)
       .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
+  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling, isRootCanal]);
 
   // If loading, display the skeleton state first
   if (isLoading) {
@@ -1614,11 +1410,8 @@ export default function ServiceDetail({
   // Formulate WhatsApp API direct URL
   const getWhatsAppUrl = () => {
     if (!service) return '';
-    const text = `Hi Patel Dental Hospital, I'm interested in booking a consultation for the "${service.title}" treatment. Please let me know the next available slot!`;
-    const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-      ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-      : contactInfo.whatsappRaw;
-    return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+    const text = `Hello Patel Dental Hospital, I would like to book a free consultation for "${service.title}". Please share the available appointment slots.`;
+    return getGlobalWhatsAppUrl(text);
   };
 
   // Get configured Call To Action buttons dynamically
@@ -1702,11 +1495,8 @@ export default function ServiceDetail({
             const url = value.startsWith('http') ? value : 'https://' + value;
             window.open(url, '_blank', 'noopener,noreferrer');
           } else {
-            const textMsg = `Hi Patel Dental Hospital, I'm interested in booking a consultation for "${service?.title}".`;
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw || '919924225500';
-            window.open(`https://wa.me/${num}?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+            const textMsg = `Hello Patel Dental Hospital, I would like to book a free consultation for "${service?.title}". Please share the available appointment slots.`;
+            window.open(getGlobalWhatsAppUrl(textMsg), '_blank', 'noopener,noreferrer');
           }
         },
         isWhatsappSecondary: true
@@ -2028,13 +1818,7 @@ export default function ServiceDetail({
             )
           ) : null;
 
-          const featuredVideoElement = (
-            <FeaturedTreatmentVideo
-              mConfig={mConfig}
-              serviceTitle={service.title}
-              openAppointmentModal={openAppointmentModal}
-            />
-          );
+
 
           const introElement = (mConfig.show_introduction !== false) ? (
             isNewArchitecture ? (
@@ -2225,6 +2009,8 @@ export default function ServiceDetail({
           
           const effectiveVideoTitle = seoHeadings.video;
 
+          const videoSource = mConfig.procedure_video_source || (isMp4Url(effectiveVideoUrl) ? 'mp4' : isYouTubeUrl(effectiveVideoUrl) ? 'youtube' : 'instagram');
+
           const videoElement = (mConfig.show_procedure_video !== false && effectiveVideoUrl) ? (
             <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-video">
               {effectiveVideoTitle && (
@@ -2237,11 +2023,18 @@ export default function ServiceDetail({
               )}
 
               <div className="max-w-[640px] mx-auto w-full px-2 sm:px-0">
-                {isMp4Url(effectiveVideoUrl) ? (
-                  <div className="w-full max-w-[430px] mx-auto flex justify-center">
-                    <Mp4ReelPlayer src={effectiveVideoUrl} />
+                {videoSource === 'mp4' || videoSource === 'manual' ? (
+                  <div className="w-full max-w-[640px] mx-auto flex justify-center rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black animate-fade-in">
+                    <video
+                      src={effectiveVideoUrl}
+                      controls
+                      playsInline
+                      className="w-full h-auto block"
+                      style={{ maxHeight: '75vh' }}
+                      preload="metadata"
+                    />
                   </div>
-                ) : isYouTubeUrl(effectiveVideoUrl) ? (
+                ) : videoSource === 'youtube' ? (
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
                     <iframe
                       src={getYouTubeEmbedUrl(effectiveVideoUrl)}
@@ -2255,6 +2048,7 @@ export default function ServiceDetail({
                   <InstagramEmbed
                     url={effectiveVideoUrl}
                     title={effectiveVideoTitle || 'Procedure Video'}
+                    thumbnail={service?.procedure_video_thumbnail || mConfig.procedure_video_thumbnail || mConfig.video_thumbnail}
                   />
                 )}
               </div>
@@ -2340,7 +2134,7 @@ export default function ServiceDetail({
                     <div key={t.id || idx} className="flex flex-col items-center w-full">
                       {isMp4Url(reelUrl) ? (
                         <div className="w-full max-w-[430px] mx-auto flex justify-center">
-                          <Mp4ReelPlayer src={reelUrl} />
+                          <Mp4ReelPlayer src={reelUrl} poster={t.thumbnail || t.thumbnail_url} />
                         </div>
                       ) : isYouTubeUrl(reelUrl) ? (
                         <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
@@ -2356,6 +2150,7 @@ export default function ServiceDetail({
                         <InstagramEmbed
                           url={reelUrl}
                           title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
+                          thumbnail={t.thumbnail || t.thumbnail_url}
                         />
                       )}
                       {patientName && patientName !== 'Patient Name' && (
@@ -2551,8 +2346,7 @@ export default function ServiceDetail({
             switch (key) {
               case 'hero':
                 return heroElement;
-              case 'featured_video':
-                return featuredVideoElement;
+
               case 'intro':
                 return introElement;
               case 'process':
@@ -2583,7 +2377,7 @@ export default function ServiceDetail({
           // Formulate order lists
           const defaultOrder = [
             'hero',
-            'featured_video',
+
             'intro',
             'process',
             'benefits',
@@ -2631,7 +2425,6 @@ export default function ServiceDetail({
             return (
               <div className="space-y-8 sm:space-y-16 lg:space-y-20">
                 {heroElement}
-                {featuredVideoElement}
                 {introElement}
 
                 {/* Section 3: How We Perform Treatment (Clinical Workflow Steps) */}
@@ -2722,7 +2515,7 @@ export default function ServiceDetail({
                         {seoHeadings.transformations}
                       </h2>
                       <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
+                        {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : isRootCanal ? 'See real smile transformations of our single sitting root canal treatment patients.' : 'See real smile transformations of our patients.')}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -2817,7 +2610,7 @@ export default function ServiceDetail({
                           </a>
 
                           <a
-                            href={`https://wa.me/${String(mConfig.cost_phone_number || contactInfo?.whatsapp || DEFAULT_CONTACT_INFO.whatsapp).replace(/[^\d+]/g, '').replace('+', '')}`}
+                            href={getGlobalWhatsAppUrl(`Hello Patel Dental Hospital, I would like to book a free consultation for "${service?.title || 'Dental Treatment'}". Please share the available appointment slots.`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             referrerPolicy="no-referrer"
@@ -2884,7 +2677,7 @@ export default function ServiceDetail({
                         </button>
 
                         <a
-                          href={`https://wa.me/${String(mConfig.sec11_whatsapp || contactInfo?.whatsapp || DEFAULT_CONTACT_INFO.whatsapp).replace(/[^\d+]/g, '').replace('+', '')}`}
+                          href={getGlobalWhatsAppUrl(`Hello Patel Dental Hospital, I would like to book a free consultation for "${service?.title || 'Dental Treatment'}". Please share the available appointment slots.`)}
                           target="_blank"
                           rel="noopener noreferrer"
                           referrerPolicy="no-referrer"
@@ -3188,7 +2981,7 @@ export default function ServiceDetail({
                               )}
                               {showWa && (
                                 <a 
-                                  href={mConfig.social_wa_link || "https://wa.me"} 
+                                  href={mConfig.social_wa_link && mConfig.social_wa_link.trim() !== '' && mConfig.social_wa_link !== 'https://wa.me' ? mConfig.social_wa_link : getGlobalWhatsAppUrl()} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"

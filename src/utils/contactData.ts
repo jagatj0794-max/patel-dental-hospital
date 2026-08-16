@@ -110,3 +110,9 @@ export const contactService = {
     }
   }
 };
+
+export const getWhatsAppUrl = (customText?: string): string => {
+  const defaultText = "Hello Patel Dental Hospital, I would like to book a free consultation. Please share the available appointment slots.";
+  const text = customText || defaultText;
+  return `https://wa.me/919510397046?text=${encodeURIComponent(text)}`;
+};

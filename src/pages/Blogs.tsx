@@ -26,6 +26,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useSEO } from '../utils/seo';
+import { getWhatsAppUrl } from '../utils/contactData';
 
 interface BlogPost {
   id: string;
@@ -46,44 +47,44 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'dental-implants-rajkot',
     title: 'Dental Implants in Rajkot: Complete Guide to Treatment, Benefits & Cost',
-    excerpt: 'Learn about dental implants in Rajkot, including treatment process, benefits, expected results, cost and important factors to consider before treatment.',
+    excerpt: 'Read our comprehensive dental implants treatment guide: cost, process, and benefits at Patel Dental Hospital, the best dental clinic in Rajkot.',
     date: '8 August 2026',
     readingTime: '6 min read',
     category: 'Dental Implants',
     image: '/dental implant in rajkot.jpg',
-    imageAlt: 'Dental implants treatment guide at Patel Dental Hospital Rajkot',
-    seoTitle: 'Dental Implants in Rajkot: Treatment, Benefits & Cost',
-    metaDescription: 'Learn about dental implants in Rajkot, including treatment process, benefits, expected results, cost and important factors to consider before treatment.',
+    imageAlt: 'Before after dental implants treatment at Patel Dental Hospital, the best dental clinic in Rajkot',
+    seoTitle: 'Dental Implants in Rajkot: Cost, Procedure & Best Clinic',
+    metaDescription: 'Looking for the best dental clinic in Rajkot for tooth implants? Read our complete dental implants treatment guide: cost, process, and benefits at Patel Dental Hospital.',
     primaryKeyword: 'Dental Implants in Rajkot',
-    secondaryKeywords: ['dental implants Rajkot', 'dental implant treatment', 'dental implant cost Rajkot', 'best dental implants Rajkot']
+    secondaryKeywords: ['best dental clinic in Rajkot', 'dental implant treatment', 'dental implant cost in Rajkot', 'implant specialist dentist Rajkot']
   },
   {
     id: 'braces-vs-clear-aligners',
     title: 'The Path to a Perfect Smile: Braces vs Clear Aligners',
-    excerpt: 'Compare braces and clear aligners, including benefits, treatment differences, comfort, appearance and which orthodontic option may suit your smile goals.',
+    excerpt: 'Compare traditional braces and clear aligners, including benefits, treatment differences, comfort, appearance, and orthodontic cost in Rajkot.',
     date: '1 August 2026',
     readingTime: '5 min read',
     category: 'Orthodontics',
     image: '/cline aliner in rajkot.jpg',
-    imageAlt: 'Braces vs clear aligners comparison at Patel Dental Hospital Rajkot',
-    seoTitle: 'Braces vs Clear Aligners: Which Is Right for You?',
-    metaDescription: 'Compare braces and clear aligners, including benefits, treatment differences, comfort, appearance and which orthodontic option may suit your smile goals.',
+    imageAlt: 'Invisible clear aligners vs traditional metal braces treatment at Patel Dental Hospital, the best dental hospital in Rajkot',
+    seoTitle: 'Braces vs Clear Aligners: Cost & Results in Rajkot',
+    metaDescription: 'Wondering about braces vs clear aligners? Read our comprehensive comparison guide on orthodontic treatment cost, benefits, and invisible aligners in Rajkot.',
     primaryKeyword: 'Braces vs Clear Aligners',
-    secondaryKeywords: ['braces treatment Rajkot', 'clear aligners Rajkot', 'invisible aligners', 'braces vs aligners']
+    secondaryKeywords: ['braces treatment in Rajkot', 'clear aligners Rajkot', 'invisible aligners Rajkot', 'best dentist in Rajkot']
   },
   {
     id: 'maintain-white-teeth-after-whitening',
     title: '5 Vital Habits for Maintaining Pearly White Teeth Post-Whitening',
-    excerpt: 'Discover 5 simple habits to maintain whiter, healthier teeth after professional whitening, including oral care, food choices, hydration and dental check-ups.',
+    excerpt: 'Discover 5 dentist-approved daily habits to maintain whiter, healthier teeth after professional teeth whitening treatment at Patel Dental Hospital Rajkot.',
     date: '25 July 2026',
     readingTime: '4 min read',
     category: 'Cosmetic Dentistry',
     image: '/white teeth in rajkot.jpg',
-    imageAlt: 'Teeth whitening aftercare tips at Patel Dental Hospital Rajkot',
-    seoTitle: '5 Habits for Maintaining Pearly White Teeth After Whitening',
-    metaDescription: 'Discover 5 simple habits to maintain whiter, healthier teeth after professional whitening, including oral care, food choices, hydration and dental check-ups.',
+    imageAlt: 'White teeth scaling and teeth whitening aftercare guide by cosmetic dentist in Rajkot, Patel Dental Hospital',
+    seoTitle: 'How to Maintain White Teeth After Teeth Whitening in Rajkot',
+    metaDescription: 'Discover 5 dentist-approved daily habits to maintain whiter, healthier teeth after professional teeth whitening treatment at Patel Dental Hospital Rajkot.',
     primaryKeyword: 'maintain white teeth after whitening',
-    secondaryKeywords: ['teeth whitening Rajkot', 'white teeth after whitening', 'teeth whitening aftercare', 'professional teeth whitening']
+    secondaryKeywords: ['teeth whitening in Rajkot', 'teeth whitening aftercare', 'professional teeth whitening', 'dental treatment in Rajkot']
   }
 ];
 
@@ -205,7 +206,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
               <Tag className="h-3 w-3" /> Dental Implants
             </span>
             <h1 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] leading-tight tracking-tight">
-              Dental Implants in Rajkot: Complete Guide to Treatment, Benefits & Cost
+              Dental Implants in Rajkot: Complete Guide to Cost, Procedure & Best Clinic
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 pt-1">
               <span className="flex items-center gap-1.5">
@@ -222,7 +223,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
           <div className="aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden mb-10 border border-slate-100 shadow-2xs">
             <img 
               src="/dental implant in rajkot.jpg" 
-              alt="Dental implants treatment guide at Patel Dental Hospital Rajkot" 
+              alt="Before after dental implants treatment at Patel Dental Hospital, the best dental clinic in Rajkot" 
               className="w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
             />
@@ -290,19 +291,19 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                 3. Who Can Consider Dental Implants?
               </h2>
               <p>
-                Dental implants are suitable for many adult patients who have lost one or more teeth due to decay, gum disease, or trauma. However, suitability is not universal and depends on several key medical and anatomical factors:
+                Dental implants are suitable for many adult patients in Gujarat who have lost one or more teeth due to decay, gum disease, or trauma. At our state-of-the-art clinic, a specialist <strong>dentist in Rajkot</strong> will evaluate your health. Suitability depends on several key medical and anatomical factors:
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-1.5">
-                  <h4 className="font-bold text-[#081C3A] text-sm">Oral & Jawbone Health</h4>
+                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">Oral & Jawbone Health</h3>
                   <p className="text-xs text-slate-500 leading-normal">
-                    Patients must have healthy gums and sufficient jawbone density to support the titanium post. If bone loss has occurred, a bone graft may be recommended beforehand.
+                    Patients must have healthy gums and sufficient jawbone density to support the titanium post. If bone loss has occurred, our dental specialist in Rajkot may recommend a bone graft.
                   </p>
                 </div>
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-1.5">
-                  <h4 className="font-bold text-[#081C3A] text-sm">Overall General Health</h4>
+                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">Overall General Health</h3>
                   <p className="text-xs text-slate-500 leading-normal">
-                    Chronic conditions like diabetes or active cardiovascular issues must be managed and discussed. A professional clinical evaluation determines your exact eligibility.
+                    Chronic conditions like diabetes must be managed. A professional clinical evaluation at Patel Dental Hospital determines your eligibility for this advanced dental treatment in Rajkot.
                   </p>
                 </div>
               </div>
@@ -359,7 +360,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                       <div className="h-1.5 w-1.5 bg-[#0D9488] rounded-full" />
                     </div>
                     <span className="text-[10px] font-black text-[#0D9488] uppercase tracking-widest">{step.step}</span>
-                    <h4 className="font-bold text-sm sm:text-base text-[#081C3A] leading-tight mb-1">{step.title}</h4>
+                    <h3 className="font-bold text-sm sm:text-base text-[#081C3A] leading-tight mb-1">{step.title}</h3>
                     <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">{step.desc}</p>
                   </div>
                 ))}
@@ -387,9 +388,9 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
               <div className="p-4 sm:p-5 bg-teal-50/50 border border-teal-100/70 rounded-2xl flex gap-3.5 items-start">
                 <AlertCircle className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
                 <div className="space-y-1.5">
-                  <h4 className="font-bold text-[#081C3A] text-sm sm:text-base">Personalized Pricing After Consultation</h4>
+                  <h3 className="font-bold text-[#081C3A] text-sm sm:text-base">Personalized Pricing After Consultation</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Treatment cost varies depending on the implant system, number of implants, crown type, bone condition, and individual treatment requirements. A personalized estimate is provided after consultation.
+                    Treatment cost varies depending on the implant system, number of implants, crown type, bone condition, and individual treatment requirements. A personalized estimate is provided after a detailed clinical <a href="#contact" className="text-[#0D9488] font-bold hover:underline">appointment and consultation</a>.
                   </p>
                 </div>
               </div>
@@ -432,7 +433,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
               </p>
               <ul className="space-y-2.5 pl-4 list-disc text-slate-600 text-xs sm:text-sm">
                 <li>
-                  <strong className="text-[#081C3A]">18+ Years of Clinical Expertise:</strong> Led by Dr. Vipul Patel, our experienced surgical team has safely placed thousands of implants, adhering to international guidelines.
+                  <strong className="text-[#081C3A]">18+ Years of Clinical Expertise:</strong> Led by <a href="#doctors" className="text-[#0D9488] font-bold hover:underline">Dr. Vipul Patel</a>, our experienced surgical team has safely placed thousands of implants, adhering to international guidelines.
                 </li>
                 <li>
                   <strong className="text-[#081C3A]">In-House 3D CBCT Imaging:</strong> We utilize advanced, low-radiation Cone Beam Computed Tomography inside our facility, allowing us to perform precise bone mapping and treatment planning without third-party lab delays.
@@ -530,7 +531,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                 Book Free Consultation
               </button>
               <a
-                href="https://wa.me/919510397046"
+                href={getWhatsAppUrl("Hello Patel Dental Hospital, I would like to book a free consultation for Dental Implants. Please share the available appointment slots.")}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer"
@@ -560,7 +561,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
               <Tag className="h-3 w-3" /> Orthodontics
             </span>
             <h1 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] leading-tight tracking-tight">
-              Braces vs Clear Aligners: Which Is Right for You?
+              Braces vs Clear Aligners: Cost & Results in Rajkot
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 pt-1">
               <span className="flex items-center gap-1.5">
@@ -577,7 +578,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
           <div className="aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden mb-10 border border-slate-100 shadow-2xs">
             <img 
               src="/cline aliner in rajkot.jpg" 
-              alt="Braces vs clear aligners comparison at Patel Dental Hospital Rajkot" 
+              alt="Invisible clear aligners vs traditional metal braces treatment at Patel Dental Hospital, the best dental hospital in Rajkot" 
               className="w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
             />
@@ -611,7 +612,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                 A straight, healthy smile does wonders for your confidence and oral health. Orthodontic treatment has advanced significantly over the years, giving patients more treatment choices than ever before. If you are looking to correct misaligned, crowded, or spaced teeth, the decision typically comes down to two major modern solutions: <strong>Traditional Braces</strong> and <strong>Clear Aligners</strong>.
               </p>
               <p>
-                Both systems are designed to safely and gradually move your teeth into optimal cosmetic and functional alignment. However, they differ in terms of aesthetics, comfort, cost, care, and daily lifestyle. Choosing the right one requires a solid understanding of how each works and how they align with your smile goals.
+                Both systems are designed to safely and gradually move your teeth into optimal cosmetic and functional alignment. If you are seeking professional <a href="#services/braces-treatment" className="text-[#0D9488] font-bold hover:underline">orthodontic braces treatment in Rajkot</a> or modern <a href="#services/invisible-aligners" className="text-[#0D9488] font-bold hover:underline">clear aligners in Rajkot</a>, choosing the right one requires a solid understanding of how each works and how they align with your smile goals.
               </p>
             </section>
 
@@ -648,21 +649,21 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
               </h2>
               <div className="space-y-4 my-4">
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2">
-                  <h4 className="font-bold text-[#081C3A] text-sm">Visual Appearance & Aesthetics</h4>
+                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">Visual Appearance & Aesthetics</h3>
                   <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
                     <strong>Clear Aligners:</strong> Virtually invisible from a normal distance, making them a popular choice for working adults, teens, and professionals seeking a discreet treatment.<br/>
                     <strong>Traditional Braces:</strong> Visible, though modern ceramic braces offer clear or tooth-colored brackets to reduce visual impact.
                   </p>
                 </div>
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2">
-                  <h4 className="font-bold text-[#081C3A] text-sm">Removability & Oral Hygiene</h4>
+                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">Removability & Oral Hygiene</h3>
                   <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
                     <strong>Clear Aligners:</strong> Completely removable, allowing you to eat, brush, and floss normally without any food restrictions or cleaning difficulties.<br/>
                     <strong>Traditional Braces:</strong> Fixed in place. Patients must learn careful cleaning techniques to brush around wires and avoid hard or sticky foods.
                   </p>
                 </div>
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2">
-                  <h4 className="font-bold text-[#081C3A] text-sm">Comfort & Daily Wear</h4>
+                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">Comfort & Daily Wear</h3>
                   <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
                     <strong>Clear Aligners:</strong> Smooth, medical-grade plastic trays are highly comfortable and won't scratch or irritate your lips or inner cheeks.<br/>
                     <strong>Traditional Braces:</strong> Brackets and wires may occasionally cause initial sensitivity or mild soft-tissue irritation, which is easily managed with dental wax.
@@ -778,7 +779,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                 Book Orthodontic Consultation
               </button>
               <a
-                href="https://wa.me/919510397046"
+                href={getWhatsAppUrl("Hello Patel Dental Hospital, I would like to book an orthodontic consultation for Invisible Aligners. Please share the available appointment slots.")}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer"
@@ -808,7 +809,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
               <Tag className="h-3 w-3" /> Cosmetic Dentistry
             </span>
             <h1 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] leading-tight tracking-tight">
-              5 Habits for Maintaining Pearly White Teeth After Whitening
+              How to Maintain White Teeth After Teeth Whitening in Rajkot
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 pt-1">
               <span className="flex items-center gap-1.5">
@@ -825,7 +826,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
           <div className="aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden mb-10 border border-slate-100 shadow-2xs">
             <img 
               src="/white teeth in rajkot.jpg" 
-              alt="Teeth whitening aftercare tips at Patel Dental Hospital Rajkot" 
+              alt="White teeth scaling and teeth whitening aftercare guide by cosmetic dentist in Rajkot, Patel Dental Hospital" 
               className="w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
             />
@@ -860,7 +861,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                 A professional teeth whitening treatment can instantly remove years of yellowing and deeply embedded stains, leaving you with an incredibly bright, dazzling smile. However, teeth whitening is not a permanent shield against staining; your teeth remain naturally porous and susceptible to new stains over time.
               </p>
               <p>
-                To safeguard your beautiful whitening investment and prolong that sparkling brilliance, establishing consistent daily care and dietary habits is essential. Here are 5 vital, dentist-recommended habits to keep your pearly whites looking brighter for much longer.
+                To safeguard your beautiful whitening investment and prolong that sparkling brilliance, establishing consistent daily care and dietary habits is essential. The experienced aesthetic dentists at <a href="#doctors" className="text-[#0D9488] font-bold hover:underline">Patel Dental Hospital Rajkot</a> recommend these 5 vital, dentist-approved habits to keep your pearly whites looking brighter for much longer.
               </p>
             </section>
 
@@ -1022,7 +1023,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
                 Book Whitening Appointment
               </button>
               <a
-                href="https://wa.me/919510397046"
+                href={getWhatsAppUrl("Hello Patel Dental Hospital, I would like to book a Teeth Whitening appointment. Please share the available appointment slots.")}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer"

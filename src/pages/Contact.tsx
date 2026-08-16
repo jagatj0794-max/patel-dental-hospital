@@ -14,15 +14,18 @@ import { ContactInfo } from '../types';
 
 interface ContactProps {
   preselectedTreatment?: string;
-  onBookAppointment: (appointment: {
-    name: string;
-    phone: string;
-    treatment: string;
-    branch: string;
-    date: string;
-    timeSlot: string;
-    message?: string;
-  }) => Promise<boolean>;
+  onBookAppointment: (
+    appointment: {
+      name: string;
+      phone: string;
+      treatment: string;
+      branch: string;
+      date: string;
+      timeSlot: string;
+      message?: string;
+    },
+    preOpenedWindow?: Window | null
+  ) => Promise<boolean>;
   contactInfo?: ContactInfo;
 }
 
@@ -110,11 +113,14 @@ export default function Contact({
       return;
     }
 
+    const whatsappWindow = window.open('about:blank', '_blank');
+
     try {
       // 1. Live database check to prevent booking an already booked slot
       const isAvailable = await appointmentService.isSlotAvailable(formData.date, formData.timeSlot, formData.branch, 'To Be Assigned');
       if (!isAvailable) {
         setValidationError('This time slot is already booked. Please choose another available slot.');
+        if (whatsappWindow) whatsappWindow.close();
         return;
       }
 
@@ -126,7 +132,7 @@ export default function Contact({
         date: formData.date,
         timeSlot: formData.timeSlot,
         message: formData.message,
-      });
+      }, whatsappWindow);
 
       if (success) {
         // Refresh available slots immediately
@@ -135,9 +141,11 @@ export default function Contact({
         setFormSubmitted(true);
       } else {
         setValidationError('This time slot is already booked. Please choose another available slot.');
+        if (whatsappWindow) whatsappWindow.close();
       }
     } catch (err) {
       setValidationError('This time slot is already booked. Please choose another available slot.');
+      if (whatsappWindow) whatsappWindow.close();
     }
   };
 

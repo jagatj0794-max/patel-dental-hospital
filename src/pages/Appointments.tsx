@@ -422,7 +422,9 @@ export default function Appointments() {
   const handleWhatsApp = (mobile: string, name: string, date: string, time: string, doctor: string) => {
     const message = `Hello ${name}, this is Patel Dental Hospital. This is to follow up on your appointment scheduled with ${doctor} on ${date} at ${time}.`;
     const encodedText = encodeURIComponent(message);
-    window.open(`https://wa.me/91${mobile}?text=${encodedText}`, '_blank');
+    const cleanMobile = mobile.replace(/[^\d]/g, '');
+    const mobileWithCountry = cleanMobile.startsWith('91') ? cleanMobile : `91${cleanMobile}`;
+    window.open(`https://wa.me/${mobileWithCountry}?text=${encodedText}`, '_blank');
     showFeedback(`Opened WhatsApp communication for ${name}`);
   };
 

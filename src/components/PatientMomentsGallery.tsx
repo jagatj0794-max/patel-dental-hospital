@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Eye, Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PatientMoment } from '../types';
@@ -14,6 +14,104 @@ interface PatientMomentsGalleryProps {
   isStandalonePage?: boolean;
   onNavigate?: (page: string) => void;
 }
+
+const ROW_HEIGHT = 4; // 4px per grid auto-row unit
+const GAP = 16; // 16px gap between grid items
+
+interface GalleryCardItemProps {
+  moment: PatientMoment;
+  index: number;
+  onClick: () => void;
+}
+
+const GalleryCardItem: React.FC<GalleryCardItemProps> = ({ moment, index, onClick }) => {
+  const itemRef = useRef<HTMLDivElement>(null);
+  const [span, setSpan] = useState<number | undefined>(undefined);
+
+  const updateSpan = useCallback(() => {
+    if (!itemRef.current) return;
+    const img = itemRef.current.querySelector('img');
+    
+    let contentHeight = 0;
+    if (img) {
+      const imgHeight = img.getBoundingClientRect().height || img.offsetHeight;
+      if (imgHeight > 0) {
+        contentHeight = imgHeight;
+      } else if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        const renderedWidth = itemRef.current.clientWidth || 250;
+        contentHeight = (img.naturalHeight / img.naturalWidth) * renderedWidth;
+      }
+    }
+
+    if (contentHeight <= 0) {
+      contentHeight = itemRef.current.offsetHeight;
+    }
+
+    if (contentHeight > 0) {
+      // Add 2px for border (1px top + 1px bottom)
+      const totalHeight = contentHeight + 2;
+      const calculatedSpan = Math.ceil((totalHeight + GAP) / (ROW_HEIGHT + GAP));
+      setSpan(calculatedSpan);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = itemRef.current;
+    if (!el) return;
+
+    updateSpan();
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        updateSpan();
+      });
+      resizeObserver.observe(el);
+    }
+
+    window.addEventListener('resize', updateSpan);
+
+    return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener('resize', updateSpan);
+    };
+  }, [updateSpan]);
+
+  return (
+    <motion.div
+      ref={itemRef}
+      key={moment.id}
+      id={`patient-moment-card-${moment.id}`}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.45, delay: (index % 4) * 0.05 }}
+      onClick={onClick}
+      style={{
+        gridRowEnd: span ? `span ${span}` : undefined,
+      }}
+      className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.015)] hover:shadow-[0_16px_35px_rgba(8,28,58,0.08)] transition-shadow duration-300 group cursor-pointer relative self-start w-full"
+    >
+      <div className="overflow-hidden relative bg-slate-50 w-full">
+        <img
+          src={moment.image}
+          alt="Patel Dental Hospital Patient Moment"
+          className="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-105"
+          referrerPolicy="no-referrer"
+          loading="lazy"
+          onLoad={updateSpan}
+        />
+        <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="bg-white/95 backdrop-blur-xs p-3.5 rounded-full shadow-lg transform translate-y-3 group-hover:translate-y-0 transition-all duration-300">
+            <Maximize2 className="h-5 w-5 text-[#0D9488]" />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 export default function PatientMomentsGallery({
   patientMoments,
@@ -26,6 +124,73 @@ export default function PatientMomentsGallery({
 
   const [visibleCount, setVisibleCount] = useState(isStandalonePage ? momentsToRender.length : 12);
   const [selectedMomentIndex, setSelectedMomentIndex] = useState<number | null>(null);
+  const [navbarHeight, setNavbarHeight] = useState<number>(0);
+
+  // Dynamically detect and update navbar height
+  useEffect(() => {
+    const updateNavbarHeight = () => {
+      const navbarEl = document.getElementById('app-navbar');
+      if (navbarEl) {
+        setNavbarHeight(navbarEl.offsetHeight);
+      } else {
+        setNavbarHeight(100);
+      }
+    };
+
+    updateNavbarHeight();
+
+    const navbarEl = document.getElementById('app-navbar');
+    let resizeObserver: ResizeObserver | null = null;
+    if (navbarEl && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        updateNavbarHeight();
+      });
+      resizeObserver.observe(navbarEl);
+    }
+
+    window.addEventListener('resize', updateNavbarHeight);
+    window.addEventListener('scroll', updateNavbarHeight);
+
+    return () => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener('resize', updateNavbarHeight);
+      window.removeEventListener('scroll', updateNavbarHeight);
+    };
+  }, []);
+
+  // Lock body scroll when lightbox modal is open
+  useEffect(() => {
+    if (selectedMomentIndex !== null) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedMomentIndex]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (selectedMomentIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedMomentIndex(null);
+      } else if (e.key === 'ArrowLeft') {
+        setSelectedMomentIndex((prev) => 
+          prev !== null ? (prev === 0 ? momentsToRender.length - 1 : prev - 1) : null
+        );
+      } else if (e.key === 'ArrowRight') {
+        setSelectedMomentIndex((prev) => 
+          prev !== null ? (prev === momentsToRender.length - 1 ? 0 : prev + 1) : null
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedMomentIndex, momentsToRender.length]);
 
   const handleViewMore = () => {
     if (!isStandalonePage) {
@@ -60,34 +225,21 @@ export default function PatientMomentsGallery({
           <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
         </div>
 
-        {/* Masonry pure-image layout columns */}
-        <div className="columns-1 sm:columns-2 lg:columns-4 gap-5 space-y-5 [column-fill:_balance]">
+        {/* Dynamically calculated CSS Grid Masonry layout with no image cropping */}
+        <div 
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          style={{
+            gridAutoRows: `${ROW_HEIGHT}px`,
+            gap: `${GAP}px`,
+          }}
+        >
           {momentsToRender.slice(0, visibleCount).map((moment, index) => (
-            <motion.div
+            <GalleryCardItem
               key={moment.id}
-              id={`patient-moment-card-${moment.id}`}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: (index % 4) * 0.05 }}
+              moment={moment}
+              index={index}
               onClick={() => setSelectedMomentIndex(index)}
-              className="break-inside-avoid bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.015)] hover:shadow-[0_16px_35px_rgba(8,28,58,0.08)] transition-all duration-300 group cursor-pointer relative"
-            >
-              <div className="overflow-hidden relative bg-slate-50">
-                <img
-                  src={moment.image}
-                  alt="Patel Dental Hospital Patient Moment"
-                  className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <div className="bg-white/95 backdrop-blur-xs p-3.5 rounded-full shadow-lg transform translate-y-3 group-hover:translate-y-0 transition-all duration-300">
-                    <Maximize2 className="h-5 w-5 text-[#0D9488]" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+            />
           ))}
         </div>
 
@@ -107,7 +259,7 @@ export default function PatientMomentsGallery({
 
       </div>
 
-      {/* Lightbox Modal overlay specifically designed for smiling patient moments */}
+      {/* Lightbox Modal overlay positioned strictly below navbar */}
       <AnimatePresence>
         {selectedMomentIndex !== null && (() => {
           const currentItem = momentsToRender[selectedMomentIndex];
@@ -131,13 +283,17 @@ export default function PatientMomentsGallery({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[200] flex items-center justify-center p-3 sm:p-6 md:p-10 select-none cursor-default"
+              style={{
+                top: `${navbarHeight}px`,
+                height: `calc(100vh - ${navbarHeight}px)`,
+              }}
+              className="fixed left-0 right-0 bg-slate-950/95 backdrop-blur-md z-40 flex items-center justify-center p-3 sm:p-6 md:p-8 select-none cursor-default overflow-hidden"
               onClick={() => setSelectedMomentIndex(null)}
             >
               <button
                 id="lightbox-close-button"
                 onClick={() => setSelectedMomentIndex(null)}
-                className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-white/10 hover:bg-white/20 text-white p-2.5 rounded-full transition-all duration-200 cursor-pointer z-[210] shadow-md hover:scale-105 flex items-center justify-center"
+                className="absolute top-3 right-3 sm:top-5 sm:right-5 bg-white/10 hover:bg-white/20 text-white p-2.5 rounded-full transition-all duration-200 cursor-pointer z-50 shadow-md hover:scale-105 flex items-center justify-center"
                 title="Close Gallery"
               >
                 <X className="h-5 w-5" />
@@ -146,7 +302,7 @@ export default function PatientMomentsGallery({
               <button
                 id="lightbox-prev-button"
                 onClick={handlePrev}
-                className="absolute left-3 sm:left-6 bg-white/10 hover:bg-white/20 text-white p-3 sm:p-4 rounded-full transition-all duration-200 cursor-pointer z-[210] shadow-md hover:scale-105 flex items-center justify-center"
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 sm:p-4 rounded-full transition-all duration-200 cursor-pointer z-50 shadow-md hover:scale-105 flex items-center justify-center"
                 title="Previous Photo"
               >
                 <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -158,15 +314,18 @@ export default function PatientMomentsGallery({
                 exit={{ scale: 0.95 }}
                 transition={{ type: "spring", damping: 25, stiffness: 180 }}
                 onClick={(e) => e.stopPropagation()}
-                className="max-w-4xl max-h-[85vh] z-[205] overflow-hidden rounded-3xl relative flex flex-col justify-center items-center"
+                className="relative flex flex-col items-center justify-center max-w-full max-h-full p-2 sm:p-4"
               >
                 <img
                   src={currentItem.image}
                   alt="Patient Moment Zoomed"
-                  className="max-w-full max-h-[85vh] object-contain rounded-3xl shadow-2xl pointer-events-none"
+                  style={{
+                    maxHeight: `calc(100vh - ${navbarHeight}px - 100px)`,
+                  }}
+                  className="max-w-full w-auto h-auto object-contain rounded-2xl sm:rounded-3xl shadow-2xl pointer-events-none"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute bottom-4 bg-[#081C3A]/70 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 font-mono text-[11px] tracking-wider uppercase select-none">
+                <div className="mt-3 bg-[#081C3A]/80 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 font-mono text-[11px] sm:text-[12px] tracking-wider uppercase select-none shadow-md border border-white/10">
                   Photo {selectedMomentIndex + 1} of {momentsToRender.length}
                 </div>
               </motion.div>
@@ -174,7 +333,7 @@ export default function PatientMomentsGallery({
               <button
                 id="lightbox-next-button"
                 onClick={handleNext}
-                className="absolute right-3 sm:right-6 bg-white/10 hover:bg-white/20 text-white p-3 sm:p-4 rounded-full transition-all duration-200 cursor-pointer z-[210] shadow-md hover:scale-105 flex items-center justify-center"
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 sm:p-4 rounded-full transition-all duration-200 cursor-pointer z-50 shadow-md hover:scale-105 flex items-center justify-center"
                 title="Next Photo"
               >
                 <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -186,3 +345,4 @@ export default function PatientMomentsGallery({
     </section>
   );
 }
+

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
   HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, PatientMoment, ContactInfo, Service, AwardItem } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { getWhatsAppUrl } from '../utils/contactData';
 import { awardsService } from '../utils/awardsData';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { InstagramEmbed } from '../components/InstagramEmbed';
@@ -400,6 +401,44 @@ export default function Home({
 
   const [selectedAward, setSelectedAward] = useState<AwardItem | null>(null);
 
+  const sequenceRef = useRef<HTMLDivElement>(null);
+  const [marqueeDistance, setMarqueeDistance] = useState<number>(0);
+
+  useEffect(() => {
+    const sequenceElement = sequenceRef.current;
+    if (!sequenceElement) return;
+
+    const updateWidth = () => {
+      const rect = sequenceElement.getBoundingClientRect();
+      if (rect.width > 0) {
+        setMarqueeDistance(rect.width);
+      }
+    };
+
+    updateWidth();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateWidth();
+    });
+    resizeObserver.observe(sequenceElement);
+
+    const images = sequenceElement.querySelectorAll('img');
+    images.forEach(img => {
+      if (img.complete) {
+        updateWidth();
+      } else {
+        img.addEventListener('load', updateWidth);
+      }
+    });
+
+    return () => {
+      resizeObserver.disconnect();
+      images.forEach(img => {
+        img.removeEventListener('load', updateWidth);
+      });
+    };
+  }, [horizontalAwards]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -557,49 +596,7 @@ export default function Home({
                 </div>
               </div>
 
-              {/* Desktop-only Quick Information Cards section */}
-              <div className="hidden lg:grid grid-cols-2 gap-3.5 w-[430px] xl:w-[460px] max-w-none mt-5 mb-6 relative z-30">
-                {/* CARD 1 */}
-                <div className="flex flex-col justify-center bg-[#1E3A5F] text-white px-4 py-3 xl:px-4.5 xl:py-3.5 rounded-[16px] shadow-md border border-[#1E3A5F] h-[135px] xl:h-[140px]">
-                  <div>
-                    <h3 className="font-display text-[15px] xl:text-[16px] font-extrabold tracking-wide uppercase text-white mb-1.5 leading-tight">
-                      Need Dental Consultation?
-                    </h3>
-                    <p className="font-sans text-[12.5px] xl:text-[13.5px] text-white/80 font-medium">
-                      Please Call Us
-                    </p>
-                    <p className="font-display text-[18px] xl:text-[20px] font-extrabold text-[#C9A96E] mt-1.5">
-                      +91 9510397046
-                    </p>
-                  </div>
-                </div>
-
-                {/* CARD 2 */}
-                <div className="flex flex-col justify-center bg-[#E6F6F4] px-4 py-3 xl:px-4.5 xl:py-3.5 rounded-[16px] shadow-md border border-[#E6F6F4]/50 h-[135px] xl:h-[140px]">
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <Clock className="h-4 w-4 text-[#00897B] shrink-0" />
-                      <h3 className="font-display text-[15px] xl:text-[16px] font-extrabold tracking-wide uppercase text-[#1E3A5F] leading-tight">
-                        Working Hours
-                      </h3>
-                    </div>
-                    <div className="space-y-1">
-                      <div>
-                        <div className="text-[#1E3A5F] font-extrabold text-[12px] xl:text-[13px]">Monday – Saturday</div>
-                        <div className="text-[#4B5563] text-[11px] xl:text-[12px] font-semibold leading-snug">
-                          09:00 AM – 01:00 PM<br />
-                          04:00 PM – 08:00 PM
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-[#1E3A5F] font-extrabold text-[12px] xl:text-[13px]">
-                          Sunday: <span className="text-[#00897B] font-black">Closed</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Quick Information Cards removed from inside the hero on desktop per layout update */}
 
               {/* Two CTA buttons positioned exactly below description/trust statement */}
               <div className="mt-6 lg:mt-8 flex flex-col sm:flex-row items-center justify-start gap-4 w-full max-w-[450px]">
@@ -613,7 +610,7 @@ export default function Home({
                 </button>
 
                 <a
-                  href={`https://wa.me/${whatsappRaw}`}
+                  href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="h-[56px] w-full sm:flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[16.5px] font-extrabold rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
@@ -673,7 +670,7 @@ export default function Home({
             {/* 4 & 5. Buttons below description, horizontal row of two equal buttons with improved styling */}
             <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[340px] sm:max-w-[380px] mx-auto">
               <button
-                onClick={openAppointmentModal}
+                onClick={() => openAppointmentModal()}
                 className="h-[46px] sm:h-[50px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
                 <Calendar className="h-[14px] w-[14px] shrink-0" />
@@ -681,7 +678,7 @@ export default function Home({
               </button>
 
               <a
-                href={`https://wa.me/${whatsappRaw}`}
+                href={getWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-[46px] sm:h-[50px] flex-1 bg-white text-[#00897B] text-[11px] sm:text-[12.5px] font-extrabold rounded-[14px] sm:rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] hover:bg-[#00897B]/5 shadow-[0_5px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
@@ -754,14 +751,14 @@ export default function Home({
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-3 w-full mt-5 max-w-xs">
                 <button
-                  onClick={openAppointmentModal}
+                  onClick={() => openAppointmentModal()}
                   className="h-[44px] bg-[#00897B] hover:bg-[#00796B] text-[#FFFFFF] text-[13px] font-bold rounded-lg flex items-center justify-center active:scale-98 transition-all duration-300 shadow-sm text-center cursor-pointer"
                 >
                   Free Consultation
                 </button>
 
                 <a
-                  href={`https://wa.me/${whatsappRaw}`}
+                  href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="h-[44px] bg-[#FFFFFF] hover:bg-[#00897B] text-[#00897B] hover:text-[#FFFFFF] text-[13px] font-bold rounded-lg border-2 border-[#00897B] flex items-center justify-center active:scale-98 transition-all duration-300 text-center cursor-pointer"
@@ -774,95 +771,211 @@ export default function Home({
           </div>
         </div>
 
-        {/* BOTTOM TRUST BAR - Luxury white floating card centered horizontally */}
-        <div className="hidden lg:flex absolute left-0 right-0 bottom-0 translate-y-1/2 z-40 px-4 sm:px-6 justify-center pointer-events-none">
+        {/* NEW 3-CARD INFORMATION ROW FOR DESKTOP ONLY - Luxury floating row centered horizontally */}
+        <div className="hidden lg:flex absolute left-0 right-0 bottom-0 translate-y-1/2 z-40 px-4 sm:px-6 xl:px-8 justify-center pointer-events-none" id="desktop-3-card-row-container">
           <motion.div
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="w-full max-w-[1340px] bg-white border border-slate-100/90 rounded-2xl md:rounded-[28px] py-5 px-5 lg:px-6 shadow-[0_20px_40px_rgba(8,28,58,0.12)] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-2 items-center relative hover:shadow-[0_25px_45px_rgba(8,28,58,0.16)] transition-all duration-500 pointer-events-auto"
+            className="w-full max-w-[1360px] grid grid-cols-3 gap-0 relative pointer-events-auto rounded-[24px] overflow-hidden shadow-[0_25px_50px_rgba(8,28,58,0.2)] border border-slate-200/40"
           >
-            {/* Card 1: Digital Dental Experts */}
-            <div className="flex items-center space-x-3 sm:space-x-3.5">
-              <div className="h-11 w-11 lg:h-12 lg:w-12 xl:h-13 xl:w-13 bg-sky-50 border border-sky-100/50 rounded-full flex items-center justify-center text-[#0EA5E9] shrink-0 shadow-sm">
-                <Cpu className="h-5 w-5 lg:h-6 lg:w-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0">
-                <span className="font-bold text-[#081C3A] text-[13px] xl:text-[14px] leading-tight mb-0.5">
-                  Digital Dental Experts
-                </span>
-                <span className="text-[11px] xl:text-[12px] text-slate-500 font-medium tracking-normal leading-tight">
-                  Advanced Digital Diagnosis &amp; Treatment
-                </span>
-              </div>
-            </div>
-
-            {/* Card 2: Dental Implant Specialists */}
-            <div className="flex items-center space-x-3 sm:space-x-3.5 lg:border-l lg:border-slate-200/50 lg:pl-3 xl:pl-4">
-              <div className="h-11 w-11 lg:h-12 lg:w-12 xl:h-13 xl:w-13 bg-[#F0FDFA] border border-[#CCFBF1] rounded-full flex items-center justify-center text-[#14B8A6] shrink-0 shadow-sm">
-                <DentalImplantIcon className="h-5 w-5 lg:h-6 lg:w-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0">
-                <span className="font-bold text-[#081C3A] text-[13px] xl:text-[14px] leading-tight mb-0.5">
-                  Dental Implant Specialists
-                </span>
-                <span className="text-[11px] xl:text-[12px] text-slate-500 font-medium tracking-normal leading-tight">
-                  Advanced Implant Solutions
-                </span>
+            {/* CARD 1 — EMERGENCY DENTAL TREATMENT */}
+            <div className="flex flex-col items-center justify-center text-center bg-[#1E3A5F] text-white py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300">
+              <div className="flex flex-col items-center justify-center min-w-0">
+                <h3 className="font-display text-[17px] xl:text-[20px] font-black tracking-wider uppercase text-[#C9A96E] mb-4 text-center leading-snug">
+                  CALL US FOR EMERGENCY<br />DENTAL TREATMENT
+                </h3>
+                <p className="font-sans text-[11px] xl:text-[12px] text-white/90 font-bold uppercase tracking-wider text-center leading-none mb-2">
+                  PLEASE CALL US AT
+                </p>
+                <a 
+                  href={`tel:${phoneRaw}`} 
+                  className="block font-display text-[22px] xl:text-[26px] font-black text-white hover:text-[#C9A96E] transition-colors whitespace-nowrap leading-none text-center"
+                >
+                  +91 9510397046
+                </a>
               </div>
             </div>
 
-            {/* Card 3: Braces & Invisible Aligner Experts */}
-            <div className="flex items-center space-x-3 sm:space-x-3.5 lg:border-l lg:border-slate-200/50 lg:pl-3 xl:pl-4">
-              <div className="h-11 w-11 lg:h-12 lg:w-12 xl:h-13 xl:w-13 bg-blue-50/70 border border-blue-100/50 rounded-full flex items-center justify-center text-[#0284c7] shrink-0 shadow-sm">
-                <ClearAlignerIcon className="h-5 w-5 lg:h-6 lg:w-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0">
-                <span className="font-bold text-[#081C3A] text-[13px] xl:text-[14px] leading-tight mb-0.5">
-                  Braces &amp; Invisible Aligner Experts
-                </span>
-                <span className="text-[11px] xl:text-[12px] text-slate-500 font-medium tracking-normal leading-tight">
-                  Modern Invisible Orthodontics
-                </span>
+            {/* CARD 2 — OPENING HOURS */}
+            <div className="flex flex-col justify-start bg-[#008F83] text-white py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300">
+              <h3 className="font-display text-[22px] xl:text-[26px] font-bold text-white mb-4 text-left leading-none">
+                Opening Hours
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Monday - Saturday */}
+                <div className="flex items-start space-x-4">
+                  <div className="h-10 w-10 bg-[#8BC34A] rounded-full flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-white leading-tight">
+                      Monday - Saturday
+                    </h4>
+                    <p className="font-sans text-[14px] xl:text-[15px] text-white/90 font-medium mt-1 leading-snug">
+                      09:00 AM - 01:00 PM
+                    </p>
+                    <p className="font-sans text-[14px] xl:text-[15px] text-white/90 font-medium leading-snug">
+                      04:00 PM - 08:00 PM
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sunday */}
+                <div className="flex items-start space-x-4">
+                  <div className="h-10 w-10 bg-[#8BC34A] rounded-full flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-white leading-tight">
+                      Sunday
+                    </h4>
+                    <p className="font-sans text-[14px] xl:text-[15px] text-[#FFCDD2] font-extrabold mt-1 uppercase tracking-wider leading-snug">
+                      CLOSED
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Card 4: FMR & Root Canal Specialists */}
-            <div className="flex items-center space-x-3 sm:space-x-3.5 lg:border-l lg:border-slate-200/50 lg:pl-3 xl:pl-4">
-              <div className="h-11 w-11 lg:h-12 lg:w-12 xl:h-13 xl:w-13 bg-emerald-50/50 border border-emerald-100/40 rounded-full flex items-center justify-center text-[#10B981] shrink-0 shadow-sm">
-                <RootCanalIcon className="h-5 w-5 lg:h-6 lg:w-6" />
+            {/* CARD 3 — FREE CONSULTATION */}
+            <div 
+              className="flex items-center space-x-6 bg-[#E5F5F5] text-[#1E3A5F] py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300"
+            >
+              <div className="h-14 w-14 bg-[#008F83] rounded-full flex items-center justify-center text-white shrink-0 shadow-md">
+                <Calendar className="h-7 w-7" />
               </div>
-              <div className="flex flex-col justify-center min-w-0">
-                <span className="font-bold text-[#081C3A] text-[13px] xl:text-[14px] leading-tight mb-0.5">
-                  FMR &amp; Root Canal Specialists
-                </span>
-                <span className="text-[11px] xl:text-[12px] text-slate-500 font-medium tracking-normal leading-tight">
-                  Comprehensive Smile Designing &amp; Full Mouth Rehabilitation
-                </span>
+              <div className="flex-grow min-w-0">
+                <h3 className="font-display text-[17px] xl:text-[20px] font-black tracking-widest uppercase text-[#008F83] mb-1.5 whitespace-nowrap">
+                  Free Consultation
+                </h3>
+                <div className="text-[#1E3A5F] font-black text-[14px] xl:text-[15.5px] leading-tight mt-1">
+                  PATEL DENTAL HOSPITAL
+                </div>
+                <p className="font-sans text-[11px] xl:text-[12px] text-[#4B5563] font-medium leading-tight mt-1.5">
+                  Awarded as Best Dental Hospital by FAMDENT
+                </p>
+                <div className="mt-4">
+                  <button 
+                    onClick={() => openAppointmentModal()}
+                    className="w-full inline-flex items-center justify-center space-x-2 text-[12px] xl:text-[13px] font-black uppercase tracking-widest text-white bg-[#008F83] hover:bg-[#007a70] py-3.5 px-6 rounded-xl transition-all duration-300 cursor-pointer text-center shadow-[0_4px_12px_rgba(0,143,131,0.25)] hover:shadow-[0_6px_16px_rgba(0,143,131,0.4)] transform hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <Calendar className="h-4 w-4 shrink-0" />
+                    <span className="whitespace-nowrap">Free Consultation</span>
+                  </button>
+                </div>
               </div>
             </div>
+          </motion.div>
+        </div>
+      </section>
+      {/* 3. Patel Dental Hospital Milestones */}
+      <section className="pt-12 sm:pt-16 lg:pt-[130px] xl:pt-[135px] pb-8 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* New Horizontal Desktop Feature Section (Desktop Only) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="hidden lg:block lg:mt-[55px] mb-16"
+          >
+            <div className="w-full bg-white rounded-[24px] border border-slate-200/50 shadow-[0_15px_40px_rgba(8,28,58,0.06)] overflow-hidden">
+              <div className="grid grid-cols-5 gap-0">
+                {/* COLUMN 1 */}
+                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/Digital Dental Experts.webp" 
+                      alt="Digital Dental Experts" 
+                      className="h-[42px] w-[62px] object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    Digital Dental Experts
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-medium leading-relaxed">
+                    Advanced Digital Diagnosis & Treatment
+                  </p>
+                </div>
 
-            {/* Card 5: Oral & Maxillofacial Surgery */}
-            <div className="flex items-center space-x-3 sm:space-x-3.5 lg:border-l lg:border-slate-200/50 lg:pl-3 xl:pl-4">
-              <div className="h-11 w-11 lg:h-12 lg:w-12 xl:h-13 xl:w-13 bg-indigo-50/70 border border-indigo-100/50 rounded-full flex items-center justify-center text-[#6366F1] shrink-0 shadow-sm">
-                <Stethoscope className="h-5 w-5 lg:h-6 lg:w-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0">
-                <span className="font-bold text-[#081C3A] text-[13px] xl:text-[14px] leading-tight mb-0.5">
-                  Oral &amp; Maxillofacial Surgery
-                </span>
-                <span className="text-[11px] xl:text-[12px] text-slate-500 font-medium tracking-normal leading-tight">
-                  Advanced Oral Surgery &amp; Facial Reconstruction
-                </span>
+                {/* COLUMN 2 */}
+                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/Dental Implants.webp" 
+                      alt="Dental Implant Specialists" 
+                      className="h-[60px] w-[60px] object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    Dental Implant Specialists
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-medium leading-relaxed">
+                    Advanced Implant Solutions
+                  </p>
+                </div>
+
+                {/* COLUMN 3 */}
+                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/Aligners.webp" 
+                      alt="Braces & Invisible Aligner Experts" 
+                      className="h-[39px] w-[58px] object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    Braces & Invisible Aligner Experts
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-medium leading-relaxed">
+                    Modern Invisible Orthodontics
+                  </p>
+                </div>
+
+                {/* COLUMN 4 */}
+                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/Root Canal.webp" 
+                      alt="FMR & Root Canal Specialists" 
+                      className="h-[60px] w-[60px] object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    FMR & Root Canal Specialists
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-medium leading-relaxed">
+                    Comprehensive Smile Designing & Full Mouth Rehabilitation
+                  </p>
+                </div>
+
+                {/* COLUMN 5 */}
+                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/Oral & Maxillofacial Surgery.png" 
+                      alt="Oral & Maxillofacial Surgery" 
+                      className="h-[60px] w-[60px] object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    Oral & Maxillofacial Surgery
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-medium leading-relaxed">
+                    Advanced Oral Surgery & Facial Reconstruction
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
 
-        </div>
-      </section>
-      {/* 3. Patel Dental Hospital Milestones */}
-      <section className="pt-12 sm:pt-16 lg:pt-[160px] pb-8 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12">
             <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
               PATEL DENTAL HOSPITAL AT A GLANCE
@@ -886,7 +999,7 @@ export default function Home({
                 borderColor: "border-purple-100/40",
               },
               {
-                value: 2000,
+                value: 20000,
                 suffix: "+",
                 title: "Families",
                 subtitle: "Trusted Community",
@@ -900,7 +1013,7 @@ export default function Home({
                 suffix: "+",
                 title: "NRI Patients",
                 subtitle: "Global Smile Standards",
-                icon: "/worldwide-world-svgrepo-com.svg",
+                icon: "/world-1-svgrepo-com.svg",
                 color: "text-[#14B8A6]",
                 bgColor: "bg-[#F0FDFA]",
                 borderColor: "border-[#CCFBF1]",
@@ -910,7 +1023,7 @@ export default function Home({
                 suffix: "+",
                 title: "Dental Implants",
                 subtitle: "Fixed Teeth Solutions",
-                icon: "/tooth-svgrepo-com (1).svg",
+                icon: "/Dental Implant svg.svg",
                 color: "text-rose-500",
                 bgColor: "bg-rose-50/50",
                 borderColor: "border-rose-100/40",
@@ -920,7 +1033,7 @@ export default function Home({
                 suffix: "+",
                 title: "Full Mouth Rehabilitation",
                 subtitle: "Comprehensive Rehabilitation",
-                icon: "/face-with-open-mouth-svgrepo-com.svg",
+                icon: "/Full Mouth.webp",
                 color: "text-amber-500",
                 bgColor: "bg-amber-50/50",
                 borderColor: "border-amber-100/40",
@@ -930,7 +1043,7 @@ export default function Home({
                 suffix: "+",
                 title: "Root Canal Treatments",
                 subtitle: "Single Sitting Specialization",
-                icon: "/teeth-silhouette-svgrepo-com.svg",
+                icon: "/Root Canal Treatments.svg.svg",
                 color: "text-[#10B981]",
                 bgColor: "bg-emerald-50/50",
                 borderColor: "border-emerald-100/40",
@@ -950,7 +1063,7 @@ export default function Home({
                 suffix: "+",
                 title: "Aligners",
                 subtitle: "Clear Smile Alignment",
-                icon: "/teeth-svgrepo-com.svg",
+                icon: "/Aligners svg.svg",
                 color: "text-[#0ea5e9]",
                 bgColor: "bg-blue-50/70",
                 borderColor: "border-blue-100/50",
@@ -958,9 +1071,9 @@ export default function Home({
               {
                 value: 1000,
                 suffix: "+",
-                title: "DSD (Digital Smile Designing)",
+                title: "Smile Designing",
                 subtitle: "Aesthetic Smile Customization",
-                icon: "/face-smile-big-svgrepo-com.svg",
+                icon: "/Smile Designing.webp",
                 color: "text-teal-500",
                 bgColor: "bg-teal-50/50",
                 borderColor: "border-teal-100/40",
@@ -970,7 +1083,7 @@ export default function Home({
                 suffix: "+",
                 title: "Oral & Maxillofacial Surgeries",
                 subtitle: "Expert Surgical Solutions",
-                icon: "/tooth-svgrepo-com (1).svg",
+                icon: "/Oral & Maxillofacial Surgeries svg.svg",
                 color: "text-indigo-500",
                 bgColor: "bg-indigo-50/50",
                 borderColor: "border-indigo-100/40",
@@ -1017,7 +1130,18 @@ export default function Home({
                         <img 
                           src={item.icon} 
                           alt={item.title} 
-                          className="h-[38px] w-[38px] md:h-[50px] md:w-[50px] object-contain"
+                          className={item.title === "Root Canal Treatments" || item.title === "Dental Implants"
+                            ? "h-[50px] w-[34px] md:h-[66px] md:w-[44px] object-contain mx-auto"
+                            : item.title === "Aligners"
+                            ? "h-[34px] w-[50px] md:h-[44px] md:w-[66px] object-contain mx-auto"
+                            : item.title === "Full Mouth Rehabilitation"
+                            ? "h-[54px] w-[54px] md:h-[72px] md:w-[72px] object-contain mx-auto"
+                            : item.title === "NRI Patients"
+                            ? "h-[48px] w-[48px] md:h-[64px] md:w-[64px] object-contain mx-auto"
+                            : item.title === "Oral & Maxillofacial Surgeries" || item.title === "Smile Designing"
+                            ? "h-[52px] w-[52px] md:h-[68px] md:w-[68px] object-contain mx-auto"
+                            : "h-[38px] w-[38px] md:h-[50px] md:w-[50px] object-contain mx-auto"
+                          }
                           referrerPolicy="no-referrer"
                         />
                       ) : (
@@ -1058,7 +1182,7 @@ export default function Home({
             <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 justify-center items-start">
             {videosToRender.map((video, index) => (
               <motion.div
                 key={video.id}
@@ -1066,15 +1190,16 @@ export default function Home({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
-                className={video.videoPlatform === 'instagram' || video.videoPlatform === 'mp4' ? "w-full max-w-[430px] mx-auto flex flex-col items-center" : "bg-white rounded-[16px] overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_40px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col"}
+                className={video.videoPlatform === 'instagram' || video.videoPlatform === 'mp4' ? "w-full max-w-[240px] mx-auto flex flex-col items-center" : "bg-white rounded-[16px] overflow-hidden border border-slate-100 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col"}
               >
                 {video.videoPlatform === 'instagram' ? (
                   <InstagramEmbed
                     url={video.url || `https://www.instagram.com/p/${video.id}/`}
                     title={video.title}
+                    thumbnail={video.thumbnail}
                   />
                 ) : video.videoPlatform === 'mp4' ? (
-                  <div className="w-full max-w-[430px] mx-auto flex justify-center">
+                  <div className="w-full max-w-[240px] mx-auto flex justify-center">
                     <Mp4ReelPlayer src={video.url || video.id} />
                   </div>
                 ) : (
@@ -1102,7 +1227,6 @@ export default function Home({
                             loading="lazy"
                             referrerPolicy="no-referrer"
                           />
-                          <div className="absolute inset-0 bg-black/25 group-hover/video:bg-black/35 transition-colors duration-300 pointer-events-none" />
                           {/* Play Button Icon */}
                           <div className="absolute z-20 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#0D9488] group-hover/video:text-white transition-all duration-300 pointer-events-none">
                             <svg
@@ -1117,19 +1241,10 @@ export default function Home({
                         </button>
                       )}
                     </div>
-                    <div className="p-4 sm:p-5 flex-grow flex flex-col justify-between hidden md:flex">
-                      <div>
-                        <span className="inline-block text-[11px] font-bold text-[#0D9488] bg-[#F0FDFA] border border-[#CCFBF1] px-2.5 py-1 rounded-full mb-2">
-                          {video.treatment}
-                        </span>
-                        <h4 className="font-display font-bold text-[#081C3A] text-[15px] sm:text-[16px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
-                          {video.title}
-                        </h4>
-                      </div>
-                      <div className="text-slate-450 text-[12px] sm:text-[13px] font-medium mt-3 flex items-center justify-between border-t border-slate-50 pt-3">
-                        <span>Verified Testimonial</span>
-                        <span className="text-[#11B5D8]">★ Featured</span>
-                      </div>
+                    <div className="p-4 sm:p-5 flex-grow flex flex-col justify-center">
+                      <h4 className="font-display font-bold text-[#081C3A] text-[14px] sm:text-[15px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
+                        {video.title}
+                      </h4>
                     </div>
                   </>
                 )}
@@ -1199,11 +1314,15 @@ export default function Home({
                           transform: translate3d(0, 0, 0);
                         }
                         100% {
-                          transform: translate3d(-50%, 0, 0);
+                          transform: translate3d(calc(-1 * var(--marquee-distance, 0px)), 0, 0);
                         }
                       }
                       .animate-marquee-horizontal {
-                        animation: marquee-horizontal 38s linear infinite;
+                        animation: marquee-horizontal 110s linear infinite;
+                      }
+                      .animate-marquee-horizontal:hover,
+                      #awards-row-horizontal:hover .animate-marquee-horizontal {
+                        animation-play-state: paused;
                       }
                       @media (prefers-reduced-motion: reduce) {
                         .animate-marquee-horizontal {
@@ -1217,16 +1336,24 @@ export default function Home({
                     
                     {/* The marquee wrapper with hidden overflow */}
                     <div className="flex overflow-hidden w-full select-none pb-4 pt-2">
-                      <div className="flex flex-nowrap w-max animate-marquee-horizontal hover:[animation-play-state:paused]">
+                      <div 
+                        className="flex flex-nowrap w-max animate-marquee-horizontal"
+                        style={{ '--marquee-distance': `${marqueeDistance}px` } as React.CSSProperties}
+                      >
                         {/* Track 1 */}
-                        <div className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8">
+                        <div ref={sequenceRef} className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8">
                           {(() => {
-                            // Replicate the list if it has too few items to span the screen seamlessly
-                            const items = horizontalAwards.length < 5
-                              ? [...horizontalAwards, ...horizontalAwards, ...horizontalAwards, ...horizontalAwards]
-                              : horizontalAwards;
-                            return items.map((item, idx) => (
-                              <motion.div
+                            let baseItems = [...horizontalAwards];
+                            if (baseItems.length > 0 && baseItems.length < 10) {
+                              const multiplier = Math.ceil(10 / baseItems.length);
+                              let temp: typeof baseItems = [];
+                              for (let i = 0; i < multiplier; i++) {
+                                temp = [...temp, ...baseItems];
+                              }
+                              baseItems = temp;
+                            }
+                            return baseItems.map((item, idx) => (
+                              <div
                                 key={`track1-${item.id}-${idx}`}
                                 onClick={() => setSelectedAward(item)}
                                 className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
@@ -1236,21 +1363,27 @@ export default function Home({
                                   src={item.image_url}
                                   alt="Award & Recognition Horizontal"
                                   className="h-full w-auto object-contain object-center rounded-lg"
-                                  loading="lazy"
+                                  loading="eager"
                                   referrerPolicy="no-referrer"
                                 />
-                              </motion.div>
+                              </div>
                             ));
                           })()}
                         </div>
                         {/* Track 2 - Identical clone for seamless loop */}
                         <div className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8" aria-hidden="true">
                           {(() => {
-                            const items = horizontalAwards.length < 5
-                              ? [...horizontalAwards, ...horizontalAwards, ...horizontalAwards, ...horizontalAwards]
-                              : horizontalAwards;
-                            return items.map((item, idx) => (
-                              <motion.div
+                            let baseItems = [...horizontalAwards];
+                            if (baseItems.length > 0 && baseItems.length < 10) {
+                              const multiplier = Math.ceil(10 / baseItems.length);
+                              let temp: typeof baseItems = [];
+                              for (let i = 0; i < multiplier; i++) {
+                                temp = [...temp, ...baseItems];
+                              }
+                              baseItems = temp;
+                            }
+                            return baseItems.map((item, idx) => (
+                              <div
                                 key={`track2-${item.id}-${idx}`}
                                 onClick={() => setSelectedAward(item)}
                                 className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
@@ -1260,10 +1393,10 @@ export default function Home({
                                   src={item.image_url}
                                   alt="Award & Recognition Horizontal"
                                   className="h-full w-auto object-contain object-center rounded-lg"
-                                  loading="lazy"
+                                  loading="eager"
                                   referrerPolicy="no-referrer"
                                 />
-                              </motion.div>
+                              </div>
                             ));
                           })()}
                         </div>
@@ -1535,7 +1668,7 @@ export default function Home({
                   <div className="flex flex-col sm:flex-row gap-4">
                     {/* Primary Button */}
                     <button
-                      onClick={openAppointmentModal}
+                      onClick={() => openAppointmentModal()}
                       className="flex-1 flex items-center justify-center text-[13px] sm:text-[14px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] px-6 py-4 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95 text-center"
                     >
                       <Calendar className="h-4 w-4 mr-2" />
@@ -1544,7 +1677,7 @@ export default function Home({
                     
                     {/* Secondary Button */}
                     <a
-                      href={`https://wa.me/${whatsappRaw}?text=Hi%2C%20I%27d%20like%20to%20book%20a%20consultation%20at%20Patel%20Dental%20Hospital.`}
+                      href={getWhatsAppUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center text-[13px] sm:text-[14px] font-bold text-[#0D9488] bg-slate-50 border border-slate-100 hover:bg-[#F0FDFA] hover:border-[#CCFBF1] px-6 py-4 rounded-xl cursor-pointer transition-all duration-350 text-center"
@@ -1783,7 +1916,7 @@ export default function Home({
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <button
-                  onClick={openAppointmentModal}
+                  onClick={() => openAppointmentModal()}
                   className="inline-flex items-center justify-center text-[14px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-8 py-4 rounded-xl shadow-[0_4px_14px_0_rgba(14,165,233,0.3)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95 text-center"
                 >
                   <Calendar className="h-4.5 w-4.5 mr-2" />
@@ -1791,7 +1924,7 @@ export default function Home({
                 </button>
                 
                 <a
-                  href={`https://wa.me/${whatsappRaw}`}
+                  href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center text-[14px] font-bold text-[#0D9488] bg-[#EBFDFB] hover:bg-[#CCFBF1] px-8 py-4 rounded-xl border border-[#CCFBF1] hover:shadow-md cursor-pointer transition-all duration-300 transform active:scale-95 text-center"

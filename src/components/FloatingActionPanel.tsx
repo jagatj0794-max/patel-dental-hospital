@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Phone, Calendar, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ContactInfo } from '../types';
+import { getWhatsAppUrl } from '../utils/contactData';
 
 interface FloatingActionPanelProps {
   openAppointmentModal: (preselectedTreatment?: string) => void;
@@ -20,7 +21,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo 
   const whatsappRaw = contactInfo?.whatsappRaw || '919510397046';
   const displayPhone = contactInfo?.phone || '+91 9510397046';
 
-  const whatsappUrl = `https://wa.me/${whatsappRaw}?text=Hello%20Patel%20Dental%20Hospital,%20I%20would%20like%20to%20book%20a%20consultation%20appointment.%20Please%20guide%20me.`;
+  const whatsappUrl = getWhatsAppUrl();
   const telephoneUrl = `tel:${phoneRaw}`;
 
   return (

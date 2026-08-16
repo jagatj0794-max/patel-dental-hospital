@@ -91,8 +91,8 @@ CLINICAL EXPERIENCE
         desc: 'Biological tooth placement utilizing premium grade-V biocompatible titanium. Guided computerized insertion protocols targeting high-stability, zero-bone-loss outcomes.'
       },
       {
-        title: 'Full Smile Makeovers',
-        desc: 'Surgical and non-surgical smile reconstructions matching biological lip/face dynamics, meticulously mapped using advanced computer-aided facial proportions.'
+        title: 'Pediatric Dentistry',
+        desc: 'Specialized dental care for children focused on healthy teeth and gums, gentle treatments, preventive care, and creating a comfortable, positive dental experience.'
       },
       {
         title: 'Micro-Invasive General Care',
@@ -105,7 +105,7 @@ CLINICAL EXPERIENCE
   {
     id: 'vipul',
     name: 'Dr. Vipul Patel',
-    titles: 'BDS',
+    titles: 'MDS, Masters in Implantology (USA)',
     designation: 'Cosmetic/Aesthetic Dentist & Implantologist',
     img: '/dr. patel.png',
     briefIntro: `PROFESSIONAL PROFILE
@@ -172,10 +172,9 @@ CLINICAL EXPERIENCE
     bdsYear: '2006',
     bdsInstitution: 'Dental College Graduate',
     stats: [
-      { value: '2006', label: 'BDS Degree' },
-      { value: '20,000+', label: 'Successful Treatments' },
-      { value: '15,000+', label: 'Fixed Teeth Cases' },
-      { value: '18+', label: 'Years Experience' }
+      { value: '14+', label: 'Years Experience' },
+      { value: '21k+', label: 'Smiles Transformed' },
+      { value: '100%', label: 'Sterilization Standard' }
     ],
     expertises: [
       {
@@ -191,8 +190,8 @@ CLINICAL EXPERIENCE
         desc: 'Premium zirconia, metal-free CAD/CAM ceramic bridges, and precise crown fittings that withstand deep grinding pressures and perfectly mimic adjacent enamel gradients.'
       },
       {
-        title: 'Microscopic Endodontics',
-        desc: 'Highly structured single-sitting root canal treatments, utilizing high-torque precision rotary equipment and deep sterile sealing protocols for supreme tooth saving.'
+        title: 'Maxillofacial Surgery',
+        desc: 'Expert surgical management of facial trauma, impacted teeth, jaw deformities, and oral and facial conditions, with precise treatment focused on restoring function and facial aesthetics.'
       }
     ],
     branch: 'Amin Marg Branch',

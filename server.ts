@@ -32,7 +32,7 @@ async function startServer() {
 
   // API Proxy for Supabase requests
   app.all('/api/supabase/*', async (req, res) => {
-    const rawUrl = process.env.VITE_SUPABASE_URL;
+    const rawUrl = process.env.VITE_SUPABASE_URL || 'https://wmgzhqtqmnddfjykaykm.supabase.co';
     const supabaseUrl = sanitizeEnvValue(rawUrl);
 
     if (!supabaseUrl) {
@@ -62,13 +62,22 @@ async function startServer() {
         headers['content-type'] = req.headers['content-type'] as string;
       }
 
+      // Explicitly calculate and set content-length to prevent 411 Length Required / chunked upload failures on Supabase
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+        if (req.body && Buffer.isBuffer(req.body) && req.body.length > 0) {
+          headers['content-length'] = String(req.body.length);
+        } else if (req.headers['content-length']) {
+          headers['content-length'] = req.headers['content-length'] as string;
+        }
+      }
+
       const fetchOptions: RequestInit = {
         method: req.method,
         headers,
       };
 
-      // Set the body for payload methods
-      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.body) {
+      // Set the body for payload methods only if we have a valid non-empty Buffer
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.body && Buffer.isBuffer(req.body) && req.body.length > 0) {
         fetchOptions.body = req.body;
       }
 

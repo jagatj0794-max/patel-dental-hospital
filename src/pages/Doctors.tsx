@@ -17,6 +17,7 @@ const drVipulPatelImg = '/dr. patel.png';
 
 import { Doctor } from '../types';
 import { DoctorBioRenderer } from '../components/DoctorBioRenderer';
+import { contactService, DEFAULT_CONTACT_INFO, getWhatsAppUrl } from '../utils/contactData';
 
 interface DoctorsProps {
   openAppointmentModal: () => void;
@@ -24,6 +25,16 @@ interface DoctorsProps {
 }
 
 export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsProps) {
+  const [contactInfo, setContactInfo] = useState(DEFAULT_CONTACT_INFO);
+
+  React.useEffect(() => {
+    contactService.getContactInfo().then(data => {
+      setContactInfo(data);
+    }).catch((err) => {
+      console.error(err);
+    });
+  }, []);
+
   useSEO({
     title: 'Meet Our Specialist Doctors | Best Dentist in Rajkot',
     description: 'Get treated by the best dentists in Rajkot. Meet our senior dental specialists, Dr. Vipul Patel and Dr. Kinjal Patel, at Patel Dental Hospital. Expert care in dental implants, RCT, and smile design.',
@@ -85,18 +96,6 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                     className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
-                  
-                  {doctor.titles && (
-                    <span className="absolute bottom-4 right-4 bg-[#0B1B33]/85 backdrop-blur-md text-[#00E5FF] text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-[#00E5FF]/20">
-                      Degree: {doctor.titles}
-                    </span>
-                  )}
-
-                  {doctor.branch && (
-                    <span className="absolute bottom-4 left-4 bg-emerald-900/90 backdrop-blur-md text-white text-[10.5px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-emerald-500/20">
-                      📍 {doctor.branch}
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -127,52 +126,73 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                         <GraduationCap className="h-4.5 w-4.5 text-[#0ea5e9] shrink-0 mt-0.5" />
                         <div>
                           <p className="text-[11px] font-extrabold text-[#0B1B33]">Qualification</p>
-                          <p className="text-xs text-gray-500 font-sans">{doctor.titles} ({doctor.bdsInstitution})</p>
-                        </div>
-                      </div>
-                    )}
-                    {doctor.branch && (
-                      <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100 flex items-start space-x-2.5">
-                        <ShieldCheck className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-[11px] font-extrabold text-[#0B1B33]">Hospital Branch</p>
-                          <p className="text-xs text-gray-500 font-sans">{doctor.branch}</p>
+                          <p className="text-xs text-gray-500 font-sans">
+                            {doctor.id === 'vipul' ? 'MDS, Masters in Implantology (USA)' : `${doctor.titles} (${doctor.bdsInstitution})`}
+                          </p>
                         </div>
                       </div>
                     )}
                   </div>
 
                   {/* Quick Stats Grid */}
-                  {doctor.stats && doctor.stats.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                      {doctor.stats.map((stat, i) => (
-                        <div key={i} className="p-3 bg-slate-50/80 rounded-xl text-center border border-slate-100">
-                          <span className="block font-display font-black text-lg sm:text-xl text-[#0B1B33]">
-                            {stat.value}
-                          </span>
-                          <span className="block text-[9px] text-gray-400 font-black uppercase tracking-wider mt-1 leading-none">
-                            {stat.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {doctor.stats && doctor.stats.length > 0 && (() => {
+                    let displayedStats = doctor.stats;
+                    if (doctor.id === 'vipul') {
+                      displayedStats = [
+                        { value: '14+', label: 'Years Experience' },
+                        { value: '21k+', label: 'Smiles Transformed' },
+                        { value: '100%', label: 'Sterilization Standard' }
+                      ];
+                    } else if (doctor.id === 'kinjal') {
+                      displayedStats = [
+                        { value: '14+', label: 'Years Experience' },
+                        { value: '18k+', label: 'Smiles Transformed' },
+                        { value: '100%', label: 'Sterilization Standard' }
+                      ];
+                    }
+
+                    return (
+                      <div className={`grid ${displayedStats.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-3 pt-2`}>
+                        {displayedStats.map((stat, i) => (
+                          <div key={i} className="p-3 bg-slate-50/80 rounded-xl text-center border border-slate-100">
+                            <span className="block font-display font-black text-sm sm:text-base md:text-lg lg:text-xl text-[#0B1B33]">
+                              {stat.value}
+                            </span>
+                            <span className="block text-[8px] md:text-[9px] text-gray-400 font-black uppercase tracking-wider mt-1 leading-none">
+                              {stat.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Action Buttons */}
                 <div className="pt-2 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                   <button
-                    onClick={openAppointmentModal}
+                    onClick={() => openAppointmentModal()}
                     className="flex-1 bg-[#0ea5e9] hover:bg-[#0284c7] text-white text-xs font-extrabold py-3.5 px-6 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center shadow-sm hover:shadow-md"
                   >
-                    Book Consultation
+                    Book Free Consultation
                   </button>
-                  <button
-                    onClick={() => setActiveDoctor(doctor)}
-                    className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-[#0B1B33] text-xs font-extrabold py-3.5 px-6 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center"
-                  >
-                    View Full Profile Modal
-                  </button>
+                  {doctor.id === 'vipul' || doctor.id === 'kinjal' ? (
+                    <a
+                      href={getWhatsAppUrl(`Hello Patel Dental Hospital, I would like to book a free consultation with ${doctor.name}. Please share the available appointment slots.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-[#0B1B33] text-xs font-extrabold py-3.5 px-6 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center flex items-center justify-center"
+                    >
+                      WhatsApp Us
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => setActiveDoctor(doctor)}
+                      className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-[#0B1B33] text-xs font-extrabold py-3.5 px-6 rounded-xl transition duration-300 uppercase tracking-widest cursor-pointer text-center"
+                    >
+                      View Full Profile Modal
+                    </button>
+                  )}
                 </div>
 
               </div>
@@ -189,7 +209,21 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                     Specialized Procedures & Clinical Expertise
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {doctor.expertises.map((exp, idx) => (
+                    {doctor.expertises.map((exp) => {
+                      if (doctor.id === 'vipul' && (exp.title === 'Microscopic Endodontics' || exp.title === 'Maxillofacial Surgery')) {
+                        return {
+                          title: 'Maxillofacial Surgery',
+                          desc: 'Expert surgical management of facial trauma, impacted teeth, jaw deformities, and oral and facial conditions, with precise treatment focused on restoring function and facial aesthetics.'
+                        };
+                      }
+                      if (doctor.id === 'kinjal' && (exp.title === 'Full Smile Makeovers' || exp.title === 'Pediatric Dentistry')) {
+                        return {
+                          title: 'Pediatric Dentistry',
+                          desc: 'Specialized dental care for children focused on healthy teeth and gums, gentle treatments, preventive care, and creating a comfortable, positive dental experience.'
+                        };
+                      }
+                      return exp;
+                    }).map((exp, idx) => (
                       <div key={idx} className="bg-slate-50/70 p-3.5 rounded-xl border border-slate-100 flex items-start space-x-3">
                         <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
                         <div>
@@ -326,7 +360,21 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                     <div className="space-y-4 pt-4 border-t border-slate-100 animate-fade-in">
                       <h4 className="font-display font-extrabold text-xs uppercase tracking-wider text-slate-400">Clinical Focus & Specializations</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {activeDoctor.expertises.map((exp, idx) => (
+                        {activeDoctor.expertises.map((exp) => {
+                          if (activeDoctor.id === 'vipul' && (exp.title === 'Microscopic Endodontics' || exp.title === 'Maxillofacial Surgery')) {
+                            return {
+                              title: 'Maxillofacial Surgery',
+                              desc: 'Expert surgical management of facial trauma, impacted teeth, jaw deformities, and oral and facial conditions, with precise treatment focused on restoring function and facial aesthetics.'
+                            };
+                          }
+                          if (activeDoctor.id === 'kinjal' && (exp.title === 'Full Smile Makeovers' || exp.title === 'Pediatric Dentistry')) {
+                            return {
+                              title: 'Pediatric Dentistry',
+                              desc: 'Specialized dental care for children focused on healthy teeth and gums, gentle treatments, preventive care, and creating a comfortable, positive dental experience.'
+                            };
+                          }
+                          return exp;
+                        }).map((exp, idx) => (
                           <div key={idx} className="bg-white p-5 rounded-xl border border-slate-105 flex items-start space-x-3.5 shadow-2xs">
                             <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 mt-0.5" />
                             <div>

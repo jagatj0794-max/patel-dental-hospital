@@ -9,7 +9,8 @@ import { Service } from '../types';
 import { serviceService, DEFAULT_FMR_GOOGLE_REVIEWS, DEFAULT_FMR_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
-import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
+import ProcedureVideoCmsSection from './ProcedureVideoCmsSection';
+import TestimonialThumbnailUpload from './TestimonialThumbnailUpload';
 
 interface FullMouthRehabCmsProps {
   onSaveSuccess?: () => void;
@@ -807,16 +808,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* FEATURED TREATMENT VIDEO */}
-        <FeaturedVideoCmsSection
-          mConfig={mConfig}
-          updateMConfigField={updateMConfigField}
-          isExpanded={!!expandedSections.featuredVideo}
-          onToggle={() => toggleSection('featuredVideo')}
-          sectionNumber="2"
-        />
-
-        {/* 3. ABOUT FULL MOUTH REHABILITATION */}
+        {/* 2. ABOUT FULL MOUTH REHABILITATION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -826,7 +818,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. About Full Mouth Rehabilitation</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. About Full Mouth Rehabilitation</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introduction text, clinical overview, and highlight banner</span>
               </div>
             </div>
@@ -866,7 +858,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 3. HOW WE PERFORM FULL MOUTH REHABILITATION */}
+        {/* 2. HOW WE PERFORM FULL MOUTH REHABILITATION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -876,7 +868,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. How We Perform Full Mouth Rehabilitation</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. How We Perform Full Mouth Rehabilitation</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure step-by-step treatment process steps</span>
               </div>
             </div>
@@ -950,7 +942,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 4. TREATMENT PLANNING INCLUDES */}
+        {/* 3. TREATMENT PLANNING INCLUDES */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -960,7 +952,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Shield className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Treatment Planning Includes</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Treatment Planning Includes</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure inclusions, advantages, and clinical planning scope</span>
               </div>
             </div>
@@ -1028,7 +1020,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 5. WHO IS A CANDIDATE FOR FULL MOUTH REHABILITATION */}
+        {/* 4. WHO IS A CANDIDATE FOR FULL MOUTH REHABILITATION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1038,7 +1030,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Who Is a Candidate for Full Mouth Rehabilitation</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Who Is a Candidate for Full Mouth Rehabilitation</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure clinical criteria and candidate indications</span>
               </div>
             </div>
@@ -1280,7 +1272,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 6. CLINICAL CASE GALLERY (SIMPLIFIED - ONE GALLERY GRID, NO CATEGORIES) */}
+        {/* 5. CLINICAL CASE GALLERY (SIMPLIFIED - ONE GALLERY GRID, NO CATEGORIES) */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1290,7 +1282,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Upload, delete, and reorder full mouth clinical gallery images (Single Gallery)</span>
               </div>
             </div>
@@ -1382,63 +1374,18 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 7. PROCEDURE VIDEO */}
-        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleSection('procedure_video')}
-            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
-              <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure single clinical procedure demonstration video</span>
-              </div>
-            </div>
-            {expandedSections.procedure_video ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-          </button>
+        {/* 6. PROCEDURE VIDEO */}
+        <ProcedureVideoCmsSection
+          service={service}
+          mConfig={mConfig}
+          updateServiceField={updateServiceField}
+          updateMConfigField={updateMConfigField}
+          sectionNumber={7}
+          isExpanded={!!expandedSections.procedure_video}
+          onToggle={() => toggleSection('procedure_video')}
+        />
 
-          {expandedSections.procedure_video && (
-            <div className="p-6 border-t border-slate-100 space-y-5">
-              <CmsSectionToggle
-                checked={mConfig.show_procedure_video !== false}
-                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
-              />
-
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Procedure Video Title</label>
-                  <input
-                    type="text"
-                    value={mConfig.procedure_video_title || service.procedure_video_title || 'Full Mouth Rehabilitation Procedure'}
-                    onChange={(e) => {
-                      updateMConfigField('procedure_video_title', e.target.value);
-                      updateServiceField('procedure_video_title', e.target.value);
-                    }}
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Procedure Video URL (YouTube / Instagram Reel / MP4)</label>
-                  <input
-                    type="text"
-                    value={mConfig.procedure_video_url || service.procedure_video_url || ''}
-                    onChange={(e) => {
-                      updateMConfigField('procedure_video_url', e.target.value);
-                      updateServiceField('procedure_video_url', e.target.value);
-                    }}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488]"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 8. PATIENT TESTIMONIALS */}
+        {/* 7. PATIENT TESTIMONIALS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1448,7 +1395,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure multiple patient video review reels</span>
               </div>
             </div>
@@ -1512,6 +1459,14 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
                         <label className="text-[9px] font-bold text-slate-500 uppercase">Video URL (Instagram Reel / YouTube / MP4)</label>
                         <input type="text" value={testi.video_url || ''} onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)} className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-800" />
                       </div>
+
+                      <TestimonialThumbnailUpload
+                        value={testi.thumbnail || testi.thumbnail_url || ''}
+                        onChange={(url) => {
+                          updateTestimonialItemField(idx, 'thumbnail', url);
+                          updateTestimonialItemField(idx, 'thumbnail_url', url);
+                        }}
+                      />
                     </div>
 
                     <button type="button" onClick={() => deleteTestimonialItem(idx)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"><Trash2 className="h-4 w-4" /></button>
@@ -1522,7 +1477,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 9. HOSPITAL & TEAM GALLERY */}
+        {/* 8. HOSPITAL & TEAM GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1532,7 +1487,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure hospital infrastructure and specialist doctor team photos</span>
               </div>
             </div>
@@ -1635,7 +1590,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 10. COST / OFFER */}
+        {/* 9. COST / OFFER */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1645,7 +1600,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Offer</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure package pricing heading, descriptions, and starting offers</span>
               </div>
             </div>
@@ -1696,7 +1651,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 11. GOOGLE PATIENT REVIEWS */}
+        {/* 10. GOOGLE PATIENT REVIEWS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1706,7 +1661,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure service-specific Google reviews and ratings</span>
               </div>
             </div>
@@ -1780,7 +1735,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 12. BOTTOM CTA */}
+        {/* 11. BOTTOM CTA */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1790,7 +1745,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom call to action section, phone number, and WhatsApp link</span>
               </div>
             </div>
@@ -1840,7 +1795,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
           )}
         </div>
 
-        {/* 13. FAQ */}
+        {/* 12. FAQ */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1850,7 +1805,7 @@ export default function FullMouthRehabCms({ onSaveSuccess }: FullMouthRehabCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. FAQ Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. FAQ Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure service-specific frequently asked questions</span>
               </div>
             </div>

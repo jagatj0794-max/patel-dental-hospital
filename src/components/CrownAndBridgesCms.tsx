@@ -9,7 +9,8 @@ import { Service } from '../types';
 import { serviceService } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
-import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
+import ProcedureVideoCmsSection from './ProcedureVideoCmsSection';
+import TestimonialThumbnailUpload from './TestimonialThumbnailUpload';
 
 interface CrownAndBridgesCmsProps {
   onSaveSuccess?: () => void;
@@ -716,16 +717,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* FEATURED TREATMENT VIDEO */}
-        <FeaturedVideoCmsSection
-          mConfig={mConfig}
-          updateMConfigField={updateMConfigField}
-          isExpanded={!!expandedSections.featuredVideo}
-          onToggle={() => toggleSection('featuredVideo')}
-          sectionNumber="2"
-        />
-
-        {/* 3. WHAT ARE CROWN AND BRIDGES? */}
+        {/* 2. WHAT ARE CROWN AND BRIDGES? */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -735,7 +727,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Layers className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. What are Crown and Bridges?</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. What are Crown and Bridges?</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure introductory description and highlight banner box</span>
               </div>
             </div>
@@ -788,7 +780,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 3. CROWN & BRIDGES TREATMENT PLANNING */}
+        {/* 2. CROWN & BRIDGES TREATMENT PLANNING */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -798,7 +790,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Crown & Bridges Treatment Planning</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Crown & Bridges Treatment Planning</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure step-by-step clinical workflow steps</span>
               </div>
             </div>
@@ -906,7 +898,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 4. CROWN & BRIDGE MATERIALS */}
+        {/* 3. CROWN & BRIDGE MATERIALS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -916,7 +908,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Shield className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Crown & Bridge Materials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Crown & Bridge Materials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure material types (Metal Fused Ceramic, Metal-Free Zirconia, Natural Appearance, MRI Safe)</span>
               </div>
             </div>
@@ -1013,7 +1005,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 5. BEFORE & AFTER GALLERY */}
+        {/* 4. BEFORE & AFTER GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1023,7 +1015,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Before & After Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Before & After Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure slider comparison image pairs</span>
               </div>
             </div>
@@ -1185,7 +1177,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 6. CLINICAL CASE GALLERY */}
+        {/* 5. CLINICAL CASE GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1195,7 +1187,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure clinical case images and photos</span>
               </div>
             </div>
@@ -1329,63 +1321,18 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 7. PROCEDURE VIDEO */}
-        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleSection('video')}
-            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
-              <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Procedure Video</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure demonstration video URL</span>
-              </div>
-            </div>
-            {expandedSections.video ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-          </button>
+        {/* 6. PROCEDURE VIDEO */}
+        <ProcedureVideoCmsSection
+          service={service}
+          mConfig={mConfig}
+          updateServiceField={updateServiceField}
+          updateMConfigField={updateMConfigField}
+          sectionNumber={7}
+          isExpanded={!!expandedSections.video}
+          onToggle={() => toggleSection('video')}
+        />
 
-          {expandedSections.video && (
-            <div className="p-6 border-t border-slate-100 space-y-5">
-              <CmsSectionToggle
-                checked={mConfig.show_procedure_video !== false}
-                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
-              />
-
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video Title</label>
-                  <input
-                    type="text"
-                    value={mConfig.procedure_video_title || service.procedure_video_title || 'Crown & Bridges Procedure Video'}
-                    onChange={(e) => {
-                      updateMConfigField('procedure_video_title', e.target.value);
-                      updateServiceField('procedure_video_title', e.target.value);
-                    }}
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Video URL (YouTube / Instagram Reel)</label>
-                  <input
-                    type="text"
-                    value={mConfig.procedure_video_url || service.procedure_video_url || ''}
-                    onChange={(e) => {
-                      updateMConfigField('procedure_video_url', e.target.value);
-                      updateServiceField('procedure_video_url', e.target.value);
-                    }}
-                    placeholder="https://www.youtube.com/watch?v=... or Instagram Reel URL"
-                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-white text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488]"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 8. PATIENT TESTIMONIALS */}
+        {/* 7. PATIENT TESTIMONIALS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1395,7 +1342,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient review reels and testimonials</span>
               </div>
             </div>
@@ -1496,6 +1443,14 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
                         className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white"
                       />
                     </div>
+
+                    <TestimonialThumbnailUpload
+                      value={testi.thumbnail || testi.thumbnail_url || ''}
+                      onChange={(url) => {
+                        updateTestimonialField(idx, 'thumbnail', url);
+                        updateTestimonialField(idx, 'thumbnail_url', url);
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -1503,7 +1458,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 9. HOSPITAL & TEAM GALLERY */}
+        {/* 8. HOSPITAL & TEAM GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1513,7 +1468,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Users className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure hospital facilities and specialist doctors photos</span>
               </div>
             </div>
@@ -1649,7 +1604,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 10. COST / OFFER */}
+        {/* 9. COST / OFFER */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1659,7 +1614,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><DollarSign className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Cost / Offer</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost / Offer</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure treatment pricing packages and discount offers</span>
               </div>
             </div>
@@ -1760,7 +1715,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 11. GOOGLE PATIENT REVIEWS */}
+        {/* 10. GOOGLE PATIENT REVIEWS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1770,7 +1725,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure verified Google reviews and star ratings</span>
               </div>
             </div>
@@ -1859,7 +1814,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 12. BOTTOM CTA */}
+        {/* 11. BOTTOM CTA */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1869,7 +1824,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Phone className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom appointment booking call to action banner</span>
               </div>
             </div>
@@ -1920,7 +1875,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
           )}
         </div>
 
-        {/* 13. FAQ */}
+        {/* 12. FAQ */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1930,7 +1885,7 @@ export default function CrownAndBridgesCms({ onSaveSuccess }: CrownAndBridgesCms
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. Frequently Asked Questions (FAQ)</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Frequently Asked Questions (FAQ)</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure common patient questions and answers</span>
               </div>
             </div>

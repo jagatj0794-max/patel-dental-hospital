@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  UserCheck, ShieldCheck, GraduationCap, Microscope, Award, Clock, BookOpen, CheckCircle2 
+  UserCheck, ShieldCheck, GraduationCap, Microscope, Award, Clock, BookOpen, CheckCircle2, ArrowRight
 } from 'lucide-react';
 
 interface Block {
@@ -132,7 +132,7 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
   const isBulletLine = (line: string): boolean => {
     const trimmed = line.trim();
     if (!trimmed) return false;
-    if (/^[•\-\*\+–—>]\s+/.test(trimmed)) return true;
+    if (/^[•\-\*\+–—>]\s*/.test(trimmed)) return true;
     if (/^\d+[\.\)]\s+/.test(trimmed)) return true;
     if (/^[a-zA-Z][\.\)]\s+/.test(trimmed)) return true;
     return false;
@@ -141,7 +141,7 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
   const cleanBulletLine = (line: string): string => {
     return line
       .trim()
-      .replace(/^[•\-\*\+–—>]\s+/, '')
+      .replace(/^[•\-\*\+–—>]\s*/, '')
       .replace(/^\d+[\.\)]\s+/, '')
       .replace(/^[a-zA-Z][\.\)]\s+/, '')
       .trim();
@@ -253,9 +253,12 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
                 return (
                   <ul key={bIdx} className="grid grid-cols-1 gap-2.5 my-3">
                     {block.items.map((item, iIdx) => (
-                      <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-start space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 transition-colors">
-                        <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
-                        <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
+                      <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
+                        <div className="flex items-start space-x-3 flex-1">
+                          <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                          <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
                       </li>
                     ))}
                   </ul>

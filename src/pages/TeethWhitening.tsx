@@ -66,7 +66,7 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
   };
 
   const getWhatsAppUrl = (messageText?: string) => {
-    const text = messageText || `Hi Patel Dental Hospital, I'm interested in booking a consultation for Teeth Whitening. Please let me know the next available slot!`;
+    const text = messageText || `Hello Patel Dental Hospital, I would like to book a free consultation for Teeth Whitening. Please share the available appointment slots.`;
     return `https://wa.me/919510397046?text=${encodeURIComponent(text)}`;
   };
 

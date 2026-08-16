@@ -42,7 +42,11 @@ import {
   EyeOff,
   Heart,
   Bell,
-  BellRing
+  BellRing,
+  Plane,
+  Info,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, SocialServiceItem, TechnologyItem, AwardItem, InternationalPatientImage } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
@@ -73,6 +77,8 @@ import TeethWhiteningCms from '../components/TeethWhiteningCms';
 import PediatricDentistryCms from '../components/PediatricDentistryCms';
 import BracesTreatmentCms from '../components/BracesTreatmentCms';
 import WisdomToothSurgeryCms from '../components/WisdomToothSurgeryCms';
+import CmsSectionToggle from '../components/CmsSectionToggle';
+import TestimonialThumbnailUpload from '../components/TestimonialThumbnailUpload';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -96,7 +102,7 @@ interface AdminProps {
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>;
 }
 
-type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services' | 'implants-cms';
+type SidebarTab = 'dashboard' | 'hero' | 'doctors' | 'media' | 'appointments' | 'contact' | 'services' | 'implants-cms' | 'dental-tourism';
 
 const detectImageOrientation = (file: File): Promise<'horizontal' | 'vertical'> => {
   return new Promise((resolve) => {
@@ -333,6 +339,7 @@ export default function Admin({
   const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
   const [isLoadingInternationalPatients, setIsLoadingInternationalPatients] = useState(false);
   const [editingInternationalPatient, setEditingInternationalPatient] = useState<InternationalPatientImage | null>(null);
+  const [tourismSubTab, setTourismSubTab] = useState<'image' | 'video'>('image');
 
   const loadInternationalPatientsList = async () => {
     setIsLoadingInternationalPatients(true);
@@ -347,7 +354,7 @@ export default function Admin({
   };
 
   useEffect(() => {
-    if (activeTab === 'media') {
+    if (activeTab === 'media' || activeTab === 'dental-tourism') {
       loadSocialServicesList();
       loadTechnologyList();
       loadAwardsList();
@@ -364,6 +371,13 @@ export default function Admin({
   const [servicesError, setServicesError] = useState<string | null>(null);
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [expandedAddServiceSections, setExpandedAddServiceSections] = useState<Record<string, boolean>>({
+    core: true, // Keep the first one open by default
+  });
+
+  const toggleAddServiceSection = (sec: string) => {
+    setExpandedAddServiceSections(prev => ({ ...prev, [sec]: !prev[sec] }));
+  };
   const [serviceImgUploading, setServiceImgUploading] = useState(false);
   const [homePageImgUploading, setHomePageImgUploading] = useState(false);
   const [serviceFormError, setServiceFormError] = useState<string | null>(null);
@@ -2810,6 +2824,9 @@ export default function Admin({
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
   const [customVideoTitle, setCustomVideoTitle] = useState('');
+  const [videoThumbnailInput, setVideoThumbnailInput] = useState('');
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
+  const [thumbnailUploadError, setThumbnailUploadError] = useState<string | null>(null);
 
   // Image Edit Drawer states
   const [imageDrawerOpen, setImageDrawerOpen] = useState(false);
@@ -2868,23 +2885,41 @@ export default function Admin({
     audio.preload = 'auto';
     audioRef.current = audio;
 
-    // Interaction listener to unlock audio playback
+    // Interaction listener to unlock audio playback using a tiny silent audio stream
     const unlockAudio = () => {
-      if (audioRef.current) {
-        // Play and immediately pause to unlock audio context without playing sound early
-        audioRef.current.play()
-          .then(() => {
-            if (audioRef.current) {
-              audioRef.current.pause();
-              audioRef.current.currentTime = 0;
-            }
-            console.log('[Audio] Playback successfully unlocked via user interaction.');
-            cleanupListeners();
-          })
-          .catch(err => {
-            console.warn('[Audio] Failed to unlock audio context:', err);
-          });
-      }
+      // 1. Play a tiny base64 silent audio to unlock the browser's AudioContext completely
+      const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAAA');
+      silentAudio.play()
+        .then(() => {
+          console.log('[Audio] Browser AudioContext successfully unlocked via silent base64 playback.');
+          
+          // 2. Pre-warm our actual notification sound
+          if (audioRef.current) {
+            audioRef.current.play()
+              .then(() => {
+                if (audioRef.current) {
+                  audioRef.current.pause();
+                  audioRef.current.currentTime = 0;
+                }
+              })
+              .catch(() => {});
+          }
+          cleanupListeners();
+        })
+        .catch(err => {
+          console.warn('[Audio] Silent playback failed to unlock context, trying primary pre-warm directly:', err);
+          if (audioRef.current) {
+            audioRef.current.play()
+              .then(() => {
+                if (audioRef.current) {
+                  audioRef.current.pause();
+                  audioRef.current.currentTime = 0;
+                }
+                cleanupListeners();
+              })
+              .catch(e => console.warn('[Audio] Pre-warm failed:', e));
+          }
+        });
     };
 
     const cleanupListeners = () => {
@@ -2904,7 +2939,7 @@ export default function Admin({
     };
   }, []);
 
-  // Sound Player Function
+  // Sound Player Function with multiple format fallbacks
   const playNotificationSound = () => {
     try {
       if (!audioRef.current) {
@@ -2915,8 +2950,15 @@ export default function Admin({
       }
       audioRef.current.currentTime = 0;
       audioRef.current.play()
-        .then(() => console.log('[Audio] Chime played successfully.'))
-        .catch(e => console.warn('[Audio] Playback prevented or failed:', e));
+        .then(() => console.log('[Audio] Wav Chime played successfully.'))
+        .catch(e => {
+          console.warn('[Audio] Wav playback prevented or failed, trying mp3 fallback:', e);
+          const audioFallback = new Audio('/sounds/notification.wav.mp3');
+          audioFallback.volume = 0.55;
+          audioFallback.play()
+            .then(() => console.log('[Audio] Fallback MP3 chime played successfully.'))
+            .catch(err => console.warn('[Audio] Both audio formats prevented or failed:', err));
+        });
     } catch (err) {
       console.error('Could not play notification sound:', err);
     }
@@ -2963,7 +3005,7 @@ export default function Admin({
     console.log('[Realtime] Subscribing to public:appointments insert and broadcast events...');
     
     const channel = supabase.client
-      .channel('public:appointments-admin-listener')
+      .channel('appointments-realtime')
       .on(
         'postgres_changes',
         {
@@ -3056,6 +3098,7 @@ export default function Admin({
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'services', label: 'Services', icon: Stethoscope },
+    { id: 'dental-tourism', label: 'Dental Tourism', icon: Plane },
   ] as const;
 
   const handleLogout = async () => {
@@ -4421,9 +4464,9 @@ export default function Admin({
               ? getAutoTitle(videoUrlInput) 
               : getInstagramAutoTitle(videoUrlInput);
 
-            thumbnail = isYoutube
+            thumbnail = videoThumbnailInput || (isYoutube
               ? `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`
-              : `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+              : `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`);
 
             videoUrl = isYoutube
               ? `https://www.youtube.com/watch?v=${extractedId}`
@@ -4442,7 +4485,7 @@ export default function Admin({
               platform: currentPlatform,
               url: videoUrl,
               youtubeUrl: videoUrl,
-              thumbnail: thumbnail,
+              thumbnail: videoThumbnailInput || thumbnail,
               createdAt: v.createdAt || new Date().toISOString()
             } : v);
           } else {
@@ -4458,7 +4501,7 @@ export default function Admin({
                 platform: currentPlatform,
                 url: videoUrl,
                 youtubeUrl: videoUrl,
-                thumbnail: thumbnail,
+                thumbnail: videoThumbnailInput || thumbnail,
                 createdAt: new Date().toISOString()
               }
             ];
@@ -4485,6 +4528,9 @@ export default function Admin({
           setEditingVideo(null);
           setVideoUrlInput('');
           setCustomVideoTitle('');
+          setVideoThumbnailInput('');
+          setIsUploadingThumbnail(false);
+          setThumbnailUploadError(null);
           setVideoFile(null);
           setVideoUploadError(null);
           setIsUploadingVideo(false);
@@ -4594,11 +4640,11 @@ export default function Admin({
 
         let previewVideoThumbnail = '';
         if (isYoutube) {
-          previewVideoThumbnail = videoIdPreview ? `https://img.youtube.com/vi/${videoIdPreview}/hqdefault.jpg` : '';
+          previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://img.youtube.com/vi/${videoIdPreview}/hqdefault.jpg` : '');
         } else if (isInstagram) {
-          previewVideoThumbnail = videoIdPreview ? `https://www.instagram.com/p/${videoIdPreview}/media/?size=l` : '';
+          previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://www.instagram.com/p/${videoIdPreview}/media/?size=l` : '');
         } else if (isMp4) {
-          previewVideoThumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+          previewVideoThumbnail = videoThumbnailInput || `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
         }
 
         return (
@@ -5063,6 +5109,9 @@ export default function Admin({
                       setVideoUrlInput('');
                       setVideoPlatformInput('youtube');
                       setCustomVideoTitle('');
+                      setVideoThumbnailInput('');
+                      setIsUploadingThumbnail(false);
+                      setThumbnailUploadError(null);
                       setVideoFile(null);
                       setVideoUploadError(null);
                       setIsUploadingVideo(false);
@@ -5137,6 +5186,9 @@ export default function Admin({
                                 setVideoUrlInput(item.youtubeUrl);
                                 setVideoPlatformInput(item.videoPlatform || 'youtube');
                                 setCustomVideoTitle(item.title || '');
+                                setVideoThumbnailInput(item.thumbnail || '');
+                                setIsUploadingThumbnail(false);
+                                setThumbnailUploadError(null);
                                 setVideoFile(null);
                                 setVideoUploadError(null);
                                 setIsUploadingVideo(false);
@@ -5392,18 +5444,42 @@ export default function Admin({
             {activeMediaTab === 'technology' && (
               <div className="space-y-6" id="technology-tab-content">
                 {/* Actions row */}
-                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
-                  <div className="text-xs text-slate-500 font-medium">
-                    Showing <span className="font-bold text-slate-800">{(draftTechnology || []).length}</span> technology photos
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
+                  <div>
+                    <h3 className="text-sm font-extrabold text-[#081C3A]">Our Technology CMS</h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Managing <span className="font-bold text-slate-800">{(draftTechnology || []).length}</span> technology showcase items
+                    </p>
                   </div>
                   
-                  <div>
-                    <label
-                      htmlFor="technology-upload-file-trigger"
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                  <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                    {/* Add Technology Item Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingTechnology({
+                          id: generateUUID(),
+                          title: '',
+                          short_description: '',
+                          description: '',
+                          image_url: '',
+                          display_order: (draftTechnology || []).length,
+                          is_active: true
+                        });
+                      }}
+                      className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
                     >
                       <Plus className="h-4 w-4" />
-                      <span>Upload Technology Image</span>
+                      <span>Add Technology Item</span>
+                    </button>
+
+                    {/* Direct Quick Upload Button */}
+                    <label
+                      htmlFor="technology-upload-file-trigger"
+                      className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold shadow-2xs transition duration-150 cursor-pointer select-none"
+                    >
+                      <Upload className="h-4 w-4 text-slate-500" />
+                      <span>Upload Image</span>
                     </label>
                     <input
                       type="file"
@@ -5418,24 +5494,20 @@ export default function Admin({
                           try {
                             const imageUrl = await uploadImage(file);
                             console.log('[Technology] Upload Success:', imageUrl);
-                            const updated = [
-                              {
-                                id: generateUUID(),
-                                image_url: imageUrl,
-                                title: '',
-                                display_order: draftTechnology.length,
-                                is_active: true
-                              },
-                              ...(draftTechnology || [])
-                            ];
+                            const newItem: TechnologyItem = {
+                              id: generateUUID(),
+                              image_url: imageUrl,
+                              title: '',
+                              short_description: '',
+                              description: '',
+                              display_order: (draftTechnology || []).length,
+                              is_active: true
+                            };
+                            const updated = [...(draftTechnology || []), newItem];
                             setDraftTechnology(updated);
-                            setSaveMessage('Saving technology image to Supabase...');
-                            const success = await technologyService.saveTechnologyList(updated);
-                            if (success) {
-                              setSaveMessage('Technology image uploaded and saved to Supabase successfully!');
-                            } else {
-                              setSaveMessage('Failed to save technology image to database.');
-                            }
+                            setEditingTechnology(newItem);
+                            setSaveMessage('Image uploaded! Enter title & description.');
+                            await technologyService.saveTechnologyList(updated);
                           } catch (err: any) {
                             console.warn('Upload failed, falling back to local Base64:', err);
                             try {
@@ -5445,19 +5517,20 @@ export default function Admin({
                                 reader.onerror = reject;
                                 reader.readAsDataURL(file);
                               });
-                              const updated = [
-                                {
-                                  id: generateUUID(),
-                                  image_url: dataUrl,
-                                  title: '',
-                                  display_order: draftTechnology.length,
-                                  is_active: true
-                                },
-                                ...(draftTechnology || [])
-                              ];
+                              const newItem: TechnologyItem = {
+                                id: generateUUID(),
+                                image_url: dataUrl,
+                                title: '',
+                                short_description: '',
+                                description: '',
+                                display_order: (draftTechnology || []).length,
+                                is_active: true
+                              };
+                              const updated = [...(draftTechnology || []), newItem];
                               setDraftTechnology(updated);
+                              setEditingTechnology(newItem);
                               await technologyService.saveTechnologyList(updated);
-                              setSaveMessage('Technology image loaded locally and saved.');
+                              setSaveMessage('Image loaded locally! Enter title & description.');
                             } catch (fallbackErr) {
                               console.error(fallbackErr);
                             }
@@ -5473,106 +5546,323 @@ export default function Admin({
                 {/* Grid */}
                 {(!draftTechnology || draftTechnology.length === 0) ? (
                   <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
-                    No technology photos uploaded yet. Add some advanced equipment moments!
+                    No technology items available. Click <strong className="text-indigo-600">Add Technology Item</strong> to create one!
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {draftTechnology.map((item) => (
-                      <div 
-                        key={item.id}
-                        id={`admin-technology-card-${item.id}`}
-                        className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-indigo-100 transition-all duration-200 shadow-3xs"
-                      >
-                        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
-                          <img 
-                            src={item.image_url} 
-                            alt="Technology Equipment" 
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {draftTechnology.map((item, idx) => {
+                      const shortText = item.short_description || item.shortDesc || item.description || '';
+                      
+                      return (
+                        <div 
+                          key={item.id || idx}
+                          id={`admin-technology-card-${item.id}`}
+                          className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-4 group relative hover:border-indigo-200 transition-all duration-200 shadow-3xs"
+                        >
+                          <div className="space-y-3">
+                            {/* Image Frame with object-contain */}
+                            <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center p-3">
+                              {item.image_url ? (
+                                <img 
+                                  src={item.image_url} 
+                                  alt={item.title || 'Technology Equipment'} 
+                                  className="max-w-full max-h-full object-contain mx-auto block"
+                                  referrerPolicy="no-referrer"
+                                />
+                              ) : (
+                                <div className="text-slate-300 text-xs text-center font-medium">No Image Provided</div>
+                              )}
 
-                        {/* Replace & Delete Actions */}
-                        <div className="flex items-center justify-between gap-2 mt-auto">
-                          <label
-                            htmlFor={`technology-replace-trigger-${item.id}`}
-                            className="font-bold text-xs text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-indigo-100 transition select-none flex-1 text-center cursor-pointer"
-                          >
-                            <Upload className="h-3 w-3 shrink-0" />
-                            <span>Replace</span>
-                          </label>
-                          <input
-                            type="file"
-                            id={`technology-replace-trigger-${item.id}`}
-                            className="hidden"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                const file = e.target.files[0];
-                                console.log('[Technology] Upload Started:', file.name);
-                                setSaveMessage('Replacing technology photo on Supabase...');
-                                try {
-                                  const imageUrl = await uploadImage(file);
-                                  console.log('[Technology] Upload Success:', imageUrl);
-                                  const updated = (draftTechnology || []).map(moment => moment.id === item.id ? { ...moment, image_url: imageUrl } : moment);
-                                  setDraftTechnology(updated);
-                                  setSaveMessage('Saving updated technology photo to Supabase...');
-                                  const success = await technologyService.saveTechnologyList(updated);
-                                  if (success) {
-                                    setSaveMessage('Technology photo replaced and saved successfully!');
-                                  } else {
-                                    setSaveMessage('Failed to save replacement to database.');
-                                  }
-                                } catch (err: any) {
-                                  console.warn('Upload failed, falling back to local Base64:', err);
+                              {item.is_active === false && (
+                                <span className="absolute top-2 right-2 bg-slate-900/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                  Hidden
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Info */}
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-slate-800 text-sm sm:text-base line-clamp-1">
+                                {item.title || <span className="text-slate-400 italic">Untitled Equipment</span>}
+                              </h4>
+                              {shortText ? (
+                                <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed">
+                                  {shortText}
+                                </p>
+                              ) : (
+                                <p className="text-slate-300 text-xs italic">No description added yet</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 mt-auto">
+                            {/* Edit Text & Details */}
+                            <button
+                              type="button"
+                              onClick={() => setEditingTechnology(item)}
+                              className="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer flex-1"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              <span>Edit</span>
+                            </button>
+
+                            {/* Replace Image */}
+                            <label
+                              htmlFor={`technology-replace-trigger-${item.id}`}
+                              className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer"
+                              title="Replace Image"
+                            >
+                              <Upload className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline">Replace</span>
+                            </label>
+                            <input
+                              type="file"
+                              id={`technology-replace-trigger-${item.id}`}
+                              className="hidden"
+                              accept="image/*"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const file = e.target.files[0];
+                                  console.log('[Technology] Upload Started:', file.name);
+                                  setSaveMessage('Replacing technology photo on Supabase...');
                                   try {
-                                    const dataUrl = await new Promise<string>((resolve, reject) => {
-                                      const reader = new FileReader();
-                                      reader.onload = () => resolve(reader.result as string);
-                                      reader.onerror = reject;
-                                      reader.readAsDataURL(file);
-                                    });
-                                    const updated = (draftTechnology || []).map(moment => moment.id === item.id ? { ...moment, image_url: dataUrl } : moment);
+                                    const imageUrl = await uploadImage(file);
+                                    const updated = (draftTechnology || []).map(moment => moment.id === item.id ? { ...moment, image_url: imageUrl } : moment);
                                     setDraftTechnology(updated);
-                                    await technologyService.saveTechnologyList(updated);
-                                    setSaveMessage('Technology photo replaced locally.');
-                                  } catch (fallbackErr) {
-                                    console.error(fallbackErr);
+                                    setSaveMessage('Saving updated technology photo to Supabase...');
+                                    const success = await technologyService.saveTechnologyList(updated);
+                                    if (success) {
+                                      setSaveMessage('Technology photo replaced and saved successfully!');
+                                    } else {
+                                      setSaveMessage('Failed to save replacement to database.');
+                                    }
+                                  } catch (err: any) {
+                                    console.warn('Upload failed, falling back to local Base64:', err);
+                                    try {
+                                      const dataUrl = await new Promise<string>((resolve, reject) => {
+                                        const reader = new FileReader();
+                                        reader.onload = () => resolve(reader.result as string);
+                                        reader.onerror = reject;
+                                        reader.readAsDataURL(file);
+                                      });
+                                      const updated = (draftTechnology || []).map(moment => moment.id === item.id ? { ...moment, image_url: dataUrl } : moment);
+                                      setDraftTechnology(updated);
+                                      await technologyService.saveTechnologyList(updated);
+                                      setSaveMessage('Technology photo replaced locally.');
+                                    } catch (fallbackErr) {
+                                      console.error(fallbackErr);
+                                    }
+                                  } finally {
+                                    setTimeout(() => setSaveMessage(null), 3500);
                                   }
-                                } finally {
-                                  setTimeout(() => setSaveMessage(null), 3500);
                                 }
-                              }
-                            }}
-                          />
+                              }}
+                            />
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTechnologyToDelete(item.id);
-                            }}
-                            className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
-                            aria-label="Delete Technology Photo"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              onClick={() => setTechnologyToDelete(item.id)}
+                              className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl transition cursor-pointer"
+                              title="Delete Item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
-                {/* Custom Technology Image Delete Confirmation Dialog Modal */}
+                {/* EDIT / ADD TECHNOLOGY ITEM MODAL */}
+                {editingTechnology && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+                    <div className="absolute inset-0" onClick={() => setEditingTechnology(null)} />
+                    
+                    <div className="relative bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-xl w-full p-6 text-slate-800 z-10 animate-fade-in max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                        <h3 className="text-lg font-black text-[#081C3A]">
+                          {draftTechnology.some(t => t.id === editingTechnology.id) ? 'Edit Technology Item' : 'Add New Technology'}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setEditingTechnology(null)}
+                          className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition"
+                        >
+                          <CloseIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Image Preview & Upload */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            Technology Image
+                          </label>
+                          <div className="flex items-center gap-4">
+                            <div className="w-28 h-24 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden p-2 shrink-0">
+                              {editingTechnology.image_url ? (
+                                <img
+                                  src={editingTechnology.image_url}
+                                  alt="Preview"
+                                  className="max-w-full max-h-full object-contain"
+                                />
+                              ) : (
+                                <span className="text-[10px] text-slate-400 font-bold text-center">No Image</span>
+                              )}
+                            </div>
+                            <div className="flex-1 space-y-2">
+                              <label
+                                htmlFor="modal-technology-upload-input"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold cursor-pointer transition"
+                              >
+                                <Upload className="h-4 w-4" />
+                                <span>{editingTechnology.image_url ? 'Replace Image' : 'Upload Image'}</span>
+                              </label>
+                              <input
+                                type="file"
+                                id="modal-technology-upload-input"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    const file = e.target.files[0];
+                                    setSaveMessage('Uploading image...');
+                                    try {
+                                      const imageUrl = await uploadImage(file);
+                                      setEditingTechnology(prev => prev ? { ...prev, image_url: imageUrl } : null);
+                                      setSaveMessage('Image uploaded successfully!');
+                                    } catch (err) {
+                                      const reader = new FileReader();
+                                      reader.onload = () => {
+                                        setEditingTechnology(prev => prev ? { ...prev, image_url: reader.result as string } : null);
+                                      };
+                                      reader.readAsDataURL(file);
+                                    } finally {
+                                      setTimeout(() => setSaveMessage(null), 2500);
+                                    }
+                                  }
+                                }}
+                              />
+                              <p className="text-[11px] text-slate-400">
+                                Recommended: Clear, high-resolution equipment photo. Aspect ratio preserved (`object-contain`).
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Title Input */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Technology Name / Title <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 3D CBCT Scanner or Dental Microscope"
+                            value={editingTechnology.title || ''}
+                            onChange={(e) => setEditingTechnology({ ...editingTechnology, title: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-800 font-medium"
+                          />
+                        </div>
+
+                        {/* Short Description */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Short Description <span className="text-rose-500">*</span>
+                          </label>
+                          <textarea
+                            rows={3}
+                            placeholder="e.g. For precised single-sitting Root Canal Treatment and micro-restorative dentistry."
+                            value={editingTechnology.short_description || editingTechnology.shortDesc || editingTechnology.description || ''}
+                            onChange={(e) => setEditingTechnology({ 
+                              ...editingTechnology, 
+                              short_description: e.target.value,
+                              shortDesc: e.target.value,
+                              description: e.target.value
+                            })}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-800 font-medium"
+                          />
+                        </div>
+
+                        {/* Active Checkbox */}
+                        <div className="flex items-center gap-2 pt-1">
+                          <input
+                            type="checkbox"
+                            id="technology-active-toggle"
+                            checked={editingTechnology.is_active !== false}
+                            onChange={(e) => setEditingTechnology({ ...editingTechnology, is_active: e.target.checked })}
+                            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          <label htmlFor="technology-active-toggle" className="text-xs font-bold text-slate-700 cursor-pointer">
+                            Active (Show on public Technology page)
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Modal Footer Buttons */}
+                      <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-6">
+                        <button
+                          type="button"
+                          onClick={() => setEditingTechnology(null)}
+                          className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!editingTechnology.image_url && !editingTechnology.title) {
+                              alert('Please provide at least a title or image.');
+                              return;
+                            }
+                            
+                            const exists = (draftTechnology || []).some(t => t.id === editingTechnology.id);
+                            let updated: TechnologyItem[];
+                            
+                            if (exists) {
+                              updated = draftTechnology.map(t => t.id === editingTechnology.id ? editingTechnology : t);
+                            } else {
+                              updated = [...(draftTechnology || []), editingTechnology];
+                            }
+
+                            setDraftTechnology(updated);
+                            setEditingTechnology(null);
+                            setSaveMessage('Saving technology item to database...');
+                            try {
+                              const success = await technologyService.saveTechnologyList(updated);
+                              if (success) {
+                                setSaveMessage('Technology item saved successfully!');
+                              } else {
+                                setSaveMessage('Saved locally, DB sync error: ' + (technologyService.lastError || ''));
+                              }
+                            } catch (err: any) {
+                              console.error('Error saving technology item:', err);
+                              setSaveMessage('Error saving item.');
+                            } finally {
+                              setTimeout(() => setSaveMessage(null), 3500);
+                            }
+                          }}
+                          className="px-6 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition cursor-pointer shadow-md shadow-indigo-600/20 flex items-center gap-1.5"
+                        >
+                          <Save className="h-4 w-4" />
+                          <span>Save Technology Item</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Technology Item Delete Confirmation Dialog Modal */}
                 {technologyToDelete && (
                   <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-                    {/* Backdrop click to close */}
                     <div className="absolute inset-0" onClick={() => setTechnologyToDelete(null)} />
                     
-                    {/* Card container */}
                     <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
-                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Image</h3>
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Technology Item</h3>
                       <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-                        Are you sure you want to delete this image?
+                        Are you sure you want to delete this technology item? It will be removed from the public website.
                       </p>
                       <div className="flex items-center justify-end gap-2.5">
                         <button
@@ -5585,19 +5875,19 @@ export default function Admin({
                         <button
                           type="button"
                           onClick={async () => {
-                            const updated = (draftTechnology || []).filter(moment => moment.id !== technologyToDelete);
+                            const updated = (draftTechnology || []).filter(item => item.id !== technologyToDelete);
                             setDraftTechnology(updated);
                             setTechnologyToDelete(null);
-                            setSaveMessage('Deleting technology photo and syncing with Supabase...');
+                            setSaveMessage('Deleting technology item from database...');
                             try {
                               const success = await technologyService.saveTechnologyList(updated);
                               if (success) {
-                                setSaveMessage('Technology photo deleted successfully!');
+                                setSaveMessage('Technology item deleted successfully!');
                               } else {
-                                setSaveMessage('Failed to delete technology photo on Supabase database.');
+                                setSaveMessage('Failed to delete technology item on database.');
                               }
                             } catch (err: any) {
-                              console.error('Error deleting technology photo:', err);
+                              console.error('Error deleting technology item:', err);
                               setSaveMessage('Error: ' + (err.message || err));
                             } finally {
                               setTimeout(() => setSaveMessage(null), 3500);
@@ -6387,6 +6677,9 @@ export default function Admin({
                     setEditingVideo(null);
                     setVideoUrlInput('');
                     setCustomVideoTitle('');
+                    setVideoThumbnailInput('');
+                    setIsUploadingThumbnail(false);
+                    setThumbnailUploadError(null);
                     setVideoFile(null);
                     setVideoUploadError(null);
                     setIsUploadingVideo(false);
@@ -6407,6 +6700,9 @@ export default function Admin({
                           setEditingVideo(null);
                           setVideoUrlInput('');
                           setCustomVideoTitle('');
+                          setVideoThumbnailInput('');
+                          setIsUploadingThumbnail(false);
+                          setThumbnailUploadError(null);
                           setVideoFile(null);
                           setVideoUploadError(null);
                           setIsUploadingVideo(false);
@@ -6437,6 +6733,9 @@ export default function Admin({
                         setEditingVideo(null);
                         setVideoUrlInput('');
                         setCustomVideoTitle('');
+                        setVideoThumbnailInput('');
+                        setIsUploadingThumbnail(false);
+                        setThumbnailUploadError(null);
                         setVideoFile(null);
                         setVideoUploadError(null);
                         setIsUploadingVideo(false);
@@ -6707,32 +7006,194 @@ export default function Admin({
                           </div>
                         </>
                       ) : (
-                        /* Video URL Input */
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video URL</label>
-                          <input
-                            type="text"
-                            value={videoUrlInput}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setVideoUrlInput(val);
-                              if (val.includes('instagram.com') || val.includes('instagr.am')) {
-                                setVideoPlatformInput('instagram');
-                              } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
-                                setVideoPlatformInput('youtube');
-                              }
-                            }}
-                            placeholder={videoPlatformInput === 'youtube'
-                              ? "e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                              : "e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"}
-                            className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
-                          />
-                          <p className="text-[10px] text-slate-400 font-medium">
-                            {videoPlatformInput === 'youtube'
-                              ? "The system extracts the YouTube Video ID and automatically pulls the corresponding HD thumbnail and dynamic clinical title."
-                              : "The system extracts the Instagram post or reel ID and integrates the media directly."}
-                          </p>
-                        </div>
+                        <>
+                          {/* Video URL Input */}
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video URL</label>
+                            <input
+                              type="text"
+                              value={videoUrlInput}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setVideoUrlInput(val);
+                                if (val.includes('instagram.com') || val.includes('instagr.am')) {
+                                  setVideoPlatformInput('instagram');
+                                } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
+                                  setVideoPlatformInput('youtube');
+                                }
+                              }}
+                              placeholder={videoPlatformInput === 'youtube'
+                                ? "e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                : "e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"}
+                              className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
+                            />
+                            <p className="text-[10px] text-slate-400 font-medium">
+                              {videoPlatformInput === 'youtube'
+                                ? "The system extracts the YouTube Video ID and automatically pulls the corresponding HD thumbnail and dynamic clinical title."
+                                : "The system extracts the Instagram post or reel ID and integrates the media directly."}
+                            </p>
+                          </div>
+
+                          {/* Reel Thumbnail Field (Optional, for Instagram) */}
+                          {videoPlatformInput === 'instagram' && (
+                            <div className="space-y-2 mt-4">
+                              <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Reel Thumbnail (Optional)</label>
+                              
+                              {videoThumbnailInput ? (
+                                <div className="border border-slate-150 rounded-2xl p-4 bg-slate-50/50">
+                                  <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="h-16 w-12 rounded-lg overflow-hidden border border-slate-100 bg-slate-200 shrink-0">
+                                        <img 
+                                          src={videoThumbnailInput} 
+                                          alt="Reel Thumbnail" 
+                                          className="h-full w-full object-cover"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-xs font-bold text-teal-900">Thumbnail Ready</p>
+                                        <p className="text-[10px] text-teal-600 truncate max-w-[220px]">{videoThumbnailInput}</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                      <label className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition cursor-pointer" title="Replace thumbnail">
+                                        <Pencil className="h-4 w-4" />
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={async (e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                              const file = e.target.files[0];
+                                              if (!file.type.startsWith('image/')) {
+                                                setThumbnailUploadError('Unsupported file type. Only image files are accepted.');
+                                                return;
+                                              }
+                                              const maxBytes = 10 * 1024 * 1024; // 10 MB
+                                              if (file.size > maxBytes) {
+                                                setThumbnailUploadError('File is too large. Maximum size allowed is 10 MB.');
+                                                return;
+                                              }
+                                              setThumbnailUploadError(null);
+                                              setIsUploadingThumbnail(true);
+                                              try {
+                                                const publicUrl = await uploadImage(file);
+                                                setVideoThumbnailInput(publicUrl);
+                                              } catch (err: any) {
+                                                console.error('Error uploading thumbnail:', err);
+                                                setThumbnailUploadError(err.message || 'Failed to upload thumbnail.');
+                                              } finally {
+                                                setIsUploadingThumbnail(false);
+                                              }
+                                            }
+                                          }}
+                                          className="hidden"
+                                        />
+                                      </label>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setVideoThumbnailInput('');
+                                        }}
+                                        className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition"
+                                        title="Remove thumbnail"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div
+                                  onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                  onDrop={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                      const file = e.dataTransfer.files[0];
+                                      if (!file.type.startsWith('image/')) {
+                                        setThumbnailUploadError('Unsupported file type. Only image files are accepted.');
+                                        return;
+                                      }
+                                      const maxBytes = 10 * 1024 * 1024; // 10 MB
+                                      if (file.size > maxBytes) {
+                                        setThumbnailUploadError('File is too large. Maximum size allowed is 10 MB.');
+                                        return;
+                                      }
+                                      setThumbnailUploadError(null);
+                                      setIsUploadingThumbnail(true);
+                                      try {
+                                        const publicUrl = await uploadImage(file);
+                                        setVideoThumbnailInput(publicUrl);
+                                      } catch (err: any) {
+                                        console.error('Error uploading thumbnail:', err);
+                                        setThumbnailUploadError(err.message || 'Failed to upload thumbnail.');
+                                      } finally {
+                                        setIsUploadingThumbnail(false);
+                                      }
+                                    }
+                                  }}
+                                  className="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-2xl p-6 text-center cursor-pointer bg-slate-50/50 hover:bg-blue-50/10 transition relative group"
+                                >
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                      if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        if (!file.type.startsWith('image/')) {
+                                          setThumbnailUploadError('Unsupported file type. Only image files are accepted.');
+                                          return;
+                                        }
+                                        const maxBytes = 10 * 1024 * 1024; // 10 MB
+                                        if (file.size > maxBytes) {
+                                          setThumbnailUploadError('File is too large. Maximum size allowed is 10 MB.');
+                                          return;
+                                        }
+                                        setThumbnailUploadError(null);
+                                        setIsUploadingThumbnail(true);
+                                        try {
+                                          const publicUrl = await uploadImage(file);
+                                          setVideoThumbnailInput(publicUrl);
+                                        } catch (err: any) {
+                                          console.error('Error uploading thumbnail:', err);
+                                          setThumbnailUploadError(err.message || 'Failed to upload thumbnail.');
+                                        } finally {
+                                          setIsUploadingThumbnail(false);
+                                        }
+                                      }
+                                    }}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    disabled={isUploadingThumbnail}
+                                  />
+                                  {isUploadingThumbnail ? (
+                                    <div className="space-y-2 py-2">
+                                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto" />
+                                      <p className="text-xs font-bold text-slate-600">Uploading thumbnail...</p>
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-2 py-1">
+                                      <Upload className="h-8 w-8 text-slate-400 mx-auto group-hover:scale-110 duration-200 transition" />
+                                      <div className="space-y-0.5">
+                                        <p className="text-xs font-bold text-slate-700">Drag & drop your thumbnail image, or click to browse</p>
+                                        <p className="text-[10px] text-slate-400 font-medium">PNG, JPG, or WEBP up to 10 MB. Recommended size: 9:16 vertical ratio.</p>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {thumbnailUploadError && (
+                                <p className="text-[10px] text-rose-500 font-bold mt-1.5 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                                  <span>⚠ {thumbnailUploadError}</span>
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -6746,6 +7207,9 @@ export default function Admin({
                         setEditingVideo(null);
                         setVideoUrlInput('');
                         setCustomVideoTitle('');
+                        setVideoThumbnailInput('');
+                        setIsUploadingThumbnail(false);
+                        setThumbnailUploadError(null);
                         setVideoFile(null);
                         setVideoUploadError(null);
                         setIsUploadingVideo(false);
@@ -7250,6 +7714,1138 @@ export default function Admin({
             </div>
           </div>
         );
+      case 'dental-tourism': {
+        // Derive tourismVideos dynamically
+        const tourismVideos = (videosList || []).filter(v => v.treatment === 'Dental Tourism').map(v => {
+          const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
+          const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
+          const platform = isMp4 ? 'mp4' : (isInstagram ? 'instagram' : 'youtube');
+          
+          let youtubeUrl = '';
+          if (platform === 'mp4') {
+            youtubeUrl = v.id;
+          } else if (platform === 'instagram') {
+            youtubeUrl = `https://www.instagram.com/p/${v.id}/`;
+          } else {
+            youtubeUrl = `https://www.youtube.com/watch?v=${v.id}`;
+          }
+
+          let thumbnail = v.thumbnail;
+          if (!thumbnail) {
+            if (platform === 'mp4') {
+              thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+            } else if (platform === 'instagram') {
+              thumbnail = `https://www.instagram.com/p/${v.id}/media/?size=l`;
+            } else {
+              thumbnail = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+            }
+          }
+
+          return {
+            id: v.id,
+            youtubeUrl: youtubeUrl,
+            title: v.title,
+            thumbnail: thumbnail,
+            videoPlatform: platform,
+            treatment: v.treatment,
+            category: v.category
+          };
+        });
+
+        // Local Media helpers
+        const getYouTubeId = (url: string): string | null => {
+          if (!url) return null;
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+          const match = url.match(regExp);
+          return (match && match[2].length === 11) ? match[2] : null;
+        };
+
+        const getInstagramId = (url: string): string | null => {
+          if (!url) return null;
+          const match = url.match(/(?:instagram\.com\/(?:p|reel)\/)([A-Za-z0-9_-]+)/);
+          return match ? match[1] : null;
+        };
+
+        const getInstagramAutoTitle = (url: string): string => {
+          return "Dental Tourism Patient Instagram Reel";
+        };
+
+        const getAutoTitle = (url: string): string => {
+          const ytId = getYouTubeId(url);
+          if (!ytId) return "New Dental Tourism Video";
+          const titles = [
+            "Dental Tourism India - International Patient Experience & Tour",
+            "Same-Day Dental Implants & Smile Makeover Testimonial",
+            "Patel Dental Hospital Rajkot - Clinical Care & Travel Review"
+          ];
+          const index = Math.abs(ytId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % titles.length;
+          return titles[index];
+        };
+
+        const handleSaveVideo = async () => {
+          let currentPlatform = videoPlatformInput;
+          if (videoUrlInput.includes('instagram.com') || videoUrlInput.includes('instagr.am')) {
+            currentPlatform = 'instagram';
+          } else if (videoUrlInput.includes('youtube.com') || videoUrlInput.includes('youtu.be')) {
+            currentPlatform = 'youtube';
+          } else if (videoUrlInput.startsWith('http') && (videoUrlInput.endsWith('.mp4') || videoUrlInput.includes('supabase.co'))) {
+            currentPlatform = 'mp4';
+          } else if (editingVideo && (editingVideo.videoPlatform === 'instagram' || editingVideo.platform === 'instagram')) {
+            currentPlatform = 'instagram';
+          } else if (editingVideo && (editingVideo.videoPlatform === 'mp4' || editingVideo.platform === 'mp4')) {
+            currentPlatform = 'mp4';
+          }
+
+          let extractedId = '';
+          let generatedTitle = '';
+          let thumbnail = '';
+          let videoUrl = '';
+
+          if (currentPlatform === 'mp4') {
+            extractedId = videoUrlInput;
+            if (!extractedId) {
+              alert('Please upload an MP4 video or enter a valid video URL.');
+              return;
+            }
+            generatedTitle = customVideoTitle || 'Dental Tourism Video';
+            thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+            videoUrl = videoUrlInput;
+          } else {
+            const isYoutube = currentPlatform === 'youtube';
+            const id = isYoutube ? getYouTubeId(videoUrlInput) : getInstagramId(videoUrlInput);
+            
+            if (!id) {
+              alert(`Please enter a valid ${isYoutube ? 'YouTube' : 'Instagram'} video URL.`);
+              return;
+            }
+            extractedId = id;
+            
+            generatedTitle = customVideoTitle || (isYoutube 
+              ? getAutoTitle(videoUrlInput) 
+              : getInstagramAutoTitle(videoUrlInput));
+
+            thumbnail = videoThumbnailInput || (isYoutube
+              ? `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`
+              : `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`);
+
+            videoUrl = isYoutube
+              ? `https://www.youtube.com/watch?v=${extractedId}`
+              : `https://www.instagram.com/p/${extractedId}/`;
+          }
+
+          let updated: DentalVideo[];
+          if (editingVideo) {
+            updated = (videosList || []).map(v => v.id === editingVideo.id ? {
+              id: extractedId,
+              title: generatedTitle,
+              treatment: 'Dental Tourism',
+              category: 'Dental Tourism',
+              videoPlatform: currentPlatform,
+              platform: currentPlatform,
+              url: videoUrl,
+              youtubeUrl: videoUrl,
+              thumbnail: videoThumbnailInput || thumbnail,
+              createdAt: v.createdAt || new Date().toISOString()
+            } : v);
+          } else {
+            updated = [
+              ...(videosList || []),
+              {
+                id: extractedId,
+                title: generatedTitle,
+                treatment: 'Dental Tourism',
+                category: 'Dental Tourism',
+                videoPlatform: currentPlatform,
+                platform: currentPlatform,
+                url: videoUrl,
+                youtubeUrl: videoUrl,
+                thumbnail: videoThumbnailInput || thumbnail,
+                createdAt: new Date().toISOString()
+              }
+            ];
+          }
+
+          setVideosList(updated);
+          setSaveMessage('Saving video list changes to Supabase...');
+          try {
+            const success = await videoService.saveVideos(updated);
+            if (success) {
+              setSaveMessage('Video list saved to Supabase successfully!');
+            } else {
+              setSaveMessage('Failed to save videos to Supabase database.');
+            }
+          } catch (err: any) {
+            console.error('Error saving video changes:', err);
+            setSaveMessage('Error saving: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 3000);
+          }
+
+          // Reset and close
+          setVideoDrawerOpen(false);
+          setEditingVideo(null);
+          setVideoUrlInput('');
+          setCustomVideoTitle('');
+          setVideoThumbnailInput('');
+          setIsUploadingThumbnail(false);
+          setThumbnailUploadError(null);
+          setVideoFile(null);
+          setVideoUploadError(null);
+          setIsUploadingVideo(false);
+        };
+
+        const handleDeleteVideo = async (id: string) => {
+          if (!window.confirm('Are you sure you want to delete this video?')) return;
+          const updated = (videosList || []).filter(v => v.id !== id);
+          setVideosList(updated);
+          setSaveMessage('Deleting video and syncing with Supabase...');
+          try {
+            const success = await videoService.saveVideos(updated);
+            if (success) {
+              setSaveMessage('Video deleted successfully!');
+            } else {
+              setSaveMessage('Failed to sync video deletion with Supabase.');
+            }
+          } catch (err: any) {
+            console.error('Error deleting video:', err);
+            setSaveMessage('Error deleting: ' + (err.message || err));
+          } finally {
+            setTimeout(() => setSaveMessage(null), 3000);
+          }
+        };
+
+        const isYoutube = videoPlatformInput === 'youtube';
+        const isInstagram = videoPlatformInput === 'instagram';
+        const isMp4 = videoPlatformInput === 'mp4';
+        
+        let videoIdPreview = null;
+        if (isYoutube) {
+          videoIdPreview = getYouTubeId(videoUrlInput);
+        } else if (isInstagram) {
+          videoIdPreview = getInstagramId(videoUrlInput);
+        } else if (isMp4) {
+          videoIdPreview = videoUrlInput || null;
+        }
+
+        let previewVideoTitle = '';
+        if (isYoutube) {
+          previewVideoTitle = videoIdPreview ? getAutoTitle(videoUrlInput) : 'Enter YouTube URL above';
+        } else if (isInstagram) {
+          previewVideoTitle = videoIdPreview ? getInstagramAutoTitle(videoUrlInput) : 'Enter Instagram URL above';
+        } else if (isMp4) {
+          previewVideoTitle = customVideoTitle || 'Dental Tourism Video';
+        }
+
+        let previewVideoThumbnail = '';
+        if (isYoutube) {
+          previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://img.youtube.com/vi/${videoIdPreview}/hqdefault.jpg` : '');
+        } else if (isInstagram) {
+          previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://www.instagram.com/p/${videoIdPreview}/media/?size=l` : '');
+        } else if (isMp4) {
+          previewVideoThumbnail = videoThumbnailInput || `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
+        }
+
+        return (
+          <div className="space-y-6" id="admin-dental-tourism-view">
+            {/* Header Banner */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-150 shadow-3xs flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold font-display text-slate-900 flex items-center gap-2" id="tourism-admin-title">
+                  <span className="p-2 rounded-xl bg-teal-50 text-teal-600"><Plane className="h-5 w-5 animate-pulse" /></span>
+                  Dental Tourism CMS
+                </h1>
+                <p className="text-slate-500 text-xs md:text-sm mt-1">
+                  Manage standard patient galleries and high-impact travel testimonies on the Dental Tourism page.
+                </p>
+              </div>
+            </div>
+
+            {/* Selection Options - IMAGE and VIDEO only */}
+            <div className="flex border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => setTourismSubTab('image')}
+                className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-200 cursor-pointer ${
+                  tourismSubTab === 'image'
+                    ? 'border-teal-600 text-teal-600 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                📸 Image Management
+              </button>
+              <button
+                type="button"
+                onClick={() => setTourismSubTab('video')}
+                className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-200 cursor-pointer ${
+                  tourismSubTab === 'video'
+                    ? 'border-teal-600 text-teal-600 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                🎥 Video Management
+              </button>
+            </div>
+
+            {/* IMAGE MANAGEMENT TAB */}
+            {tourismSubTab === 'image' && (
+              <div className="space-y-6" id="tourism-images-tab">
+                {/* Actions row */}
+                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-150 shadow-3xs">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Showing <span className="font-bold text-slate-800">{(draftInternationalPatients || []).length}</span> Dental Tourism gallery photos
+                  </div>
+                  
+                  <div>
+                    <label
+                      htmlFor="tourism-patient-upload-file-trigger"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Upload New Image</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="tourism-patient-upload-file-trigger"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const file = e.target.files[0];
+                          setSaveMessage('Uploading Dental Tourism image to Supabase...');
+                          try {
+                            const imageUrl = await uploadImage(file);
+                            const updated = [
+                              {
+                                id: generateUUID(),
+                                image_url: imageUrl,
+                                display_order: draftInternationalPatients.length,
+                                is_active: true
+                              },
+                              ...(draftInternationalPatients || [])
+                            ];
+                            setDraftInternationalPatients(updated);
+                            setSaveMessage('Saving Dental Tourism image...');
+                            const success = await internationalPatientsService.saveInternationalPatientsList(updated);
+                            if (success) {
+                              setSaveMessage('Dental Tourism image uploaded and saved successfully!');
+                              await loadInternationalPatientsList();
+                            } else {
+                              setSaveMessage('Failed to save Dental Tourism image.');
+                            }
+                          } catch (err: any) {
+                            console.warn('Upload failed, falling back to local Base64:', err);
+                            try {
+                              const dataUrl = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                              });
+                              const updated = [
+                                {
+                                  id: generateUUID(),
+                                  image_url: dataUrl,
+                                  display_order: draftInternationalPatients.length,
+                                  is_active: true
+                                },
+                                ...(draftInternationalPatients || [])
+                              ];
+                              setDraftInternationalPatients(updated);
+                              await internationalPatientsService.saveInternationalPatientsList(updated);
+                              setSaveMessage('Dental Tourism image loaded locally.');
+                              await loadInternationalPatientsList();
+                            } catch (fallbackErr) {
+                              console.error(fallbackErr);
+                            }
+                          } finally {
+                            setTimeout(() => setSaveMessage(null), 3500);
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Image Grid */}
+                {(!draftInternationalPatients || draftInternationalPatients.length === 0) ? (
+                  <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
+                    No Dental Tourism gallery images uploaded yet. Add some patient moments!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {draftInternationalPatients.map((item) => (
+                      <div 
+                        key={item.id}
+                        id={`tourism-image-card-${item.id}`}
+                        className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-teal-100 transition-all duration-200 shadow-3xs"
+                      >
+                        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0">
+                          <img 
+                            src={item.image_url} 
+                            alt="Dental Tourism Moment" 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Replace & Delete Actions */}
+                        <div className="flex items-center justify-between gap-2 mt-auto">
+                          <label
+                            htmlFor={`tourism-image-replace-trigger-${item.id}`}
+                            className="font-bold text-xs text-teal-600 hover:text-teal-700 bg-teal-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-teal-100 transition select-none flex-1 text-center cursor-pointer"
+                          >
+                            <Upload className="h-3 w-3 shrink-0" />
+                            <span>Replace</span>
+                          </label>
+                          <input
+                            type="file"
+                            id={`tourism-image-replace-trigger-${item.id}`}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                const file = e.target.files[0];
+                                setSaveMessage('Replacing Dental Tourism image...');
+                                try {
+                                  const imageUrl = await uploadImage(file);
+                                  const updated = (draftInternationalPatients || []).map(moment => moment.id === item.id ? { ...moment, image_url: imageUrl } : moment);
+                                  setDraftInternationalPatients(updated);
+                                  setSaveMessage('Saving updated image...');
+                                  const success = await internationalPatientsService.saveInternationalPatientsList(updated);
+                                  if (success) {
+                                    setSaveMessage('Image replaced successfully!');
+                                    await loadInternationalPatientsList();
+                                  } else {
+                                    setSaveMessage('Failed to save replacement.');
+                                  }
+                                } catch (err: any) {
+                                  console.warn('Replace failed, falling back to Base64:', err);
+                                  try {
+                                    const dataUrl = await new Promise<string>((resolve, reject) => {
+                                      const reader = new FileReader();
+                                      reader.onload = () => resolve(reader.result as string);
+                                      reader.onerror = reject;
+                                      reader.readAsDataURL(file);
+                                    });
+                                    const updated = (draftInternationalPatients || []).map(moment => moment.id === item.id ? { ...moment, image_url: dataUrl } : moment);
+                                    setDraftInternationalPatients(updated);
+                                    await internationalPatientsService.saveInternationalPatientsList(updated);
+                                    setSaveMessage('Image replaced locally.');
+                                    await loadInternationalPatientsList();
+                                  } catch (fallbackErr) {
+                                    console.error(fallbackErr);
+                                  }
+                                } finally {
+                                  setTimeout(() => setSaveMessage(null), 3500);
+                                }
+                              }
+                            }}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPatientToDelete(item.id);
+                            }}
+                            className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
+                            aria-label="Delete Dental Tourism Image"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Patient Delete Confirmation Dialog Modal */}
+                {patientToDelete && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+                    <div className="absolute inset-0" onClick={() => setPatientToDelete(null)} />
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Image</h3>
+                      <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                        Are you sure you want to delete this image?
+                      </p>
+                      <div className="flex items-center justify-end gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setPatientToDelete(null)}
+                          className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const updated = (draftInternationalPatients || []).filter(p => p.id !== patientToDelete);
+                            setDraftInternationalPatients(updated);
+                            setPatientToDelete(null);
+                            setSaveMessage('Deleting photo and syncing with Supabase...');
+                            const success = await internationalPatientsService.saveInternationalPatientsList(updated);
+                            if (success) {
+                              setSaveMessage('Photo deleted successfully!');
+                              await loadInternationalPatientsList();
+                            } else {
+                              setSaveMessage('Failed to delete photo.');
+                            }
+                            setTimeout(() => setSaveMessage(null), 3000);
+                          }}
+                          className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* VIDEO MANAGEMENT TAB */}
+            {tourismSubTab === 'video' && (
+              <div className="space-y-6" id="tourism-videos-tab">
+                {/* Actions row */}
+                <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-150 shadow-3xs">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Showing <span className="font-bold text-slate-800">{tourismVideos.length}</span> Dental Tourism videos
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingVideo(null);
+                      setVideoUrlInput('');
+                      setVideoPlatformInput('youtube');
+                      setCustomVideoTitle('');
+                      setVideoThumbnailInput('');
+                      setIsUploadingThumbnail(false);
+                      setThumbnailUploadError(null);
+                      setVideoFile(null);
+                      setVideoUploadError(null);
+                      setIsUploadingVideo(false);
+                      setVideoDrawerOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Add Video</span>
+                  </button>
+                </div>
+
+                {/* Video Grid */}
+                {tourismVideos.length === 0 ? (
+                  <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
+                    No Dental Tourism videos registered yet. Add some testimonials!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {tourismVideos.map((item) => (
+                      <div
+                        key={item.id}
+                        className="group bg-white rounded-2xl border border-slate-150 shadow-3xs overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col"
+                      >
+                        {/* Video Player or Thumbnail Overlay */}
+                        {item.videoPlatform === 'mp4' || item.id.endsWith('.mp4') || item.id.includes('supabase.co') ? (
+                          <div className="w-full max-w-[430px] mx-auto flex justify-center py-2">
+                            <Mp4ReelPlayer
+                              src={item.youtubeUrl || item.id}
+                              containerClassName="aspect-[9/16] h-[440px] sm:h-[460px] rounded-xl overflow-hidden bg-black border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.03)]"
+                            />
+                          </div>
+                        ) : (
+                          <div className="relative aspect-video w-full overflow-hidden bg-transparent flex items-center justify-center">
+                            <img
+                              src={item.thumbnail}
+                              alt={item.title}
+                              className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                              onError={(e) => {
+                                e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition flex items-center justify-center z-10">
+                              <div className="bg-teal-600 hover:bg-teal-700 text-white p-3.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 duration-200 transition">
+                                <Play className="h-6 w-6 text-white fill-current translate-x-0.5" />
+                              </div>
+                            </div>
+                            
+                            <a
+                              href={item.youtubeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5 z-20"
+                            >
+                              <span>Open on {item.videoPlatform === 'instagram' ? 'Instagram' : 'YouTube'}</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
+                        )}
+
+                        {/* Title & Actions footer */}
+                        <div className="p-4 flex-1 flex flex-col">
+                          <h4 className="font-display font-extrabold text-slate-900 text-sm leading-snug line-clamp-2 flex-1">
+                            {item.title}
+                          </h4>
+                          
+                          <div className="p-1 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50/50 -mx-4 -mb-4 mt-4">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingVideo(item);
+                                setVideoUrlInput(item.youtubeUrl);
+                                setVideoPlatformInput(item.videoPlatform || 'youtube');
+                                setCustomVideoTitle(item.title || '');
+                                setVideoThumbnailInput(item.thumbnail || '');
+                                setIsUploadingThumbnail(false);
+                                setThumbnailUploadError(null);
+                                setVideoFile(null);
+                                setVideoUploadError(null);
+                                setIsUploadingVideo(false);
+                                setVideoDrawerOpen(true);
+                              }}
+                              className="px-3.5 py-1.5 rounded-lg text-teal-600 hover:text-white hover:bg-teal-600 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteVideo(item.id)}
+                              className="px-3.5 py-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Slide-out Drawer for Adding / Editing Videos (Dental Tourism localized drawer) */}
+            {videoDrawerOpen && (
+              <div className="fixed inset-0 z-100 flex justify-end" id="tourism-video-drawer-overlay">
+                <div
+                  className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity"
+                  onClick={() => {
+                    setVideoDrawerOpen(false);
+                    setEditingVideo(null);
+                    setVideoUrlInput('');
+                    setCustomVideoTitle('');
+                    setVideoThumbnailInput('');
+                    setIsUploadingThumbnail(false);
+                    setThumbnailUploadError(null);
+                    setVideoFile(null);
+                    setVideoUploadError(null);
+                    setIsUploadingVideo(false);
+                  }}
+                />
+
+                <div className="relative w-full md:w-[650px] bg-white h-full shadow-2xl flex flex-col z-110 border-l border-slate-100 animate-slide-in">
+                  {/* Drawer Header */}
+                  <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVideoDrawerOpen(false);
+                          setEditingVideo(null);
+                          setVideoUrlInput('');
+                          setCustomVideoTitle('');
+                          setVideoThumbnailInput('');
+                          setIsUploadingThumbnail(false);
+                          setThumbnailUploadError(null);
+                          setVideoFile(null);
+                          setVideoUploadError(null);
+                          setIsUploadingVideo(false);
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-bold shadow-3xs cursor-pointer transition duration-150 shrink-0"
+                      >
+                        <ArrowLeft className="h-3.5 w-3.5 text-slate-500" />
+                        <span>← Back</span>
+                      </button>
+                      
+                      <div className="min-w-0">
+                        <h3 className="font-display font-extrabold text-[#081C3A] text-base md:text-lg leading-tight">
+                          {editingVideo ? 'Edit Dental Tourism Video' : 'Add New Dental Tourism Video'}
+                        </h3>
+                      </div>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVideoDrawerOpen(false);
+                        setEditingVideo(null);
+                        setVideoUrlInput('');
+                        setCustomVideoTitle('');
+                        setVideoThumbnailInput('');
+                        setIsUploadingThumbnail(false);
+                        setThumbnailUploadError(null);
+                        setVideoFile(null);
+                        setVideoUploadError(null);
+                        setIsUploadingVideo(false);
+                      }}
+                      className="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-lg transition"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  {/* Scrollable Drawer Content */}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    {/* Live Preview Card */}
+                    <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/80 space-y-2.5">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-center">Video Live Preview Card</span>
+                      
+                      {videoIdPreview ? (
+                        <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-5 max-w-[350px] mx-auto flex flex-col items-center transition-all duration-200">
+                          {videoPlatformInput === 'mp4' ? (
+                            <div className="w-full max-w-[320px] mx-auto flex justify-center mb-3.5">
+                              <Mp4ReelPlayer
+                                src={videoUrlInput}
+                                containerClassName="aspect-[9/16] h-[420px] sm:h-[440px] rounded-xl overflow-hidden bg-black border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.03)]"
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-transparent mb-3.5 flex items-center justify-center">
+                              <img
+                                src={previewVideoThumbnail}
+                                alt="Live Preview"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-slate-900/30 flex items-center justify-center pointer-events-none">
+                                <Play className="h-10 w-10 text-white fill-current" />
+                              </div>
+                            </div>
+                          )}
+                          
+                          <h4 className="font-display font-extrabold text-slate-900 text-sm leading-snug text-center">
+                            {previewVideoTitle}
+                          </h4>
+                          
+                          <div className="text-[10px] text-teal-600 font-bold bg-teal-50 px-3 py-1 rounded-full border border-teal-100 mt-3 flex items-center gap-1">
+                            <span>Ready to save</span>
+                            <Check className="h-3 w-3" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-white rounded-3xl border border-slate-100 border-dashed p-10 text-center max-w-[350px] mx-auto">
+                          <Video className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                          <span className="text-xs text-slate-400 font-medium block">
+                            {videoPlatformInput === 'mp4'
+                              ? "Live Preview displays automatically once you upload a valid .mp4 video."
+                              : `Live Preview displays automatically once you enter a valid ${videoPlatformInput === 'youtube' ? 'YouTube' : 'Instagram'} URL.`}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Inputs */}
+                    <div className="space-y-4">
+                      {/* Video Platform */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video Platform</label>
+                        <select
+                          value={videoPlatformInput}
+                          onChange={(e) => {
+                            const val = e.target.value as 'youtube' | 'instagram' | 'mp4';
+                            setVideoPlatformInput(val);
+                            setVideoUrlInput('');
+                            setVideoFile(null);
+                            setVideoUploadError(null);
+                            if (val !== 'mp4') {
+                              setCustomVideoTitle('');
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white"
+                        >
+                          <option value="youtube">YouTube</option>
+                          <option value="instagram">Instagram</option>
+                          <option value="mp4">MP4 Video File</option>
+                        </select>
+                      </div>
+
+                      {videoPlatformInput === 'mp4' ? (
+                        <>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video Title</label>
+                            <input
+                              type="text"
+                              value={customVideoTitle}
+                              onChange={(e) => setCustomVideoTitle(e.target.value)}
+                              placeholder="e.g. International Patient Testimonial"
+                              className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Upload MP4 Video File</label>
+                            {videoUrlInput ? (
+                              <div className="p-4 border border-slate-200 rounded-xl bg-[#F0FDFA] border-[#CCFBF1] space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="h-9 w-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
+                                      <Video className="h-5 w-5 shrink-0" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-bold text-teal-900">MP4 Video Ready</p>
+                                      <p className="text-[10px] text-teal-600 truncate max-w-[220px]">{videoUrlInput}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <label className="p-1.5 text-teal-600 hover:text-teal-850 hover:bg-teal-50 rounded-lg transition cursor-pointer" title="Replace video">
+                                      <Pencil className="h-4 w-4" />
+                                      <input
+                                        type="file"
+                                        accept=".mp4"
+                                        onChange={(e) => {
+                                          if (e.target.files && e.target.files[0]) {
+                                            const file = e.target.files[0];
+                                            if (file.type !== 'video/mp4' && !file.name.endsWith('.mp4')) {
+                                              setVideoUploadError('Unsupported file type. Only .mp4 files are accepted.');
+                                              return;
+                                            }
+                                            const maxBytes = 100 * 1024 * 1024; // 100 MB
+                                            if (file.size > maxBytes) {
+                                              setVideoUploadError('File is too large. Maximum size allowed is 100 MB.');
+                                              return;
+                                            }
+                                            setVideoUploadError(null);
+                                            setVideoFile(file);
+                                            setIsUploadingVideo(true);
+                                            uploadVideo(file).then((publicUrl) => {
+                                              setVideoUrlInput(publicUrl);
+                                            }).catch((err: any) => {
+                                              console.error('Error uploading video:', err);
+                                              setVideoUploadError(err.message || 'Failed to upload video.');
+                                              setVideoFile(null);
+                                            }).finally(() => {
+                                              setIsUploadingVideo(false);
+                                            });
+                                          }
+                                        }}
+                                        className="hidden"
+                                      />
+                                    </label>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setVideoUrlInput('');
+                                        setVideoFile(null);
+                                      }}
+                                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition"
+                                      title="Delete video"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                onDragOver={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                    const file = e.dataTransfer.files[0];
+                                    if (file.type !== 'video/mp4' && !file.name.endsWith('.mp4')) {
+                                      setVideoUploadError('Unsupported file type. Only .mp4 files are accepted.');
+                                      return;
+                                    }
+                                    const maxBytes = 100 * 1024 * 1024; // 100 MB
+                                    if (file.size > maxBytes) {
+                                      setVideoUploadError('File is too large. Maximum size allowed is 100 MB.');
+                                      return;
+                                    }
+                                    setVideoUploadError(null);
+                                    setVideoFile(file);
+                                    setIsUploadingVideo(true);
+                                    uploadVideo(file).then((publicUrl) => {
+                                      setVideoUrlInput(publicUrl);
+                                      if (!customVideoTitle) {
+                                        const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                                        setCustomVideoTitle(nameWithoutExt);
+                                      }
+                                    }).catch((err: any) => {
+                                      console.error('Error uploading video:', err);
+                                      setVideoUploadError(err.message || 'Failed to upload video.');
+                                      setVideoFile(null);
+                                    }).finally(() => {
+                                      setIsUploadingVideo(false);
+                                    });
+                                  }
+                                }}
+                                className="border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-2xl p-6 text-center cursor-pointer bg-slate-50/50 hover:bg-teal-50/10 transition relative group"
+                              >
+                                <input
+                                  type="file"
+                                  accept=".mp4"
+                                  onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                      const file = e.target.files[0];
+                                      if (file.type !== 'video/mp4' && !file.name.endsWith('.mp4')) {
+                                        setVideoUploadError('Unsupported file type. Only .mp4 files are accepted.');
+                                        return;
+                                      }
+                                      const maxBytes = 100 * 1024 * 1024; // 100 MB
+                                      if (file.size > maxBytes) {
+                                        setVideoUploadError('File is too large. Maximum size allowed is 100 MB.');
+                                        return;
+                                      }
+                                      setVideoUploadError(null);
+                                      setVideoFile(file);
+                                      setIsUploadingVideo(true);
+                                      uploadVideo(file).then((publicUrl) => {
+                                        setVideoUrlInput(publicUrl);
+                                        if (!customVideoTitle) {
+                                          const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                                          setCustomVideoTitle(nameWithoutExt);
+                                        }
+                                      }).catch((err: any) => {
+                                        console.error('Error uploading video:', err);
+                                        setVideoUploadError(err.message || 'Failed to upload video.');
+                                        setVideoFile(null);
+                                      }).finally(() => {
+                                        setIsUploadingVideo(false);
+                                      });
+                                    }
+                                  }}
+                                  className="absolute inset-0 opacity-0 cursor-pointer"
+                                  disabled={isUploadingVideo}
+                                />
+                                
+                                {isUploadingVideo ? (
+                                  <div className="space-y-2 py-2">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto" />
+                                    <p className="text-xs font-bold text-slate-600">Uploading video to Supabase Storage...</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2 py-1">
+                                    <Upload className="h-8 w-8 text-slate-400 mx-auto group-hover:scale-110 duration-200 transition" />
+                                    <p className="text-xs font-bold text-slate-700">Drag & drop your .mp4 file here, or click to browse</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">Only .mp4 files. Max 100 MB.</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {videoUploadError && (
+                              <p className="text-[10px] text-rose-500 font-bold mt-1.5 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                                <span>⚠ {videoUploadError}</span>
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {/* Video URL Input */}
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video URL</label>
+                            <input
+                              type="text"
+                              value={videoUrlInput}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setVideoUrlInput(val);
+                                if (val.includes('instagram.com') || val.includes('instagr.am')) {
+                                  setVideoPlatformInput('instagram');
+                                } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
+                                  setVideoPlatformInput('youtube');
+                                }
+                              }}
+                              placeholder={videoPlatformInput === 'youtube'
+                                ? "e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                : "e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"}
+                              className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white"
+                            />
+                            <p className="text-[10px] text-slate-400 font-medium">
+                              {videoPlatformInput === 'youtube'
+                                ? "Enter a YouTube URL. The system automatically pulls details."
+                                : "Enter an Instagram reel or video URL."}
+                            </p>
+                          </div>
+
+                          {/* Thumbnail uploading for Instagram */}
+                          {videoPlatformInput === 'instagram' && (
+                            <div className="space-y-2 mt-4">
+                              <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Reel Thumbnail (Optional)</label>
+                              {videoThumbnailInput ? (
+                                <div className="border border-slate-150 rounded-2xl p-4 bg-slate-50/50">
+                                  <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="h-16 w-12 rounded-lg overflow-hidden border border-slate-100 bg-slate-200 shrink-0">
+                                        <img 
+                                          src={videoThumbnailInput} 
+                                          alt="Reel Thumbnail" 
+                                          className="h-full w-full object-cover"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-xs font-bold text-teal-900">Thumbnail Ready</p>
+                                        <p className="text-[10px] text-teal-600 truncate max-w-[220px]">{videoThumbnailInput}</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                      <label className="p-2 text-teal-600 hover:text-teal-850 hover:bg-teal-50 rounded-lg transition cursor-pointer" title="Replace thumbnail">
+                                        <Pencil className="h-4 w-4" />
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={async (e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                              const file = e.target.files[0];
+                                              if (!file.type.startsWith('image/')) {
+                                                setThumbnailUploadError('Unsupported file type. Only images are accepted.');
+                                                return;
+                                              }
+                                              const maxBytes = 10 * 1024 * 1024; // 10 MB
+                                              if (file.size > maxBytes) {
+                                                setThumbnailUploadError('File too large (Max 10 MB).');
+                                                return;
+                                              }
+                                              setThumbnailUploadError(null);
+                                              setIsUploadingThumbnail(true);
+                                              try {
+                                                const publicUrl = await uploadImage(file);
+                                                setVideoThumbnailInput(publicUrl);
+                                              } catch (err: any) {
+                                                console.error('Thumbnail upload failed:', err);
+                                                setThumbnailUploadError(err.message || 'Failed to upload thumbnail.');
+                                              } finally {
+                                                setIsUploadingThumbnail(false);
+                                              }
+                                            }
+                                          }}
+                                          className="hidden"
+                                        />
+                                      </label>
+                                      <button
+                                        type="button"
+                                        onClick={() => setVideoThumbnailInput('')}
+                                        className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition"
+                                        title="Remove thumbnail"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div
+                                  onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                  onDrop={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                      const file = e.dataTransfer.files[0];
+                                      if (!file.type.startsWith('image/')) {
+                                        setThumbnailUploadError('Unsupported file type.');
+                                        return;
+                                      }
+                                      setThumbnailUploadError(null);
+                                      setIsUploadingThumbnail(true);
+                                      try {
+                                        const publicUrl = await uploadImage(file);
+                                        setVideoThumbnailInput(publicUrl);
+                                      } catch (err: any) {
+                                        setThumbnailUploadError(err.message);
+                                      } finally {
+                                        setIsUploadingThumbnail(false);
+                                      }
+                                    }
+                                  }}
+                                  className="border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-2xl p-6 text-center cursor-pointer bg-slate-50/50 hover:bg-teal-50/10 transition relative group"
+                                >
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                      if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        setIsUploadingThumbnail(true);
+                                        try {
+                                          const publicUrl = await uploadImage(file);
+                                          setVideoThumbnailInput(publicUrl);
+                                        } catch (err: any) {
+                                          setThumbnailUploadError(err.message);
+                                        } finally {
+                                          setIsUploadingThumbnail(false);
+                                        }
+                                      }
+                                    }}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                  />
+                                  {isUploadingThumbnail ? (
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto" />
+                                  ) : (
+                                    <p className="text-xs font-bold text-slate-700">Browse thumbnail image</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Drawer Footer */}
+                  <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVideoDrawerOpen(false);
+                        setEditingVideo(null);
+                        setVideoUrlInput('');
+                        setCustomVideoTitle('');
+                        setVideoThumbnailInput('');
+                        setIsUploadingThumbnail(false);
+                        setThumbnailUploadError(null);
+                        setVideoFile(null);
+                        setVideoUploadError(null);
+                        setIsUploadingVideo(false);
+                      }}
+                      className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition duration-150 cursor-pointer flex items-center gap-1.5 shadow-3xs"
+                    >
+                      <X className="h-4 w-4" />
+                      <span>Cancel</span>
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={handleSaveVideo}
+                      disabled={!videoIdPreview}
+                      className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl transition duration-150 flex items-center gap-1.5 ${
+                        videoIdPreview 
+                          ? 'bg-teal-600 hover:bg-teal-700 shadow-md shadow-teal-500/10 cursor-pointer' 
+                          : 'bg-slate-300 cursor-not-allowed'
+                      }`}
+                    >
+                      <Check className="h-4 w-4" />
+                      <span>Save Video</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
       case 'appointments':
         return <Appointments />;
       case 'implants-cms':
@@ -7328,8 +8924,7 @@ export default function Admin({
                         <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-28">Hero Image</th>
                         <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Title</th>
                         <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Slug</th>
-                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-28">Status</th>
-                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right pr-6 w-72">Actions</th>
+                        <th className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right pr-6 w-80">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -7379,27 +8974,6 @@ export default function Admin({
                             {svc.slug}
                           </td>
 
-                          {/* Active/Inactive Status with Inline Enable/Disable Toggle */}
-                          <td className="px-4 py-4 text-xs">
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                const updatedSvc = { ...svc, is_active: !svc.is_active };
-                                setServicesList(prev => prev.map(s => s.id === svc.id ? updatedSvc : s));
-                                await serviceService.saveService(updatedSvc);
-                              }}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
-                                svc.is_active 
-                                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' 
-                                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
-                              }`}
-                              title={svc.is_active ? "Click to Disable Service" : "Click to Enable Service"}
-                            >
-                              <span className={`w-1.5 h-1.5 rounded-full ${svc.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-                              {svc.is_active ? 'Enabled' : 'Disabled'}
-                            </button>
-                          </td>
-
                           {/* Actions */}
                           <td className="px-4 py-4 text-xs text-right pr-6 whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1.5">
@@ -7412,61 +8986,44 @@ export default function Admin({
                                   setIsSlugTouched(true);
                                   setServiceFormError(null);
                                 }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#0D9488] bg-[#F0FDFA] hover:bg-[#CCFBF1] rounded-lg transition cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#0D9488] bg-[#F0FDFA] hover:bg-[#CCFBF1] rounded-lg transition cursor-pointer font-display"
                                 title={svc.slug === 'dental-implants' || svc.id === 'implants-srv' ? "Open Dental Implants CMS Editor" : "Edit Service details"}
                               >
                                 <Pencil className="h-3 w-3" />
                                 Edit
                               </button>
 
-                              {svc.slug !== 'dental-implants' && svc.id !== 'implants-srv' && (
-                                <>
-                                  {/* Gallery Action */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveServiceEditorTab('gallery');
-                                      setEditingService(svc);
-                                      setIsSlugTouched(true);
-                                      setServiceFormError(null);
-                                    }}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition cursor-pointer"
-                                    title="Manage service gallery images"
-                                  >
-                                    <ImageIcon className="h-3 w-3" />
-                                    Gallery
-                                  </button>
+                              {/* Second Action: Same Dental Implants Status Action/Function */}
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const updatedSvc = { ...svc, is_active: !svc.is_active };
+                                  setServicesList(prev => prev.map(s => s.id === svc.id ? updatedSvc : s));
+                                  await serviceService.saveService(updatedSvc);
+                                }}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
+                                  svc.is_active 
+                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' 
+                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
+                                }`}
+                                title={svc.is_active ? "Click to Disable Service" : "Click to Enable Service"}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${svc.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                                {svc.is_active ? 'Enabled' : 'Disabled'}
+                              </button>
 
-                                  {/* FAQs Action */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveServiceEditorTab('faqs');
-                                      setEditingService(svc);
-                                      setIsSlugTouched(true);
-                                      setServiceFormError(null);
-                                    }}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition cursor-pointer"
-                                    title="Manage service FAQs"
-                                  >
-                                    <MessageCircle className="h-3 w-3" />
-                                    FAQs
-                                  </button>
-
-                                  {/* Delete Action */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setServiceToDelete(svc.id);
-                                    }}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer"
-                                    title="Delete service"
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                    Delete
-                                  </button>
-                                </>
-                              )}
+                              {/* Delete Action (Consistently rendered for all services, including Dental Implants) */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setServiceToDelete(svc.id);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer font-display"
+                                title="Delete service"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                                Delete
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -7583,7 +9140,7 @@ export default function Admin({
         <div className="w-full flex items-center justify-between bg-white border border-slate-200/80 rounded-2xl px-6 py-4 mb-6 shadow-3xs" id="admin-top-bar">
           <div>
             <h2 className="font-display font-black text-[#081C3A] text-sm md:text-base capitalize tracking-wide">
-              {activeTab === 'dashboard' ? 'Overview Dashboard' : `${activeTab} Management`}
+              {activeTab === 'dashboard' ? 'Overview Dashboard' : activeTab === 'dental-tourism' ? 'Dental Tourism CMS' : `${activeTab} Management`}
             </h2>
             <p className="text-[10px] md:text-xs text-slate-400 font-medium">
               Real-time synchronization active • {notifications.filter(n => !n.isRead).length} unread alerts
@@ -8671,7 +10228,7 @@ export default function Admin({
               </div>
             </div>
           ) : (
-            /* Main Full-Width Editor Box */
+            /* Main Full-Width Editor Box for Generic Edit Service */
             <div className="relative bg-white flex-grow flex flex-col w-full h-full">
             {/* Drawer Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
@@ -9295,235 +10852,6 @@ export default function Admin({
                   </div>
                 </div>
 
-                {/* FEATURED TREATMENT VIDEO */}
-                {(() => {
-                  const mConfig = typeof editingService.marketing_config === 'string'
-                    ? (() => { try { return JSON.parse(editingService.marketing_config) } catch(e) { return {} } })()
-                    : (editingService.marketing_config || {});
-                  return (
-                    <div className="border-t border-slate-100 pt-6 space-y-4">
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2">
-                          <Video className="h-4 w-4 text-[#0D9488]" />
-                          <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">Featured Treatment Video</h4>
-                        </div>
-                        {/* Enable / Disable Checkbox */}
-                        <label className="relative inline-flex items-center cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            checked={mConfig.featured_video_enabled !== false}
-                            onChange={(e) => updateMarketingConfig('featured_video_enabled', e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                          <span className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-wider">Enable Section</span>
-                        </label>
-                      </div>
-
-                      {mConfig.featured_video_enabled !== false && (
-                        <div className="space-y-4 animate-fade-in">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Section Heading</label>
-                              <input
-                                type="text"
-                                placeholder="e.g. Watch Our Treatment Procedure In Action"
-                                value={mConfig.featured_video_heading || ''}
-                                onChange={(e) => updateMarketingConfig('featured_video_heading', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              />
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Video Source</label>
-                              <select
-                                value={mConfig.featured_video_source || 'youtube'}
-                                onChange={(e) => updateMarketingConfig('featured_video_source', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              >
-                                <option value="youtube">YouTube (Embedded)</option>
-                                <option value="upload">Direct Uploaded Video File</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Rich Description</label>
-                            <textarea
-                              rows={3}
-                              placeholder="Write a compelling summary of what the video shows and how it educates the patient..."
-                              value={mConfig.featured_video_description || ''}
-                              onChange={(e) => updateMarketingConfig('featured_video_description', e.target.value)}
-                              className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 resize-none"
-                            />
-                          </div>
-
-                          {/* Video URLs based on selected source */}
-                          {mConfig.featured_video_source === 'upload' ? (
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Direct Video File URL</label>
-                              <input
-                                type="text"
-                                placeholder="https://example.com/videos/treatment.mp4"
-                                value={mConfig.featured_video_upload_url || ''}
-                                onChange={(e) => updateMarketingConfig('featured_video_upload_url', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              />
-                            </div>
-                          ) : (
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">YouTube Video URL</label>
-                              <input
-                                type="text"
-                                placeholder="https://www.youtube.com/watch?v=..."
-                                value={mConfig.featured_video_youtube_url || ''}
-                                onChange={(e) => updateMarketingConfig('featured_video_youtube_url', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              />
-                            </div>
-                          )}
-
-                          {/* Thumbnail configuration */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Thumbnail Source</label>
-                              <select
-                                value={mConfig.featured_video_thumbnail_source || 'auto'}
-                                onChange={(e) => updateMarketingConfig('featured_video_thumbnail_source', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              >
-                                <option value="auto">Auto Generate (First Frame / YouTube Cover)</option>
-                                <option value="custom">Upload Custom Thumbnail</option>
-                              </select>
-                            </div>
-
-                            {mConfig.featured_video_thumbnail_source === 'custom' && (
-                              <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Custom Thumbnail Image URL</label>
-                                <input
-                                  type="text"
-                                  placeholder="https://images.unsplash.com/photo-..."
-                                  value={mConfig.featured_video_custom_thumbnail || ''}
-                                  onChange={(e) => updateMarketingConfig('featured_video_custom_thumbnail', e.target.value)}
-                                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Dynamic Bullet Points (Add / Remove) */}
-                          <div className="space-y-2 border border-slate-100 p-4 rounded-2xl bg-slate-50/30">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Featured Video Bullet Points</label>
-                            <div className="space-y-2">
-                              {(mConfig.featured_video_bullets || []).map((bullet: string, index: number) => (
-                                <div key={index} className="flex items-center gap-2">
-                                  <input
-                                    type="text"
-                                    value={bullet}
-                                    onChange={(e) => {
-                                      const list = [...(mConfig.featured_video_bullets || [])];
-                                      list[index] = e.target.value;
-                                      updateMarketingConfig('featured_video_bullets', list);
-                                    }}
-                                    className="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 bg-white text-slate-800"
-                                    placeholder={`Bullet point #${index + 1}`}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const list = (mConfig.featured_video_bullets || []).filter((_: any, i: number) => i !== index);
-                                      updateMarketingConfig('featured_video_bullets', list);
-                                    }}
-                                    className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl cursor-pointer"
-                                  >
-                                    <X className="h-3.5 w-3.5" />
-                                  </button>
-                                </div>
-                              ))}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const list = [...(mConfig.featured_video_bullets || []), ''];
-                                  updateMarketingConfig('featured_video_bullets', list);
-                                }}
-                                className="text-xs text-[#0D9488] hover:text-[#0F766E] font-bold flex items-center gap-1 mt-1 cursor-pointer"
-                              >
-                                + Add Bullet Point
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* CTA button settings */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">CTA Button Text</label>
-                              <input
-                                type="text"
-                                placeholder="e.g. Book Clinic Slot"
-                                value={mConfig.featured_video_cta_text || ''}
-                                onChange={(e) => updateMarketingConfig('featured_video_cta_text', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              />
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">CTA Button Link</label>
-                              <input
-                                type="text"
-                                placeholder="e.g. #appointment, or a full URL"
-                                value={mConfig.featured_video_cta_link || ''}
-                                onChange={(e) => updateMarketingConfig('featured_video_cta_link', e.target.value)}
-                                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Video Player Settings (Autoplay, Mute, Loop) */}
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
-                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Autoplay After Click</span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={mConfig.featured_video_autoplay !== false}
-                                  onChange={(e) => updateMarketingConfig('featured_video_autoplay', e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                              </label>
-                            </div>
-
-                            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
-                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Mute Video</span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={!!mConfig.featured_video_mute}
-                                  onChange={(e) => updateMarketingConfig('featured_video_mute', e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                              </label>
-                            </div>
-
-                            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between select-none">
-                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Loop Video</span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={!!mConfig.featured_video_loop}
-                                  onChange={(e) => updateMarketingConfig('featured_video_loop', e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
 
                 {/* 2. INTRODUCTION SECTION */}
                 <div className="border-t border-slate-100 pt-6 space-y-4">
@@ -10571,6 +11899,15 @@ export default function Admin({
                               />
                             </div>
                           </div>
+
+                          <TestimonialThumbnailUpload
+                            value={testi.thumbnail || testi.thumbnail_url || ''}
+                            onChange={(url) => {
+                              const list = [...(editingService.patient_testimonials || [])];
+                              list[index] = { ...list[index], thumbnail: url, thumbnail_url: url };
+                              setEditingService({ ...editingService, patient_testimonials: list });
+                            }}
+                          />
                         </div>
                       ))}
                     </div>

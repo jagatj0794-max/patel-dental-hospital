@@ -19,13 +19,13 @@ export const detectPlatform = (video: any): 'youtube' | 'instagram' | 'mp4' => {
   if (!video) return 'youtube';
 
   // 1. Explicit check of platform fields
-  if (video.platform === 'mp4' || video.videoPlatform === 'mp4') {
+  if (video.platform === 'mp4' || video.videoPlatform === 'mp4' || video.videoplatform === 'mp4') {
     return 'mp4';
   }
-  if (video.platform === 'instagram' || video.videoPlatform === 'instagram') {
+  if (video.platform === 'instagram' || video.videoPlatform === 'instagram' || video.videoplatform === 'instagram') {
     return 'instagram';
   }
-  if (video.platform === 'youtube' || video.videoPlatform === 'youtube') {
+  if (video.platform === 'youtube' || video.videoPlatform === 'youtube' || video.videoplatform === 'youtube') {
     return 'youtube';
   }
 
@@ -93,8 +93,23 @@ export const videoService = {
       console.warn('Failed to parse local videos storage:', e);
     }
 
+    // Deduplicate helper
+    const deduplicate = (list: DentalVideo[]): DentalVideo[] => {
+      const uniqueList: DentalVideo[] = [];
+      const seen = new Set<string>();
+      for (const item of list) {
+        if (item && item.id) {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            uniqueList.push(item);
+          }
+        }
+      }
+      return uniqueList;
+    };
+
     if (!isSupabaseConfigured()) {
-      return (localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS;
+      return deduplicate((localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS);
     }
 
     try {
@@ -105,7 +120,7 @@ export const videoService = {
 
       if (error) {
         console.warn('Error fetching videos from Supabase:', error);
-        return (localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS;
+        return deduplicate((localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS);
       }
 
       if (!data || data.length === 0) {
@@ -146,40 +161,68 @@ export const videoService = {
       const remoteVideos = data.map((row: any) => {
         // Match with localVideos version if exists to preserve metadata
         const localMatch = localVideos?.find(v => v.id === row.id);
-        const combined = { ...row, ...localMatch };
+
+        let originalTreatment = row.treatment || 'Patient Testimonial';
+        let customThumbnail = '';
+        let customPlatform = '';
+
+        if (originalTreatment.includes('||')) {
+          const parts = originalTreatment.split('||');
+          originalTreatment = parts[0];
+          for (let i = 1; i < parts.length; i++) {
+            if (parts[i].startsWith('thumb:')) {
+              customThumbnail = parts[i].substring(6);
+            } else if (parts[i].startsWith('platform:')) {
+              customPlatform = parts[i].substring(9);
+            }
+          }
+        } else if (originalTreatment.includes('||thumb:')) {
+          const parts = originalTreatment.split('||thumb:');
+          originalTreatment = parts[0];
+          customThumbnail = parts[1];
+        }
+
+        const combined = { 
+          ...row, 
+          platform: customPlatform || row.videoPlatform || row.videoplatform || localMatch?.platform || localMatch?.videoPlatform,
+          videoPlatform: customPlatform || row.videoPlatform || row.videoplatform || localMatch?.videoPlatform || localMatch?.platform
+        };
         const detectedPlatform = detectPlatform(combined);
 
         const id = row.id;
         const platform = detectedPlatform;
         const url = platform === 'mp4' ? id : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/` : `https://www.youtube.com/watch?v=${id}`);
-        const thumbnail = platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/media/?size=l` : `https://img.youtube.com/vi/${id}/hqdefault.jpg`);
+        
+        const thumbnail = customThumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/media/?size=l` : `https://img.youtube.com/vi/${id}/hqdefault.jpg`));
         const createdAt = row.created_at || new Date().toISOString();
 
         return {
           id: id,
           title: row.title || '',
-          treatment: row.treatment || 'Patient Testimonial',
+          treatment: originalTreatment,
           videoPlatform: platform,
           platform: platform,
           url: url,
           youtubeUrl: url,
           thumbnail: thumbnail,
-          category: row.treatment || 'Patient Testimonial',
+          category: originalTreatment,
           createdAt: createdAt
         };
       });
 
+      const uniqueRemoteVideos = deduplicate(remoteVideos);
+
       // Update localStorage with Supabase data
       try {
-        localStorage.setItem('patel_dental_videos_list', JSON.stringify(remoteVideos));
+        localStorage.setItem('patel_dental_videos_list', JSON.stringify(uniqueRemoteVideos));
       } catch (e) {
         console.warn('Error updating local videos cache:', e);
       }
 
-      return remoteVideos;
+      return uniqueRemoteVideos;
     } catch (e) {
       console.warn('Exception in getVideos:', e);
-      return (localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS;
+      return deduplicate((localVideos && localVideos.length > 0) ? localVideos : DEFAULT_VIDEOS);
     }
   },
 
@@ -188,7 +231,19 @@ export const videoService = {
    * Deletes those not present in current set.
    */
   saveVideos: async (videos: DentalVideo[]): Promise<boolean> => {
-    const enrichedVideos = videos.map((video) => {
+    // Unique-ify incoming list by ID to prevent duplicate primary keys
+    const uniqueInput: DentalVideo[] = [];
+    const seen = new Set<string>();
+    for (const v of videos) {
+      if (v && v.id) {
+        if (!seen.has(v.id)) {
+          seen.add(v.id);
+          uniqueInput.push(v);
+        }
+      }
+    }
+
+    const enrichedVideos = uniqueInput.map((video) => {
       const platform = video.platform || video.videoPlatform || detectPlatform(video);
       const url = video.url || video.youtubeUrl || (platform === 'mp4' ? video.id : (platform === 'instagram' ? `https://www.instagram.com/p/${video.id}/` : `https://www.youtube.com/watch?v=${video.id}`));
       const thumbnail = video.thumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${video.id}/media/?size=l` : `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`));
@@ -222,13 +277,31 @@ export const videoService = {
     }
 
     try {
-      const rowsToUpsert = enrichedVideos.map((video, idx) => ({
-        id: video.id,
-        title: video.title,
-        treatment: video.treatment,
-        display_order: idx,
-        videoPlatform: video.videoPlatform || 'youtube'
-      }));
+      const rowsToUpsert = enrichedVideos.map((video, idx) => {
+        const platform = video.videoPlatform || video.platform || detectPlatform(video);
+        let savedTreatment = video.treatment || 'Patient Testimonial';
+        
+        // Always append platform to savedTreatment so it is permanently persisted in database text column
+        savedTreatment = `${savedTreatment}||platform:${platform}`;
+
+        const defaultThumb = platform === 'mp4' 
+          ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` 
+          : (platform === 'instagram' 
+              ? `https://www.instagram.com/p/${video.id}/media/?size=l` 
+              : `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`);
+
+        if (video.thumbnail && video.thumbnail !== defaultThumb) {
+          savedTreatment = `${savedTreatment}||thumb:${video.thumbnail}`;
+        }
+
+        return {
+          id: video.id,
+          title: video.title,
+          treatment: savedTreatment,
+          display_order: idx,
+          videoPlatform: platform
+        };
+      });
 
       const videoIds = enrichedVideos.map(v => v.id);
 

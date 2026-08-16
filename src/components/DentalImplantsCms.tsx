@@ -8,9 +8,9 @@ import { Service } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
-import VideoUploadCmsField from './VideoUploadCmsField';
-import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
 import CmsSectionToggle from './CmsSectionToggle';
+import ProcedureVideoCmsSection from './ProcedureVideoCmsSection';
+import TestimonialThumbnailUpload from './TestimonialThumbnailUpload';
 
 interface DentalImplantsCmsProps {
   onSaveSuccess?: () => void;
@@ -741,16 +741,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* FEATURED TREATMENT VIDEO */}
-        <FeaturedVideoCmsSection
-          mConfig={mConfig}
-          updateMConfigField={updateMConfigField}
-          isExpanded={!!expandedSections.featuredVideo}
-          onToggle={() => toggleSection('featuredVideo')}
-          sectionNumber="2"
-        />
-
-        {/* 3. TREATMENT OVERVIEW */}
+        {/* 2. TREATMENT OVERVIEW */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -760,7 +751,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Treatment Overview</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. Treatment Overview</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section visibility, title, and descriptive introduction</span>
               </div>
             </div>
@@ -799,7 +790,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 3. HOW WE PERFORM DENTAL IMPLANTS */}
+        {/* 2. HOW WE PERFORM DENTAL IMPLANTS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -809,7 +800,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. How We Perform Dental Implants</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. How We Perform Dental Implants</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage advanced clinical workflow stages and step-by-step descriptions</span>
               </div>
             </div>
@@ -982,7 +973,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 4. WHY OUR METHOD IS SUPERIOR */}
+        {/* 3. WHY OUR METHOD IS SUPERIOR */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -992,7 +983,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Heart className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Why Our Method Is Superior</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Why Our Method Is Superior</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section headline and add/reorder comparison highlight cards</span>
               </div>
             </div>
@@ -1114,7 +1105,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 5. CLINICAL CASE GALLERY */}
+        {/* 4. CLINICAL CASE GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1124,7 +1115,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section show/hide and manage clinical gallery images</span>
               </div>
             </div>
@@ -1266,65 +1257,18 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 6. PROCEDURE VIDEO */}
-        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleSection('video')}
-            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
-              <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure title, description, and Instagram Reel URL</span>
-              </div>
-            </div>
-            {expandedSections.video ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-          </button>
-          
-          {expandedSections.video && (
-            <div className="p-6 border-t border-slate-100 space-y-5">
-              <CmsSectionToggle
-                checked={mConfig.show_procedure_video !== false}
-                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
-              />
+        {/* 5. PROCEDURE VIDEO */}
+        <ProcedureVideoCmsSection
+          service={service}
+          mConfig={mConfig}
+          updateServiceField={updateServiceField}
+          updateMConfigField={updateMConfigField}
+          sectionNumber={6}
+          isExpanded={!!expandedSections.video}
+          onToggle={() => toggleSection('video')}
+        />
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_title || 'Screw Retained Prosthesis Procedure'}
-                  onChange={(e) => updateServiceField('procedure_video_title', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Instagram Reel URL</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_url || 'https://www.instagram.com/reel/C8qLd9MyWwG/'}
-                  onChange={(e) => updateServiceField('procedure_video_url', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                  placeholder="e.g. https://www.instagram.com/reel/..."
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Short Video Summary Description</label>
-                <textarea
-                  rows={2}
-                  value={service.procedure_video_description || 'Watch this comprehensive guide detailing how we construct, position, and securely lock the modern screw-retained teeth prosthesis onto premium implants.'}
-                  onChange={(e) => updateServiceField('procedure_video_description', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 leading-normal"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 7. PATIENT TESTIMONIAL VIDEOS */}
+        {/* 6. PATIENT TESTIMONIAL VIDEOS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1334,7 +1278,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonial Reels</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Patient Testimonial Reels</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient Reel testimonial list, names, Instagram Reel URLs, and sort order</span>
               </div>
             </div>
@@ -1428,28 +1372,24 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                              <label className="text-[9px] font-bold text-slate-500 uppercase">Instagram Reel URL</label>
-                              <input
-                                type="text"
-                                value={testi.video_url || ''}
-                                onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)}
-                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
-                                placeholder="e.g. https://www.instagram.com/reel/..."
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <label className="text-[9px] font-bold text-slate-500 uppercase">Custom Cover Thumbnail URL (optional)</label>
-                              <input
-                                type="text"
-                                value={testi.thumbnail || ''}
-                                onChange={(e) => updateTestimonialItemField(idx, 'thumbnail', e.target.value)}
-                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
-                                placeholder="Provide a cover image URL for the Reel preview"
-                              />
-                            </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase">Instagram Reel URL</label>
+                            <input
+                              type="text"
+                              value={testi.video_url || ''}
+                              onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)}
+                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              placeholder="e.g. https://www.instagram.com/reel/..."
+                            />
                           </div>
+
+                          <TestimonialThumbnailUpload
+                            value={testi.thumbnail || testi.thumbnail_url || ''}
+                            onChange={(url) => {
+                              updateTestimonialItemField(idx, 'thumbnail', url);
+                              updateTestimonialItemField(idx, 'thumbnail_url', url);
+                            }}
+                          />
                         </div>
 
                         <button
@@ -1469,7 +1409,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 8. HOSPITAL & TEAM */}
+        {/* 7. HOSPITAL & TEAM */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1479,7 +1419,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Hospital & Team</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Upload hospital premises and clinical team photo collections dynamically</span>
               </div>
             </div>
@@ -1617,7 +1557,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost of Dental Implants</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Cost of Dental Implants</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure premium cost display, saving highlight, call/WhatsApp numbers, and actions</span>
               </div>
             </div>
@@ -1717,7 +1657,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Before & After Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Before & After Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure smile transformations, images before, images after, captions, and display order</span>
               </div>
             </div>
@@ -1893,7 +1833,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 9. FINAL CTA */}
+        {/* 8. FINAL CTA */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1903,7 +1843,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Final CTA</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Final CTA</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure bottom action block, call numbers, WhatsApp prompts, and request callback triggers</span>
               </div>
             </div>
@@ -1970,7 +1910,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 10. GOOGLE PATIENT REVIEWS */}
+        {/* 9. GOOGLE PATIENT REVIEWS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1980,7 +1920,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4 fill-teal-500 text-teal-500" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure premium Google Review cards, ratings, descriptions, photos, and slider links</span>
               </div>
             </div>
@@ -2215,7 +2155,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 11. BOTTOM CALL TO ACTION */}
+        {/* 10. BOTTOM CALL TO ACTION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -2225,7 +2165,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4 fill-teal-500 text-teal-500" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. Bottom Call To Action</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Bottom Call To Action</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure premium full-width CTA block with section heading, short description, action buttons, and background image</span>
               </div>
             </div>
@@ -2356,7 +2296,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
           )}
         </div>
 
-        {/* 12. FREQUENTLY ASKED QUESTIONS (FAQ) */}
+        {/* 11. FREQUENTLY ASKED QUESTIONS (FAQ) */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -2366,7 +2306,7 @@ export default function DentalImplantsCms({ onSaveSuccess }: DentalImplantsCmsPr
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">15. FREQUENTLY ASKED QUESTIONS (FAQ)</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">14. FREQUENTLY ASKED QUESTIONS (FAQ)</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure custom Frequently Asked Questions with questions, answers, and display ordering</span>
               </div>
             </div>

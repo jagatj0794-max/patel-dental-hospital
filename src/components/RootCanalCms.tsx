@@ -9,8 +9,8 @@ import { Service } from '../types';
 import { serviceService, DEFAULT_RCT_GOOGLE_REVIEWS } from '../utils/serviceData';
 import { uploadImage } from '../utils/supabaseStorage';
 import { isSupabaseConfigured } from '../utils/supabase';
-import VideoUploadCmsField from './VideoUploadCmsField';
-import FeaturedVideoCmsSection from './FeaturedVideoCmsSection';
+import ProcedureVideoCmsSection from './ProcedureVideoCmsSection';
+import TestimonialThumbnailUpload from './TestimonialThumbnailUpload';
 
 interface RootCanalCmsProps {
   onSaveSuccess?: () => void;
@@ -883,16 +883,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* FEATURED TREATMENT VIDEO */}
-        <FeaturedVideoCmsSection
-          mConfig={mConfig}
-          updateMConfigField={updateMConfigField}
-          isExpanded={!!expandedSections.featuredVideo}
-          onToggle={() => toggleSection('featuredVideo')}
-          sectionNumber="2"
-        />
-
-        {/* 3. TREATMENT OVERVIEW */}
+        {/* 2. TREATMENT OVERVIEW */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -902,7 +893,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Info className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. Treatment Overview</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">2. Treatment Overview</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section visibility, title, and descriptive introduction</span>
               </div>
             </div>
@@ -940,7 +931,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 3. HOW WE PERFORM */}
+        {/* 2. HOW WE PERFORM */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -950,7 +941,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sliders className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. How We Perform Root Canal Treatment</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">3. How We Perform Root Canal Treatment</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage advanced clinical workflow stages and step-by-step descriptions</span>
               </div>
             </div>
@@ -1025,7 +1016,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 4. WHY OUR METHOD IS SUPERIOR */}
+        {/* 3. WHY OUR METHOD IS SUPERIOR */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1035,7 +1026,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Heart className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Why Our Method Is Superior</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">4. Why Our Method Is Superior</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section headline and add/reorder feature cards</span>
               </div>
             </div>
@@ -1105,7 +1096,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 5. CLINICAL CASE GALLERY */}
+        {/* 4. CLINICAL CASE GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1115,7 +1106,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">6. Clinical Case Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">5. Clinical Case Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure section show/hide and manage gallery images</span>
               </div>
             </div>
@@ -1207,65 +1198,18 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 6. PROCEDURE VIDEO */}
-        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleSection('video')}
-            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Video className="h-4 w-4" /></span>
-              <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Procedure Video</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure procedure video title, URL, and summary text</span>
-              </div>
-            </div>
-            {expandedSections.video ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-          </button>
-          
-          {expandedSections.video && (
-            <div className="p-6 border-t border-slate-100 space-y-5">
-              <CmsSectionToggle
-                checked={mConfig.show_procedure_video !== false}
-                onChange={(checked) => updateMConfigField('show_procedure_video', checked)}
-              />
+        {/* 5. PROCEDURE VIDEO */}
+        <ProcedureVideoCmsSection
+          service={service}
+          mConfig={mConfig}
+          updateServiceField={updateServiceField}
+          updateMConfigField={updateMConfigField}
+          sectionNumber={6}
+          isExpanded={!!expandedSections.video}
+          onToggle={() => toggleSection('video')}
+        />
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Title</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_title || '3D Laser & Rotary Root Canal Procedure'}
-                  onChange={(e) => updateServiceField('procedure_video_title', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-[#0D9488] font-medium bg-white text-slate-800"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video / Instagram Reel URL</label>
-                <input
-                  type="text"
-                  value={service.procedure_video_url || ''}
-                  onChange={(e) => updateServiceField('procedure_video_url', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-[#0D9488] font-medium bg-white text-slate-800"
-                  placeholder="e.g. https://www.instagram.com/reel/..."
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Video Description</label>
-                <textarea
-                  rows={2}
-                  value={service.procedure_video_description || ''}
-                  onChange={(e) => updateServiceField('procedure_video_description', e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-[#0D9488] font-medium bg-white text-slate-800"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 7. PATIENT TESTIMONIAL REELS */}
+        {/* 6. PATIENT TESTIMONIAL REELS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1275,7 +1219,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><MessageSquare className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Patient Testimonials</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">7. Patient Testimonials</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Manage video & written patient testimonials</span>
               </div>
             </div>
@@ -1299,17 +1243,25 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
 
                 {testimonials.map((testi: any, idx: number) => (
                   <div key={testi.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex flex-col sm:flex-row gap-4 items-start relative">
-                    <div className="flex-1 space-y-2 w-full">
+                    <div className="flex-1 space-y-3 w-full">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="text-[9px] font-bold text-slate-500 uppercase">Patient Name</label>
-                          <input type="text" value={testi.patient_name || ''} onChange={(e) => updateTestimonialItemField(idx, 'patient_name', e.target.value)} className="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-white" />
+                          <input type="text" value={testi.patient_name || ''} onChange={(e) => updateTestimonialItemField(idx, 'patient_name', e.target.value)} className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white" />
                         </div>
                         <div>
                           <label className="text-[9px] font-bold text-slate-500 uppercase">Video URL</label>
-                          <input type="text" value={testi.video_url || ''} onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)} className="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-white" placeholder="Instagram reel / YouTube URL" />
+                          <input type="text" value={testi.video_url || ''} onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)} className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white" placeholder="Instagram reel / YouTube URL" />
                         </div>
                       </div>
+
+                      <TestimonialThumbnailUpload
+                        value={testi.thumbnail || testi.thumbnail_url || ''}
+                        onChange={(url) => {
+                          updateTestimonialItemField(idx, 'thumbnail', url);
+                          updateTestimonialItemField(idx, 'thumbnail_url', url);
+                        }}
+                      />
                     </div>
                     <button type="button" onClick={() => deleteTestimonialItem(idx)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="h-4 w-4" /></button>
                   </div>
@@ -1319,7 +1271,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 8. HOSPITAL & TEAM GALLERY */}
+        {/* 7. HOSPITAL & TEAM GALLERY */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1329,7 +1281,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Stethoscope className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Hospital & Team Gallery</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">8. Hospital & Team Gallery</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Upload hospital premises and clinical team photo collections dynamically</span>
               </div>
             </div>
@@ -1457,7 +1409,193 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 9. COST SECTION */}
+        {/* BEFORE & AFTER GALLERY */}
+        <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('beforeAfter')}
+            className="w-full px-6 py-4 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><ImageIcon className="h-4 w-4" /></span>
+              <div>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">Before & After Gallery</span>
+                <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure smile transformations, images before, images after, captions, and display order</span>
+              </div>
+            </div>
+            {expandedSections.beforeAfter ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </button>
+          
+          {expandedSections.beforeAfter && (
+            <div className="p-6 border-t border-slate-100 space-y-5">
+              <CmsSectionToggle
+                checked={mConfig.show_before_after !== false}
+                onChange={(checked) => updateMConfigField('show_before_after', checked)}
+              />
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Heading</label>
+                <input
+                  type="text"
+                  value={mConfig.before_after_heading || 'Before & After Smile Transformations'}
+                  onChange={(e) => updateMConfigField('before_after_heading', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800 font-display font-bold text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Section Description</label>
+                <input
+                  type="text"
+                  value={mConfig.before_after_description || 'See real smile transformations of our root canal treatment patients.'}
+                  onChange={(e) => updateMConfigField('before_after_description', e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-4 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Before & After Smile Transformation Pairs</h5>
+                  <button
+                    type="button"
+                    onClick={addBeforeAfterPair}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 hover:text-teal-600 rounded-lg text-xs font-bold transition cursor-pointer text-slate-700"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add New Pair
+                  </button>
+                </div>
+
+                {beforeAfterPairs.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    No transformation pairs added yet. This section will be hidden on the live page unless pairs are added.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {beforeAfterPairs.map((pair: any, idx: number) => (
+                      <div key={pair.id || idx} className="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl flex flex-col md:flex-row gap-4 items-start relative shadow-3xs hover:border-slate-300 transition-colors">
+                        <div className="flex items-center gap-2 md:flex-col md:gap-1.5 shrink-0">
+                          <span className="h-7 w-7 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-300 shadow-xs">
+                            {idx + 1}
+                          </span>
+                          <div className="flex bg-white border border-slate-150 rounded-lg p-0.5 shadow-3xs">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveBeforeAfterPair(idx, 'up')}
+                              className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 rounded transition"
+                              title="Move Up"
+                            >
+                              <ArrowUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === beforeAfterPairs.length - 1}
+                              onClick={() => moveBeforeAfterPair(idx, 'down')}
+                              className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 rounded transition"
+                              title="Move Down"
+                            >
+                              <ArrowDown className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Image Fields Grid */}
+                        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0 md:w-80">
+                          {/* Before Image */}
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-bold text-red-500 uppercase block">Before Image</label>
+                            <img src={pair.before_image} alt="Before" className="w-full h-20 object-cover rounded-xl border border-slate-200/60 shadow-3xs" referrerPolicy="no-referrer" />
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById(`before-image-file-${idx}`)?.click()}
+                              className="w-full px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-[10px] font-bold text-slate-600 shadow-3xs transition cursor-pointer"
+                            >
+                              Replace Before
+                            </button>
+                            <input
+                              type="file"
+                              id={`before-image-file-${idx}`}
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const url = await handleFileUpload(e.target.files[0]);
+                                  if (url) updateBeforeAfterPairField(idx, 'before_image', url);
+                                }
+                              }}
+                            />
+                          </div>
+
+                          {/* After Image */}
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-bold text-emerald-600 uppercase block">After Image</label>
+                            <img src={pair.after_image} alt="After" className="w-full h-20 object-cover rounded-xl border border-slate-200/60 shadow-3xs" referrerPolicy="no-referrer" />
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById(`after-image-file-${idx}`)?.click()}
+                              className="w-full px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-[10px] font-bold text-slate-600 shadow-3xs transition cursor-pointer"
+                            >
+                              Replace After
+                            </button>
+                            <input
+                              type="file"
+                              id={`after-image-file-${idx}`}
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const url = await handleFileUpload(e.target.files[0]);
+                                  if (url) updateBeforeAfterPairField(idx, 'after_image', url);
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Optional Caption & Display Order */}
+                        <div className="flex-1 space-y-3 w-full">
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase">Caption text (optional)</label>
+                            <input
+                              type="text"
+                              value={pair.caption || ''}
+                              onChange={(e) => updateBeforeAfterPairField(idx, 'caption', e.target.value)}
+                              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              placeholder="Describe the smile reconstruction/treatment..."
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase">Display Order</label>
+                            <input
+                              type="number"
+                              value={pair.display_order || ''}
+                              onChange={(e) => updateBeforeAfterPairField(idx, 'display_order', Number(e.target.value))}
+                              className="w-24 px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              placeholder="10"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() => deleteBeforeAfterPair(idx)}
+                          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                          title="Delete Pair"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 8. COST SECTION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1467,7 +1605,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Cost Section</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">9. Cost Section</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure pricing details, saving highlight, call/WhatsApp numbers, and offer actions</span>
               </div>
             </div>
@@ -1557,7 +1695,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 10. GOOGLE PATIENT REVIEWS */}
+        {/* 9. GOOGLE PATIENT REVIEWS */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1567,7 +1705,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Star className="h-4 w-4 fill-teal-500 text-teal-500" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Google Patient Reviews</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">10. Google Patient Reviews</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure patient Google Reviews cards, ratings, descriptions, photos, and links</span>
               </div>
             </div>
@@ -1794,7 +1932,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 11. BOTTOM CALL TO ACTION */}
+        {/* 10. BOTTOM CALL TO ACTION */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1804,7 +1942,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Sparkles className="h-4 w-4 fill-teal-500 text-teal-500" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Bottom Call To Action</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">11. Bottom Call To Action</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure premium full-width CTA block with section heading, short description, action buttons, and background image</span>
               </div>
             </div>
@@ -1935,7 +2073,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
           )}
         </div>
 
-        {/* 12. FREQUENTLY ASKED QUESTIONS (FAQ) */}
+        {/* 11. FREQUENTLY ASKED QUESTIONS (FAQ) */}
         <div className="bg-white border border-slate-150 rounded-2xl shadow-3xs overflow-hidden">
           <button
             type="button"
@@ -1945,7 +2083,7 @@ export default function RootCanalCms({ onSaveSuccess }: RootCanalCmsProps = {}) 
             <div className="flex items-center gap-2.5">
               <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><HelpCircle className="h-4 w-4" /></span>
               <div>
-                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">13. Frequently Asked Questions (FAQ)</span>
+                <span className="text-xs font-black text-[#081C3A] uppercase tracking-wider block">12. Frequently Asked Questions (FAQ)</span>
                 <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">Configure custom Frequently Asked Questions with questions, answers, and display ordering</span>
               </div>
             </div>

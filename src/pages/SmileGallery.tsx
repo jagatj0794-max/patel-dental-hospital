@@ -125,19 +125,19 @@ export default function SmileGallery({ patientMoments, mediaImages = [] }: Smile
                   viewport={{ once: true }}
                   transition={{ duration: 0.35, delay: (index % 4) * 0.05 }}
                   onClick={() => setLightboxIndex(index)}
-                  className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-[0_4px_20px_rgba(8,28,58,0.02)] hover:shadow-[0_16px_35px_rgba(8,28,58,0.08)] transition-all duration-300 group cursor-pointer flex flex-col justify-between"
+                  className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-[0_5px_16px_rgba(0,0,0,0.20)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.30)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
                 >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
+                  <div className="relative w-full overflow-hidden bg-slate-50">
                     <img
                       src={img.url}
                       alt={img.altText || img.title || 'Patel Dental Hospital Gallery'}
-                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      className="w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-105 block"
                       referrerPolicy="no-referrer"
                       loading="lazy"
                     />
                     
                     {/* Category Badge */}
-                    {img.category && (
+                    {img.category && img.category !== 'Homepage Gallery' && (
                       <span className="absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
                         {img.category}
                       </span>
@@ -149,18 +149,6 @@ export default function SmileGallery({ patientMoments, mediaImages = [] }: Smile
                         <Maximize2 className="h-5 w-5 text-[#0D9488]" />
                       </div>
                     </div>
-                  </div>
-
-                  {/* Title & Branch footer */}
-                  <div className="p-4 bg-white border-t border-slate-50 space-y-1">
-                    <h3 className="font-display font-bold text-slate-800 text-xs sm:text-sm line-clamp-1 group-hover:text-[#0D9488] transition-colors">
-                      {img.title || 'Clinic Asset'}
-                    </h3>
-                    {img.branch && img.branch !== 'All Branches' && (
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {img.branch}
-                      </p>
-                    )}
                   </div>
                 </motion.div>
               ))}
