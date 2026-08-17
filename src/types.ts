@@ -353,3 +353,16 @@ export interface InternationalPatientImage {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface BeforeAfterEntry {
+  id: string;
+  treatment_name: string;
+  before_image_url: string;
+  before_storage_path?: string;
+  after_image_url: string;
+  after_storage_path?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}

@@ -48,7 +48,7 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, SocialServiceItem, TechnologyItem, AwardItem, InternationalPatientImage } from '../types';
+import { PageId, Doctor, PatientMoment, ContactInfo, DentalVideo, Service, ServiceGalleryItem, ServiceFaq, SocialServiceItem, TechnologyItem, AwardItem, InternationalPatientImage, BeforeAfterEntry } from '../types';
 import { Plus, Pencil, Save, X as CloseIcon, ArrowLeft, CalendarDays, Link, ArrowUpDown, Trophy, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
 import { safeStorage } from '../utils/storage';
 import { supabase } from '../utils/supabase';
@@ -64,6 +64,7 @@ import { socialServiceService, generateUUID } from '../utils/socialServiceData';
 import { technologyService } from '../utils/technologyData';
 import { awardsService } from '../utils/awardsData';
 import { internationalPatientsService } from '../utils/internationalPatientsData';
+import { beforeAfterService } from '../utils/beforeAfterData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import Appointments from './Appointments';
 import ServiceDetail from './ServiceDetail';
@@ -79,6 +80,7 @@ import BracesTreatmentCms from '../components/BracesTreatmentCms';
 import WisdomToothSurgeryCms from '../components/WisdomToothSurgeryCms';
 import CmsSectionToggle from '../components/CmsSectionToggle';
 import TestimonialThumbnailUpload from '../components/TestimonialThumbnailUpload';
+import BeforeAfterCms from '../components/BeforeAfterCms';
 
 interface AdminProps {
   setCurrentPage: (page: PageId) => void;
@@ -339,7 +341,7 @@ export default function Admin({
   const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
   const [isLoadingInternationalPatients, setIsLoadingInternationalPatients] = useState(false);
   const [editingInternationalPatient, setEditingInternationalPatient] = useState<InternationalPatientImage | null>(null);
-  const [tourismSubTab, setTourismSubTab] = useState<'image' | 'video'>('image');
+  const [tourismSubTab, setTourismSubTab] = useState<'image' | 'video' | 'before_after'>('image');
 
   const loadInternationalPatientsList = async () => {
     setIsLoadingInternationalPatients(true);
@@ -7960,7 +7962,7 @@ export default function Admin({
               </div>
             </div>
 
-            {/* Selection Options - IMAGE and VIDEO only */}
+            {/* Selection Options - IMAGE, VIDEO and BEFORE & AFTER */}
             <div className="flex border-b border-slate-200">
               <button
                 type="button"
@@ -7983,6 +7985,17 @@ export default function Admin({
                 }`}
               >
                 🎥 Video Management
+              </button>
+              <button
+                type="button"
+                onClick={() => setTourismSubTab('before_after')}
+                className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-200 cursor-pointer ${
+                  tourismSubTab === 'before_after'
+                    ? 'border-teal-600 text-teal-600 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                ✨ Before & After
               </button>
             </div>
 
@@ -8323,6 +8336,11 @@ export default function Admin({
                   </div>
                 )}
               </div>
+            )}
+
+            {/* BEFORE & AFTER MANAGEMENT TAB */}
+            {tourismSubTab === 'before_after' && (
+              <BeforeAfterCms />
             )}
 
             {/* Slide-out Drawer for Adding / Editing Videos (Dental Tourism localized drawer) */}

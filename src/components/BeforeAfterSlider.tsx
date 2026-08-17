@@ -5,12 +5,14 @@ interface BeforeAfterSliderProps {
   beforeImage: string;
   afterImage: string;
   caption?: string;
+  aspectRatio?: string;
 }
 
 export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   beforeImage,
   afterImage,
-  caption
+  caption,
+  aspectRatio = 'aspect-[4/3]'
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(600);
@@ -100,7 +102,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={`Before and after treatment slider${caption ? `: ${caption}` : ''}`}
-        className="relative aspect-[4/3] w-full max-h-[340px] overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/60 focus:ring-offset-2 transition-shadow"
+        className={`relative ${aspectRatio} w-full ${aspectRatio === 'aspect-[4/3]' ? 'max-h-[340px]' : ''} overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/60 focus:ring-offset-2 transition-shadow`}
       >
         {/* After Image (Background) */}
         <img

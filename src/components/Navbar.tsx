@@ -144,9 +144,9 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
         className="bg-gradient-to-r from-[#1488CC] via-[#20B2AA] to-[#6BCB3C] w-full h-[40px] opacity-100 transition-all duration-300 overflow-hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between text-white text-[13px] font-medium tracking-wide">
-          <div className="flex items-center space-x-0 gap-[10px]">
-            <Phone className="h-[21px] w-[21px] shrink-0" fill="#FF4D4F" stroke="#FF4D4F" />
-            <span className="font-bold text-[17px] text-white leading-none select-all">{contactInfo?.phone || '+91 9510397046'}</span>
+          <div className="flex items-center space-x-0 gap-1.5 sm:gap-[10px]">
+            <Phone className="h-4.5 w-4.5 sm:h-[21px] sm:w-[21px] shrink-0" fill="#FF4D4F" stroke="#FF4D4F" />
+            <span className="font-bold text-[13.5px] sm:text-[17px] text-white leading-none select-all">{contactInfo?.phone || '+91 9510397046'}</span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPin className="h-3.5 w-3.5" />
@@ -159,8 +159,8 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
       {/* Main Navbar */}
       <div className={`transition-all duration-300 ${
         isScrolled 
-          ? 'py-1 sm:py-1.5 lg:py-2' 
-          : 'py-2 sm:py-3 lg:py-3.5'
+          ? 'py-0.5 sm:py-1.5 lg:py-2' 
+          : 'py-1 sm:py-3 lg:py-3.5'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between flex-nowrap">
@@ -174,7 +174,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                 id="navbar-brand-logo-img"
                 src="/Best Dntal Hospital Rajkot.PNG" 
                 alt="Patel Dental Hospital Logo"
-                className="w-auto h-[52px] sm:h-[60px] lg:h-[72px] object-contain transition-all duration-300 group-hover:scale-[1.02] origin-left bg-transparent rounded-lg max-w-[65vw] sm:max-w-[340px] lg:max-w-[380px] xl:max-w-[500px]"
+                className="w-auto h-[40px] sm:h-[60px] lg:h-[72px] object-contain transition-all duration-300 group-hover:scale-[1.02] origin-left bg-transparent rounded-lg max-w-[65vw] sm:max-w-[340px] lg:max-w-[380px] xl:max-w-[500px]"
               />
             </div>
 

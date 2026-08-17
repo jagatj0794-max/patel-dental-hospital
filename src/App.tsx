@@ -806,7 +806,7 @@ export default function App() {
           />
         );
       case 'international':
-        return <DentalTourism openAppointmentModal={openAppointmentModal} />;
+        return <DentalTourism openAppointmentModal={openAppointmentModal} setCurrentPage={setCurrentPage} />;
       case 'academy':
       case 'blogs':
         return (
