@@ -1614,12 +1614,12 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 </thead>
                 <tbody className="divide-y divide-slate-100/80">
                   {[
-                    { name: "Dental Implant", duration: "X–X days" },
-                    { name: "Multiple Implants", duration: "X–X days" },
-                    { name: "Smile Makeover", duration: "X–X days" },
-                    { name: "Full-Mouth Rehabilitation", duration: "X–X days" },
-                    { name: "Zirconia Crowns", duration: "X–X days" },
-                    { name: "Root Canal + Crown", duration: "X–X days" }
+                    { name: "Dental Implant", duration: "7–15 days" },
+                    { name: "Multiple Implants", duration: "7–15 days" },
+                    { name: "Smile Makeover", duration: "7–15 days" },
+                    { name: "Full-Mouth Rehabilitation", duration: "7–15 days" },
+                    { name: "Zirconia Crowns", duration: "7–15 days" },
+                    { name: "Root Canal + Crown", duration: "7–15 days" }
                   ].map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-4 px-6 font-sans font-semibold text-[#0B1D3A] text-sm sm:text-base">
