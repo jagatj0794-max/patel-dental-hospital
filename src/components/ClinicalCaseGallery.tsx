@@ -82,12 +82,12 @@ const SlideCard: React.FC<SlideCardProps> = ({ item, category, index, onClick })
 
   return (
     <div
-      className="relative bg-white border border-slate-200/90 rounded-2xl p-2 sm:p-2.5 flex flex-col items-center justify-center h-auto shadow-xs hover:shadow-md group/img transition-all duration-300 hover:border-teal-400/60 cursor-zoom-in"
+      className="relative flex flex-col items-center justify-center w-full h-auto group/img cursor-zoom-in"
       onClick={onClick}
     >
-      <div className="relative w-full overflow-hidden rounded-xl bg-slate-50 min-h-[180px] sm:min-h-[240px] md:min-h-[280px] flex items-center justify-center">
+      <div className="relative w-full flex items-center justify-center rounded-xl">
         {!isLoaded && (
-          <div className="absolute inset-0 bg-slate-100/60 animate-pulse flex items-center justify-center">
+          <div className="absolute inset-0 bg-slate-100/60 animate-pulse flex items-center justify-center rounded-xl">
             <div className="h-6 w-6 rounded-full border-2 border-slate-300/40 border-t-slate-500 animate-spin" />
           </div>
         )}
@@ -96,9 +96,7 @@ const SlideCard: React.FC<SlideCardProps> = ({ item, category, index, onClick })
           alt={item.caption || item.title || `${category} Case ${index + 1}`}
           onLoad={() => setIsLoaded(true)}
           draggable={false}
-          className={`max-h-[180px] sm:max-h-[240px] md:max-h-[280px] max-w-full object-contain mx-auto rounded-xl shadow-2xs transition-all duration-300 group-hover/img:scale-[1.015] select-none ${
-            isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          }`}
+          className="max-h-[180px] sm:max-h-[240px] md:max-h-[280px] max-w-full object-contain mx-auto rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.24)] transition-all duration-300 group-hover/img:scale-[1.015] select-none opacity-100 scale-100"
           referrerPolicy="no-referrer"
         />
         <button
@@ -113,11 +111,6 @@ const SlideCard: React.FC<SlideCardProps> = ({ item, category, index, onClick })
           <Maximize2 className="h-3.5 w-3.5" />
         </button>
       </div>
-      {(item.caption || item.title) && (
-        <p className="mt-2.5 text-xs font-bold text-slate-700 text-center px-1 truncate w-full font-sans">
-          {item.caption || item.title}
-        </p>
-      )}
     </div>
   );
 };
@@ -629,7 +622,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
               ))}
             </div>
 
-            {/* Incoming sliding element */}
+             {/* Incoming sliding element */}
             <div
               className={`absolute inset-0 grid gap-3 sm:gap-5 ${gridLayout} ${
                 direction === 'left' ? 'animate-slide-in-right' : 'animate-slide-in-left'
@@ -637,7 +630,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
             >
               {currentVisible.map(({ item, actualIndex }) => (
                 <SlideCard
-                  key={`current-${actualIndex}`}
+                  key={`slide-${actualIndex}`}
                   item={item}
                   category={cat}
                   index={actualIndex}
@@ -651,7 +644,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
           <div className={`relative w-full grid gap-3 sm:gap-5 ${gridLayout}`}>
             {currentVisible.map(({ item, actualIndex }) => (
               <SlideCard
-                key={`static-${actualIndex}`}
+                key={`slide-${actualIndex}`}
                 item={item}
                 category={cat}
                 index={actualIndex}
@@ -804,32 +797,32 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
       {/* Hardware Accelerated Sliding Animation Keyframe CSS Style Injection */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes slideOutLeft {
-          0% { transform: translate3d(0, 0, 0); opacity: 1; }
-          100% { transform: translate3d(-100%, 0, 0); opacity: 0; }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-100%, 0, 0); }
         }
         @keyframes slideOutRight {
-          0% { transform: translate3d(0, 0, 0); opacity: 1; }
-          100% { transform: translate3d(100%, 0, 0); opacity: 0; }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(100%, 0, 0); }
         }
         @keyframes slideInLeft {
-          0% { transform: translate3d(-100%, 0, 0); opacity: 0; }
-          100% { transform: translate3d(0, 0, 0); opacity: 1; }
+          0% { transform: translate3d(-100%, 0, 0); }
+          100% { transform: translate3d(0, 0, 0); }
         }
         @keyframes slideInRight {
-          0% { transform: translate3d(100%, 0, 0); opacity: 0; }
-          100% { transform: translate3d(0, 0, 0); opacity: 1; }
+          0% { transform: translate3d(100%, 0, 0); }
+          100% { transform: translate3d(0, 0, 0); }
         }
         .animate-slide-out-left {
-          animation: slideOutLeft 350ms forwards cubic-bezier(0.25, 1, 0.5, 1);
+          animation: slideOutLeft 350ms forwards ease-in-out;
         }
         .animate-slide-out-right {
-          animation: slideOutRight 350ms forwards cubic-bezier(0.25, 1, 0.5, 1);
+          animation: slideOutRight 350ms forwards ease-in-out;
         }
         .animate-slide-in-left {
-          animation: slideInLeft 350ms forwards cubic-bezier(0.25, 1, 0.5, 1);
+          animation: slideInLeft 350ms forwards ease-in-out;
         }
         .animate-slide-in-right {
-          animation: slideInRight 350ms forwards cubic-bezier(0.25, 1, 0.5, 1);
+          animation: slideInRight 350ms forwards ease-in-out;
         }
       ` }} />
 

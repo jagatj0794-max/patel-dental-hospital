@@ -628,47 +628,53 @@ export default function Home({
         </div>
 
         {/* DEDICATED MOBILE & TABLET HERO VIEW (ONLY visible on mobile/tablet screens lg:hidden) */}
-        <div className="block lg:hidden relative w-full h-[660px] sm:h-[740px] md:h-[800px] overflow-hidden bg-white pt-[108px] sm:pt-[124px]">
-          {/* Main Background Image - Containing doctors, reception desk on left, logo wall on right */}
+        <div className="block lg:hidden relative w-full h-[660px] sm:h-[740px] md:h-[800px] overflow-hidden bg-white md:bg-[#FAFAFC] pt-[108px] sm:pt-[124px] md:pt-[120px]">
+          {/* Main Background Image / Layers */}
           <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
-            {/* 
-              TODO:
-              Replace hero collage with doctor's original photo / hospital photo / staff photo once assets are provided.
-            */}
-            {/* Mobile background (< 768px/md) */}
+            {/* Mobile background (< 768px/md) - Cover background */}
             <img 
               src={heroBgImageMobile || heroBgImage || "/patel mobile hero.jpeg"} 
               alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
               className="block md:hidden w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
             />
-            {/* Tablet background (>= 768px/md up to lg) */}
+            {/* Tablet background (>= 768px/md up to lg) - Full-cover background image */}
             <img 
-              src={heroBgImage || "/parel doctor.png"} 
-              alt="Dr. Vipul Patel and Dr. Kinjal Patel at Patel Dental Hospital reception" 
-              className="hidden md:block w-full h-full object-cover object-[center_top]"
+              src="/teblate background.webp" // Tablet background image path from user
+              alt="Patel Dental Hospital Tablet Background" 
+              className="hidden md:block w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
             />
 
           </div>
 
-          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3.5 px-4 sm:px-6 relative z-10 pt-3 sm:pt-4 pb-4">
+          {/* Tablet Foreground Doctor Image - Independent layer on the RIGHT side (>= 768px/md up to lg) */}
+          <div className="hidden md:block lg:hidden absolute right-0 bottom-0 w-[54%] h-[100%] z-10 pointer-events-none overflow-hidden">
+            <img 
+              src="/Teblate hero image.webp" 
+              alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
+              className="w-full h-full object-cover object-[center_top] scale-[1.25] origin-top"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3.5 px-4 sm:px-6 relative z-20 pt-12 sm:pt-4 pb-4 md:items-start md:text-left md:mx-0 md:ml-[6%] md:max-w-[42%] md:pt-[10%]">
             
             {/* 2. Headline */}
-            <div className="flex flex-col text-center space-y-2 max-w-[450px]">
+            <div className="flex flex-col text-center space-y-2 max-w-[450px] md:text-left md:items-start">
               {/* Main Heading */}
-              <h1 className="font-display text-[21px] sm:text-[24px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+              <h1 className="font-display text-[24px] sm:text-[24px] md:text-[28px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap md:whitespace-normal">
                 WORLD CLASS <span className="text-[#00897B]">DENTAL CARE</span>
               </h1>
               {/* Secondary Heading */}
-              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#1E3A5F] leading-snug flex flex-col space-y-1.5 sm:space-y-2">
+              <div className="font-display text-[11px] sm:text-[12.5px] md:text-[14px] font-extrabold text-[#1E3A5F] leading-snug flex flex-col space-y-1.5 sm:space-y-2 md:space-y-2">
                 <span>Best Dental Hospital In India</span>
                 <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
               </div>
             </div>
 
             {/* 4 & 5. Buttons below description, horizontal row of two equal buttons with improved styling */}
-            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-2.5 sm:pt-3.5">
+            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] md:max-w-[390px] mx-auto pt-5.5 sm:pt-3.5 md:pt-4 md:mx-0 md:justify-start">
               <button
                 onClick={() => openAppointmentModal()}
                 className="h-[38px] sm:h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
@@ -691,7 +697,7 @@ export default function Home({
         </div>
 
         {/* Compact Premium Visit Info Card for Mobile/Tablet (Visible on lg:hidden) - Floats over the hero image bottom border */}
-        <div className="block lg:hidden px-4 relative z-20 -mt-10 sm:-mt-14 pb-6">
+        <div className="block lg:hidden px-4 relative z-20 mt-4 sm:-mt-14 pb-6">
           <div 
             className="w-full max-w-md mx-auto rounded-[20px] overflow-hidden bg-white border border-[#E5E7EB] shadow-md flex flex-col"
           >
@@ -871,7 +877,7 @@ export default function Home({
         </div>
       </section>
       {/* 3. Patel Dental Hospital Milestones */}
-      <section className="pt-12 sm:pt-16 lg:pt-[130px] xl:pt-[135px] pb-8 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
+      <section className="pt-8 sm:pt-16 lg:pt-[130px] xl:pt-[135px] pb-5 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* New Horizontal Desktop Feature Section (Desktop Only) */}
           <motion.div 
@@ -1169,7 +1175,7 @@ export default function Home({
       </section>
 
       {/* 4. Patient Video Testimonials */}
-      <section className="py-16 sm:py-20 bg-white relative z-10 border-t border-sky-100/30" id="patient-success-stories">
+      <section className="py-12 sm:py-20 bg-white relative z-10 border-t border-sky-100/30" id="patient-success-stories">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
@@ -1258,7 +1264,7 @@ export default function Home({
       </section>
 
       {/* Awards Section */}
-      <section className="py-16 sm:py-20 bg-slate-50/50 relative z-10 border-t border-sky-100/30" id="awards-and-recognitions">
+      <section className="py-12 sm:py-20 bg-slate-50/50 relative z-10 border-t border-sky-100/30" id="awards-and-recognitions">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
@@ -1473,7 +1479,7 @@ export default function Home({
       />
 
       {/* Services Section */}
-      <section className="pt-12 sm:pt-16 lg:pt-32 pb-24 lg:pb-32 bg-[#FAFAFC] relative z-10 border-t border-slate-100" id="services">
+      <section className="pt-8 sm:pt-16 lg:pt-32 pb-16 lg:pb-32 bg-[#FAFAFC] relative z-10 border-t border-slate-100" id="services">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">
@@ -1603,7 +1609,7 @@ export default function Home({
 
 
       {/* 9. Book Your Consultation Today */}
-      <section className="py-16 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="book-consultation-cta">
+      <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="book-consultation-cta">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-[#081C3A]/[0.02] via-[#0D9488]/[0.01] to-white rounded-[32px] border border-slate-100 p-8 sm:p-12 lg:p-16 shadow-[0_10px_45px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_55px_rgba(8,28,58,0.06)] transition-all duration-500 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#0D9488]/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none" />
@@ -1716,7 +1722,7 @@ export default function Home({
 
 
       {/* 12. Advanced Dental Care With A Personal Touch */}
-      <section className="py-16 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="advanced-care-personal">
+      <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="advanced-care-personal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
@@ -1782,7 +1788,7 @@ export default function Home({
       </section>
 
       {/* 13. What Our Patients Say */}
-      <section className="py-16 sm:py-24 bg-slate-50/50 relative z-10 border-t border-slate-100" id="patient-reviews">
+      <section className="py-12 sm:py-24 bg-slate-50/50 relative z-10 border-t border-slate-100" id="patient-reviews">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
@@ -1869,7 +1875,7 @@ export default function Home({
       </section>
 
       {/* 14. Need Help With Your Smile? */}
-      <section className="py-16 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="need-help-cta">
+      <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="need-help-cta">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
@@ -1969,7 +1975,7 @@ export default function Home({
       </section>
 
       {/* 15. Frequently Asked Questions (Moved above Footer) */}
-      <section className="py-16 sm:py-24 bg-slate-50/40 relative z-10 border-t border-slate-100" id="frequently-asked-questions">
+      <section className="py-12 sm:py-24 bg-slate-50/40 relative z-10 border-t border-slate-100" id="frequently-asked-questions">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">

@@ -408,9 +408,9 @@ export default function Contact({
                     <span className="text-gray-400">Monday - Saturday (Evening)</span>
                     <span className="font-semibold">04:00 PM - 08:00 PM</span>
                   </div>
-                  <div className="flex justify-between items-center text-amber-400">
-                    <span>Sunday Availability</span>
-                    <span className="font-semibold">Emergency / Custom Booking Only</span>
+                  <div className="flex justify-between items-center text-red-400">
+                    <span>Sunday</span>
+                    <span className="font-semibold">Closed</span>
                   </div>
                 </div>
               </div>

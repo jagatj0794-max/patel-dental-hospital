@@ -965,6 +965,7 @@ export default function App() {
         <FloatingActionPanel 
           openAppointmentModal={openAppointmentModal} 
           contactInfo={contactInfo}
+          currentPage={currentPage}
         />
       )}
 

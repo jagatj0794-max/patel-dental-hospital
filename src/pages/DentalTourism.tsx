@@ -819,7 +819,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
               
               {/* Title */}
               <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[30px] tracking-tight mt-4 sm:mt-6 mb-2 sm:mb-4 leading-tight">
-                15+ Years of Excellence
+                14+ Years of Excellence
               </h3>
               
               {/* Description */}
