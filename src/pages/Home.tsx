@@ -936,18 +936,18 @@ export default function Home({
       {/* 3. Patel Dental Hospital Milestones */}
       <section className="pt-8 sm:pt-16 lg:pt-[130px] xl:pt-[135px] pb-5 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* New Horizontal Desktop Feature Section (Desktop Only) */}
+          {/* New Horizontal Feature Section - Visible on Desktop, Tablet, and Mobile */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0.1, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="hidden lg:block lg:mt-[55px] mb-16"
+            viewport={{ once: true, amount: "any" }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="block lg:mt-[55px] mb-16"
           >
             <div className="w-full bg-white rounded-[24px] border border-slate-200/50 shadow-[0_15px_40px_rgba(8,28,58,0.06)] overflow-hidden">
-              <div className="grid grid-cols-5 gap-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0">
                 {/* COLUMN 1 */}
-                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/Digital Dental Experts.webp" 
@@ -965,7 +965,7 @@ export default function Home({
                 </div>
 
                 {/* COLUMN 2 */}
-                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/Dental Implants.webp" 
@@ -983,7 +983,7 @@ export default function Home({
                 </div>
 
                 {/* COLUMN 3 */}
-                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/Aligners.webp" 
@@ -1001,7 +1001,7 @@ export default function Home({
                 </div>
 
                 {/* COLUMN 4 */}
-                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/Root Canal.webp" 
@@ -1019,7 +1019,7 @@ export default function Home({
                 </div>
 
                 {/* COLUMN 5 */}
-                <div className="flex flex-col items-center text-center p-8 border-r border-slate-100 last:border-r-0 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-slate-100 col-span-1 sm:col-span-2 lg:col-span-1 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/Oral & Maxillofacial Surgery.png" 
