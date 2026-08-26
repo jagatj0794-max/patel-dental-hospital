@@ -20,6 +20,14 @@ PROFESSIONAL MEMBERSHIPS
 • Active Member of Indian Dental Association (IDA)
 • Life Member of Indian Society of Oral Implantology (ISOI)
 
+PERSONAL PHILOSOPHY
+
+She actively implements valuable learnings from renowned mentors to continuously provide the highest standard of dental care:
+
+• Santosh Nair
+• Sandeep Maheshwari
+• Sadhguru
+
 ADVANCED TRAINING, FELLOWSHIPS & CERTIFICATIONS
 
 • Fellowship Accreditation – Indian Society of Oral Implantology
@@ -43,35 +51,21 @@ She strongly believes in teamwork, leadership, and continuous improvement.
 
 She is dedicated to mentoring freshly graduated dentists and dental assistants to improve the overall quality of dental healthcare.
 
-PERSONAL PHILOSOPHY
+CLINICAL EXPERIENCE
 
-Dr. Kinjal Patel is an enthusiastic entrepreneur who continuously strives to provide the highest standard of dental care to every patient.
-
-She is passionate about continuous learning and professional development.
-
-She actively implements valuable learnings from renowned mentors including:
-
-• Santosh Nair
-• Sandeep Maheshwari
-• Sadhguru
-
-She also enjoys reading biographies, leadership books, and life lessons from great writers to strengthen both her professional and spiritual mindset.
+• Aesthetic Dentist practicing in Rajkot since 2012
+• Dental Implant Surgeon
+• More than 14 Years of Clinical Experience
+• Extensive Experience in Oral Surgery
+• Extensive Experience in Aesthetic Dentistry
+• Special Interest in Pediatric Dentistry
+• Special Interest in Single Sitting Root Canal Treatment
 
 AWARDS & RECOGNITION
 
 • Awarded "Aesthetic Dentist of the Year"
 • Awarded "Best Dental Hospital in India"
-• Recognition received from FAMDENT in 2022, one of India's most prestigious organizations in Dentistry.
-
-CLINICAL EXPERIENCE
-
-• Aesthetic Dentist practicing in Rajkot since 2012
-• Dental Implant Surgeon
-• More than 11 Years of Clinical Experience
-• Extensive Experience in Oral Surgery
-• Extensive Experience in Aesthetic Dentistry
-• Special Interest in Pediatric Dentistry
-• Special Interest in Single Sitting Root Canal Treatment`,
+• Recognition received from FAMDENT in 2022, one of India's most prestigious organizations in Dentistry.`,
     quote: 'Dr. Kinjal Patel is committed to providing patient-focused dental care with modern technology and advanced treatment planning.',
     bdsYear: '2012',
     bdsInstitution: 'Government Dental College, Jamnagar',
@@ -125,29 +119,36 @@ PROFESSIONAL MEMBERSHIPS
 
 ADVANCED TRAINING, FELLOWSHIPS & CERTIFICATIONS
 
+### Advanced implant surgery training (12 programmes)
 • Accreditation in Diplomateship & Fellowship – Indian Society of Oral Implantology
-• Mastership in Implant Prosthodontics
-• Fellowship in Implantology – International Congress of Oral Implantologists (USA)
 • Advanced Hard & Soft Tissue Management in Dental Implants Training by Dr. Dong Seok Sohn (Korea)
-• Computer Assisted Digital Densification in Implant Placement utilizing C-Guide Protocol by Dr. Richard Martin
 • Parameter for Success in Hard Tissue Development by Dr. Michael A. Pikos
-• Pedicled Flap from Hard Palate for Soft Tissue Augmentation by Dr. Radoslaw Iadach (Poland)
-• Osseodensification Workshop – Optimize Site and Optimize Outcome in Implant Dentistry by Dr. Salah Huwais
 • Autogenous Tuberosity Bone Grafting Technique in Implant Dentistry by Dr. Sniezana Poul
 • Newest and Latest Sinus Lift Technique by Dr. Samuel Lee
 • Autologous Blood from Tuberosity Area to Seal Sinus Perforation Workshop by Dr. Samuel Lee
 • Osseodensification – A Paradigm Shift in Sinus Lift Procedure by Prof. Ziv Mazor (Israel)
 • The Khoury Technique, Osseodensification & Partial Extraction Therapy by Dr. Howard Gluckman
-• Same Day Restoration in Implant Dentistry – Parameters for Success by Dr. Costa Nicolopoulos
 • Nerve Transposition Technique in Atrophic Mandible by Dr. Mazem Tamimi
+
+### Digital and guided surgery (4 programmes)
+• Fellowship in Implantology – International Congress of Oral Implantologists (USA)
+• Computer Assisted Digital Densification in Implant Placement utilizing C-Guide Protocol by Dr. Richard Martin
+• Osseodensification Workshop – Optimize Site and Optimize Outcome in Implant Dentistry by Dr. Salah Huwais
 • Clinical Aspects of Modern Implant Protocol by Dr. Kleanthis Manolakhis
+• Digital Workflow of Implant Dentistry from CBCT to Surgery and Immediate Loading by Dr. Byungho Choi
+
+### Immediate loading and same-day teeth (4 programmes)
+• Mastership in Implant Prosthodontics
+• Same Day Restoration in Implant Dentistry – Parameters for Success by Dr. Costa Nicolopoulos
 • Improve the Outcome for All-on-4 & All-on-6 Cases with Osseodensification using Densah Bur by Dr. Jack T. Krauser
 • Pterygoid Implants, All-on-4, All-on-6 & Immediate Loading by Dr. Rudberg Omri (Israel)
+• Immediate Implant Placement with One-Day Restoration by Isaac Tawil
+
+### Soft tissue and aesthetics (3 programmes)
+• Pedicled Flap from Hard Palate for Soft Tissue Augmentation by Dr. Radoslaw Iadach (Poland)
 • Soft Tissue Management by Dr. Ricardo Kern (Brazil)
 • IDR & Osseo Densification by Dr. Jose Carlos Martins Da Rosa
 • Osseodensification with Bio-Activators & Autologous Tissue Graft (Platelet Growth Factors) by Prof. Nelson Pinto
-• Immediate Implant Placement with One-Day Restoration by Isaac Tawil
-• Digital Workflow of Implant Dentistry from CBCT to Surgery and Immediate Loading by Dr. Byungho Choi
 
 RESEARCH
 

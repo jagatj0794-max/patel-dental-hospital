@@ -44,8 +44,8 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
 
   const [activeDoctor, setActiveDoctor] = useState<Doctor | null>(null);
 
-  // Ensure Dr. Vipul Patel appears first, followed by Dr. Kinjal Patel, then any other doctors
-  const doctorsData = [...doctorsList].sort((a, b) => {
+// Ensure Dr. Vipul Patel appears first, followed by Dr. Kinjal Patel, then any other doctors
+  const rawDoctors = [...doctorsList].sort((a, b) => {
     const nameA = (a.name || '').toLowerCase();
     const nameB = (b.name || '').toLowerCase();
     if (nameA.includes('vipul')) return -1;
@@ -54,6 +54,27 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
     if (nameB.includes('kinjal')) return 1;
     return 0;
   });
+
+  const replaceImplantologists = <T,>(obj: T): T => {
+    if (typeof obj === 'string') {
+      return obj.replace(/Dental Implantologists/g, 'Dental Implantologist') as unknown as T;
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(item => replaceImplantologists(item)) as unknown as T;
+    }
+    if (obj !== null && typeof obj === 'object') {
+      const newObj: any = {};
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          newObj[key] = replaceImplantologists(obj[key]);
+        }
+      }
+      return newObj as T;
+    }
+    return obj;
+  };
+
+  const doctorsData = replaceImplantologists(rawDoctors);
 
   return (
     <div id="doctors-page-view" className="relative pt-[108px] sm:pt-[124px] lg:pt-[140px] bg-slate-50/50 min-h-screen">
@@ -108,8 +129,8 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                       {doctor.designation}
                     </span>
                     {doctor.experience && (
-                      <span className="text-[10px] bg-sky-50 text-sky-700 border border-sky-100 px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider">
-                        {doctor.experience}+ Years Exp.
+                      <span className={`text-[10px] bg-sky-50 text-sky-700 border border-sky-100 px-2.5 py-0.5 rounded-full font-extrabold tracking-wider ${doctor.id === 'vipul' ? '' : 'uppercase'}`}>
+                        {doctor.id === 'vipul' ? '14+ Years Experience' : `${doctor.experience.endsWith('+') ? doctor.experience : `${doctor.experience}+`} Years Exp.`}
                       </span>
                     )}
                   </div>
@@ -203,7 +224,7 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
               <DoctorBioRenderer bioText={doctor.briefIntro} doctorName={doctor.name} />
 
               {/* Clinical Specializations & Expertises */}
-              {doctor.expertises && doctor.expertises.length > 0 && (
+              {doctor.expertises && doctor.expertises.length > 0 && doctor.id !== 'vipul' && doctor.id !== 'kinjal' && (
                 <div className="mt-6 pt-6 border-t border-slate-100">
                   <h4 className="font-display font-extrabold text-xs uppercase tracking-wider text-slate-400 mb-3">
                     Specialized Procedures & Clinical Expertise

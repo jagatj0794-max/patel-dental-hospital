@@ -628,7 +628,7 @@ export default function Home({
         </div>
 
         {/* MOBILE HERO VIEW (ONLY visible on mobile screens < 768px) */}
-        <div className="block md:hidden relative w-full h-[660px] sm:h-[740px] overflow-hidden bg-white pt-[108px] sm:pt-[124px]">
+        <div className="block md:hidden relative w-full h-[640px] sm:h-[720px] overflow-hidden bg-white pt-[88px] sm:pt-[100px]">
           {/* Mobile Background Image */}
           <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             <img 
@@ -639,7 +639,12 @@ export default function Home({
             />
           </div>
 
-          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3.5 px-4 sm:px-6 relative z-20 pt-12 sm:pt-4 pb-4">
+          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3 px-4 sm:px-6 relative z-20 pt-6 sm:pt-4 pb-4">
+            {/* 1. Small trust badge */}
+            <span className="inline-flex items-center justify-center text-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[9px] sm:text-[11px] leading-snug uppercase tracking-widest shadow-md mb-2 animate-fade-in max-w-[95%]">
+              <span className="text-[18px] sm:text-[22px] leading-none shrink-0 mr-2 select-none">🏆</span> AWARDED AS BEST DENTAL HOSPITAL IN INDIA BY FAMDENT
+            </span>
+
             {/* Headline */}
             <div className="flex flex-col text-center space-y-2 max-w-[450px]">
               {/* Main Heading */}
@@ -647,17 +652,17 @@ export default function Home({
                 WORLD CLASS <span className="text-[#00897B]">DENTAL CARE</span>
               </h1>
               {/* Secondary Heading */}
-              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#1E3A5F] leading-snug flex flex-col space-y-1.5 sm:space-y-2">
+              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#1E3A5F] leading-snug flex flex-col space-y-2">
                 <span>Best Dental Hospital In India</span>
                 <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
               </div>
             </div>
 
             {/* CTA Buttons */}
-            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-5.5 sm:pt-3.5">
+            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-4 sm:pt-3">
               <button
                 onClick={() => openAppointmentModal()}
-                className="h-[38px] sm:h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                className="h-[38px] sm:h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
               >
                 <Calendar className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] shrink-0" />
                 <span className="whitespace-nowrap">Free Consultation</span>
@@ -677,46 +682,46 @@ export default function Home({
         </div>
 
         {/* TABLET HERO VIEW (ONLY visible on tablet screens: 768px <= width < 1024px) */}
-        <div className="hidden md:block lg:hidden relative w-full h-[550px] md:h-[570px] overflow-hidden bg-[#EEF5F3] pt-[105px] pb-0 border-b border-[#00897B]/20">
+        <div className="hidden md:block lg:hidden relative w-full h-[520px] md:h-[540px] overflow-hidden bg-[#EEF5F3] pt-[88px] pb-0 border-b border-[#00897B]/20">
           
           {/* LAYER 1: INDEPENDENT BACKGROUND LAYER (Background Asset Only - Zero Doctors) */}
           <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
-            <img 
-              src="/patel-tablet-bg.webp" 
-              alt="Patel Dental Hospital Tablet Background" 
-              className="w-full h-full object-cover object-center select-none"
+            <img
+              src="/patel-tablet-bg.webp"
+              alt="Background"
+              className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
           </div>
 
           {/* LAYER 2: CONTENT LAYER (Left Side: Award Badge + Headline + Subtitle + CTA Buttons) */}
           <div className="relative z-20 max-w-[1200px] mx-auto px-6 sm:px-8 w-full h-full flex flex-row items-center justify-start pointer-events-auto">
-            <div className="w-[40%] flex flex-col justify-center py-4 pr-2">
+            <div className="w-[42%] flex flex-col justify-center py-4 pr-2">
               {/* Trust Badge */}
-              <div className="inline-flex items-center self-start px-3.5 py-1.5 rounded-full bg-white/95 border border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[11px] leading-tight uppercase tracking-wider shadow-sm mb-3.5">
-                <span className="text-[16px] leading-none mr-2 select-none">🏆</span> Awarded as Best Dental Hospital by FAMDENT
+              <div className="inline-flex items-center self-start px-3.5 py-1.5 rounded-full bg-white/95 border border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[10px] md:text-[11px] leading-tight uppercase tracking-wider shadow-sm mb-3.5">
+                <span className="text-[14px] md:text-[16px] leading-none mr-2 select-none">🏆</span> Awarded as Best Dental Hospital by FAMDENT
               </div>
 
               {/* Main Headline */}
               <div className="flex flex-col text-left space-y-2">
-                <h1 className="font-display text-[26px] md:text-[28px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
+                <h1 className="font-display text-[24px] md:text-[26px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
                   WORLD CLASS{" "}
                   <span className="relative inline-block text-[#00897B]">
                     DENTAL CARE
                     <div className="absolute -bottom-1 left-0 w-full h-[3px] bg-[#C9A96E] rounded-full" />
                   </span>
                 </h1>
-                <div className="font-display text-[13.5px] md:text-[14px] font-bold text-[#1E3A5F] leading-snug pt-1">
+                <div className="font-display text-[12.5px] md:text-[13px] font-bold text-[#1E3A5F] leading-snug pt-1">
                   Best Dental Hospital In India <br />
                   <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="mt-5 flex flex-row items-center justify-start gap-3 w-full max-w-[360px]">
+              <div className="mt-5 flex flex-row items-center justify-start gap-3 w-full max-w-[340px]">
                 <button
                   onClick={openAppointmentModal}
-                  className="h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[12px] font-extrabold rounded-[14px] shadow-[0_8px_20px_rgba(0,137,123,0.2)] hover:shadow-[0_12px_24px_rgba(0,137,123,0.28)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                  className="h-[42px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[11px] font-extrabold rounded-[12px] shadow-[0_8px_20px_rgba(0,137,123,0.15)] hover:shadow-[0_12px_24px_rgba(0,137,123,0.28)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
                 >
                   <Calendar className="h-4 w-4 shrink-0" />
                   <span className="whitespace-nowrap">Free Consultation</span>
@@ -726,7 +731,7 @@ export default function Home({
                   href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-[46px] flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[12px] font-extrabold rounded-[14px] border-2 border-[#00897B] hover:border-[#00796B] shadow-sm cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                  className="h-[42px] flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[11px] font-extrabold rounded-[12px] border-2 border-[#00897B] hover:border-[#00796B] shadow-sm cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
                 >
                   <MessageCircle className="h-4 w-4 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
                   <span className="whitespace-nowrap">WhatsApp Us</span>
@@ -736,18 +741,12 @@ export default function Home({
           </div>
 
           {/* LAYER 3: INDEPENDENT DOCTOR IMAGE LAYER (Foreground Transparent Doctor Asset Only) */}
-          <div className="absolute right-0 bottom-0 top-0 h-full w-[58%] md:w-[60%] z-10 flex items-end justify-end pointer-events-none pr-1 md:pr-4">
+          <div className="absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 flex items-end justify-end pointer-events-none pr-1 md:pr-4">
             <img
               src="/Teblate hero image-1.webp"
               alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
               className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
               referrerPolicy="no-referrer"
-              onError={(e) => {
-                const target = e.currentTarget;
-                if (target.src.indexOf('Teblate%20hero%20image-1.webp') === -1 && target.src.indexOf('Teblate hero image-1.webp') === -1) {
-                  target.src = '/Teblate hero image-1.webp';
-                }
-              }}
             />
           </div>
 

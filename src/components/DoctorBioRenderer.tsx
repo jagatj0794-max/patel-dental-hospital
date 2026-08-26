@@ -1,10 +1,10 @@
 import React from 'react';
 import { 
-  UserCheck, ShieldCheck, GraduationCap, Microscope, Award, Clock, BookOpen, CheckCircle2, ArrowRight
+  UserCheck, ShieldCheck, GraduationCap, Microscope, Award, Clock, BookOpen, CheckCircle2, ArrowRight, ChevronDown
 } from 'lucide-react';
 
 interface Block {
-  type: 'paragraph' | 'list';
+  type: 'paragraph' | 'list' | 'subheading';
   content?: string;
   items?: string[];
 }
@@ -86,7 +86,90 @@ function getSectionIcon(title: string) {
   return <BookOpen className="h-5 w-5 text-[#0ea5e9]" />;
 }
 
+interface AccordionItem {
+  title: string;
+  blocks: Block[];
+}
+
+function AdvancedTrainingAccordion({ items }: { items: AccordionItem[] }) {
+  const [openStates, setOpenStates] = React.useState<Record<number, boolean>>({});
+
+  const toggle = (idx: number) => {
+    setOpenStates(prev => ({
+      ...prev,
+      [idx]: !prev[idx]
+    }));
+  };
+
+  return (
+    <div className="space-y-4 w-full mt-2">
+      {items.map((item, idx) => {
+        const isOpen = !!openStates[idx];
+        return (
+          <div 
+            key={idx} 
+            className="border border-slate-200/85 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300"
+          >
+            {/* Accordion Trigger */}
+            <button
+              type="button"
+              onClick={() => toggle(idx)}
+              className="w-full px-5 py-4 flex items-center justify-between text-left font-display text-[#0B1B33] hover:bg-slate-50 transition-colors duration-200 select-none cursor-pointer focus:outline-none"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0 pr-4">
+                <span className="w-1.5 h-4 bg-[#0D9488] rounded-full inline-block shrink-0" />
+                <span className="block font-black text-sm sm:text-base text-slate-800 leading-snug">
+                  {item.title}
+                </span>
+              </div>
+              <ChevronDown 
+                className={`h-5 w-5 text-slate-400 transition-transform duration-300 shrink-0 ${isOpen ? 'transform rotate-180 text-[#0D9488]' : ''}`} 
+              />
+            </button>
+
+            {/* Accordion Content */}
+            <div 
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                isOpen ? 'max-h-[5000px] opacity-100 border-t border-slate-100' : 'max-h-0 opacity-0 pointer-events-none'
+              }`}
+            >
+              <div className="p-4 sm:p-5 bg-slate-50/40 space-y-3">
+                {item.blocks.map((block, bIdx) => {
+                  if (block.type === 'paragraph' && block.content) {
+                    return (
+                      <p key={bIdx} className="text-gray-700 font-sans text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                        {block.content}
+                      </p>
+                    );
+                  } else if (block.type === 'list' && block.items && block.items.length > 0) {
+                    return (
+                      <ul key={bIdx} className="grid grid-cols-1 gap-2.5">
+                        {block.items.map((bullet, iIdx) => (
+                          <li key={iIdx} className="bg-white border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-50/50 transition-all duration-200 group">
+                            <div className="flex items-start space-x-3 flex-1">
+                              <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                              <span className="flex-1 font-sans font-medium text-slate-700">{bullet}</span>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; doctorName?: string }) {
+  const [clinicalExpanded, setClinicalExpanded] = React.useState(false);
+
   if (!bioText || !bioText.trim()) {
     return (
       <p className="text-gray-400 italic text-sm">
@@ -136,6 +219,21 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
     if (/^\d+[\.\)]\s+/.test(trimmed)) return true;
     if (/^[a-zA-Z][\.\)]\s+/.test(trimmed)) return true;
     return false;
+  };
+
+  const isSubheadingLine = (line: string): boolean => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('###')) return true;
+    if (trimmed.startsWith('**') && trimmed.endsWith('**') && !isHeaderLine(line)) return true;
+    if (/^\d+\.\s+/.test(trimmed) && !isBulletLine(line)) return true;
+    return false;
+  };
+
+  const cleanSubheadingLine = (line: string): string => {
+    return line.trim()
+      .replace(/^###\s*/, '')
+      .replace(/^\*\*|\*\*$/g, '')
+      .trim();
   };
 
   const cleanBulletLine = (line: string): string => {
@@ -203,6 +301,16 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
       continue;
     }
 
+    if (isSubheadingLine(line)) {
+      flushList();
+      flushPara();
+      currentSection.blocks.push({
+        type: 'subheading',
+        content: cleanSubheadingLine(line)
+      });
+      continue;
+    }
+
     if (isBulletLine(line)) {
       flushPara();
       currentList.push(cleanBulletLine(line));
@@ -226,49 +334,309 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
     sections[0].title = 'Professional Profile';
   }
 
+  // Ensure absolute correct ordering and uniqueness of sections for Dr. Kinjal Patel's profile
+  if (doctorName && doctorName.toLowerCase().includes('kinjal')) {
+    const desiredOrder = [
+      'professional profile',
+      'professional memberships',
+      'personal philosophy',
+      'advanced training, fellowships & certifications',
+      'leadership & management',
+      'clinical experience',
+      'awards & recognition'
+    ];
+    
+    // Deduplicate: Keep only the first section for each unique title key
+    const seen = new Set<string>();
+    const uniqueSections: Section[] = [];
+    sections.forEach(sec => {
+      const titleLower = (sec.title || '').toLowerCase().trim();
+      if (!seen.has(titleLower)) {
+        seen.add(titleLower);
+        uniqueSections.push(sec);
+      }
+    });
+
+    // Replace the sections array
+    sections.length = 0;
+    sections.push(...uniqueSections);
+    
+    sections.sort((a, b) => {
+      const titleA = (a.title || '').toLowerCase().trim();
+      const titleB = (b.title || '').toLowerCase().trim();
+      
+      const idxA = desiredOrder.findIndex(item => titleA.startsWith(item) || item.startsWith(titleA) || titleA.includes(item));
+      const idxB = desiredOrder.findIndex(item => titleB.startsWith(item) || item.startsWith(titleB) || titleB.includes(item));
+      
+      const realIdxA = idxA === -1 ? 999 : idxA;
+      const realIdxB = idxB === -1 ? 999 : idxB;
+      
+      return realIdxA - realIdxB;
+    });
+  }
+
   return (
     <div className="space-y-8">
-      {sections.map((section, sIdx) => (
-        <div key={sIdx} className="space-y-4">
-          {section.title && (
-            <div className="flex items-center space-x-3 pb-3 border-b border-slate-200/90">
-              <div className="p-2 bg-slate-100/80 rounded-xl shrink-0">
-                {getSectionIcon(section.title)}
-              </div>
-              <h4 className="font-display font-black text-base sm:text-lg text-[#0B1B33] tracking-wide uppercase">
-                {section.title}
-              </h4>
-            </div>
-          )}
+      {sections.map((section, sIdx) => {
+        const isAdvancedTraining = section.title && (
+          section.title.toLowerCase().includes('advanced training') ||
+          section.title.toLowerCase().includes('fellowship') ||
+          section.title.toLowerCase().includes('certification')
+        );
 
-          <div className="space-y-3.5 pl-0.5">
-            {section.blocks.map((block, bIdx) => {
-              if (block.type === 'paragraph' && block.content) {
-                return (
-                  <p key={bIdx} className="text-gray-700 font-sans text-sm sm:text-base leading-relaxed whitespace-pre-line">
-                    {block.content}
-                  </p>
-                );
-              } else if (block.type === 'list' && block.items && block.items.length > 0) {
-                return (
-                  <ul key={bIdx} className="grid grid-cols-1 gap-2.5 my-3">
-                    {block.items.map((item, iIdx) => (
-                      <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
-                        <div className="flex items-start space-x-3 flex-1">
-                          <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
-                          <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
-                        </div>
-                        <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
-                      </li>
-                    ))}
-                  </ul>
-                );
+        let renderedContent = null;
+        if (isAdvancedTraining) {
+          let accordionItems: AccordionItem[] = [];
+
+          if (doctorName && doctorName.toLowerCase().includes('vipul')) {
+            // Collect all bullet list items in this section
+            const allItems: string[] = [];
+            section.blocks.forEach((block) => {
+              if (block.type === 'list' && block.items) {
+                allItems.push(...block.items);
               }
-              return null;
-            })}
+            });
+
+            const group1: string[] = [];
+            const group2: string[] = [];
+            const group3: string[] = [];
+            const group4: string[] = [];
+
+            allItems.forEach((item) => {
+              const clean = item.trim();
+              if (!clean) return;
+
+              if (
+                clean.includes('Ricardo Kern') ||
+                clean.includes('Jose Carlos') ||
+                clean.includes('Nelson Pinto')
+              ) {
+                group4.push(item);
+              } else if (
+                clean.includes('Costa Nicolopoulos') ||
+                clean.includes('Jack T. Krauser') ||
+                clean.includes('Rudberg Omri') ||
+                clean.includes('Isaac Tawil')
+              ) {
+                group3.push(item);
+              } else if (
+                clean.includes('Prosthodontics') ||
+                clean.includes('Richard Martin') ||
+                clean.includes('Kleanthis') ||
+                clean.includes('Byungho Choi')
+              ) {
+                group2.push(item);
+              } else {
+                group1.push(item);
+              }
+            });
+
+            accordionItems = [
+              {
+                title: "Advanced implant surgery training (12 programmes)",
+                blocks: [{ type: 'list', items: group1 }]
+              },
+              {
+                title: "Digital and guided surgery (4 programmes)",
+                blocks: [{ type: 'list', items: group2 }]
+              },
+              {
+                title: "Immediate loading and same-day teeth (4 programmes)",
+                blocks: [{ type: 'list', items: group3 }]
+              },
+              {
+                title: "Soft tissue and aesthetics (3 programmes)",
+                blocks: [{ type: 'list', items: group4 }]
+              }
+            ];
+          } else if (doctorName && doctorName.toLowerCase().includes('kinjal')) {
+            // Collect all bullet list items in this section
+            const allItems: string[] = [];
+            section.blocks.forEach((block) => {
+              if (block.type === 'list' && block.items) {
+                allItems.push(...block.items);
+              }
+            });
+
+            const group1: string[] = []; // Implantology
+            const group2: string[] = []; // Pediatric
+            const group3: string[] = []; // Endodontic
+            const group4: string[] = []; // Clinical/Mentorship
+
+            allItems.forEach((item) => {
+              const clean = item.trim();
+              if (!clean) return;
+
+              const lower = clean.toLowerCase();
+              if (lower.includes('pediatric')) {
+                group2.push(item);
+              } else if (lower.includes('endodontic') || lower.includes('root canal')) {
+                group3.push(item);
+              } else if (lower.includes('fellowship') || lower.includes('implantology')) {
+                group1.push(item);
+              } else {
+                group4.push(item);
+              }
+            });
+
+            accordionItems = [
+              {
+                title: "Implantology Fellowships (2 programmes)",
+                blocks: [{ type: 'list', items: group1 }]
+              },
+              {
+                title: "Pediatric Dentistry Training & Conferences (3 programmes)",
+                blocks: [{ type: 'list', items: group2 }]
+              },
+              {
+                title: "Endodontic Training & Conferences (3 programmes)",
+                blocks: [{ type: 'list', items: group3 }]
+              },
+              {
+                title: "Clinical Training & Mentorship (2 programmes)",
+                blocks: [{ type: 'list', items: group4 }]
+              }
+            ];
+          } else {
+            let currentItem: AccordionItem | null = null;
+            section.blocks.forEach((block) => {
+              if (block.type === 'subheading' && block.content) {
+                if (currentItem) {
+                  accordionItems.push(currentItem);
+                }
+                currentItem = { title: block.content, blocks: [] };
+              } else {
+                if (currentItem) {
+                  currentItem.blocks.push(block);
+                } else {
+                  currentItem = { title: 'General Training', blocks: [block] };
+                }
+              }
+            });
+            if (currentItem) {
+              accordionItems.push(currentItem);
+            }
+          }
+
+          renderedContent = <AdvancedTrainingAccordion items={accordionItems} />;
+        } else if (section.title && section.title.toLowerCase().includes('clinical experience') && doctorName && doctorName.toLowerCase().includes('kinjal')) {
+          const listItems: string[] = [];
+          section.blocks.forEach((block) => {
+            if (block.type === 'list' && block.items) {
+              listItems.push(...block.items);
+            }
+          });
+          renderedContent = (
+            <div 
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                clinicalExpanded ? 'max-h-[800px] opacity-100 mt-2' : 'max-h-0 opacity-0 pointer-events-none mt-0'
+              }`}
+            >
+              <ul className="grid grid-cols-1 gap-2.5 my-3">
+                {listItems.map((item, iIdx) => (
+                  <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
+                    <div className="flex items-start space-x-3 flex-1">
+                      <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                      <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        } else {
+          renderedContent = (
+            <div className="space-y-3.5 pl-0.5">
+              {section.blocks.map((block, bIdx) => {
+                if (block.type === 'paragraph' && block.content) {
+                  return (
+                    <p key={bIdx} className="text-gray-700 font-sans text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                      {block.content}
+                    </p>
+                  );
+                } else if (block.type === 'subheading' && block.content) {
+                  return (
+                    <h5 key={bIdx} className="font-display font-black text-sm sm:text-base text-[#0B1B33] mt-6 mb-3 flex items-center gap-2">
+                      <span className="w-1.5 h-3.5 bg-[#0D9488] rounded-full inline-block" />
+                      {block.content}
+                    </h5>
+                  );
+                } else if (block.type === 'list' && block.items && block.items.length > 0) {
+                  return (
+                    <ul key={bIdx} className="grid grid-cols-1 gap-2.5 my-3">
+                      {block.items.map((item, iIdx) => (
+                        <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
+                          <div className="flex items-start space-x-3 flex-1">
+                            <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                            <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
+                          </div>
+                          <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          );
+        }
+
+        const isClinicalExpForKinjal = section.title && section.title.toLowerCase().includes('clinical experience') && doctorName && doctorName.toLowerCase().includes('kinjal');
+
+        if (isClinicalExpForKinjal) {
+          return (
+            <div key={sIdx} className="my-8 sm:my-10 space-y-4">
+              <button
+                type="button"
+                onClick={() => setClinicalExpanded(!clinicalExpanded)}
+                className="w-full flex items-center justify-between p-4 sm:p-5 border border-slate-200 rounded-2xl bg-white shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] text-left hover:border-[#0D9488]/40 hover:shadow-md transition-all duration-300 cursor-pointer focus:outline-none group/hdr"
+              >
+                <div className="flex items-center space-x-3.5">
+                  <div className="p-2 bg-slate-100/80 rounded-xl shrink-0 group-hover/hdr:bg-[#0D9488]/5 transition-colors duration-300">
+                    {getSectionIcon(section.title)}
+                  </div>
+                  <h4 className="font-display font-black text-base sm:text-lg text-[#0B1B33] tracking-wide uppercase group-hover/hdr:text-[#0D9488] transition-colors duration-200">
+                    {section.title}
+                  </h4>
+                </div>
+                <ChevronDown 
+                  className={`h-5 w-5 text-slate-400 transition-transform duration-300 shrink-0 mr-1 group-hover/hdr:text-[#0D9488] ${clinicalExpanded ? 'transform rotate-180 text-[#0D9488]' : ''}`} 
+                />
+              </button>
+              {renderedContent}
+            </div>
+          );
+        }
+
+        return (
+          <div key={sIdx} className="space-y-4">
+            {section.title && (
+              <div className="flex items-center space-x-3 pb-3 border-b border-slate-200/90">
+                <div className="p-2 bg-slate-100/80 rounded-xl shrink-0">
+                  {getSectionIcon(section.title)}
+                </div>
+                <h4 className="font-display font-black text-base sm:text-lg text-[#0B1B33] tracking-wide uppercase">
+                  {section.title}
+                </h4>
+              </div>
+            )}
+            {renderedContent}
+            {isAdvancedTraining && doctorName && (doctorName.toLowerCase().includes('vipul') || doctorName.toLowerCase().includes('kinjal')) && (
+              <div className="pt-2">
+                <a 
+                  href="#"
+                  onClick={(e) => e.preventDefault()}
+                  className="inline-block text-[#0D9488] hover:text-[#0b7a70] hover:underline font-sans font-semibold text-sm sm:text-base"
+                >
+                  Download full CV (PDF)
+                </a>
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
