@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Phone, Calendar, MapPin, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, ContactInfo } from '../types';
-import { serviceService } from '../utils/serviceData';
+import { serviceService, isApprovedServiceSlug } from '../utils/serviceData';
 
 interface NavbarProps {
   currentPage: PageId;
@@ -67,7 +67,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
         const services = await serviceService.getServices();
         if (active) {
           const activeServices = services
-            .filter(s => s.is_active)
+            .filter(s => s.is_active && isApprovedServiceSlug(s.slug) && !s.title?.toLowerCase().includes('bone graft'))
             .map(s => ({
               label: s.title,
               id: `services/${s.slug}`

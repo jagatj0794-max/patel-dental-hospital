@@ -147,7 +147,6 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                 { label: 'Crowns & Bridges', target: 'services/crowns-bridges' },
                 { label: 'Teeth Whitening', target: 'services/teeth-whitening' },
                 { label: 'Pediatric Dentistry', target: 'services/pediatric-dentistry' },
-                { label: 'Teeth Whitening', target: 'services/teeth-whitening' },
                 { label: 'Braces Treatment', target: 'services/braces-treatment' },
                 { label: 'Wisdom Tooth Surgery', target: 'services/wisdom-tooth-surgery' },
                 { label: 'Tooth Coloured Filling', target: 'services/tooth-coloured-filling' },

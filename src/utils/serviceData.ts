@@ -531,73 +531,68 @@ export const DEFAULT_SERVICES: Service[] = [
       {
         id: 'fmr-step-1',
         phase: 'Step 1',
-        title: '',
-        description: 'For Full Mouth Reconstruction, first of all you have to visit Patel Dental Hospital, a top most dental hospital in Gujarat where Dr. Vipul Patel and team do clinical examination of the mouth and perform a Full Mouth OPG X-Ray.',
+        title: 'Consultation & Assessment',
+        description: 'Your teeth, gums, bite, and jaw condition are carefully evaluated to create the right rehabilitation plan.',
         display_order: 10
       },
       {
         id: 'fmr-step-2',
         phase: 'Step 2',
-        title: '',
-        description: 'After studying the OPG X-Ray and intraoral and extraoral clinical data, Dr. Vipul Patel gives you a treatment plan where the role of:\n• Oral Surgeon\n• Implantologist\n• Periodontist\n• Prosthodontist\n• Endodontist (RCT Specialist)\nis very well defined.',
+        title: 'Treatment Planning',
+        description: 'Your complete treatment plan is prepared, including the required procedures, sequence, timeline, and estimated cost.',
         display_order: 20
       },
       {
         id: 'fmr-step-3',
         phase: 'Step 3',
-        title: '',
-        description: 'Subsequently, each member of the team executes their work to establish the form, function and aesthetics of teeth, gums, joint and face to create a world-class treatment experience.',
+        title: 'Coordinated Treatment',
+        description: 'Required treatments such as implants, root canals, gum treatment, crowns, or bridges are completed according to your plan.',
         display_order: 30
+      },
+      {
+        id: 'fmr-step-4',
+        phase: 'Step 4',
+        title: 'Final Smile & Function',
+        description: 'Your final restorations are completed to restore comfortable chewing, proper function, and a confident smile.',
+        display_order: 40
       }
     ],
     features: [
       {
-        id: 'fmr-plan-1',
-        title: '',
-        description: 'Tooth Coloured Filling (Composite)',
+        id: 'fmr-why-1',
+        title: 'COMPLETE TREATMENT UNDER ONE TEAM',
+        description: 'Your implants, crowns, root canals and gum treatment can be planned together instead of being handled as disconnected treatments.',
         display_order: 10
       },
       {
-        id: 'fmr-plan-2',
-        title: '',
-        description: 'Root Canal Treatment',
+        id: 'fmr-why-2',
+        title: 'EXPERIENCED FULL MOUTH REHABILITATION PLANNING',
+        description: 'Your treatment plan is designed around your bite, remaining teeth, gums and long-term oral function.',
         display_order: 20
       },
       {
-        id: 'fmr-plan-3',
-        title: '',
-        description: 'Crown and Bridges',
+        id: 'fmr-why-3',
+        title: 'FOCUS ON FIXED, LONG-TERM SOLUTIONS',
+        description: 'When clinically suitable, treatment planning focuses on stable, functional and natural-looking fixed teeth.',
         display_order: 30
       },
       {
-        id: 'fmr-plan-4',
-        title: '',
-        description: 'E-max Veneers and Crowns',
+        id: 'fmr-why-4',
+        title: 'ADVANCED PLANNING FOR COMPLEX CASES',
+        description: 'Complex dental conditions are evaluated carefully before treatment so the complete rehabilitation plan is clear before treatment begins.',
         display_order: 40
       },
       {
-        id: 'fmr-plan-5',
-        title: '',
-        description: 'Dental Implant',
+        id: 'fmr-why-5',
+        title: 'TWO SPECIALISTS, ONE COORDINATED PLAN',
+        description: 'Your case benefits from coordinated in-house specialist care instead of requiring you to manage treatment between multiple clinics.',
         display_order: 50
       },
       {
-        id: 'fmr-plan-6',
-        title: '',
-        description: 'Wisdom Tooth or any other Impacted Tooth Removal',
+        id: 'fmr-why-6',
+        title: 'WRITTEN PLAN AND CLEAR COST DISCUSSION',
+        description: 'You receive a clear treatment plan and cost discussion before treatment begins, helping you understand the full rehabilitation process.',
         display_order: 60
-      },
-      {
-        id: 'fmr-plan-7',
-        title: '',
-        description: 'Laser Treatment of Gums for Pyorrhea',
-        display_order: 70
-      },
-      {
-        id: 'fmr-plan-8',
-        title: '',
-        description: 'Braces or Invisible Aligners for Alignment of Teeth',
-        display_order: 80
       }
     ],
     procedure_video_title: 'Full Mouth Rehabilitation Procedure',
@@ -607,34 +602,9 @@ export const DEFAULT_SERVICES: Service[] = [
     marketing_config: {
       green_highlight_line: DEFAULT_FMR_GREEN_HIGHLIGHT_LINE,
       process_section_title: 'How We Perform Full Mouth Rehabilitation',
-      benefits_section_title: 'Treatment Planning Includes',
-      candidate_section_title: 'Who Is a Candidate for Full Mouth Rehabilitation',
-      candidate_items: [
-        {
-          id: 'cand-1',
-          title: '',
-          description: 'Worn out teeth due to Pan Masala chewing.',
-          display_order: 10
-        },
-        {
-          id: 'cand-2',
-          title: '',
-          description: 'Teeth lost due to trauma or accident.',
-          display_order: 20
-        },
-        {
-          id: 'cand-3',
-          title: '',
-          description: 'Sensitive eroded teeth due to prolonged acid erosion from meals, severe acidity, acid reflux disorder and excessive use of cold drinks and lemon juice.',
-          display_order: 30
-        },
-        {
-          id: 'cand-4',
-          title: '',
-          description: 'Temporomandibular joint disorder causing long-term headache, jaw muscle pain, joint pain, clicking sounds and ear pain due to improper traumatic bite.',
-          display_order: 40
-        }
-      ],
+      benefits_section_title: 'WHY PATEL DENTAL FOR FULL MOUTH REHABILITATION?',
+      candidate_section_title: '',
+      candidate_items: [],
       gallery_heading: 'Clinical Case Gallery',
       gallery_description: 'Before and after transformations of full mouth rehabilitation cases.',
       gallery_items: [
@@ -658,7 +628,9 @@ export const DEFAULT_SERVICES: Service[] = [
       hospital_team_title: 'Hospital & Team Gallery',
       procedure_video_title: 'Full Mouth Rehabilitation Procedure',
       procedure_video_url: '',
-      sec11_heading: 'Book Your Full Mouth Rehabilitation Consultation',
+      sec11_heading: 'Get Your Personalized Full Mouth Treatment Plan',
+      sec11_primary_label: 'BOOK YOUR FMR CONSULTATION',
+      sec11_secondary_label: 'SEND YOUR X-RAY ON WHATSAPP',
       google_reviews_heading: 'Google Patient Reviews',
       google_reviews: DEFAULT_FMR_GOOGLE_REVIEWS,
       before_after_heading: 'Before & After Smile Transformations',
@@ -668,7 +640,7 @@ export const DEFAULT_SERVICES: Service[] = [
       show_introduction: true,
       show_process: true,
       show_benefits: true,
-      show_candidate: true,
+      show_candidate: false,
       show_before_after: true,
       show_gallery: true,
       show_procedure_video: true,
@@ -684,8 +656,8 @@ export const DEFAULT_SERVICES: Service[] = [
     id: 'aligners-srv',
     slug: 'invisible-aligners',
     title: 'Invisible Aligners',
-    short_description: 'A modern approach to straighten and align your teeth with the help of custom-made series of aligners created for you using expert planning and advanced software.',
-    hero_description: 'A modern approach to straighten and align your teeth with the help of custom-made series of aligners created for you using expert planning and advanced software.',
+    short_description: 'Straighten your teeth with clear, custom-made aligners designed to gradually improve alignment without the appearance of traditional metal braces.',
+    hero_description: 'Straighten your teeth with clear, custom-made aligners designed to gradually improve alignment without the appearance of traditional metal braces.',
     description: 'A modern approach to straighten and align your teeth with the help of Custom made series of aligners created for you with help of expert and advanced software.\n\nOur aligner trays are made up of smooth, comfortable and virtually invisible plastic that you simply wear over your teeth.\n\nOur Invisible Aligners gradually and gently move your teeth into the correct position without the use of wires or brackets.',
     intro_title: 'What is Invisible Aligners?',
     hero_image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp',
@@ -1651,6 +1623,44 @@ export const DEFAULT_SERVICES: Service[] = [
   }
 ];
 
+export const APPROVED_SERVICE_SLUGS = [
+  'dental-implants',
+  'root-canal-treatment',
+  'full-mouth-rehabilitation',
+  'invisible-aligners',
+  'smile-makeover',
+  'crowns-bridges',
+  'teeth-whitening',
+  'pediatric-dentistry',
+  'braces-treatment',
+  'wisdom-tooth-surgery',
+  'tooth-coloured-filling'
+];
+
+export const isApprovedServiceSlug = (slug: string): boolean => {
+  if (!slug) return false;
+  if (slug === 'bone-grafting-sinus-lift' || slug === 'bone-grafting') return false;
+  if (slug.toLowerCase().includes('bone-graft') || slug.toLowerCase().includes('sinus-lift')) return false;
+  return (
+    APPROVED_SERVICE_SLUGS.includes(slug) ||
+    slug === 'laser-teeth-whitening' ||
+    slug === 'clear-aligners'
+  );
+};
+
+const sanitizeServiceList = (services: Service[]): Service[] => {
+  if (!Array.isArray(services)) return [];
+  return services
+    .filter(s => {
+      if (!s) return false;
+      if (s.slug === 'bone-grafting-sinus-lift' || s.slug === 'bone-grafting' || s.id === 'bone-graft-srv') return false;
+      if (s.title && s.title.toLowerCase().includes('bone graft')) return false;
+      if (s.slug && s.slug.toLowerCase().includes('bone-graft')) return false;
+      return isApprovedServiceSlug(s.slug);
+    })
+    .map(s => s.title === 'Clear Aligners' ? { ...s, title: 'Invisible Aligners', slug: 'invisible-aligners' } : s);
+};
+
 /**
  * Direct helper to update localStorage and Supabase without calling getServices() or triggering recursion
  */
@@ -2070,10 +2080,11 @@ export const serviceService = {
             }
             return svc;
           });
-          if (updated) {
-            localStorage.setItem('hospital_services', JSON.stringify(resultList));
+          const sanitized = sanitizeServiceList(resultList);
+          if (updated || sanitized.length !== list.length) {
+            localStorage.setItem('hospital_services', JSON.stringify(sanitized));
           }
-          return resultList;
+          return sanitized;
         } catch (e) {
           console.error('Failed to parse services from localStorage:', e);
         }
@@ -2083,6 +2094,16 @@ export const serviceService = {
     }
 
     try {
+      // Proactively clean up any deleted/unapproved service entries in Supabase
+      try {
+        await supabase.client
+          .from('services')
+          .delete()
+          .or('slug.eq.bone-grafting-sinus-lift,slug.eq.bone-grafting,id.eq.bone-graft-srv,title.ilike.%Bone Graft%');
+      } catch (cleanupErr) {
+        // Non-blocking cleanup
+      }
+
       const { data, error } = await supabase.client
         .from('services')
         .select('*')
@@ -2503,12 +2524,12 @@ export const serviceService = {
             .select('*')
             .order('display_order', { ascending: true });
           if (refetched) {
-            return refetched.map(s => s.title === 'Clear Aligners' ? { ...s, title: 'Invisible Aligners', slug: 'invisible-aligners' } : s);
+            return sanitizeServiceList(refetched);
           }
         }
       }
 
-      return (data || []).map(s => s.title === 'Clear Aligners' ? { ...s, title: 'Invisible Aligners', slug: 'invisible-aligners' } : s);
+      return sanitizeServiceList(data || []);
     } catch (e) {
       console.warn('Exception in getServices:', e);
       return DEFAULT_SERVICES;
@@ -2519,6 +2540,10 @@ export const serviceService = {
    * Fetch a service by its slug.
    */
   getServiceBySlug: async (slug: string): Promise<Service | null> => {
+    if (!slug || !isApprovedServiceSlug(slug)) {
+      return null;
+    }
+
     let resolvedSlug = slug;
     if (slug === 'laser-teeth-whitening') {
       resolvedSlug = 'teeth-whitening';
@@ -2534,6 +2559,9 @@ export const serviceService = {
       }
       if (!found && resolvedSlug === 'invisible-aligners') {
         found = services.find(s => s.slug === 'clear-aligners');
+      }
+      if (found && (!isApprovedServiceSlug(found.slug) || (found.title && found.title.toLowerCase().includes('bone graft')))) {
+        return null;
       }
       return found || null;
     }
@@ -2555,6 +2583,9 @@ export const serviceService = {
         if (!found && resolvedSlug === 'invisible-aligners') {
           found = services.find(s => s.slug === 'clear-aligners');
         }
+        if (found && (!isApprovedServiceSlug(found.slug) || (found.title && found.title.toLowerCase().includes('bone graft')))) {
+          return null;
+        }
         return found || null;
       }
 
@@ -2569,6 +2600,9 @@ export const serviceService = {
             .eq('slug', fallbackSlug)
             .maybeSingle();
           if (!fbError && fbData) {
+            if (!isApprovedServiceSlug(fbData.slug) || (fbData.title && fbData.title.toLowerCase().includes('bone graft'))) {
+              return null;
+            }
             // Check if this implants record needs auto-populate
             if (fbData.id === 'implants-srv') {
               const steps = typeof fbData.process_steps === 'string'
