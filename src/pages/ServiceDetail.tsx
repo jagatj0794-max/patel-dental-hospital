@@ -2102,7 +2102,7 @@ export default function ServiceDetail({
 
                         {/* Subheading */}
                         <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed whitespace-pre-line font-sans">
-                          Digital Smile Design lets you preview your result on your own face — and try a physical mock-up in your own mouth — before any treatment begins.
+                          Digital Smile Design lets you preview your result on your own face  -  and try a physical mock-up in your own mouth  -  before any treatment begins.
                         </p>
 
                         {/* Qualitative proof points - no fake stats or numbers! */}
@@ -2244,11 +2244,11 @@ export default function ServiceDetail({
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
                           <button
                             type="button"
-                            onClick={() => openAppointmentModal("Pediatric Dentistry - Book Your Child's First Visit — Free")}
+                            onClick={() => openAppointmentModal("Pediatric Dentistry - Book Your Child's First Visit  -  Free")}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                           >
                             <Calendar className="h-4 w-4 shrink-0" />
-                            <span>Book Your Child&apos;s First Visit — Free</span>
+                            <span>Book Your Child&apos;s First Visit  -  Free</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
                           </button>
 
@@ -2262,6 +2262,63 @@ export default function ServiceDetail({
                           >
                             <MessageCircle className="h-4 w-4 shrink-0" />
                             <span>WhatsApp for Child Care Advice</span>
+                          </button>
+                        </div>
+                      </>) : isTeethWhitening ? (
+                      <>
+                        <div className="space-y-3">
+                          <div className="inline-flex items-center gap-1.5 bg-[#F0FDFA] border border-teal-150 text-[#0D9488] px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-3xs">
+                            <Sparkles className="h-3.5 w-3.5 text-[#0D9488]" />
+                            <span>IN-CLINIC PROFESSIONAL WHITENING</span>
+                          </div>
+
+                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                            Brighter, Whiter Smile in Just 30 Minutes
+                          </h1>
+                        </div>
+
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed whitespace-pre-line font-sans">
+                          Professional in-clinic teeth whitening performed under expert dental supervision in Rajkot for safe, noticeable results in a single 30-minute session.
+                        </p>
+
+                        {/* Proof / Reassurance Cards */}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1 text-left">
+                          <div className="inline-flex items-center gap-1.5 bg-[#F8FAFC] border border-slate-200/80 rounded-xl px-2.5 py-2 text-[11.5px] sm:text-xs font-bold text-slate-700">
+                            <Check className="h-3.5 w-3.5 text-[#0D9488] shrink-0 stroke-[2.5]" />
+                            <span>30-Minute In-Clinic Care</span>
+                          </div>
+                          <div className="inline-flex items-center gap-1.5 bg-[#F8FAFC] border border-slate-200/80 rounded-xl px-2.5 py-2 text-[11.5px] sm:text-xs font-bold text-slate-700">
+                            <Check className="h-3.5 w-3.5 text-[#0D9488] shrink-0 stroke-[2.5]" />
+                            <span>Dentist-Supervised Safety</span>
+                          </div>
+                          <div className="inline-flex items-center gap-1.5 bg-[#F8FAFC] border border-slate-200/80 rounded-xl px-2.5 py-2 text-[11.5px] sm:text-xs font-bold text-slate-700">
+                            <Check className="h-3.5 w-3.5 text-[#0D9488] shrink-0 stroke-[2.5]" />
+                            <span>Enamel-Conscious Protection</span>
+                          </div>
+                        </div>
+
+                        {/* CTA Buttons */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => openAppointmentModal("Teeth Whitening - Book Teeth Whitening Consultation")}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                          >
+                            <Calendar className="h-4 w-4 shrink-0" />
+                            <span>Book Teeth Whitening Consultation</span>
+                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const prefilledText = "Hello Patel Dental Hospital, I would like to consult about Teeth Whitening before an upcoming event. Please share available appointment slots.";
+                              window.open(getGlobalWhatsAppUrl(prefilledText), '_blank', 'noopener,noreferrer');
+                            }}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#081C3A] hover:bg-[#112C55] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#081C3A]/50 group"
+                          >
+                            <MessageCircle className="h-4 w-4 shrink-0" />
+                            <span>WhatsApp for Whitening Advice</span>
                           </button>
                         </div>
                       </>
@@ -2589,12 +2646,12 @@ export default function ServiceDetail({
 
 
 
-          const introElement = (mConfig.show_introduction !== false && !isRootCanal && !isSmileMakeover && !isCrownsAndBridges && !isPediatricDentistry) ? (
+          const introElement = (mConfig.show_introduction !== false && !isRootCanal && !isSmileMakeover && !isCrownsAndBridges && !isPediatricDentistry && !isTeethWhitening) ? (
             isFullMouth ? (
               <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="fmr-symptom-qualification">
                 <div className="space-y-3 max-w-3xl mx-auto text-center">
                   <span className="text-[#0D9488] font-sans font-extrabold text-xs tracking-wider uppercase">
-                    YOU MAY NEED THIS IF…
+                    YOU MAY NEED THIS IF...
                   </span>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
                     Is Your Mouth Making Everyday Life Difficult?
@@ -2659,7 +2716,7 @@ export default function ServiceDetail({
               <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="aligners-symptom-qualification">
                 <div className="space-y-3 max-w-3xl mx-auto text-center">
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                    You May Need Invisible Aligners If…
+                    You May Need Invisible Aligners If...
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2770,7 +2827,7 @@ export default function ServiceDetail({
                         </div>
                         {img.caption && img.caption.trim() !== '' && (
                           <p className="text-slate-500 text-[11px] font-semibold text-center italic">
-                            📸 {img.caption}
+                             {img.caption}
                           </p>
                         )}
                       </div>
@@ -4460,7 +4517,7 @@ export default function ServiceDetail({
                   Your Single Sitting Root Canal Timeline
                 </h2>
                 <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center">
-                  Completed in a single continuous appointment of 45–60 minutes. Here is what happens from start to finish.
+                  Completed in a single continuous appointment of 45-60 minutes. Here is what happens from start to finish.
                 </p>
                 <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
               </div>
@@ -4559,7 +4616,7 @@ export default function ServiceDetail({
                   {/* Left accent line */}
                   <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                   <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
-                    Dr. Vipul Patel’s 100% Honest Clinical Guidance
+                    Dr. Vipul Patel's 100% Honest Clinical Guidance
                   </h3>
                   <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2">
                     If a tooth is too severely fractured or has a compromised bone structure where a root canal will fail, Dr. Patel will tell you honestly beforehand. We never perform treatments that are clinically unviable just to bill patients.
@@ -5028,7 +5085,7 @@ export default function ServiceDetail({
                   WHY PATEL DENTAL
                 </span>
                 <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                  A Smile Designed for You — Not from a Template
+                  A Smile Designed for You  -  Not from a Template
                 </h2>
                 <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center">
                   A smile makeover is not one fixed treatment. The right approach depends on your teeth, bite, gums, facial features and the result you want to achieve.
@@ -5235,7 +5292,7 @@ export default function ServiceDetail({
                     SEE YOUR SMILE BEFORE YOU DECIDE
                   </span>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                    Start with Your Smile Photo — See What’s Possible
+                    Start with Your Smile Photo  -  See What's Possible
                   </h2>
                   <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200 font-sans">
                     Send us a photo of your smile on WhatsApp to begin discussing your concerns and explore whether a Digital Smile Design preview and personalised treatment plan may be suitable for you.
@@ -5926,7 +5983,7 @@ export default function ServiceDetail({
                     Pulpectomy
                   </h3>
                   <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 mb-4 font-sans">
-                    A gentle, child-safe procedure to clear deep decay and infection from the root of an infected milk tooth. It eliminates pain, clears infection, and preserves the natural tooth until normal shedding—preventing premature spacing loss for permanent teeth.
+                    A gentle, child-safe procedure to clear deep decay and infection from the root of an infected milk tooth. It eliminates pain, clears infection, and preserves the natural tooth until normal shedding - preventing premature spacing loss for permanent teeth.
                   </p>
                   <div className="pl-2 border-t border-slate-100 pt-3 space-y-1.5 font-sans">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
@@ -6120,11 +6177,11 @@ export default function ServiceDetail({
                 <div>
                   <button
                     type="button"
-                    onClick={() => openAppointmentModal("Pediatric Dentistry - Book Your Child's First Visit — Free")}
+                    onClick={() => openAppointmentModal("Pediatric Dentistry - Book Your Child's First Visit  -  Free")}
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] hover:from-[#0D9488] hover:to-[#0F766E] text-white font-sans font-bold text-sm sm:text-base rounded-full shadow-[0_10px_25px_-5px_rgba(13,148,136,0.3)] hover:shadow-[0_20px_35px_-5px_rgba(13,148,136,0.4)] transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
                   >
                     <Calendar className="h-4.5 w-4.5" />
-                    <span>Book Your Child&apos;s First Visit — Free</span>
+                    <span>Book Your Child&apos;s First Visit  -  Free</span>
                   </button>
                 </div>
               </div>
@@ -6532,7 +6589,7 @@ export default function ServiceDetail({
               answer: "If decay reaches the nerve of a baby tooth, a gentle procedure called a Pulpectomy (milk tooth root canal) is performed to clear infection and relieve pain. Saving the milk tooth is vital because it preserves the natural spacing and guide path required for underlying permanent teeth to erupt correctly."
             },
             {
-              question: "Can thumb sucking or other habits affect my child’s teeth?",
+              question: "Can thumb sucking or other habits affect my child's teeth?",
               answer: "Prolonged thumb sucking, pacifier use, tongue thrusting, or chronic mouth breathing beyond age 3 to 4 can alter jaw growth and lead to open bites or misaligned teeth. We provide gentle habit-breaking appliances and positive guidance to help children safely transition away from these habits."
             },
             {
@@ -6700,6 +6757,678 @@ export default function ServiceDetail({
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          );
+
+          {/* ========================================== */}
+          {/* TEETH WHITENING DEDICATED SECTIONS (PART 1) */}
+          {/* ========================================== */}
+
+          const teethWhiteningOccasionSection = (
+            <div className="bg-white border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 animate-fade-in" id="whitening-occasion-hook">
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  UPCOMING OCCASIONS &amp; EVENTS
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Have an Important Upcoming Event or Milestone?
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center font-sans">
+                  When you need your smile to look its absolute best for a special deadline, in-clinic professional whitening provides a fast, safe, and noticeable transformation.
+                </p>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto text-left">
+                {/* Occasion 1 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Weddings &amp; Pre-Wedding Events
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    Look vibrant and picture-perfect on your big day. In-clinic whitening helps ensure confident smiles across all close-up photographs and wedding celebrations.
+                  </p>
+                </div>
+
+                {/* Occasion 2 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Interviews &amp; Career Presentations
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    First impressions matter in executive interviews and client pitches. A refreshed, clean smile enhances self-assurance and professional poise.
+                  </p>
+                </div>
+
+                {/* Occasion 3 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Photoshoots &amp; Social Milestones
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    Whether for portfolio headshots, anniversaries, or reunion gatherings, achieve a bright, natural smile ready for high-definition photography.
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+
+          const teethWhiteningComparisonSection = (
+            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center animate-fade-in" id="whitening-comparison">
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  TREATMENT COMPARISON
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Professional In-Clinic Whitening vs Other Options
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center font-sans">
+                  Compare clinical in-chair whitening with home-based and over-the-counter options to understand differences in speed, safety, and supervision.
+                </p>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              <div className="max-w-6xl mx-auto bg-white border border-[#E8EEF5] rounded-[24px] shadow-xs overflow-hidden text-left">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse min-w-[750px]">
+                    <thead>
+                      <tr className="bg-[#081C3A] text-white">
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
+                          Comparison Factor
+                        </th>
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase bg-[#0D9488] text-white border-b border-teal-600 relative">
+                          <span className="relative z-10">In-Clinic Professional Whitening</span>
+                        </th>
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
+                          Take-Home Custom Trays
+                        </th>
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
+                          Over-The-Counter Kits
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E2E8F0]">
+                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
+                          Professional Supervision
+                        </td>
+                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
+                          Direct dentist supervision throughout
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Dentist prescribed, used at home
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Unsupervised / self-administered
+                        </td>
+                      </tr>
+                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
+                          Speed of Visible Result
+                        </td>
+                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
+                          Immediate results in ~30 minutes
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Gradual results over 10-14 days
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Slow or unpredictable results
+                        </td>
+                      </tr>
+                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
+                          Gum &amp; Enamel Protection
+                        </td>
+                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
+                          Protective gum barrier applied by dentist
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Custom trays help minimize gel leak
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Generic trays may irritate gums
+                        </td>
+                      </tr>
+                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
+                          Sensitivity Management
+                        </td>
+                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
+                          Pre-treatment check &amp; desensitizing agent
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Adjustable application wear time
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          No individualized sensitivity control
+                        </td>
+                      </tr>
+                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
+                          Individual Suitability Check
+                        </td>
+                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
+                          Comprehensive dental assessment first
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          Evaluated by dentist before tray fabrication
+                        </td>
+                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
+                          No pre-treatment dental check
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+
+          const teethWhiteningPricingSection = (
+            <div className="bg-white border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center animate-fade-in" id="whitening-pricing">
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  TRANSPARENT PRICING
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Teeth Whitening Treatment Options &amp; Fee Guide
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center font-sans">
+                  We provide transparent, upfront guidance on treatment approaches. The recommended whitening method depends on your timeline, current shade, and oral health.
+                </p>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              <div className="max-w-4xl mx-auto bg-[#F8FAFC] border border-[#E8EEF5] rounded-[24px] shadow-xs overflow-hidden text-left">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse min-w-[600px]">
+                    <thead>
+                      <tr className="bg-[#081C3A] text-white">
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
+                          Whitening Option
+                        </th>
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase bg-[#F0FDFA] text-[#0D9488] border-b border-teal-200 relative">
+                          <span className="relative z-10">Fee Guidance</span>
+                        </th>
+                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
+                          Key Characteristics
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E2E8F0]">
+                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
+                          In-Clinic 30-Minute Whitening
+                        </td>
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
+                          Contact Us for Pricing
+                        </td>
+                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
+                          Fast in-chair session with light-activation and gum barrier protection
+                        </td>
+                      </tr>
+                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
+                          Take-Home Custom Tray Whitening
+                        </td>
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
+                          Contact Us for Pricing
+                        </td>
+                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
+                          Custom-fitted trays with professional-grade bleaching gel for gradual home use
+                        </td>
+                      </tr>
+                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
+                          Combination In-Clinic + Take-Home Care
+                        </td>
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
+                          Contact Us for Pricing
+                        </td>
+                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
+                          Immediate in-clinic shade boost followed by touch-up home maintenance
+                        </td>
+                      </tr>
+                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
+                          Pre-Whitening Smile &amp; Enamel Assessment
+                        </td>
+                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
+                          Contact Us for Detail
+                        </td>
+                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
+                          Clinical shade recording, cavity check, and sensitivity evaluation
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+
+          const teethWhiteningTimelineSection = (
+            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-12 mt-8 sm:mt-12 lg:mt-16 text-center animate-fade-in" id="whitening-timeline">
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  TREATMENT JOURNEY
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Your 5-Step Teeth Whitening Journey
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center font-sans">
+                  A structured, comfortable clinical process designed for maximum safety, comfort, and noticeable brightness.
+                </p>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              {/* Connected Timeline Steps */}
+              <div className="max-w-6xl mx-auto relative px-4">
+                {/* Desktop horizontal connection line */}
+                <div className="hidden lg:block absolute top-[40px] left-[10%] right-[10%] h-[2px] bg-teal-200 z-0" />
+                
+                {/* Mobile vertical connection line */}
+                <div className="lg:hidden absolute left-[50%] -translate-x-[50%] top-10 bottom-10 w-[2px] bg-teal-200 z-0" />
+                
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4 relative z-10">
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center text-center space-y-4 relative group">
+                    <div className="w-20 h-20 rounded-full bg-white border-2 border-[#0D9488] flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative z-10">
+                      <span className="font-sans font-black text-2xl text-[#0D9488]">1</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-sans font-extrabold text-base text-[#081C3A] leading-tight">
+                        Smile Assessment
+                      </h3>
+                      <p className="text-[#475569] text-xs leading-relaxed max-w-xs mx-auto font-medium font-sans">
+                        Clinical shade recording and evaluation of teeth and gums to determine individual whitening suitability.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center text-center space-y-4 relative group">
+                    <div className="w-20 h-20 rounded-full bg-white border-2 border-[#0D9488] flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative z-10">
+                      <span className="font-sans font-black text-2xl text-[#0D9488]">2</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-sans font-extrabold text-base text-[#081C3A] leading-tight">
+                        Whitening Preparation
+                      </h3>
+                      <p className="text-[#475569] text-xs leading-relaxed max-w-xs mx-auto font-medium font-sans">
+                        Gentle surface polish and precise application of protective barrier to safeguard lips and gum tissues.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center text-center space-y-4 relative group">
+                    <div className="w-20 h-20 rounded-full bg-[#0D9488] border-2 border-[#0D9488] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 relative z-10">
+                      <span className="font-sans font-black text-2xl text-white">3</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-sans font-extrabold text-base text-[#081C3A] leading-tight">
+                        30-Min In-Clinic Care
+                      </h3>
+                      <p className="text-[#475569] text-xs leading-relaxed max-w-xs mx-auto font-medium font-sans">
+                        Professional whitening gel applied under dentist supervision during a focused ~30 minute procedure.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="flex flex-col items-center text-center space-y-4 relative group">
+                    <div className="w-20 h-20 rounded-full bg-white border-2 border-[#0D9488] flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative z-10">
+                      <span className="font-sans font-black text-2xl text-[#0D9488]">4</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-sans font-extrabold text-base text-[#081C3A] leading-tight">
+                        Immediate Review
+                      </h3>
+                      <p className="text-[#475569] text-xs leading-relaxed max-w-xs mx-auto font-medium font-sans">
+                        Rinse, protective barrier removal, and immediate before-and-after shade comparison for visible evaluation.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 5 */}
+                  <div className="flex flex-col items-center text-center space-y-4 relative group">
+                    <div className="w-20 h-20 rounded-full bg-white border-2 border-[#0D9488] flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative z-10">
+                      <span className="font-sans font-black text-2xl text-[#0D9488]">5</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-sans font-extrabold text-base text-[#081C3A] leading-tight">
+                        Post-Care Guidance
+                      </h3>
+                      <p className="text-[#475569] text-xs leading-relaxed max-w-xs mx-auto font-medium font-sans">
+                        Personalized dietary advice (avoiding heavy staining foods for 48 hrs) and home care tips for long-lasting results.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
+          const teethWhiteningRiskReversalSection = (
+            <div className="bg-white border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center animate-fade-in" id="whitening-reassurance">
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  SAFETY &amp; REASSURANCE
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Safe, Supervised &amp; Enamel-Conscious Whitening
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center font-sans">
+                  We ensure your whitening treatment is medically sound, comfortable, and tailored to your dental health without compromising enamel.
+                </p>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto text-left">
+                {/* Reassurance 1 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
+                    Professional Assessment First
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We examine your teeth and gums before recommending treatment, ensuring you are a suitable candidate and that underlying cavities or gum issues are identified.
+                  </p>
+                </div>
+
+                {/* Reassurance 2 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
+                    Enamel-Conscious Approach
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    Our clinical whitening agents are formulated for dental safety, targeting internal and external stains without eroding or damaging the protective enamel layer.
+                  </p>
+                </div>
+
+                {/* Reassurance 3 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
+                    Sensitivity Consideration
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We discuss sensitivity history in advance, use calibrated exposure times, and apply soothing desensitizing agents to ensure a comfortable patient experience.
+                  </p>
+                </div>
+
+                {/* Reassurance 4 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
+                    Personalised Treatment Guidance
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We set clear, realistic expectations based on your tooth structure, existing fillings, and lifestyle factors to achieve a naturally bright outcome.
+                  </p>
+                </div>
+
+                {/* Reassurance 5 */}
+                <div className="relative w-full bg-[#F8FAFC] border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full md:col-span-2 lg:col-span-2">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
+                    Post-Treatment Care Support
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    You will receive clear post-procedure oral hygiene instructions and diet recommendations to help maintain your brighter smile over the long term.
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+
+          const whiteningFaqs = [
+            {
+              question: "Is professional teeth whitening safe?",
+              answer: "Yes. When performed by a qualified dental professional, in-clinic teeth whitening is a well-established and safe cosmetic procedure. The gums and lips are carefully protected with isolation barriers, and professional-grade gels are applied under continuous clinical supervision to safeguard your enamel and oral tissues."
+            },
+            {
+              question: "Will teeth whitening damage my enamel?",
+              answer: "No. Professional in-clinic whitening does not remove or erode your enamel. The active whitening agents work by penetrating micro-pores in the tooth structure to break down internal and external stain molecules without altering the structural integrity or mineral strength of the tooth enamel."
+            },
+            {
+              question: "Can teeth whitening cause sensitivity?",
+              answer: "Some patients may experience mild, temporary tooth sensitivity during or within 24-48 hours after treatment. At Patel Dental Hospital, we evaluate your sensitivity history beforehand and apply clinical desensitizing agents to ensure your experience remains as comfortable as possible."
+            },
+            {
+              question: "How long can teeth whitening results last?",
+              answer: "Results typically last from several months up to a year or longer, depending on your dietary habits and oral hygiene. Regular brushing, routine cleanings, and limiting heavy stain-causing substances like tobacco, tea, coffee, and dark spices help prolong your brighter shade."
+            },
+            {
+              question: "What foods and drinks should I avoid after teeth whitening?",
+              answer: "For the first 48 hours following your whitening session - when teeth are most susceptible to new pigment absorption - it is best to avoid deeply pigmented foods and drinks such as tea, coffee, red wine, turmeric-rich gravies, soy sauce, and tobacco products."
+            },
+            {
+              question: "Is professional teeth whitening suitable for everyone?",
+              answer: "Professional whitening is suitable for most adults with healthy teeth and gums. However, it is not recommended for individuals with untreated cavities, active gum disease, or severe intrinsic staining from certain medications. A preliminary dental assessment determines if whitening is appropriate for you."
+            },
+            {
+              question: "Will whitening change the colour of crowns, veneers or fillings?",
+              answer: "No. Whitening agents only act on natural tooth enamel and do not change the color of existing dental materials such as porcelain crowns, composite fillings, or veneers. If you have visible restorations, our dentists will guide you on how to achieve a harmonious, unified smile."
+            },
+            {
+              question: "How can I help maintain my teeth whitening results?",
+              answer: "Maintaining your brighter smile is easy with good oral hygiene practices: brush twice daily with a non-abrasive fluoride toothpaste, floss regularly, schedule bi-annual professional cleanings, and consider dentist-prescribed touch-up trays for periodic maintenance before major occasions."
+            },
+            {
+              question: "Can I have teeth whitening if I already have sensitive teeth?",
+              answer: "Yes, in many cases. Our dentists will evaluate the underlying cause of your sensitivity (such as gum recession or enamel wear) and can customize the procedure with lower-concentration gels, shorter activation times, and pre- and post-treatment desensitizing protocols."
+            }
+          ];
+
+          const teethWhiteningWhyPatelSection = (
+            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 animate-fade-in" id="whitening-why-patel-dental">
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  WHY PATEL DENTAL
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Why Choose Patel Dental Hospital for Teeth Whitening?
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center font-sans">
+                  A safe, natural-looking brighter smile requires accurate dental evaluation, protective barrier isolation, and calibrated clinical care. Here is how we ensure your comfort and results.
+                </p>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto text-left">
+                {/* Card 1 */}
+                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Comprehensive Pre-Assessment
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We examine your enamel health, existing restorations, and gum condition before starting to ensure professional whitening is suitable and completely safe for your teeth.
+                  </p>
+                </div>
+
+                {/* Card 2 */}
+                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Dentist-Supervised 30-Min Session
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    Every step is performed directly by experienced dental professionals with continuous monitoring, ensuring optimal gel activation and prompt shade improvement.
+                  </p>
+                </div>
+
+                {/* Card 3 */}
+                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Complete Gum &amp; Soft Tissue Isolation
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We apply specialized clinical isolation barriers over your gums and lips, preventing bleach irritation and keeping the whitening focused purely on tooth enamel.
+                  </p>
+                </div>
+
+                {/* Card 4 */}
+                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Personalised Sensitivity Protocols
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We calibrate application times and apply clinical desensitizing solutions before and after the procedure to ensure a comfortable and relaxing patient experience.
+                  </p>
+                </div>
+
+                {/* Card 5 */}
+                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Transparent Advice on Restorations
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We provide honest guidance regarding existing composite fillings, veneers, or crowns so you have realistic, clear expectations for overall smile harmony.
+                  </p>
+                </div>
+
+                {/* Card 6 */}
+                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
+                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-3 leading-tight pl-2">
+                    Personalised Maintenance &amp; Aftercare
+                  </h3>
+                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2 font-sans">
+                    We equip you with specific dietary guidelines and oral hygiene recommendations to protect your new brightness and help you maintain results for upcoming events.
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+
+          const teethWhiteningFaqSection = (
+            <div className="bg-white border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center animate-fade-in" id="whitening-faq">
+              {/* FAQPage JSON-LD Schema */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "FAQPage",
+                    "mainEntity": whiteningFaqs.map(faq => ({
+                      "@type": "Question",
+                      "name": faq.question,
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": faq.answer
+                      }
+                    }))
+                  })
+                }}
+              />
+
+              <div className="space-y-3 max-w-3xl mx-auto text-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+                  <HelpCircle className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                  Teeth Whitening FAQs
+                </span>
+                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                  Frequently Asked Questions About Teeth Whitening
+                </h2>
+                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+              </div>
+
+              <div className="max-w-[1100px] mx-auto space-y-4 text-left">
+                {whiteningFaqs.map((faq, idx) => {
+                  const isExpanded = expandedDentalFaqIdx === idx;
+                  return (
+                    <div
+                      key={idx}
+                      className={`border rounded-2xl transition-all duration-200 overflow-hidden ${isExpanded ? "border-[#0D9488]/40 bg-teal-50/20 shadow-xs" : "border-[#E8EEF5] bg-white hover:border-slate-300"}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setExpandedDentalFaqIdx(isExpanded ? null : idx)}
+                        className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left cursor-pointer transition-colors duration-150"
+                        aria-expanded={isExpanded}
+                      >
+                        <span className="font-sans font-bold text-base sm:text-lg text-[#081C3A] leading-snug">
+                          {faq.question}
+                        </span>
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 ${isExpanded ? "bg-[#0D9488] text-white rotate-180" : "bg-slate-100 text-slate-500"}`}>
+                          <ChevronDown className="h-4 w-4 stroke-[2.5]" />
+                        </div>
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: 'easeInOut' }}
+                          >
+                            <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0 border-t border-teal-100/60 mt-1">
+                              <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium pt-3 font-sans">
+                                {faq.answer}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+
+          const teethWhiteningClosingCtaSection = (
+            <div className="pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="whitening-bottom-cta">
+              <div className="relative overflow-hidden rounded-3xl py-8 px-5 sm:py-16 sm:px-12 max-w-7xl mx-auto border text-center flex flex-col items-center justify-center gap-4 sm:gap-6 border-slate-200/80 bg-gradient-to-br from-slate-900 via-[#081C3A] to-slate-900 text-white shadow-md">
+                <div className="relative z-10 max-w-3xl space-y-4">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-teal-300 uppercase tracking-widest px-3.5 py-1 bg-teal-500/20 rounded-full border border-teal-400/30 font-sans">
+                    <Sparkles className="h-3.5 w-3.5 text-teal-300 shrink-0" />
+                    READY FOR YOUR UPCOMING OCCASION?
+                  </span>
+                  <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
+                    Step Into Your Next Special Event with a Brighter, Whiter Smile
+                  </h2>
+                  <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200 font-sans">
+                    Experience safe, in-clinic professional teeth whitening in just ~30 minutes under expert dental supervision in Rajkot.
+                  </p>
+                </div>
+
+                <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
+                  <button
+                    type="button"
+                    onClick={() => openAppointmentModal("Teeth Whitening - Book Your Teeth Whitening Appointment")}
+                    className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                  >
+                    <Calendar className="h-4.5 w-4.5 shrink-0" />
+                    <span>BOOK YOUR TEETH WHITENING APPOINTMENT</span>
+                    <ArrowRight className="h-4 w-4 shrink-0" />
+                  </button>
+
+                  <a
+                    href={getGlobalWhatsAppUrl("Hello Patel Dental Hospital, I would like to book an in-clinic Teeth Whitening appointment before an upcoming event. Please share available slots.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    referrerPolicy="no-referrer"
+                    className="px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                  >
+                    <MessageCircle className="h-4.5 w-4.5 shrink-0" />
+                    <span>CHAT ON WHATSAPP FOR WHITENING</span>
+                  </a>
+                </div>
               </div>
             </div>
           );
@@ -7167,967 +7896,116 @@ export default function ServiceDetail({
             </div>
           );
 
-          const processElement = isDentalImplants ? (
-            <>
-              <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-10 animate-fade-in" id="cms-section-process">
-                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                  <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                    <Activity className="h-4.5 w-4.5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                      Indications
-                    </h2>
-                    <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                      You May Need Dental Implants If…
-                    </h3>
-                  </div>
-                </div>
+          const processElement = isDentalImplants ?x��}kW�Ȗ����L� s0��B��K$�!��3�2�D��X'��H2���߽w���TU�y59���4��]�����-�S�����=��u='�>8C�=׹h|��������/��=�����ͽ���/,�~���W56X4�56ٰ�k5Y4r��1����ݡ�F�����1��=�F��wc7��0��(�+�<̾ǯ�s���~��pF��d�����[�&uk���M`&�/�$�%��Xo�r��G�۟&?c~�R5߼X������܁	_��4����:t
+�α�PW`��9z��>htW�~��xN�[:������6�x�u"��>��Ec��Rf�؁�s��_��ʠm�jilޅel�b�bG�G0f�)��y���mq<v0y�G젿��l���._�U��1	�Q\l7�Ё��
+ ��U�ǁvn�+��v���Z�?V~� �I�?�<<�����u֛���j���0�"}������
+_6����B̽�Lv'e2��Q�:>�a_ {|^m��B>�n����ؚ�8���u�'��8������Z{���܄��Kne��kPr��)�j���!��^o�lT��Kȁ)��!Asc���w$+6� !�i��t��[��̮;� l��6K�=������2P��%`��fx�}?���"�0���t{�t��Þ`'�&�u��/Z�N��P����ϰ�k��dC���"tz.��{�!V��7�#��z���b�a�a�\�����l�3?	��
+q�C� �0�J"p�; ��:�� ��EP��qL�0`�����=__�x�̧���O��>6 ��/bE��率�Z��$��q�́i8�>\x7
+�!t�z|�u|�p�������\�*-��F�S�l�'���ٞ0�=c����1��}ν�ADX��
+�� ������z�s��tD�i������� ��,�������*D��V����{Br¾9�3t. ��?g'�S��A�^sv
+ez?��a��ޔ�� g�xי1�or���'�p�u �vy�1���{�pO�1ܾ<�A�޸���{1��]���q�x�M�VR�.C�7�R�I�c�C%�����Q���{BqO(�Q�'!�P���C�y(ґ�����,X'���Bn��ȥ �^#y'9�!���=�>L�{�1.DP!N��^��zy
+�y�n���V�xD�D������2}�8! �xzxnw�-�2݋l�-wQ�y�
+�ɹ�dd�lo���E�={T$�e���|-{ܿ�u�;k.�W�p�z���7�!���ч���ݨ	pMp~Ϸ����x-�!'�j���M7z?7���	�-KHҲ0Z�9(�E����47j�� d?��e?W坨 �(vB�|�s'v�"�s	N��"��{���q�|��=��A>N�P��t��Sw�������]_.vc�o_㰖�o]1�Na%@����!�f�<�rs��ź��,�B��g����0�(f��G{� R���|�"�}���#Ʊ�����)�o�~b$+�����!�{dv2���f����������f�ïĬ)lV`V�̘�*=N�z�/�&�*?k��[�mV���Hl�ƀR���
+g9Ūe,*G{$�`��'$�[�S�~<ր��?  x s��{6<vb�B�3TԀ�:���=�i`A����㙛Y�^�)�˺��L�3���mXy��.d1���U�
+`2��O`t�ӛjq�F�Wޠ�+8��#E��["Q<_@}`j�3H��hi����d��w�/ܾ�f�-����������Q0��!�]'�Z���-j5S�m���תr�PQ��D#����k+�_T���{VM�T��C�k՗��B���Ea7Yx���q�֟���,��y`��?�_����/�.7S~|�������9�ͤ�Rw.��A矸�]\;�nUͫ9�u�`�lAכMS�!��0��bm��A#y��bP��9���uc��dTT�Ԯq��f��nU̱P1�|��\y�d����XC5�X`�&�����tAj&8���l�Y-���|�Z�s_��tS%l+�����ˑ}�2�Mz�z�v��%����u��	��^��G�	�I�R��X� �)���t����:��]>hD^5t��7��u�&�z]vF�y��;�;,P�1��{w#�|���VG'A�:�㉟����`L;�<�/���x|�C�(+����{�'�D�v�`�G;~�5V ��-]�|B���6����ġ���Q2�
+�ʣ�$"8��'7�C2�9�<)Lov/ ����z4���@ p,��z��q<��VV&���&2���n0\�8qw��r��?���<?m��<�C�<���49�!�������ދ��O��+��b �y8]��F5��DH)q�Y�!��o���>��Xe~~��ra�}�U�L��誱�D���{Y<bp˰wÅ�+�{�X���ԑ�$��S��.�0�:`@ ��Gk0���<Gk��n�G0>`0���BP�B�~�&A�0Լ����.���Nr�qY�N���j�(
+���u�c-s�Z*,ee���@�lcp��k��ԙ4��rr}�Z�И��f��L�>ʹ
+�>���kh���j3Ry'$9a��!�\ �k���@�*D6���7�H,Mz�l1J����P'��@�83p���x�%��*1�ю�����&!餪6�*���)��A���=��j�� +�!�Ɔ�(%ś�DZ%���OQ�z�+��#��z�~9�7I�0�YA����sbg����![U�����T�N���ʋ/	 aA���pa��x޴3<��co��==	1��Tw�,���чy#���]9s��
+H0������I��!t!\�
+��N����$>�7��n8Ũ�BN�7v1
+���������������-r��]`��F>�B��RM{��ؙڧ�N�+���q�[#_���qg�B�O�!hV��E��u��൞��!7DJ��\���
+��������w�9
+�h��u>qP��֗��3,�M����v��P�B�RSyՏ��r���.9����;4�%����h��[���Ƨ8��ڈ��9�D�K����6��A0�~s��)��g���
+`�uB��p��V��K������p���/�H�����׼+n���Y�,L���4���y'�A��`	死.�R�RmN�J���P�s�G���G�*�h�Ї"|k��bkD$�P�G
+*�@i,$��a��4*N9��v���p�s�dT��U
+�a��7-�w�m�׋����������۩���R{si}���5F�d�N���қe���/޴�*l�V�e������(i�8Z��10�ʝ�U!�W5���}
+A�Yٌ]�d`�@�����ә32��w	Syע��i5�M� �Z�D���F<FK{�Nei
+�-m�H�k*8���u?�y�Cud7�n:P��r���w�
+�-K=-���i�f�el��NS�xn�G�;|��Hh�1��h���BL���F��_啵�;�Z*�P�]E�$A�R�D��禥Ӏ�ʸu��2�Z�(5��=wɞ�4B�Gs}���j��ܠ߁�L��P�����-���5li�?���{Ն���k$K��'�;�$G���B#j�#q�qa��x:�A���ω3&Ea-��'��=�e̼�+L;C�n�r�ڸn�� +
+��'��eb��R|m�J)n�a$'0�c %0r���~�Q�h
+/�H�Oa�sS.g�x�v����}��"�����}�cR�&�38R����Wh�����ï��,� �:����?V���Zc��E�c��
 
-                <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-                  {/* Card 1 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Have One or More Missing Teeth
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        Missing teeth are affecting your smile, chewing, or confidence.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 2 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        Your Denture Feels Loose or Uncomfortable
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        You want a more stable and fixed alternative to removable dentures.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 3 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Have a Damaged Tooth That Cannot Be Saved
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        A severely damaged or decayed tooth may need to be replaced.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 4 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Find It Difficult to Chew Properly
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        Missing teeth are making everyday eating uncomfortable or difficult.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 5 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Want a Long-Term Fixed Teeth Solution
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        You are looking for natural-looking replacement teeth designed for long-term function.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {comparisonSection}
-              {costSection}
-              {timelineSection}
-              {warrantyPolicySection}
-            </>
-          ) : (mConfig.show_process !== false && displaySteps.length > 0) ? (
-            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 animate-fade-in" id="cms-section-process">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                  <Activity className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <h2 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                    Methodical Procedures
-                  </h2>
-                  <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    {seoHeadings.process}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-                {displaySteps.map((step, idx) => (
-                  <PremiumMedicalCard
-                    key={idx}
-                    icon={<Activity />}
-                    title={step.title}
-                  >
-                    {step.description}
-                  </PremiumMedicalCard>
-                ))}
-              </div>
-            </div>
-          ) : null;
-
-          const benefitsElement = (mConfig.show_benefits !== false && displayFeatures.length > 0) ? (
-            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 animate-fade-in" id="cms-section-benefits">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                  <Sparkles className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <h2 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                    Premium Highlights
-                  </h2>
-                  <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    {seoHeadings.whyChooseUs}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                {displayFeatures.map((feat, idx) => (
-                  <PremiumMedicalCard
-                    key={idx}
-                    icon={<Sparkles />}
-                    title={feat.title}
-                  >
-                    {feat.description}
-                  </PremiumMedicalCard>
-                ))}
-              </div>
-            </div>
-          ) : null;
-
-          const galleryElement = (mConfig.show_gallery !== false && displayGallery.length > 0) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 shadow-3xs space-y-6" id="cms-section-gallery">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                    <ImageIcon className="h-4.5 w-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                      Patient Transformations
-                    </h4>
-                    <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                      {seoHeadings.caseGallery}
-                    </h3>
-                  </div>
-                </div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-2.5 py-1 rounded-md">
-                  {displayGallery.length} Images
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {displayGallery.map((item, index) => (
-                  <motion.div 
-                    key={item.id} 
-                    whileHover={{ y: -2 }}
-                    onClick={() => openLightbox(index)}
-                    className="group relative bg-slate-100 border border-slate-150 rounded-2xl overflow-hidden aspect-[4/3] shadow-3xs hover:shadow-md transition-all duration-300 cursor-zoom-in"
-                  >
-                    <img 
-                      src={item.image_url} 
-                      alt={item.alt_text || item.caption || service.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                      referrerPolicy="no-referrer"
-                    />
-                    
-                    {/* Caption Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent p-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <div className="text-white w-full">
-                        <p className="text-[11px] font-bold tracking-tight">
-                          {item.caption || item.alt_text || `${service.title} Result`}
-                        </p>
-                        <span className="text-[9px] text-[#0D9488] font-black uppercase tracking-widest mt-0.5 block">
-                          View Case &rarr;
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          ) : null;
-
-          const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) 
-            ? ((isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
-            : (fallback?.procedure_video_url || fallback?.marketing_config?.procedure_video_url || '');
-          const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultVideoUrl || '').trim();
-          
-          const effectiveVideoTitle = seoHeadings.video;
-
-          const videoSource = mConfig.procedure_video_source || (isMp4Url(effectiveVideoUrl) ? 'mp4' : isYouTubeUrl(effectiveVideoUrl) ? 'youtube' : 'instagram');
-
-          const videoElement = (mConfig.show_procedure_video !== false && effectiveVideoUrl) ? (
-            <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-video">
-              {effectiveVideoTitle && (
-                <div className="text-center max-w-xl mx-auto px-4">
-                  <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
-                    {effectiveVideoTitle}
-                  </h2>
-                  <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
-                </div>
-              )}
-
-              <div className="max-w-[640px] mx-auto w-full px-2 sm:px-0">
-                {videoSource === 'mp4' || videoSource === 'manual' ? (
-                  <div className="w-full max-w-[640px] mx-auto flex justify-center rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black animate-fade-in">
-                    <video
-                      src={effectiveVideoUrl}
-                      controls
-                      playsInline
-                      className="w-full h-auto block"
-                      style={{ maxHeight: '75vh' }}
-                      preload="metadata"
-                    />
-                  </div>
-                ) : videoSource === 'youtube' ? (
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
-                    <iframe
-                      src={getYouTubeEmbedUrl(effectiveVideoUrl)}
-                      title={effectiveVideoTitle || 'Procedure Video'}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                ) : (
-                  <InstagramEmbed
-                    url={effectiveVideoUrl}
-                    title={effectiveVideoTitle || 'Procedure Video'}
-                    thumbnail={service?.procedure_video_thumbnail || mConfig.procedure_video_thumbnail || mConfig.video_thumbnail}
-                  />
-                )}
-              </div>
-            </div>
-          ) : null;
-
-          const renderCombinedGallery = () => {
-            const isSectionEnabled = mConfig.show_hospital_photos !== false && mConfig.show_hospital_team_photos !== false;
-            const hasCmsImages = displayTeamPhotos.length > 0;
-            const sectionTitle = "Patel Dental Hospital " + seoHeadings.keywordPlural + " Clinical Facility & Team Gallery";
-
-            if (!isSectionEnabled || !hasCmsImages) return null;
-
-            return (
-              <div className="py-12 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-hospital-gallery">
-                {sectionTitle && (
-                  <div className="text-center max-w-xl mx-auto px-4">
-                    <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
-                      {sectionTitle}
-                    </h2>
-                    <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-                  {displayTeamPhotos.map((p: any, idx: number) => {
-                    const imgUrl = (p.image_url || p.photo_url || '').trim();
-                    const titleText = (p.caption || p.title || p.name || '').trim();
-                    if (!imgUrl) return null;
-
-                    return (
-                      <div 
-                        key={p.id || idx} 
-                        className="group bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col hover:-translate-y-1"
-                      >
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
-                          <img
-                            src={imgUrl}
-                            alt={titleText || 'Hospital Gallery Photo'}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                            referrerPolicy="no-referrer"
-                          />
-                        </div>
-                        {titleText && (
-                          <div className="p-4 bg-slate-50/50 border-t border-[#E5EEF5] text-center">
-                            <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                              {titleText}
-                            </h4>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          };
-
-          const validTestimonialVideos = displayTestimonials.filter((t: any) => {
-            const url = (t?.video_url || t?.instagram_url || t?.reel_url || '').trim();
-            return url !== '';
-          });
-
-          const testimonialsTitle = seoHeadings.keywordPlural + " Patient Testimonials & Success Stories";
-
-          const testimonialsElement = (mConfig.show_testimonials !== false && validTestimonialVideos.length > 0) ? (
-            <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-testimonials">
-              {testimonialsTitle && (
-                <div className="text-center max-w-xl mx-auto px-4">
-                  <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight text-center">
-                    {testimonialsTitle}
-                  </h2>
-                  <div className="h-0.5 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
-                {validTestimonialVideos.map((t: any, idx: number) => {
-                  const reelUrl = (t.video_url || t.instagram_url || t.reel_url || '').trim();
-                  const patientName = typeof t.patient_name === 'string' ? t.patient_name.trim() : '';
-                  return (
-                    <div key={t.id || idx} className="flex flex-col items-center w-full">
-                      {isMp4Url(reelUrl) ? (
-                        <div className="w-full max-w-[430px] mx-auto flex justify-center">
-                          <Mp4ReelPlayer src={reelUrl} poster={t.thumbnail || t.thumbnail_url} />
-                        </div>
-                      ) : isYouTubeUrl(reelUrl) ? (
-                        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
-                          <iframe
-                            src={getYouTubeEmbedUrl(reelUrl)}
-                            title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Video')}
-                            className="w-full h-full border-0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        </div>
-                      ) : (
-                        <InstagramEmbed
-                          url={reelUrl}
-                          title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
-                          thumbnail={t.thumbnail || t.thumbnail_url}
-                        />
-                      )}
-                      {patientName && patientName !== 'Patient Name' && (
-                        <span className="text-xs font-bold text-slate-700 mt-2 text-center block">
-                          {patientName}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null;
-
-          const faqElement = (mConfig.show_faq !== false && faqs.length > 0) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 shadow-3xs space-y-6" id="cms-section-faq">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                  <HelpCircle className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                    Patient Support Hub
-                  </h4>
-                  <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    {seoHeadings.faq}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {faqs.map((faq) => {
-                  const isExpanded = expandedFaqId === faq.id;
-                  return (
-                    <div 
-                      key={faq.id}
-                      className={`border rounded-2xl transition-all duration-300 ${
-                        isExpanded 
-                          ? 'border-[#0D9488] bg-teal-50/10' 
-                          : 'border-slate-150 hover:border-slate-200 bg-white'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => toggleFaq(faq.id)}
-                        className="w-full text-left p-4 flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
-                      >
-                        <div className="flex gap-2.5 items-start">
-                          <span className="text-xs font-black text-[#0D9488] bg-teal-50 h-5 w-5 rounded-md flex items-center justify-center shrink-0 mt-0.5">
-                            Q
-                          </span>
-                          <span className="text-xs sm:text-sm font-bold text-[#081C3A] leading-relaxed">
-                            {faq.question}
-                          </span>
-                        </div>
-                        <span className="shrink-0 p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors">
-                          {isExpanded ? (
-                            <ChevronUp className="h-4 w-4 text-[#0D9488]" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
-                          )}
-                        </span>
-                      </button>
-                      
-                      <AnimatePresence initial={false}>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                            className="overflow-hidden"
-                          >
-                            <div className="px-4 pb-4 pt-1 border-t border-slate-100/50 text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-wrap pl-11">
-                              {faq.answer}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null;
-
-          const relatedServicesElement = (mConfig.show_related_services !== false && relatedServices.length > 0) ? (
-            <div className="space-y-6 pt-6" id="cms-section-related-services">
-              <div className="text-center max-w-xl mx-auto space-y-2">
-                <span className="text-[9px] text-[#0D9488] font-black uppercase tracking-widest block">
-                  Explore More Solutions
-                </span>
-                <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
-                  Other Treatments
-                </h2>
-                <p className="text-slate-500 text-xs">
-                  Learn about other specialized cosmetic, restorative, and general dental care treatments we offer.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {relatedServices.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.3 }}
-                    className="bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col justify-between group"
-                  >
-                    <div>
-                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
-                        <img 
-                          src={item.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600'} 
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <div className="p-6 space-y-2.5">
-                        <h3 className="font-display font-extrabold text-base text-[#081C3A] line-clamp-1 tracking-tight group-hover:text-[#0D9488] transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="text-slate-500 text-xs leading-relaxed line-clamp-2">
-                          {item.short_description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-5 pt-0">
-                      <button
-                        onClick={() => handleNavigateToService(item.slug)}
-                        className="w-full py-2 bg-slate-50 hover:bg-[#0D9488]/5 border border-slate-150 text-[#081C3A] hover:text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
-                      >
-                        Learn Details
-                        <ArrowRight className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          ) : null;
-
-          const bottomCtaElement = (mConfig.show_bottom_cta !== false) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl relative overflow-hidden text-center space-y-6" id="cms-section-bottom-cta">
-              <div className="max-w-xl mx-auto space-y-4 relative z-10">
-                <span className="inline-flex items-center gap-1 bg-[#0D9488] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full leading-none">
-                  Consultation Booking
-                </span>
-                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                  {seoHeadings.bottomCta}
-                </h2>
-                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                  {mConfig.bottom_cta_description || `Book a pain-free diagnostic consultation with our specialists in Rajkot. Experience high-end treatment tailored exactly to your clinical expectations.`}
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 relative z-10 pt-2">
-                <button
-                  onClick={() => {
-                    const link = mConfig.bottom_cta_primary_link;
-                    if (link && link.trim() !== '') {
-                      if (link.startsWith('http')) {
-                        window.open(link, '_blank', 'noopener,noreferrer');
-                      } else {
-                        window.location.hash = link;
-                      }
-                    } else {
-                      openAppointmentModal(`${service.title} - Bottom CTA`);
-                    }
-                  }}
-                  className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 group"
-                >
-                  <Calendar className="h-4.5 w-4.5" />
-                  <span>{mConfig.bottom_cta_primary_text || "Free Consultation"}</span>
-                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-                
-                <a
-                  href={mConfig.bottom_cta_secondary_link && mConfig.bottom_cta_secondary_link.trim() !== '' ? mConfig.bottom_cta_secondary_link : getWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="h-4.5 w-4.5" />
-                  <span>{mConfig.bottom_cta_secondary_text || "WhatsApp Us"}</span>
-                </a>
-              </div>
-            </div>
-          ) : null;
-
-          // Dispatch switcher
-          const getSectionNode = (key) => {
-            switch (key) {
-              case 'hero':
-                return heroElement;
-
-              case 'intro':
-                return introElement;
-              case 'process':
-                return processElement;
-              case 'benefits':
-                return benefitsElement;
-              case 'gallery':
-                return galleryElement;
-              case 'video':
-                return videoElement;
-              case 'hospital_photos':
-                return renderCombinedGallery();
-              case 'team_photos':
-                return null;
-              case 'testimonials':
-                return testimonialsElement;
-              case 'faq':
-                return faqElement;
-              case 'related_services':
-                return relatedServicesElement;
-              case 'bottom_cta':
-                return bottomCtaElement;
-              default:
-                return null;
-            }
-          };
-
-          // Formulate order lists
-          const defaultOrder = [
-            'hero',
-
-            'intro',
-            'process',
-            'benefits',
-            'gallery',
-            'video',
-            'testimonials',
-            'hospital_photos',
-            'team_photos',
-            'faq',
-            'related_services',
-            'bottom_cta'
-          ];
-          const currentOrder = Array.isArray(mConfig.section_order) 
-            ? mConfig.section_order 
-            : defaultOrder;
-
-          const cleanOrder = [...currentOrder];
-          defaultOrder.forEach(sec => {
-            if (!cleanOrder.includes(sec)) {
-              cleanOrder.push(sec);
-            }
-          });
-          const sectionOrder = cleanOrder.filter(sec => defaultOrder.includes(sec));
-
-          const innerKeys = ['intro', 'process', 'benefits', 'gallery', 'faq'];
-          const outerBeforeGridKeys = [];
-          const outerAfterGridKeys = [];
-          const innerGridKeys = [];
-
-          let foundInner = false;
-          sectionOrder.forEach(sec => {
-            if (innerKeys.includes(sec)) {
-              foundInner = true;
-              innerGridKeys.push(sec);
-            } else {
-              if (!foundInner) {
-                outerBeforeGridKeys.push(sec);
-              } else {
-                outerAfterGridKeys.push(sec);
-              }
-            }
-          });
-
-          if (isNewArchitecture) {
-            return (
-              <div className="space-y-8 sm:space-y-16 lg:space-y-20">
-                {heroElement}
-                {introElement}
-
-                {/* Section 2.5: Treatment / Option Comparison for Full Mouth Rehabilitation */}
-                {isFullMouth && fullMouthComparisonSection}
-                {isFullMouth && fullMouthCostSection}
-                {isFullMouth && fullMouthTimelineSection}
-                {isFullMouth && fullMouthWarrantyPolicySection}
-
-                {/* Section 3: How We Perform Treatment (Clinical Workflow Steps) */}
-                {isDentalImplants ? (
-                  <>
-                    <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="service-workflow">
-                      <div className="space-y-3 max-w-3xl mx-auto text-center">
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                          You May Need Dental Implants If…
-                        </h2>
-                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                      </div>
-
-                      <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-                        {/* Card 1 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Have One or More Missing Teeth
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              Missing teeth are affecting your smile, chewing, or confidence.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 2 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              Your Denture Feels Loose or Uncomfortable
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              You want a more stable and fixed alternative to removable dentures.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Have a Damaged Tooth That Cannot Be Saved
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              A severely damaged or decayed tooth may need to be replaced.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 4 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Find It Difficult to Chew Properly
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              Missing teeth are making everyday eating uncomfortable or difficult.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 5 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Want a Long-Term Fixed Teeth Solution
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              You are looking for natural-looking replacement teeth designed for long-term function.
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {comparisonSection}
-                    {costSection}
-                    {timelineSection}
-                    {warrantyPolicySection}
-                  </>
-                ) : isFullMouth ? (
-                  <>
-                    {fullMouthComparisonSection}
-                    {fullMouthCostSection}
-                    {fullMouthTimelineSection}
-                    {fullMouthWarrantyPolicySection}
-                  </>
-                ) : isRootCanal ? (
-                  <>
-                    {rootCanalSymptomSection}
-                    {rootCanalComparisonSection}
-                    {rootCanalCostSection}
-                    {rootCanalTimelineSection}
-                    {rootCanalWarrantyPolicySection}
-                  </>
-                ) : isInvisibleAligners ? (
-                  <>
-                    {alignersComparisonSection}
-                    {alignersCostSection}
-                    {alignersTimelineSection}
-                    {alignersWarrantyPolicySection}
-                  </>
-                ) : isSmileMakeover ? (
-                  <>
-                    {smileMakeoverSymptomSection}
-                    {smileMakeoverRouteComparisonSection}
-                    {smileMakeoverPricingSection}
-                    {smileMakeoverTimelineSection}
-                    {smileMakeoverRiskReversalSection}
-                  </>
-                ) : isCrownsAndBridges ? (
-                  <>
-                    {crownsBridgesSymptomSection}
-                    {crownsBridgesComparisonSection}
-                    {crownsBridgesPricingSection}
-                    {crownsBridgesTimelineSection}
-                    {crownsBridgesRiskReversalSection}
-                  </>
-                ) : isPediatricDentistry ? (
-                  <>
-                    {pediatricDentistrySymptomSection}
-                    {pediatricDentistryServicesSection}
-                    {pediatricDentistryPricingSection}
-                    {pediatricDentistryTimelineSection}
-                    {pediatricDentistryRiskReversalSection}
-                  </>
-                ) : (
-                  mConfig.show_process !== false && (
-                    <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="service-workflow">
-                      <div className="space-y-3 max-w-3xl mx-auto text-center">
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                          {seoHeadings.process}
-                        </h2>
-                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                      </div>
-
-                      <div className={`grid grid-cols-1 ${displaySteps.length === 1 ? 'max-w-2xl' : displaySteps.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-start mx-auto`}>
-                        {displaySteps.map((step, idx) => (
-                          <PremiumMedicalCard
-                            key={step.id || idx}
-                            icon={<Activity />}
-                            title={step.title}
-                            imageUrl={step.image_url}
-                          >
-                            {step.description}
-                          </PremiumMedicalCard>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                )}
-
-                {/* Section 5: Who Is a Candidate for Treatment */}
-                {(mConfig.show_candidate !== false && displayCandidateItems.length > 0 && !isFullMouth && !isInvisibleAligners && !isRootCanal && !isSmileMakeover && !isCrownsAndBridges && !isPediatricDentistry) && (
-                  <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="candidate-section">
-                    <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {seoHeadings.candidate}
-                      </h2>
-                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                    </div>
-
-                    <div className={`grid grid-cols-1 ${displayCandidateItems.length === 1 ? 'max-w-2xl' : displayCandidateItems.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-start mx-auto`}>
-                      {[...displayCandidateItems]
-                        .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-                        .map((cand: any, idx: number) => (
-                          <PremiumMedicalCard
-                            key={cand.id || idx}
-                            icon={<CheckCircle2 />}
-                            title={cand.title}
-                          >
-                            {cand.description}
-                          </PremiumMedicalCard>
-                        ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Section 5: Interactive Before & After Smile Transformations */}
-                {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
-                    <div className="space-y-3 max-w-3xl mx-auto text-center">
-                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        Transformations
-                      </span>
-                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {seoHeadings.transformations}
-                      </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : isRootCanal ? 'See real smile transformations of our single sitting root canal treatment patients.' : 'See real smile transformations of our patients.')}
-                      </p>
-                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
-                      {beforeAfterPairs.map((pair, pIdx) => (
-                        <div 
-                          key={pair.id || pIdx} 
-                          className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
-                        >
-                          <BeforeAfterSlider
-                            beforeImage={pair.before_image}
-                            afterImage={pair.after_image}
-                            caption={pair.caption}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Section 6: Clinical Case Gallery */}
-                {mConfig.show_gallery !== false && (
-                  <ClinicalCaseGallery
-                    heading={seoHeadings.caseGallery}
-                    description={mConfig.gallery_description}
-                    items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
-                    singleGallery={isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling}
-                  />
-                )}
-
-                {/* Section 6: Procedure Video (Loaded dynamically from CMS Instagram Reel) */}
-                {videoElement}
-
-                {/* Section 7: Patient Testimonial Reels */}
-                {testimonialsElement}
-
-                {/* Section 8: Hospital & Team Gallery */}
-                {renderCombinedGallery()}
-
-                {/* Section 9: Cost Section (100% CMS-driven, Premium Two-column card) */}
-                {mConfig.show_cost !== false && !isDentalImplants && !isFullMouth && !isInvisibleAligners && !isRootCanal && !isSmileMakeover && !isCrownsAndBridges && !isPediatricDentistry && (
-                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 space-y-5 sm:space-y-8 animate-fade-in" id="dental-implants-cost">
-                    {/* Two-column responsive card wrapper */}
-                    <div className="bg-gradient-to-br from-slate-50 via-white to-teal-50/20 border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-12 shadow-sm hover:shadow-md transition-all duration-300 max-w-7xl mx-auto">
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
-                        
-                        {/* Left Column: Heading, Highlight, Subtext, Contact Text */}
-                        <div className="lg:col-span-7 space-y-3 sm:space-y-4">
-                          <div className="space-y-2">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                              <FileText className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                              Transparent Pricing
-                            </span>
-                            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                              {mConfig.cost_heading || (isToothColouredFilling ? 'Tooth Coloured Filling Cost & Offers' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Cost & Offers' : isBracesTreatment ? 'Braces Treatment Cost & Offers' : isPediatricDentistry ? 'Pediatric Dentistry Cost / Offer' : isTeethWhitening ? 'Teeth Whitening Cost & Offer' : isCrownsAndBridges ? 'Crown & Bridges Cost & Offer' : isSmileMakeover ? 'Smile Makeover Consultation' : isInvisibleAligners ? 'Invisible Aligners Treatment Cost & Offer' : isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
-                            </h2>
-                          </div>
-
-                          {((mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '') || 
-                            (mConfig.cost_highlight_sub && mConfig.cost_highlight_sub.trim() !== '')) && (
-                            <div className="space-y-1.5 mt-2 bg-white/80 p-4 sm:p-5 rounded-2xl border border-teal-100/80 shadow-2xs">
-                              {mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '' && (
-      x��=�v�8����'�3�,ɗ8���l%:�[�Ngrz�%A�ɐ�eœs�#��K�
- )^ ���tfN���H\U��BU��go`ݒ�m��9��+C�	��t¾�l�CBzw6	&���&|g_~�s������G�P�rFFh����ORv�'m�Z�Z�
-��1Գ��5������:���բvTc�=��Q����5���g���R����!{IPG �i�7Z9��o�\{��k�b�#ğ�0�2�	��5����x�Rc�^� 
-&1�zf@9't`M'Ħ� ��Sۼ�21��� pi���A��q2�ɗi|( �ku;5wI��Kw�x,��H��f�ϧ}!A)�AhM ^1�!���(ZP~`�#����ޚ��-ש�ǭ[k-�4P��_��@�$mמN�]Ҿj�V�����;β/{��wm#�L��"C�ޱ?<DDa�}wF�\�|dz�Fm�̌�Զ�oS��pn��0�"˞���ا���O!�w��_~8�jjݽ���kg:�����D�A���k�%>=<��_]��N�Z����i猿]���M����
-��q}�ȷ����, �ě��7J0��{K�]����m����m6�Bʿ�1���n1�<���c�5�0Cߝ::@V�́;3&ѓ�
-��8��+o�����P�؈H��_[�$����-k��?��7<�b���-�
-�h��jޟ��4J���0�p��f�G������z��w�6�cc���
-��ՍQ_!�� ���aV �k��Q��F v�'�д��uo���ұ�!Ԓ(?�������-�{���Oo�m����
-#L��[7�,��F�d�Na۳����\���d���v�������o�>}]��fdRm^��'��u�F�a L���1%�-���A�c8�EI`�aP�T����S�_�Dwnt(@�:�+��z��s\ �}`(�x�s׶�sl�(WQM�ͭÍ��I7����$� ��H���9�m���߆�gHI��	򎈋�+O�ꗺZ#�)_)^�>��/)��I��K޸����Bڼ����ڨ����O.������3AA/�W��B�`�ήG��k_����д������c.l�cr���AM�#g*�������/G����7ggo���/�~����U�`NDw���<�u_�N�g�H� ������`D�ֽ�r-g�x��3� �`]�N�H�����A�7A��WV�sլ⢋�0$/zZfNM<bF8�ˉtpb�P�k8�`
-��b.��C�j�v�8&6+&�jDM� ��2sշ���ҕ��ۡ�puP|?�?�16{�m	�A���À�я,0��skJ-P�AP�V\2.c1��%�"��2B��O?Oa�����P���z�R��FV�ի��W��(�������uA!5��L���Ea<~�c��S��H�GV)���''4��L��h���s�<�&��(�[��-vKŶ\M��=��V�ّ�e���'�ef�L�n���x|E)�<ȝB�?��uxq �/
-�������;��A�/��#��٣�k�S�:�
-�hU)md�LV��tZ��GP�|��?x~�st���K�n4����3vP���F��Dا����'яȟ�`e��ް&�2a`by��آ�6�Y
-�Ó;Ü��擽q��ٹ�0;c'�(o�F��}4���_ex��f�y{�}��P�7�S̀ll4@�u�fa7�֏ٞ"NB�H)����u�N�ں�d����Dx.~n0k�_v�6����~�Xh%�V h5� � ����U�}���ݭ���4��s.ן 
-�J׆j��������"h_��[}�ٿ�k�i���kM���30�.�wm�P��v4$�y=��¶x�nA���&4���'����z���WF����j[��v�l�1;o*n	�� ���0@�]r���;!�bv�
-�sN�\#�L�@lL=��ߔQ>�o4������r�U���9c����h_�/���Y��o�Ac`� ��P�r���c���
-���+Pg1��Oxʂf�s���[X���!����S�;c�
-6#>�;�9�my9Ql�/�Ōl�<�WK�Hl}z�kF��9��5�D�FӖg�(
- [��/l]#�q#��کc�4`��у9��@�̫z��Zfr�s�����:�Q���,��=��>;b���g�����sE�����W���Wy��]h���o� v&�/�漖�$6�J�\�m)f�=��R��\{
-�����[+�-X�-6���z �L}��~�Z����ELr_@�K�a�l��t��1٘�0ki���Өm	a��@)3>���k!�-�
-�q"��6�!���߬�����ˊmB����P�����>%{���h"�0KZe���k��=��{�=8>"���ӣ��@����:��ٻ�����m�{ܽj]u�Ny��F�N�ZǤ{r~�:�"����w��*}J_��A��)Ը�8j]�@m^,��@������K��]t���J({~t�m]]t�GԽ�����W�ѱs;q4���G���i� N04ҿaTK�������`m ��l,	��9,�d��
-}��vYy�����l��γ]��6�9c�a�Z�&8�j[tȶ���R�TTrnZ|�s5�\ �b� <Ϙ�ѝ KI҂cZ�@�Uo�g�������)yc
-C��I@����|����< d�c��4Fw��z�iڡ�9��)n2��ֽG樲�gJ3�B�rA���?+��h�:3�A#�O����%̈�F���#�0FD����w �����]hM(n�9�$K �j�Y�P*uR
-u���h��.����ћ�����:��8���L+�E��]� �����p�`������|�o"D��їϘ"�_��L�B�lD�\.	��qW"K0_�&>h��3Fȋ:��P&v+@Z�-����'�)���A?BM���
-����@�Z>ȇH�!CQ�!q�ak���0=7�[�9ؘ�k������-�]	 D�.�voj1��!��7�F��=i��S2�B ��a�y�b�7���&�8�{�q$���^9��"ܐ��
-�Z��F�v�c.�q`3����3a��ӯ͝��v��z���G}��X.�9M@^թ`�)�)���8����y�������*3���Qk��tR�]�;LU�R��������*�0j��Q������	�r�Ov�V.kF/�xSau$g(P�?B�x��gOb�0�� c��5(�>V�d�E%�Z���]%�	T�g�X����VT�Y�I{|�$�8��B҉��r{���x|٣���TB���u�����{i�m����#ݼ�������N>�����
-)��:'��)�e��]���������9�'�C�������΃���	_7�&�
-��2.o-�=�,O��U���[��W�������e��ԇve)Z��:�s_���
-����`�.
-*(0yzsGFz]Y�N$���a�@�8��9gӉ����vKY~�1q}���QOr�#Nm����]��C9��D��3���؜Š�h����v����y�{zy���~������{�w��������vk������o��߶�.[��|��<���gWg����������q��@�NIT_�ۧ��:;�z˛^g�U�}��[���.:g ���v�∴鶏*���(D%��6�PeH�NJl�����~��&l%Y�Į�n�;�	�g�UW�4��f�g�C�Jü�d/j �� -~"�%<v�9`����t��K��vԞc��<&��A"9����4t���C����	Pt�`K�g��A�de��8l���~�p��JI�<C*a��D4k,wڑG�R[R>Gÿ�n{�z�y�[!/2{��ʏ�2�if�V�C���|�`�r���>n��)�Gf������r��X��XS��p��'���?�9X���tT��!R6`���К�Rℇth��^]�[A
-kH�
-�Sݥ�A�Z-셐t��'��
-;/�v0��gk����c3�}�讨7�Z��]۾r��@u�.��%�>g��.�Գ*�k��nS�'����#�����9����N���o2�q!��Z�nԽ��
-��zf�����X�l��k��Տi �c���-I�F3.���<�im�*�
-w�c�q�vݴE?�z4�Q��<3��Z8]wv�Iƌ�<<���+�K8p0�8m��(�-�I���(_l�7`�����I��\{�dTLn~?�\�$Ĵò�������-_��~�IsJ�ʆ@4��5�[I�a_��?Y �V]��?��5Wl�˼��������O�¤/h�]Ai6�7h�	�%~� [!���D���z��i����r{��wGr�t^�r�x���x�����c�{�֦��<9��P"J���o�d�8�OBB-���3��-�s)Z;�����+>�K����Q"�Y{Җ��!uJF-Z�x ��Oɓ�hV�i�� 9Gs���Y`��15}'J��B�9B!�K��&
-�Jl\=��
-6��i�v8c�@5�LZ
-jVs�`{z���4SJ)9���<�2��G�w*S�L?�֨�D)��?YZlN�y����!hw�%��ŘJ��Dڴ�"�T�S��F����(�vZ?��J��>�*�T�>�E}�pUydj*�hh~F�"̨t��S�5��祌��	c p���	ڌ�y[Og��"��V����dg��FZ.�������=́�H`�臺��(�e�a1	h���*lm�f�|n V��$^�ސ]�jh \Z6S�
-w��̙�	~����u�w����#��N�Rj� _�U���Fz����,_լ� �kFl�xDU_%F\�'-�픙�ٲPht~��J���|<$VptD�B�ѿ�}]D�v�1���5Л�|NA�)�Z���\|����Z"[L(=�5UE􀔞�~�d@M��Ⓚa���p�$���߁6�s�QD{�Lc�MZ�-�$��>%D�BW��S�%5�d\SI���X�8���Sa_���e5��U�Z��yM	��m�c���Rdo�-
-Y�c^=���[L�z���f	SWi-(E�JF��*e���H�Q�#�g�<��Ғ	�Mo���h�0`�Kn'e�g	�1i.CF�-BB�z<��BQ���n�,�;u۔i9a�٪ןИ���w�CPr$t)��<�K8q�E[\�9�i��C��$no ���^��K�:��L����Ty��=Sh�	���������G(sɖ*(�V�5�7G��	F��l,"h���Z#����]�lV�6\A%�1�z��2���M�>݈�>ě�f9ۭf��ʤ(.�{>5�YWҠs�%zl*ͨ_v�J�UEK��.�L����z�����=����Ld��R�L�ԤځJ�l���q N�
-�` u�8$ls�|>�.�8�CקX��tΓF�^!��ػ�f?�u|s��]���R��O��V%+���n3��j�舳l<i=aS=6�胝�b�o��%�KB���	:���)�Q�:��X0�@@]n����_$���/��ʭ��k�:(�n�邵Ï�0���0[r��\\Lpi
-h��I�������]�l~� �7��+�3��T-8���P0��"�Ѕ���S�&I2	ʒ
-����Vs{��rO%o��aw���I���)S�*��4Ǉ��:�c��3c�I��'�Af+c.�4<hBH;��o��Q�*��<���)E�RÎ�I*&Um��ڞ�i��.2�lFn�L-S[��{�f��X%n�P�E:�zo��3�
-�X�^�&ڒ�׮�M�Q�����({��M� UG�qp�0ޗw�~4�)�_�r�p��I���x��+��5'��2�!00��6HfQU�\*ũe�A.�v2�$nX��?��Lb���lQwoM�������1�<,�w�X��FsV��--Ԉ�Y6��䩙ȥ톅�-�C�
-d�ʣ���Z{PQ�k\`�+E�af*��|�V	�\.K��w�����RU5�*Z�+�]T:f��қ�	@)0�u�P�8�
-�T�o���
-LRU}����:7Yr�T�I:�Dn�^�;	u��Q��Z�]"��0�fYo���s����lr��Z�� �/Zb���Ͽ�aQ�q&���N�r���)�
-E�p���x���>��Ǽ/K�
-���2��@�$5��R b%Tsl���_��g]�k	����1�P�o.?ۣ��3���|��Z�T	��*#�½+���+g��OS��%n��%��Τw����.�Y�~��
-���Oݥ�������S�D.3=`���	�=	�
-w�$^����-�g;�;eI�GT(��-�޺�˸}4� �9�9�lpS"�G���Uc���C�Ҕ�8��Z����L'��"��/Џ��8�@��':�PQLG�j��>�%H����i�q.8��9���Ĥ�w@��U��3���JIV"n�� �����B
-�̙i~?��N���)~�D'v'!��bT���G0e���y5��F��"S�T�"=�=1�sKvh���d=����"��J.Ֆ��X[pȗC�2|z~�����5ra�v�k�}��gX��Ux0��zbz������������t�kP��P�S�;�Ւ�JZ:&$ �t4�2!Nр�ϣ��tq��,�#/|���B��1��t�K�k
-�ċ�\�F�u�~��j�Te�b��n�[�����2�6�әq�LVc���g��%��,v��E��(��H���QZ"#{Lǵ1�ϻ�\�}L��
-v��L��%�L��������x�Ůr´�a����ƽ�j��c���c@T�G�Rl����dxA,�����3u�]4'S�^t�廵F�M�]��!���[�a�V�a&��.���,�o8+�o��R��7������&���j:.f�W���&-#f�����u�2��8�`w}}�5�j����->�L��ˈ��L��M�;q*i�U�n�$�ی�-�eF��
-\��"4��{"o��9ŁF�8�I����`p�����B��oN�@����A�02n�@��7G�y�GI�����Y<q���M�0���!�D�(Z�!P�o�� z�PP�������� ��c���� ok|�<����
-A���'�C�+�'�F������}kd=�!c2;J�M��%e9^ ��Y��J"�A��<I�vOr��
-&s~MV%Wi�$��F-������D�`M�_x ��ĭ�8'n�J�Ls�D�-Z��<�;~W���������v�}��8�c�9����A�T[k�
-����ش�H,_��gʬm�&�_���	'P�ix�1h��{��{�HhuJg-��t��~>WU�Zl�XZvo�&������m�/@���Y8f�TS�'���AC1	C�̀�e���HF�믲�}+��X���TF~F��BCa ���M~�9ϖݨ��P���)�XJ7]���7s����90q��
-�L���L�R>E��d�n�c�R��Ě�Ru�3lbGH;�o�y��I���x3w7F/9ՙ��_縂1f����`�(�Q�+���^�(Q���(�P��"�&��D���H��N� o�Ace��>�w?�ܴ�X�8����p*�#Q���=b?%zdB|Jb��W����1]��"t+��H��<X�iAE��5�6�7�{G�hIc& ���!!Yd�,���E3]X�;����R�����
-�S���Q%cI�\Qg4IdSQgO�r�����o��`�.������_0�`sq��*�\�x-.�؎p���_�ژ���H'�F\�x91�"�!���k�笌%�븼���Z2�l����<R$�ś��������'�7GY��+i|%gr/Ÿ|f��8h���
-�1#��k#�Z4��+�l�a.cY�SE�,#�(dKI��?�LlXض��ɹ�L�CD���2�]� sF������S`m��J�r�N^��x�J��]����	LG��o���g0�Y�mGiQ��.D_����N�\.ٽ%0E$c�O�ę���e�c0�<E�y�'69�P�j�(�Ub��Eٶ�=c�^t9�d���i��kj��� rOav��v�dᑨ5�%<&#���__�o�奯�r$AԠm��n�;=֥�S��GP��@�Q���T����	�ĢH�uqnm��K�"��S���5�S��қ�2F�"sYƧ��%Ӡ��q�.(��,2Wڂn��q
-M0?�t|��7�d�2hn��,�\\K�".nf�o����  �� -L�5
+�xn�H��Y闓sg)w�����^�+1�����|��Q�������%�)�U��Y����ȷU6���Sn?,�e�y2��5��,��Rc�w���g��g����n^�� ���v�zǽѮv�tߧK��� �s|
+��0f��=+�������A|�@�9�\���Y��
+&ݍ�� ��讌�?���=b��`oo��1͢�������M���^E��2Uj~��S%X"�egq�՜���Jkgh)�>θ�����a0�5��v�ql�u�HB$J��lQ�s!..<� v�B�ˌ`5��,Fޅ%?.r�(�g��q��c�mi��od��+�i$�z����F�|A}��xbĲ�N5V� �~k4�5u�Z�VE�����.Q�DCs��D!�W�lb/:����U�+뎺B}[�R���F+9���T�5�E��J�7 ��.�2?���T��_���qT �H��d�&�TIjgo�Iё��j��|���sL�M�v���8��f�[�xH;���a�Q6��j$s�.]��5H3��R�����#��j�y�q�FZU��+7��2�&�	���K�C���G��b�'|
+���]q�TT�_`"�F1�X�v/�4�J9�p�H��l�(�"���k�l��CVs�ê�'+��rAI�=T����!]R�ީ�Q3ޮ�b�Җ�p�Rhd&�1�P���dۍ��J!�z����	}w�deV3 ��(��A���������ګ�٥��x ��:�膦�����%�;E������>��7*���*�ѐ�nw	 -����*�(@��9�/��^����ل����a9ƚ���.\�坎N�+��7��S�q�|��%�.�k&�a&@��*պ���.�$���n��Q���n?Z�/yw�Ԑ�H�-̵ţ�̫[pN�p�UN���M�<��Dr�#3�Fk���E��Fkuc}����ϟwW�w�/^!��1#������������6��y����<nu��/39���9Z���([md��*mꂀ�� ������Ȉ�<42DY�p���Z�.�*���m[�z��Z*������!������]�͚��#�d6�R3H����\��lg�$Ob���b&�����B{*Ƨ0��n�(���J�=�N>����J��d��l<�f(��;�����0&'t~r��*������V���8ϋ ��c*Hλ��Iw~��)n�Zm5p#a+ૉ��.-�O2�L�R 1
+k�(�JSGq�g����j�-�����RKTQ~5���s�8I��3�bkA����E�YU,��f�@�;��B)���@o*稪�:
+���dGE�9UW�9l�~�r�z�s��Ⱥtӭ�� ~Sn8)FE �>;q��-��Q �Kj��^��&��$��WN7�����2�u�%~�ܪ������t��a	�o@���{uy=��Lj�|#�,�F�3	,�7�yMٳQ�s8=�f_�����ع	��EC�Y�e��>�/�>�h�2��\�WT}�͟�����_~��y��	#;opQa�����D>��H�J楀6��+z�1�#��z��P��� ����v�v�f��_+��Ij����s-��U�g����^G��VFR.���5��6��Z>b�"��3F6$��Ci��H"%��#S����}�����9�$u�"�`�Dh0�0q]墎f�8Lۺ�;�r
+��z����L��n�8q���L<`(�='����|�2�@,C��3�����Ս���h7_��<��Q�d��Q�\��mvl�#���$��>F��rũ�R��_Yao�
+�hI,N�;�a��ȑ.��x/|�:�р�Z��ċΣj~�4%i��_�TQr��]�an�>�-�����M��F����V
+����H�is+� ��FȘ�܄�H�@��ܔ6@�+@����[ਯ�����k|�������V2CI}��}�m�tlJ��
+�v�%�k��UiÏ"&�9�0!��(Q���#*��>��|)x�]ʿLNb�uz�
+��Rx-���2=�oEp/U���	�����d��|�R���n&�
+��3]v#��]H��v��O[��N�<�n���;�����+7l��e����`�.Srw�^v��7iKk���hQ���ϓ�LCiP�\�a榐�fi\����St���@��*�*�*�F���������KZ6����?i��2J!���`Wu��&|��r՛��HՖ�:��1/����ۮ�	��tұf�M�X���6X����1��';a9ar�)ΡfP��1���Gk��$mD8��*��*O�	�!�%w����[�%[aGB������h���D��>p:G�t����0�諐�ح�^f�k�kf�uf�xf��I�ͺ��[�]0a�8;�!]hfK������P��(�Ңi	�m
+q����)���U��2��gf@*�6�"^���DΫv���_Z�*Z�z�n�#
+'�&���0�{g�>`�h�*�ʃ>�i�!�tk8h�fp�^5
+��g�M�ML�Y]�<mY�4�k˒���{w`��<�}�<�$̐
+V�_?INX9�G�V<���9 �G>��&s�$�4�
+�O�j�۱I+�rBlGē�wt�a �%��	�[��ST��ʙq��x�ݲ���<�~Ox�	O><��Ag�9Ȣ��"���w�!1��y�%���H>D*�|�ĻO	��������apIEzb]�G�2W�P��|B�� e
+��ao4e�1���N'����������<r���"�˽)��iM��3�?c��Й2��O��9G���G�/מ���|�_��m����ݱ#�����������E�eq|��1D���H�l>V�iB��j<����0���|�X�u��!`PUIs��u��8����~tM8�sn$�$7)�h�=a���pib\�> V�	,:�G���V�)�r��c*W�S���^X7j�k�d�.�g�Խ���X�j��o���
+��,G��u���z�����}�i麋�T�Z��h��K�����ζ���VwU��U�����&I�;X�|��ٖ#R�ւ�\�49�����ǡ��=C�z��};A�:�Cs��-%�mu�T]֭���u6W����j�[�\�[/�&��lK;*5Pk}5դa��j�s�Z��.׻��2_϶�q��Q��DnT��ԅ�|�Z���Ro��un����,�`�
+a�,�P�,��:K��/��8k<���x��k)PԯI6;��L��a��)�}����㦒m*�O*"*���ŏ��#��s(�C�s��U��O
+�*��-�cn��*�?)�1�U�X�!�(��n�_'�_�P�+l^��a��v1���L��96W�^+SuQ~�ǻ���_*I'h�U�ա�j�AH,��%>�Me���r�����4�A��y�=t'B�@f���P·�UsH]�a�������R0��E'Ո���(~�Y}�ģ��K|�3�u���+!JW3�pbJ�z�t�R�
+J��|n�4��(�a�l�GR�d�\�УktLӎ��qϗ� ��8����[�@�����ĽHOs�5�m�2�L�$:��e��u�D���h�x��pko�%��M%� ��ȃ�@K���9��� 1�C���/c���1�%@�d�	>GO������s��?�Z?vܰH��P��h�DJ�Fk�ܹ�l�lH�"�ҠA&y����=�����z}bMP'����b����y*N�Zb
+-"�)���<`3O
+CL��[��
+@h�s���?)���A7��H�}E�tzK� ��R�9���K��6�4j�������D����!����'tP�m�0Vr0����Wa/��X0x�剖�I��ɍz��>��T�Y��f�gA��M���"��e����װ�<ʄ�ڍw�����pQ__�Y�q��+4���ٰ�TeɥD�q��f����:aރ�жzVw% <�+@����R�5��nV�"��C�>V�2竍�M��J����'Nr.��A��Ŗ�	��5�+b��hͷ��-�#�>������V[��ٞ�z���ފ<@U�\j��I{T���P�
+�_�f����TM��U�q&�b�7�X�羋�V��GK���R�e�v ��Nn �vA}�V�/�B�� qrp�q�	�l_���$�P�E%L�C&�[�)��,�}�R'"E?��^�/�*)��mᾌ�itj���*�K
+"ְB��.����o,z�E�x��a�`j���w�Dޔ�����S�&��T���j|����o1SX�d���U��&Ɯ�@�=�0x�3������ ���F�׬�A�������$@�:���gXļ�[��_J�/���� __PO5�몬��d�j�n�/�y�Q����i��2l�6*�B�x<T���0� R��FU���َ��x4�)�:I�� ���MSZpUq�ץ��)ㄷ>��1�Y���o�<cN-�j��)ӈ���ưH�f�1�ޥ͂�-��{2��r�;wPD]¸���E�r���1MSi����e��tyw�
+�7���K��܀vqڊ;����A#�1ib_�ʌ���N���e�w�P����K��zƎ0�Tdӎ����0y����}�W�%���֪k>}˲�TyET���'�������<o��A��U�VY�BJ���٢\I_���~qtz��8�����|��94Y��yz���ڍ�4�lZ����|!�	2q��8Ӛ�� �p"��5u�;���k�#�M�2s@�=�E���*�5��BI�ۆ�t���孞�n�f�iʌ�ed�N�^�v8��W�p�Sq�c��j.vYßQ]�,�"���\b�@�6jD���T�NXS��|#�^r/C�ے*��ܒuc�?~��<<T,�+s;5	�^9�(C���(�]W�sF8�W$�z %	�Մ.����"��}��kr���9�aa�l��t���i�q`����@��}��Ez����e]J�����������ÿ�S�� �����@b(�������#�}�������|�����������#�uqY��-�|����ۗ�����d�Q�|n��jF�\J4���'���	����O�&�Ƚ99�"�B�:�V��ւ�����n�/6a��q�LIo��J������H�geݢɯ�n}L���P_�*�vxV��s:���󻸀�A�$���$<I���������㩩A�����'��Dݷ��${�2��]�T�|*�q
+q�\��異���6S6{���2;�0�9�&�p�\�R��OYbyA-� gՉL�g��&j�����|�gK���H��ݑ����vG{�'	 V9�J���'����rp��޺��[�m���7��K�O���Y��Gt'ZG=A-������9199��t�=R���?~8�}��t�������ý���>������O�X����!R�eQT*� ޺��� �A]؂�W6��|���:%�J�0+��H�WgNM�|FK4�gl�(�2���PМ�V��ɻ�ՙ[U��nP]�l7vn��y�Z�D��K��R�ԅ4,Z�j-�q\g��-T,����,�e?(��
+��Q�Ơ�M��g����D�C�}��l'��{�c�����#��ͻr���w�8��[
+��a<���,n�l�g��+�Y�J��C��Z�C���1f��eZ8�d�
+�a �pH�'
+E��p$Ca�\
+��e���u��Q�ͺ�x�$�jn�d����V�L���>y���d0�`��73y�)k�dwcg+����#�JK���WǱy6-���Ϛ�;+��
+k�fe.�bH�K3)@�7����@-ϮY������V�;��le˳���.3�Z��4�5�p����X��iE-��t�Ց�#�m�0ca���ս��i��h�
+��j�xR�gӀ��؍9S2��]I�2J��\!�,ᜄ�Tk�G��-�n�Wsv%�#lZ�BX��n�_aRJ�ފ��.�*�A���5��6�����h
+k>��'E�j1MWa滕(�"4,�+v�:@|/h_��~�}���ʏů�L�Z�&ތ��q�o�H1�Y���LOHz��l�0�u�1��G�`�^��G��u\/F�ԌC�B�iՒ��5�����I��)sV�`�����\5�v�?h�`�G&�U�kPl�n�W��3fMm�VH~��>�~pz��p�����wr:W2����xx��}<{�N����>8<8�9;8� ʖ�
+ν��p�s���|8c�GN?�UTS����#(��j���휽��s&볹ݓ�ONQWzr�����.n�x�������.��������2��Jk�Ƥص�7R�@�����Ѵ�oy,2�Ë �ڍ�W))^��1l�f��
+������D�B(N`FS�Sܻy�&���ɸ,�,4z��	�\����	AZZ;����rN�ѕS�sa�H��3-%ہ���Uog��w.�
+8{����A�j/L��ac/N�qlq!���TU�K3~[�A��us}��i|f��i��/���y-�G*��AӺ�(�Ԃ�ܙ�iv�X4vE���95p�����1�`�ߒ��B?��%p�l���V6ň�_�W���V��ǱM�	���� =��R6�a�����M7^Nv�����OҰ�K���7v#:_!!�H�ئ�0�����U3��؉�������/e���75�9����Գ�;1wzNj�)}TK��?es�� �����
+�?ēN�4"�!���P�g�(�~��Xb�0��߬�Fi�
+�ڝ�K�8}��ե�@I�&nG/f}�7�ڌ<qR#L(����Ǽy��I�ؤ�
+�xEĽIDf�I2�L�k��$��H����:}no&	ċfQɐ�LCwX.'9���M댁O��;��#��b6������m�z���h�������[(�-�~��AC�܌k���>����B��q����4�;Pm�Z�43����(3�g9Ô�`�f|yK�M��U�7�Ư��76���Rλ�[�	�;���[�W�8V;9�zaz�{NxK�8ig���GG���8�x��r: 
+de���
+�@�
+<y2=;�9��)_�ʥ�x�>�(�u#��N8UlI�y�-�1�	����n�^�۩�+�Z�����X��VJ��im��f�=��é)4q�h;�CA�.2*�0����:gވOP`�p6q����)M'a����Ve�	���>�7@9-*Ɏ85J ���s:��ֈ=���as.�
+�ŊX���kG�lU��_�:��m�M,�oho��l�s��:6�V�q���v��������񱠰����񻣳�S]|��oD��j�����>������>;::{'�^��&z���-����.���=xwp����챝7���͗)<� ���]�4g?A'5H���l�OP�RRDIQ��@1��y����,	B�,r� �F�אI���
+"؎bi9vsˁ�K#%)&��b��k~���f��0*�I����{�X���
+�����K(\�^@�˦������'��|�;����'�Esgy�����9*���ҙSs�_J~����"T\TӤ�6�C�~ҷ3����271��HBGm�{6CR=^N
+!����}QU�G�_�t��w�6G+��z�7����t��l��_� ����w�o_X�����g�w�!�K_�X�c�_�s��*J�����]���� 0p��f��z��E�0�`��o���D��� �b���y��b������;&]N���8�����f)��/ˮ��A77t�1��.��M�GkG#��k�����	�~�� J����
+)�3�r�L�7w��@~�H1� ����K��;x�H��WZ�Oŉ�vg-Հ�2�;��(�'
+��Asupǋ�ZL���l]��:��IJ冚*��\WA&
+��κ-0q�x�pp��?���o��n
+,�:���-h�$O�7�
+kP��)?`��x�fnE�������m>�s��we�-qL�:��A�f��_�q�x^8�"-w	
+ �^���9qy�Fl��Z�EDJ���_����*�;X� �����̕[3�ѭξN�*��5Q�K��R�6[X>5o��YU�����QO��D�s��	�$h�{M��௕���W�i��0+ѬQ����F���險�Ԣ�X�����y��JP�yy��ӥ�����	�)+�o�2┛G��\	����`�,�Tk�5��U�����7�@jo�܌�w��h��t� �P����s�ι$���u��j��ޅ�Q^}�IC��h
+���К!&��ԅ6��/�|ǽ��b���$�ͩ4�{�0ܿ��0�3��g]Μ������>{,A���|��H��}a[�jXVx��zp��`�_~P���2��Z��w���%v/�.�е����-���l�	.�2�4���]�!�$�htLf��=J=����캦��c���B�VeG).E���i҄�Ң�J�Q\T��C��g�(kX����bHq)Y?����ӗ�/y��*,�ͻ3yj����S�N5y
+����4@��lI��!��22>N�:��4�	V�Z��e�	h�^$zH��(!R�CQY��S�'I؁�ԍl�j�j�F��hTk��r��Q��BF%E�Ù;�p��	��I|�	�3Rg1������ G�VZ�	�C5�d�n�⊫h��� &��f��6�oV:���.4���
+�G(�յ����_ò3-�#��G�3"M'��Rkz
+�e�:�� ��U�e#�f�-];I�.�]u��=R�S[�Gt^i�U�9~��w0��`c�!�&���K� a����h��m��j�c�
+�FIK7��S/O��`)QX��Е���`����(�
+� �5�n�!��&<��y���Y�����9�S���r�p��@�f����@z��r�Q��lZ���q������l�E�8�����_XB���ɧ"��z���'������sA��$��?Z��ѽe���V5;�r%�f��Ų&g�n� ��z�L�0�<��Ҝ	�\�.́��ߣ�����-�h�L(��L3o��gKF�����/u�bO��k�=�j�5]�w���&
+)�c\�2�é��'d�#�K�*���63~�U�D㨹
+F��>~��c(��!�<����WL5��b������~Κ<�P^�n*��u���i���tk��ӛr\��pn��O�m6�԰2�u)��AB޺de���g��d��fdAk
+;�Yf9GU�{��e�J��ج%��$����d�b!��d�#-�1�/k%e�T��������x�$��RN�$���̼\�i��N=��
+&�#�g�dylBG3S'�̾2�i���LXdF�̥�Fj�U�!����%nd��xؚ�Y���'Y�Xx2�2f*BH]���U�Em懂�]P�ԼA�x���rW`p8����79a�xM��������*�W�}v�p�m�����-v�i~���Au��f�����hYa�*�ؼ=T�\�j�f��c'�y��dv`Cv�.�;�h1d�Bi{a�Hc�j��0iE�M!��\U'�|@����"�׾��_A[CN��V��[�k�"���)N1���w�f{��>b��-�я}��0r�N������cn��U�Ƴ��
+�����e?�}��#I�G&��e�,̨���S`�T�� %�����l��=�qCB�������Em���A�'��T���q�ɑBڕCz�s����d�JB�y�2�i�L�'�DI6���߲L��.�(GDJORyY,�t�K�'��
+��a��VsV�Lc�%B ٍ��GN�Y�޺^n��;���r����@6�V#�G���Uk0�&$�45ܐmT˒���|�����v�d��az�m�(=G�jl�ZZ�t �d���y�&p �;���~�&��v�{=QU>�8���P��tf������u�ARR&�Νi���c��ĉ3��E�C����BT�Ԁ�+�ٲ9s��:�^�&�f:�f�6w ���3:vu��v��	��x0�N�of-X�d(�*��P[q�Wj��z-���%v���[/���O?�
+��ʋ�R�CgD�Fj�I�xA0tR}_:KNY|n�W�ڶ�E�������pp<�.�(9U������v��j��#�,t°���ꈁ����]Z>[&�B��z�È�7��Tu�3$p7-���;A��݆���8v$k����h6�e��bg�8[�©��K�&2�����Ӡ�1�ĦO��O)Y_arC�-�}Ԅ|�{-J����*�׭�{����^��;l;�M8�w�U����c��/���n�:��pu���E�[��~�J�Y��#f�]�^�C�<Lϭ?L���,��M��Ɠ��*eg���S�w���W)��k鸖���J�(Ḗ5i��f�l�7�q�q<��VV��N0z#�fs�Y��:Un�#�C&+���7��"Zo+�B������˔uF"�
+�%hݗ�wG��Is������d
+��k������E���>d��K y���Ad�ޣ �?�{�i\I��w�@VO\ �'�(@����#`��=
+P��AX�(�2�,VO�����8&�=
+x~���X�<�7��	�'^�3�vw���G� ��70��F��FG�})dc2�x�8�C>�D;(�GζN�N�!�T0���Y�̯%#��4[AXH0J��$b��WgAЎv��p['.�4�Tc����-�~cb��􌿴�b���h6�C�8�k�:��؂(�ɏm��u����ج��l�ؐ�gN��%yt�(Y�.(�˗�'<G �Y}��������r���������~�a��\G~Ak�O8��Y�T5�#�jH�n��$rl
+[A��1��C����
+E�>�sM�U�Wà O���]D˂nLQ�K(��d�h,�DWk|o�w��
+w�V�pU�|��4�iIȧ$�H!����e*�R����a��7�_/�p-:�X�U�fan�Vr�;
+�.a-`L� 9�э���OF���,��P���PW������$�r�@��X����Xw��iB(��52�$F�ة�$�t��H�P��Qp�	-z[�z�B>c6g��u+����(��؈<��,��eK��x'�b�[ؘ!,�{
+��p�8-YWמl� 6���7�(`*
+��:�-��)�r��D��b����H17����D<Y�|�_���C� ԑ���W���\��Ա����[�t�{��|�����5�N��{�,bxeƹ�cI�:��+�Ak�'�~ن@�)���
+?(J{UV��w����o�����k-ĕ#s�Ξ	�ց�l 3�""���
+�E˱���,z�"��1U���1��B����W�m 
+�� 0=V��p���ƺ|
+:c ����j�'SH�Kst���<,Ɇ�6�B'���d#A��/@D�Y"Gy1���_n�\7G�L.)E
+H��(�Ɍ0S� ��.i	乳]^r�(��a���U1�*!k���m%4c�^l1�t�))Hi}�M������!��]��#Qj�sx6H��6h|~޼|�'/�GT��8Q��]�}�h5B�$���P��8	}�X�1��a%4�)@ʊ��mW@ጬ��a0',P���O��sh��$�tG2{s]ħڇK'Ae��vq�N8��42Sڊn�؟�$�`y�y��5�mp�^u*����]X���!D\���o�����?   �� F��A
