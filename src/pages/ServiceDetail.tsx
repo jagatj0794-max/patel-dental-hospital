@@ -11,12 +11,14 @@ import {
   Activity, Stethoscope, Video, Mail, MapPin, 
   Facebook, Instagram, Youtube, Linkedin, Twitter, MessageSquare, Star,
   Award, Shield, Check, Clock, Users, ShieldCheck, FileText, CheckCircle, Play,
-  Smile
+  Cpu, Layers
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
-import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, UNIVERSAL_GOOGLE_REVIEWS } from '../utils/serviceData';
-import { contactService, DEFAULT_CONTACT_INFO, getWhatsAppUrl as getGlobalWhatsAppUrl } from '../utils/contactData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_SERVICES } from '../utils/serviceData';
+import { TREATMENTS } from '../data/treatments';
+import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
+import { doctorService } from '../utils/doctorData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../components/ClinicalCaseGallery';
 import { InstagramEmbed } from '../components/InstagramEmbed';
@@ -30,16 +32,7 @@ function extractYouTubeId(url: string): string {
   const trimmedUrl = url.trim();
   
   try {
-    // 1. Matches shorts URLs like https://www.youtube.com/shorts/VIDEO_ID
-    if (trimmedUrl.includes('/shorts/')) {
-      const parts = trimmedUrl.split('/shorts/');
-      if (parts[1]) {
-        const id = parts[1].split(/[?#&]/)[0];
-        if (id.length === 11) return id;
-      }
-    }
-
-    // 2. Matches embed URLs like https://www.youtube.com/embed/VIDEO_ID
+    // 1. Matches embed URLs like https://www.youtube.com/embed/VIDEO_ID
     if (trimmedUrl.includes('/embed/')) {
       const parts = trimmedUrl.split('/embed/');
       if (parts[1]) {
@@ -48,7 +41,7 @@ function extractYouTubeId(url: string): string {
       }
     }
     
-    // 3. Matches short URLs like https://youtu.be/VIDEO_ID
+    // 2. Matches short URLs like https://youtu.be/VIDEO_ID
     if (trimmedUrl.includes('youtu.be/')) {
       const parts = trimmedUrl.split('youtu.be/');
       if (parts[1]) {
@@ -57,7 +50,7 @@ function extractYouTubeId(url: string): string {
       }
     }
 
-    // 4. Matches watch URLs like watch?v=VIDEO_ID or watch&v=VIDEO_ID
+    // 3. Matches watch URLs like watch?v=VIDEO_ID or watch&v=VIDEO_ID
     if (trimmedUrl.includes('v=')) {
       const parts = trimmedUrl.split('v=');
       if (parts[1]) {
@@ -97,7 +90,334 @@ function isMp4Url(url: string) {
   return url.endsWith('.mp4') || url.includes('supabase.co');
 }
 
+interface FeaturedTreatmentVideoProps {
+  mConfig: MarketingConfig;
+  serviceTitle: string;
+  openAppointmentModal: (preselectedTreatment?: string) => void;
+}
 
+export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
+  mConfig,
+  serviceTitle,
+  openAppointmentModal
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const defaultYtUrl = 'https://www.youtube.com/watch?v=SnOxxv_S2ew';
+  const source = mConfig.featured_video_source || 'youtube';
+  const youtubeUrl = (mConfig.featured_video_youtube_url || '').trim() || defaultYtUrl;
+  const uploadUrl = (mConfig.featured_video_upload_url || '').trim();
+
+  const hasVideo = source === 'youtube' ? !!youtubeUrl : !!uploadUrl;
+  const isEnabled = mConfig.featured_video_enabled !== false;
+
+  if (!isEnabled || !hasVideo) {
+    return null;
+  }
+
+  const heading = mConfig.featured_video_heading || `Featured ${serviceTitle} Video`;
+  const description = mConfig.featured_video_description || `Learn more about the advanced procedures and clinical excellence of ${serviceTitle} treatment at Patel Dental Hospital. Watch our expert walk-through of the process.`;
+  const bullets = mConfig.featured_video_bullets && mConfig.featured_video_bullets.length > 0 
+    ? mConfig.featured_video_bullets 
+    : [
+        'Advanced state-of-the-art procedure methods',
+        'Minimally invasive and pain-free techniques',
+        'Expert clinical execution and diagnostic precision'
+      ];
+  const ctaText = mConfig.featured_video_cta_text || 'Schedule A Consultation';
+  const ctaLink = mConfig.featured_video_cta_link || '';
+
+  const getYouTubeId = (url: string) => {
+    return extractYouTubeId(url);
+  };
+
+  const buildYouTubeEmbedUrl = () => {
+    const id = getYouTubeId(youtubeUrl);
+    let embedUrl = `https://www.youtube.com/embed/${id}?rel=0`;
+    
+    // Always use autoplay=0, never autoplay=1
+    embedUrl += '&autoplay=0';
+    
+    const loop = !!mConfig.featured_video_loop;
+    if (loop) embedUrl += `&loop=1&playlist=${id}`;
+    
+    return embedUrl;
+  };
+
+  const getThumbnailUrl = () => {
+    if (mConfig.featured_video_thumbnail_source === 'custom' && mConfig.featured_video_custom_thumbnail) {
+      return mConfig.featured_video_custom_thumbnail;
+    }
+    if (source === 'youtube') {
+      const ytId = getYouTubeId(youtubeUrl);
+      if (ytId) {
+        return `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
+      }
+    }
+    return '';
+  };
+
+  const [imgSrc, setImgSrc] = useState(getThumbnailUrl());
+
+  useEffect(() => {
+    setImgSrc(getThumbnailUrl());
+  }, [
+    mConfig.featured_video_thumbnail_source,
+    mConfig.featured_video_custom_thumbnail,
+    source,
+    youtubeUrl
+  ]);
+
+  const handleImgError = () => {
+    if (imgSrc && imgSrc.includes('maxresdefault.jpg')) {
+      const ytId = getYouTubeId(youtubeUrl);
+      if (ytId) {
+        setImgSrc(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
+      }
+    }
+  };
+
+  const handleCtaClick = () => {
+    if (!ctaLink || ctaLink === '#appointment' || ctaLink === 'appointment') {
+      openAppointmentModal(`${serviceTitle} - Featured Video CTA`);
+    } else if (ctaLink.startsWith('http')) {
+      window.open(ctaLink, '_blank', 'noopener,noreferrer');
+    } else {
+      if (ctaLink.startsWith('#')) {
+        const id = ctaLink.substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.location.hash = ctaLink;
+        }
+      } else {
+        window.location.href = ctaLink;
+      }
+    }
+  };
+
+  return (
+    <div 
+      className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-14 shadow-xs hover:shadow-sm transition-shadow duration-300 relative overflow-hidden" 
+      id="featured-treatment-video-section"
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+        
+        {/* LEFT SIDE: Video Player (First in DOM so mobile/tablet is video first) */}
+        <div className="w-full">
+          <div className="relative aspect-video w-full bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200/60 group">
+            {isPlaying ? (
+              source !== 'upload' ? (
+                <iframe
+                  src={buildYouTubeEmbedUrl()}
+                  title={`${serviceTitle} Featured Video`}
+                  className="w-full h-full border-none"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={uploadUrl}
+                  className="w-full h-full object-cover"
+                  controls
+                  autoPlay={false}
+                  loop={!!mConfig.featured_video_loop}
+                />
+              )
+            ) : (
+              <button 
+                type="button"
+                onClick={() => setIsPlaying(true)}
+                className="absolute inset-0 w-full h-full cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+              >
+                {/* Thumbnail Image / Poster */}
+                {imgSrc ? (
+                  <img
+                    src={imgSrc}
+                    alt={`${serviceTitle} Video Thumbnail`}
+                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                    onError={handleImgError}
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  uploadUrl ? (
+                    <video
+                      src={uploadUrl}
+                      className="w-full h-full object-cover"
+                      preload="metadata"
+                      muted
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#081C3A] to-[#0A264F] flex items-center justify-center">
+                      <Video className="h-12 w-12 text-slate-400" />
+                    </div>
+                  )
+                )}
+
+                {/* Dark Overlay to increase play button contrast */}
+                <div className="absolute inset-0 bg-slate-950/25 group-hover:bg-slate-950/35 transition-colors duration-300" />
+
+                {/* Large Play Button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-16 w-16 sm:h-20 sm:w-20 bg-white/95 text-[#0D9488] rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                    <Play className="h-8 w-8 sm:h-10 sm:w-10 fill-current translate-x-0.5" />
+                  </div>
+                </div>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT SIDE: Content */}
+        <div className="space-y-4 sm:space-y-6 text-left font-sans">
+          <div className="space-y-3">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+              <Video className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+              Treatment Video
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl text-[#081C3A] tracking-tight leading-tight">
+              {heading}
+            </h2>
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full" />
+          </div>
+
+          {description && (
+            <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed whitespace-pre-line">
+              {description}
+            </p>
+          )}
+
+          {bullets.length > 0 && (
+            <ul className="space-y-2.5 pt-2">
+              {bullets.map((bullet, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 font-semibold">
+                  <CheckCircle2 className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={handleCtaClick}
+              className="w-full sm:w-auto px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+            >
+              <span>{ctaText}</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+const dentalImplantsFaqs: ServiceFaq[] = [
+  {
+    id: 'implants-faq-1',
+    service_id: 'dental-implants',
+    question: 'Are dental implants painful?',
+    answer: 'Implant treatment is performed with appropriate anaesthesia and planned according to your clinical condition. Your dentist will also explain what to expect during recovery.',
+    display_order: 10
+  },
+  {
+    id: 'implants-faq-2',
+    service_id: 'dental-implants',
+    question: 'Am I a suitable candidate for dental implants?',
+    answer: 'Suitability depends on your oral health, bone condition, number of missing teeth and overall treatment requirements. A clinical assessment and appropriate imaging are used to plan your treatment.',
+    display_order: 20
+  },
+  {
+    id: 'implants-faq-3',
+    service_id: 'dental-implants',
+    question: 'How long does dental implant treatment take?',
+    answer: 'Treatment time varies from patient to patient and depends on the required implant procedure, healing and final restoration.',
+    display_order: 30
+  },
+  {
+    id: 'implants-faq-4',
+    service_id: 'dental-implants',
+    question: 'Can dental implants replace multiple missing teeth?',
+    answer: 'Yes. Depending on your condition, treatment may involve one or multiple implants or implant-supported replacement teeth.',
+    display_order: 40
+  },
+  {
+    id: 'implants-faq-5',
+    service_id: 'dental-implants',
+    question: 'What happens if I do not have enough bone for an implant?',
+    answer: 'Additional bone or site preparation may sometimes be required. Your treatment plan will be decided after clinical assessment and appropriate imaging.',
+    display_order: 50
+  },
+  {
+    id: 'implants-faq-6',
+    service_id: 'dental-implants',
+    question: 'Can I get fixed teeth quickly after implant placement?',
+    answer: 'Immediate or early fixed-teeth options may be possible in selected cases when clinically appropriate. Your dentist will determine the suitable approach after assessment.',
+    display_order: 60
+  },
+  {
+    id: 'implants-faq-7',
+    service_id: 'dental-implants',
+    question: 'How should I maintain my dental implants?',
+    answer: 'Good oral hygiene, regular professional follow-up and following your dentist’s maintenance instructions are important for long-term implant care.',
+    display_order: 70
+  },
+  {
+    id: 'implants-faq-8',
+    service_id: 'dental-implants',
+    question: 'Can I get a second opinion before starting implant treatment?',
+    answer: 'Yes. You can discuss your treatment plan, ask questions and seek a second opinion before making your decision.',
+    display_order: 80
+  }
+];
+
+const fullMouthFaqs: ServiceFaq[] = [
+  {
+    id: 'fmr-faq-1',
+    service_id: 'full-mouth-rehabilitation',
+    question: 'What is included in the first appointment for Full Mouth Rehabilitation?',
+    answer: 'During your first appointment, we conduct a comprehensive clinical examination, dental mapping, and digital diagnostic records. You will receive an initial, clearly explained treatment plan outlining every necessary phase and a transparent cost breakdown before any clinical work begins.',
+    display_order: 10
+  },
+  {
+    id: 'fmr-faq-2',
+    service_id: 'full-mouth-rehabilitation',
+    question: 'How long does a Full Mouth Reconstruction take?',
+    answer: 'Contact Us for Treatment Timeline. Because full mouth rehabilitation is planned as a single, coordinated restoration, the total duration depends on the specific phases required—such as healing times for implants or custom-milling of your final zirconia crowns.',
+    display_order: 20
+  },
+  {
+    id: 'fmr-faq-3',
+    service_id: 'full-mouth-rehabilitation',
+    question: 'What is the total cost of a Full Mouth Rehabilitation?',
+    answer: 'Contact Us for Pricing. The total cost is determined by your personalized treatment plan, which is completely finalized and provided as a written, fixed estimate before we begin. We offer flexible zero-interest EMI financing options to make your treatment plan accessible.',
+    display_order: 30
+  },
+  {
+    id: 'fmr-faq-4',
+    service_id: 'full-mouth-rehabilitation',
+    question: 'How are multiple specialists coordinated for my treatment?',
+    answer: 'Your entire treatment is planned and executed under one roof at Patel Dental Hospital. Dr. Vipul Patel plans the entire case from the start, and our in-house specialists—including oral surgeons, prosthodontists, periodontists, and endodontists—work in perfect synchronization according to this single, unified plan.',
+    display_order: 40
+  },
+  {
+    id: 'fmr-faq-5',
+    service_id: 'full-mouth-rehabilitation',
+    question: 'Can I send my OPG or dental X-ray before visiting?',
+    answer: 'Yes! We highly recommend sending us your OPG (Panoramic X-Ray) or existing dental scans on WhatsApp. Our surgical team will review your records and provide an indicative treatment plan and estimated cost range within 24 hours, completely free, before you travel or visit our clinic.',
+    display_order: 50
+  },
+  {
+    id: 'fmr-faq-6',
+    service_id: 'full-mouth-rehabilitation',
+    question: 'Why is Full Mouth Rehabilitation planned as one single rehabilitation?',
+    answer: 'Unlike patching individual teeth one by one over several years, planning a full mouth reconstruction as a single coordinated rehabilitation ensures a balanced bite height, optimal muscle posture, correct alignment of both arches, and far superior long-term functional and aesthetic outcomes.',
+    display_order: 60
+  }
+];
 
 function getFallbackMedia(slug: string, title: string) {
   let heroImg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
@@ -287,7 +607,21 @@ const getServiceSEO = (slug: string, title: string, fallbackDesc: string) => {
         description: sDesc,
         keywords: 'Dental Implants, Best Dental Implants in Rajkot, Dental Implant Specialist, Implantology Rajkot, Same Day Dental Implants, Full Mouth Rehabilitation, Tooth Replacement, Missing Tooth Replacement, Single Tooth Implant, Full Mouth Dental Implants',
         canonicalUrl,
-        schema: createSchema(sTitle, sDesc)
+        schema: [
+          ...createSchema(sTitle, sDesc),
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": dentalImplantsFaqs.map((faq) => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+              }
+            }))
+          }
+        ]
       };
     }
     case 'root-canal-treatment': {
@@ -437,13 +771,25 @@ export default function ServiceDetail({
   const [gallery, setGallery] = useState<ServiceGalleryItem[]>([]);
   const [faqs, setFaqs] = useState<ServiceFaq[]>([]);
   const [relatedServices, setRelatedServices] = useState<Service[]>([]);
+  const [allServicesList, setAllServicesList] = useState<Service[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
+  const [drVipulImg, setDrVipulImg] = useState('/dr. patel.png');
   
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    doctorService.getDoctors().then(docs => {
+      const vipul = docs.find(d => d.id === 'vipul');
+      if (vipul && vipul.img) {
+        setDrVipulImg(vipul.img);
+      }
+    }).catch(err => {
+      console.error('Failed to load doctor image:', err);
+    });
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>(null);
   const [expandedImplantFaqId, setExpandedImplantFaqId] = useState<string | null>(null);
-  const [expandedDentalFaqIdx, setExpandedDentalFaqIdx] = useState<number | null>(null);
 
   // Lightbox modal state
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -611,7 +957,7 @@ export default function ServiceDetail({
       cost: `${kw} Cost & Special Treatment Offers`,
       reviews: `Google Patient Reviews for ${kwPlural}`,
       bottomCta: `Why Choose Patel Dental Hospital for ${kwPlural} in Rajkot`,
-      faq: `Frequently Asked Questions about ${kwPlural}`
+      faq: isDentalImplants ? 'Dental Implant FAQs' : `Frequently Asked Questions about ${kwPlural}`
     };
   }, [
     isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners,
@@ -937,6 +1283,7 @@ export default function ServiceDetail({
       setGallery(previewGallery || []);
       setFaqs(previewFaqs || []);
       setRelatedServices(previewRelatedServices || []);
+      setAllServicesList(previewRelatedServices || DEFAULT_SERVICES);
       setIsLoading(false);
       return;
     }
@@ -967,6 +1314,8 @@ export default function ServiceDetail({
         ]);
 
         if (active) {
+          setAllServicesList(allServices);
+
           // Sort gallery by display order
           const sortedGallery = [...fetchedGallery].sort((a, b) => a.display_order - b.display_order);
           setGallery(sortedGallery);
@@ -1308,21 +1657,11 @@ export default function ServiceDetail({
           display_order: 10
         }
       ];
-    } else if (isRootCanal) {
-      list = [
-        {
-          id: 'rct-ba-1',
-          before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
-          after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
-          caption: 'Single Sitting Root Canal & Cap Restoration',
-          display_order: 10
-        }
-      ];
     }
     return [...list]
       .filter((p: any) => p && p.before_image && p.after_image)
       .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
-  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling, isRootCanal]);
+  }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
 
   // If loading, display the skeleton state first
   if (isLoading) {
@@ -1412,8 +1751,11 @@ export default function ServiceDetail({
   // Formulate WhatsApp API direct URL
   const getWhatsAppUrl = () => {
     if (!service) return '';
-    const text = `Hello Patel Dental Hospital, I would like to book a free consultation for "${service.title}". Please share the available appointment slots.`;
-    return getGlobalWhatsAppUrl(text);
+    const text = `Hi Patel Dental Hospital, I'm interested in booking a consultation for the "${service.title}" treatment. Please let me know the next available slot!`;
+    const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
+      ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
+      : contactInfo.whatsappRaw;
+    return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
   };
 
   // Get configured Call To Action buttons dynamically
@@ -1497,8 +1839,11 @@ export default function ServiceDetail({
             const url = value.startsWith('http') ? value : 'https://' + value;
             window.open(url, '_blank', 'noopener,noreferrer');
           } else {
-            const textMsg = `Hello Patel Dental Hospital, I would like to book a free consultation for "${service?.title}". Please share the available appointment slots.`;
-            window.open(getGlobalWhatsAppUrl(textMsg), '_blank', 'noopener,noreferrer');
+            const textMsg = `Hi Patel Dental Hospital, I'm interested in booking a consultation for "${service?.title}".`;
+            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
+              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
+              : contactInfo.whatsappRaw || '919924225500';
+            window.open(`https://wa.me/${num}?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
           }
         },
         isWhatsappSecondary: true
@@ -1613,63 +1958,6 @@ export default function ServiceDetail({
         
         {/* Service Hero Section */}
 
-        {/* Dynamic Offer Banner (Promotional Section) */}
-        {(mConfig.offer_show !== false && mConfig.show_offer_banner !== false && !isNewArchitecture) && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-[#081C3A] via-[#0b2853] to-[#0D9488] border border-teal-500/20 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-            id="promo-offer-banner"
-          >
-            {/* Ambient subtle decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-            
-            <div className="space-y-3 relative z-10 max-w-2xl">
-              {mConfig.offer_badge && (
-                <span className="inline-flex items-center gap-1 bg-amber-500 text-[#081C3A] text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md leading-none">
-                  {mConfig.offer_badge}
-                </span>
-              )}
-              <div className="space-y-1">
-                <h3 className="font-display font-black text-lg sm:text-xl text-white tracking-tight leading-tight">
-                  {mConfig.offer_title || "Special Promotional Offer"}
-                </h3>
-                {mConfig.offer_subtitle && (
-                  <p className="text-teal-300 text-xs sm:text-sm font-black uppercase tracking-wide">
-                    {mConfig.offer_subtitle}
-                  </p>
-                )}
-              </div>
-              {mConfig.offer_description && (
-                <p className="text-slate-300 text-xs leading-relaxed max-w-xl">
-                  {mConfig.offer_description}
-                </p>
-              )}
-            </div>
-
-            <div className="relative z-10 shrink-0 w-full md:w-auto">
-              <button
-                onClick={() => {
-                  if (mConfig.offer_button_link && mConfig.offer_button_link.trim() !== '') {
-                    if (mConfig.offer_button_link.startsWith('http')) {
-                      window.open(mConfig.offer_button_link, '_blank', 'noopener,noreferrer');
-                    } else {
-                      window.location.hash = mConfig.offer_button_link;
-                    }
-                  } else {
-                    openAppointmentModal(`${service.title} - Promo Offer Claim`);
-                  }
-                }}
-                className="w-full md:w-auto px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-[#081C3A] text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-              >
-                <Sparkles className="h-4 w-4 shrink-0" />
-                <span>{mConfig.offer_button_text || "Claim Offer Now"}</span>
-                <ArrowRight className="h-3.5 w-3.5 shrink-0" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-
         {/* Phase 4 Dynamic Section Layout Engine */}
         {(() => {
           const clinicName = mConfig.contact_clinic_name || "Patel Dental Hospital";
@@ -1685,63 +1973,117 @@ export default function ServiceDetail({
                     {isDentalImplants ? (
                       <>
                         <div className="space-y-3">
-                          {/* Offer/Highlight */}
-                          <div className="inline-flex items-center gap-1.5 bg-[#F0FDFA] border border-teal-150 text-[#0D9488] px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-3xs">
-                            <Sparkles className="h-3.5 w-3.5 text-[#0D9488]" />
-                            <span>Fixed Teeth in Just One Week</span>
-                          </div>
-
-                          {/* Hero Title (H1) */}
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                            FIXED TEETH IN JUST ONE WEEK
+                          </span>
+                          
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
                             Missing Teeth? Get Fixed Teeth with Dental Implants.
                           </h1>
                         </div>
 
-                        {/* Subheading */}
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed whitespace-pre-line">
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                           Replace missing or loose teeth with strong, natural-looking fixed teeth designed to restore comfortable chewing, confidence, and your smile.
                         </p>
 
-                        {/* Proof Bar (Visible within first screen without scrolling) */}
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-bold text-slate-700 bg-[#F8FAFC] border border-slate-100 rounded-2xl p-3 sm:px-4 sm:py-3.5">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[#0D9488] font-black">7000+</span>
-                            <span className="text-[#081C3A] font-extrabold text-xs sm:text-sm">Implant Placements</span>
+                        {/* PROOF BAR */}
+                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">16000+ Implant Placements</span>
                           </div>
-                          <span className="text-slate-300 hidden sm:inline">|</span>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[#0D9488] font-black">350+</span>
-                            <span className="text-[#081C3A] font-extrabold text-xs sm:text-sm">Full Mouth Cases</span>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">800+ Full Mouth Cases</span>
                           </div>
-                          <span className="text-slate-300 hidden sm:inline">|</span>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[#0D9488] font-black">Fixed Teeth</span>
-                            <span className="text-[#081C3A] font-extrabold text-xs sm:text-sm">in 1 Week</span>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Fixed Teeth in 1 Week</span>
                           </div>
                         </div>
 
-                        {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
                           <button
                             type="button"
-                            onClick={() => openAppointmentModal("Dental Implants - Book Free Implant Consultation")}
+                            onClick={() => openAppointmentModal("Dental Implants - Hero CTA")}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                           >
                             <Calendar className="h-4 w-4" />
-                            <span>Book Free Implant Consultation</span>
+                            <span>BOOK FREE IMPLANT CONSULTATION</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
+
+                          <a
+                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
+                          >
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>WHATSAPP YOUR X-RAY</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : isFullMouth ? (
+                      <>
+                        <div className="space-y-3">
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                            FULL MOUTH RECONSTRUCTION
+                          </span>
                           
+                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                            FMR: Struggle to Chew, Speak or Smile?
+                          </h1>
+                        </div>
+
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                          Full mouth rehabilitation combining implants, crowns, root canals and gum treatment in one coordinated plan, led by Dr. Vipul Patel with a full specialist team in-house.
+                        </p>
+
+                        {/* PROOF BAR */}
+                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Complete plan before you start</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Written, fixed cost</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">2 specialists, one clinic</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI available</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                          <a
+                            href="https://wa.me/+91%209510397046?text=Hello%2C%20most%20of%20my%20teeth%20are%20damaged%20or%20missing.%20I%20want%20to%20know%20about%20full%20mouth%20treatment."
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                          >
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>Send your X-ray on WhatsApp</span>
+                          </a>
+
                           <button
                             type="button"
-                            onClick={() => {
-                              const prefilledText = "Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:";
-                              window.open(getGlobalWhatsAppUrl(prefilledText), '_blank', 'noopener,noreferrer');
-                            }}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#081C3A] hover:bg-[#112C55] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#081C3A]/50"
+                            onClick={() => openAppointmentModal("Full Mouth Rehabilitation - Hero CTA")}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
                           >
-                            <MessageCircle className="h-4 w-4" />
-                            <span>WhatsApp Your X-Ray</span>
+                            <Calendar className="h-4 w-4" />
+                            <span>FREE CONSULTATION</span>
+                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
                         </div>
                       </>
@@ -1814,128 +2156,62 @@ export default function ServiceDetail({
               <div className="bg-white border border-slate-150 rounded-3xl overflow-hidden shadow-sm relative grid grid-cols-1 md:grid-cols-12" id="cms-section-hero">
                 {/* Hero Left Info Section */}
                 <div className="p-8 sm:p-12 md:col-span-7 flex flex-col justify-center space-y-6 relative z-10">
-                  {isDentalImplants ? (
-                    <>
-                      <div className="space-y-3">
-                        {/* Offer/Highlight */}
-                        <div className="inline-flex items-center gap-1.5 bg-[#F0FDFA] border border-teal-150 text-[#0D9488] px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-3xs">
-                          <Sparkles className="h-3.5 w-3.5 text-[#0D9488]" />
-                          <span>Fixed Teeth in Just One Week</span>
-                        </div>
+                  <div className="space-y-3">
+                    <span className="inline-flex items-center gap-1 bg-teal-50 text-[#0D9488] text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-teal-100/50">
+                      <Sparkles className="h-3 w-3 text-[#0D9488] animate-pulse" />
+                      Premium Care treatment
+                    </span>
+                    <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-tight">
+                      {service.hero_title && service.hero_title.trim() !== '' ? service.hero_title : service.title}
+                    </h1>
+                  </div>
+                  
+                  <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
+                    {service.hero_description && service.hero_description.trim() !== '' ? service.hero_description : service.short_description}
+                  </p>
 
-                        {/* Hero Title (H1) */}
-                        <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-tight">
-                          Missing Teeth? Get Fixed Teeth with Dental Implants.
-                        </h1>
-                      </div>
+                  {/* Quick trust bullet points */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 border-t border-slate-100 pt-5">
+                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                      FDA-Approved Standards
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                      Painless Sedation Therapy
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                      Top Panel Specialists
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
+                      <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
+                      Lifetime Work Warranty
+                    </div>
+                  </div>
 
-                      <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
-                        Replace missing or loose teeth with strong, natural-looking fixed teeth designed to restore comfortable chewing, confidence, and your smile.
-                      </p>
+                  {/* Book Appointment & WhatsApp Actions */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-3">
+                    {getCtaButtons().map((btn, index) => {
+                      const isPrimary = index === 0;
+                      const baseClass = isPrimary
+                        ? "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                        : "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
 
-                      {/* Proof Bar (Visible within first screen without scrolling) */}
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-bold text-slate-700 bg-[#F8FAFC] border border-slate-100 rounded-2xl p-3 sm:px-4 sm:py-3.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[#0D9488] font-black">7000+</span>
-                          <span className="text-[#081C3A] font-extrabold text-xs sm:text-sm">Implant Placements</span>
-                        </div>
-                        <span className="text-slate-300 hidden sm:inline">|</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[#0D9488] font-black">350+</span>
-                          <span className="text-[#081C3A] font-extrabold text-xs sm:text-sm">Full Mouth Cases</span>
-                        </div>
-                        <span className="text-slate-300 hidden sm:inline">|</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[#0D9488] font-black">Fixed Teeth</span>
-                          <span className="text-[#081C3A] font-extrabold text-xs sm:text-sm">in 1 Week</span>
-                        </div>
-                      </div>
+                      let resolvedClass = baseClass;
+                      if (btn.isWhatsappSecondary && !isPrimary) {
+                        resolvedClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
+                      }
 
-                      {/* CTA Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                        <button
-                          type="button"
-                          onClick={() => openAppointmentModal("Dental Implants - Book Free Implant Consultation")}
-                          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                        >
-                          <Calendar className="h-4 w-4" />
-                          <span>Book Free Implant Consultation</span>
-                          <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      return (
+                        <button key={btn.id} type="button" onClick={btn.onClick} className={resolvedClass}>
+                          {btn.icon}
+                          <span>{btn.text}</span>
+                          {btn.id === 'appointment' && isPrimary && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
                         </button>
-                        
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const prefilledText = "Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:";
-                            window.open(getGlobalWhatsAppUrl(prefilledText), '_blank', 'noopener,noreferrer');
-                          }}
-                          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#081C3A] hover:bg-[#112C55] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                          <span>WhatsApp Your X-Ray</span>
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="space-y-3">
-                        <span className="inline-flex items-center gap-1 bg-teal-50 text-[#0D9488] text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-teal-100/50">
-                          <Sparkles className="h-3 w-3 text-[#0D9488] animate-pulse" />
-                          Premium Care treatment
-                        </span>
-                        <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#081C3A] tracking-tight leading-tight">
-                          {service.hero_title && service.hero_title.trim() !== '' ? service.hero_title : service.title}
-                        </h1>
-                      </div>
-                      
-                      <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
-                        {service.hero_description && service.hero_description.trim() !== '' ? service.hero_description : service.short_description}
-                      </p>
-
-                      {/* Quick trust bullet points */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 border-t border-slate-100 pt-5">
-                        <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                          <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                          FDA-Approved Standards
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                          <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                          Painless Sedation Therapy
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                          <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                          Top Panel Specialists
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold">
-                          <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-                          Lifetime Work Warranty
-                        </div>
-                      </div>
-
-                      {/* Book Appointment & WhatsApp Actions */}
-                      <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                        {getCtaButtons().map((btn, index) => {
-                          const isPrimary = index === 0;
-                          const baseClass = isPrimary
-                            ? "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                            : "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
-
-                          let resolvedClass = baseClass;
-                          if (btn.isWhatsappSecondary && !isPrimary) {
-                            resolvedClass = "inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer";
-                          }
-
-                          return (
-                            <button key={btn.id} type="button" onClick={btn.onClick} className={resolvedClass}>
-                              {btn.icon}
-                              <span>{btn.text}</span>
-                              {btn.id === 'appointment' && isPrimary && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Hero Right Media Image Section */}
@@ -1953,7 +2229,13 @@ export default function ServiceDetail({
             )
           ) : null;
 
-
+          const featuredVideoElement = (
+            <FeaturedTreatmentVideo
+              mConfig={mConfig}
+              serviceTitle={service.title}
+              openAppointmentModal={openAppointmentModal}
+            />
+          );
 
           const introElement = (mConfig.show_introduction !== false) ? (
             isNewArchitecture ? (
@@ -2023,565 +2305,7 @@ export default function ServiceDetail({
             )
           ) : null;
 
-          const comparisonSection = (
-            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16" id="service-comparison">
-              <div className="space-y-3 max-w-3xl mx-auto text-center">
-                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                  Dental Implants vs Other Tooth Replacement Options
-                </h2>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center">
-                  Compare Dental Implants with other common tooth replacement options to understand the differences in stability, appearance, comfort, and long-term benefits.
-                </p>
-                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-              </div>
-
-              <div className="max-w-6xl mx-auto bg-white border border-[#E8EEF5] rounded-[24px] shadow-xs overflow-hidden text-left">
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse min-w-[750px]">
-                    <thead>
-                      <tr className="bg-[#081C3A] text-white">
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
-                          Feature
-                        </th>
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase bg-[#0D9488] text-white border-b border-teal-600 relative">
-                          <span className="relative z-10">Dental Implants</span>
-                        </th>
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
-                          Dental Bridge
-                        </th>
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
-                          Removable Dentures
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#E2E8F0]">
-                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
-                          Stability
-                        </td>
-                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
-                          Fixed securely in the jaw
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Fixed to adjacent teeth
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Can move while eating or speaking
-                        </td>
-                      </tr>
-                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
-                          Appearance
-                        </td>
-                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
-                          Natural-looking
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Natural appearance
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Can look less natural over time
-                        </td>
-                      </tr>
-                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
-                          Comfort
-                        </td>
-                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
-                          Feels closest to natural teeth
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Generally comfortable
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          May feel bulky or uncomfortable
-                        </td>
-                      </tr>
-                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
-                          Impact on Nearby Teeth
-                        </td>
-                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
-                          Does not affect adjacent teeth
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Requires support from adjacent teeth
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Does not require altering nearby teeth
-                        </td>
-                      </tr>
-                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
-                          Long-Term Solution
-                        </td>
-                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
-                          Designed for long-term function
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          May need replacement over time
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          May require adjustments or replacement
-                        </td>
-                      </tr>
-                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-4.5 font-sans font-bold text-sm text-[#081C3A]">
-                          Jawbone Support
-                        </td>
-                        <td className="px-6 py-4.5 font-sans font-semibold text-sm text-[#0D9488] bg-teal-50/30">
-                          Helps support the jawbone
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Does not support the jawbone
-                        </td>
-                        <td className="px-6 py-4.5 font-sans text-sm text-[#475569]">
-                          Does not prevent jawbone loss
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          );
-
-          const costSection = (
-            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center" id="service-cost">
-              <div className="space-y-3 max-w-3xl mx-auto text-center">
-                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                  Dental Implant Cost
-                </h2>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center">
-                  The cost of dental implants depends on the number of missing teeth, type of implant treatment, bone condition, and whether additional procedures are required.
-                </p>
-                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-              </div>
-
-              <div className="max-w-4xl mx-auto bg-white border border-[#E8EEF5] rounded-[24px] shadow-xs overflow-hidden text-left">
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse min-w-[600px]">
-                    <thead>
-                      <tr className="bg-[#081C3A] text-white">
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
-                          Treatment
-                        </th>
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase bg-[#F0FDFA] text-[#0D9488] border-b border-teal-200 relative">
-                          <span className="relative z-10">Starting Price</span>
-                        </th>
-                        <th className="px-6 py-5 text-left font-sans font-black text-xs sm:text-sm tracking-wider uppercase border-b border-slate-200">
-                          Best For
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#E2E8F0]">
-                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
-                          Single Tooth Implant
-                        </td>
-                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
-                          Contact Us for Pricing
-                        </td>
-                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
-                          Replacing one missing tooth
-                        </td>
-                      </tr>
-                      <tr className="bg-[#F8FAFC]/50 hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
-                          Multiple Teeth Implants
-                        </td>
-                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
-                          Contact Us for Pricing
-                        </td>
-                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
-                          Replacing multiple missing teeth
-                        </td>
-                      </tr>
-                      <tr className="bg-white hover:bg-slate-50/50 transition-colors duration-150">
-                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#081C3A]">
-                          Full Mouth Dental Implants
-                        </td>
-                        <td className="px-6 py-5 font-sans font-bold text-sm text-[#0D9488] bg-teal-50/30">
-                          Contact Us for Pricing
-                        </td>
-                        <td className="px-6 py-5 font-sans text-sm text-[#475569]">
-                          Full arch or complete teeth replacement
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="max-w-2xl mx-auto text-center space-y-6">
-                <p className="text-xs sm:text-sm text-slate-500 font-sans italic">
-                  Your final treatment plan and cost will be determined after a clinical examination and treatment planning.
-                </p>
-                <div>
-                  <button
-                    onClick={() => openAppointmentModal('Dental Implants - Cost Consultation')}
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] hover:from-[#0D9488] hover:to-[#0F766E] text-white font-sans font-bold text-sm sm:text-base rounded-full shadow-[0_10px_25px_-5px_rgba(13,148,136,0.3)] hover:shadow-[0_20px_35px_-5px_rgba(13,148,136,0.4)] transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <Calendar className="h-4.5 w-4.5" />
-                    <span>Get a Personalized Treatment Plan</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-
-          const timelineSection = (
-            <div className="bg-white border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-12 mt-8 sm:mt-12 lg:mt-16 text-center" id="service-timeline">
-              <div className="space-y-3 max-w-3xl mx-auto text-center">
-                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                  Your Dental Implant Treatment Timeline
-                </h2>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center">
-                  Your treatment timeline depends on your oral condition, treatment plan, and whether any additional procedures are required.
-                </p>
-                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-              </div>
-
-              {/* Connected Timeline Steps */}
-              <div className="max-w-6xl mx-auto relative px-4">
-                {/* Desktop horizontal connection line */}
-                <div className="hidden lg:block absolute top-[40px] left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-teal-500/20 via-teal-500 to-teal-500/20 z-0" />
-                
-                {/* Mobile vertical connection line */}
-                <div className="lg:hidden absolute left-[50%] -translate-x-[50%] top-10 bottom-10 w-[2px] bg-gradient-to-b from-teal-500/20 via-teal-500 to-teal-500/20 z-0" />
-                
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-6 relative z-10">
-                  {/* Step 1 */}
-                  <div className="flex flex-col items-center text-center space-y-4 relative group">
-                    <div className="w-20 h-20 rounded-full bg-white border-2 border-teal-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 relative z-10">
-                      <span className="font-sans font-black text-2xl text-[#0D9488]">1</span>
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-sans font-extrabold text-lg text-[#081C3A] leading-tight">
-                        Consultation & Assessment
-                      </h3>
-                      <p className="text-[#475569] text-sm leading-relaxed max-w-xs mx-auto font-medium">
-                        Your teeth, gums, and jawbone are examined to determine the right implant treatment plan.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Step 2 */}
-                  <div className="flex flex-col items-center text-center space-y-4 relative group">
-                    <div className="w-20 h-20 rounded-full bg-white border-2 border-teal-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 relative z-10">
-                      <span className="font-sans font-black text-2xl text-[#0D9488]">2</span>
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-sans font-extrabold text-lg text-[#081C3A] leading-tight">
-                        Implant Placement
-                      </h3>
-                      <p className="text-[#475569] text-sm leading-relaxed max-w-xs mx-auto font-medium">
-                        The dental implant is carefully placed in the planned position.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Step 3 */}
-                  <div className="flex flex-col items-center text-center space-y-4 relative group">
-                    <div className="w-20 h-20 rounded-full bg-white border-2 border-teal-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 relative z-10">
-                      <span className="font-sans font-black text-2xl text-[#0D9488]">3</span>
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-sans font-extrabold text-lg text-[#081C3A] leading-tight">
-                        Healing & Integration
-                      </h3>
-                      <p className="text-[#475569] text-sm leading-relaxed max-w-xs mx-auto font-medium">
-                        The implant is given time to integrate with the jawbone for a stable foundation.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Step 4 */}
-                  <div className="flex flex-col items-center text-center space-y-4 relative group">
-                    <div className="w-20 h-20 rounded-full bg-teal-500 border-2 border-teal-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 relative z-10">
-                      <span className="font-sans font-black text-2xl text-white">4</span>
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-sans font-extrabold text-lg text-[#081C3A] leading-tight">
-                        Final Fixed Teeth
-                      </h3>
-                      <p className="text-[#475569] text-sm leading-relaxed max-w-xs mx-auto font-medium">
-                        Your custom final teeth are placed to restore function, comfort, and appearance.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
-          const warrantyPolicySection = (
-            <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center" id="service-warranty-policy">
-              <div className="space-y-3 max-w-3xl mx-auto text-center">
-                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                  Warranty, Policy & Second Opinion
-                </h2>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium text-center">
-                  We believe patients should feel confident and fully informed before making a treatment decision.
-                </p>
-                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto text-left">
-                {/* Card 1 */}
-                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
-                  {/* Left accent line */}
-                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
-                    Treatment Warranty & Support
-                  </h3>
-                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2">
-                    Get clear information about the support and warranty applicable to your dental implant treatment.
-                  </p>
-                </div>
-
-                {/* Card 2 */}
-                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
-                  {/* Left accent line */}
-                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
-                    Clear Treatment Policy
-                  </h3>
-                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2">
-                    Understand your treatment plan, recommendations, and important terms before starting treatment.
-                  </p>
-                </div>
-
-                {/* Card 3 */}
-                <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] overflow-hidden flex flex-col h-full">
-                  {/* Left accent line */}
-                  <div className="absolute left-0 top-8 bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                  <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mt-0 mb-4 leading-tight pl-2">
-                    Need a Second Opinion?
-                  </h3>
-                  <p className="text-[#475569] text-sm sm:text-base leading-relaxed font-medium flex-1 pl-2">
-                    Already have a treatment plan? You can consult our dental team for another professional opinion.
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-
-          const dentalImplantsFaqs = [
-            {
-              question: "How long do dental implants last?",
-              answer: "Dental implants are designed as a long-term tooth replacement option. With good oral hygiene, regular dental check-ups, and proper care, the implant itself can last for many years. The lifespan of the final crown or prosthetic teeth may vary depending on use and maintenance."
-            },
-            {
-              question: "Is dental implant treatment painful?",
-              answer: "Dental implant treatment is performed using appropriate local anaesthesia, so the procedure itself is generally comfortable. Some temporary soreness or swelling may occur after treatment, but this is usually manageable with the post-treatment instructions and medication recommended by the dentist."
-            },
-            {
-              question: "How long does the dental implant treatment take?",
-              answer: "The treatment timeline depends on your individual oral condition, the type of implant treatment required, bone condition, healing requirements, and whether any additional procedures are needed. After examination and treatment planning, the dental team can explain the expected timeline for your specific case."
-            },
-            {
-              question: "Can I get fixed teeth immediately after dental implant placement?",
-              answer: "In suitable cases, fixed teeth may be provided as part of an immediate or early loading treatment plan. However, this is not suitable for every patient. The decision depends on factors such as bone quality, implant stability, bite, oral health, and the overall treatment plan."
-            },
-            {
-              question: "What if I do not have enough jawbone for dental implants?",
-              answer: "Reduced jawbone does not automatically mean that dental implant treatment is impossible. Depending on your clinical condition, the dentist may recommend an appropriate treatment approach or additional procedures. A clinical examination and diagnostic evaluation are required before confirming the treatment plan."
-            },
-            {
-              question: "Are dental implants better than removable dentures?",
-              answer: "Dental implants can provide a more stable and fixed tooth replacement option for suitable patients. Unlike removable dentures, implant-supported teeth are designed to remain securely supported during normal daily activities. The most suitable option depends on your oral condition, treatment needs, and clinical evaluation."
-            },
-            {
-              question: "How much do dental implants cost?",
-              answer: "The cost depends on factors such as the number of missing teeth, type of implant treatment, type of final teeth, jawbone condition, and whether additional procedures are required. A personalised treatment plan and cost estimate can be provided after a clinical examination and treatment planning."
-            },
-            {
-              question: "Who is a suitable candidate for dental implants?",
-              answer: "Suitability for dental implants depends on your overall oral health, jawbone condition, gums, missing teeth, bite, and other clinical factors. The dentist will evaluate your condition and recommend whether dental implant treatment is an appropriate option for you."
-            }
-          ];
-
-          const dentalImplantFaqSection = (
-            <div className="bg-white border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-8 sm:space-y-10 mt-8 sm:mt-12 lg:mt-16 text-center" id="service-implant-faq">
-              {/* FAQ Schema */}
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                  __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "FAQPage",
-                    "mainEntity": dentalImplantsFaqs.map(faq => ({
-                      "@type": "Question",
-                      "name": faq.question,
-                      "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": faq.answer
-                      }
-                    }))
-                  })
-                }}
-              />
-
-              <div className="space-y-3 max-w-3xl mx-auto text-center">
-                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
-                  DENTAL IMPLANT FAQ
-                </span>
-                <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                  Frequently Asked Questions About Dental Implants
-                </h2>
-                <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-              </div>
-
-              <div className="max-w-[1100px] mx-auto space-y-4 text-left">
-                {dentalImplantsFaqs.map((faq, idx) => {
-                  const isExpanded = expandedDentalFaqIdx === idx;
-                  return (
-                    <div
-                      key={idx}
-                      className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
-                        isExpanded
-                          ? 'border-[#0D9488] shadow-sm'
-                          : 'border-slate-200/80 hover:border-slate-300 shadow-3xs'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setExpandedDentalFaqIdx(isExpanded ? null : idx)}
-                        aria-expanded={isExpanded}
-                        className="w-full px-6 py-5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/40 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
-                      >
-                        <span className={`font-sans font-bold text-base sm:text-lg leading-snug pr-4 transition-colors duration-200 ${
-                          isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
-                        }`}>
-                          {faq.question}
-                        </span>
-                        <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
-                          isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-100 text-slate-500'
-                        }`}>
-                          <ChevronDown className="h-4.5 w-4.5" />
-                        </span>
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                          >
-                            <div className="px-6 pb-6 pt-2 text-slate-600 text-sm sm:text-base leading-relaxed border-t border-slate-100/80 bg-slate-50/20">
-                              <p className="font-medium font-sans">
-                                {faq.answer}
-                              </p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-
-          const processElement = isDentalImplants ? (
-            <>
-              <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-10 animate-fade-in" id="cms-section-process">
-                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                  <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                    <Activity className="h-4.5 w-4.5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                      Indications
-                    </h2>
-                    <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                      You May Need Dental Implants If…
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-                  {/* Card 1 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Have One or More Missing Teeth
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        Missing teeth are affecting your smile, chewing, or confidence.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 2 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        Your Denture Feels Loose or Uncomfortable
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        You want a more stable and fixed alternative to removable dentures.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 3 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Have a Damaged Tooth That Cannot Be Saved
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        A severely damaged or decayed tooth may need to be replaced.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 4 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Find It Difficult to Chew Properly
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        Missing teeth are making everyday eating uncomfortable or difficult.
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 5 */}
-                  <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                    <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                      {/* Left accent line */}
-                      <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                      <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                        You Want a Long-Term Fixed Teeth Solution
-                      </h3>
-                      <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                        You are looking for natural-looking replacement teeth designed for long-term function.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {comparisonSection}
-              {costSection}
-              {timelineSection}
-              {warrantyPolicySection}
-            </>
-          ) : (mConfig.show_process !== false && displaySteps.length > 0) ? (
+          const processElement = (mConfig.show_process !== false && displaySteps.length > 0) ? (
             <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 animate-fade-in" id="cms-section-process">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                 <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
@@ -2702,8 +2426,6 @@ export default function ServiceDetail({
           
           const effectiveVideoTitle = seoHeadings.video;
 
-          const videoSource = mConfig.procedure_video_source || (isMp4Url(effectiveVideoUrl) ? 'mp4' : isYouTubeUrl(effectiveVideoUrl) ? 'youtube' : 'instagram');
-
           const videoElement = (mConfig.show_procedure_video !== false && effectiveVideoUrl) ? (
             <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-video">
               {effectiveVideoTitle && (
@@ -2716,18 +2438,11 @@ export default function ServiceDetail({
               )}
 
               <div className="max-w-[640px] mx-auto w-full px-2 sm:px-0">
-                {videoSource === 'mp4' || videoSource === 'manual' ? (
-                  <div className="w-full max-w-[640px] mx-auto flex justify-center rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black animate-fade-in">
-                    <video
-                      src={effectiveVideoUrl}
-                      controls
-                      playsInline
-                      className="w-full h-auto block"
-                      style={{ maxHeight: '75vh' }}
-                      preload="metadata"
-                    />
+                {isMp4Url(effectiveVideoUrl) ? (
+                  <div className="w-full max-w-[430px] mx-auto flex justify-center">
+                    <Mp4ReelPlayer src={effectiveVideoUrl} />
                   </div>
-                ) : videoSource === 'youtube' ? (
+                ) : isYouTubeUrl(effectiveVideoUrl) ? (
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
                     <iframe
                       src={getYouTubeEmbedUrl(effectiveVideoUrl)}
@@ -2741,7 +2456,6 @@ export default function ServiceDetail({
                   <InstagramEmbed
                     url={effectiveVideoUrl}
                     title={effectiveVideoTitle || 'Procedure Video'}
-                    thumbnail={service?.procedure_video_thumbnail || mConfig.procedure_video_thumbnail || mConfig.video_thumbnail}
                   />
                 )}
               </div>
@@ -2827,7 +2541,7 @@ export default function ServiceDetail({
                     <div key={t.id || idx} className="flex flex-col items-center w-full">
                       {isMp4Url(reelUrl) ? (
                         <div className="w-full max-w-[430px] mx-auto flex justify-center">
-                          <Mp4ReelPlayer src={reelUrl} poster={t.thumbnail || t.thumbnail_url} />
+                          <Mp4ReelPlayer src={reelUrl} />
                         </div>
                       ) : isYouTubeUrl(reelUrl) ? (
                         <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
@@ -2843,7 +2557,6 @@ export default function ServiceDetail({
                         <InstagramEmbed
                           url={reelUrl}
                           title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
-                          thumbnail={t.thumbnail || t.thumbnail_url}
                         />
                       )}
                       {patientName && patientName !== 'Patient Name' && (
@@ -2858,180 +2571,608 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const faqElement = (mConfig.show_faq !== false && faqs.length > 0) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 shadow-3xs space-y-6" id="cms-section-faq">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
-                  <HelpCircle className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
-                    Patient Support Hub
-                  </h4>
-                  <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
-                    {seoHeadings.faq}
-                  </h3>
-                </div>
-              </div>
+          const displayFaqs = isDentalImplants ? dentalImplantsFaqs : isFullMouth ? fullMouthFaqs : faqs;
 
-              <div className="space-y-3">
-                {faqs.map((faq) => {
-                  const isExpanded = expandedFaqId === faq.id;
-                  return (
-                    <div 
-                      key={faq.id}
-                      className={`border rounded-2xl transition-all duration-300 ${
-                        isExpanded 
-                          ? 'border-[#0D9488] bg-teal-50/10' 
-                          : 'border-slate-150 hover:border-slate-200 bg-white'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => toggleFaq(faq.id)}
-                        className="w-full text-left p-4 flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
+          const faqElement = (mConfig.show_faq !== false && displayFaqs.length > 0) ? (
+            isDentalImplants ? (
+              <div className="bg-white border border-slate-200/80 rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 lg:p-14 shadow-sm space-y-8 sm:space-y-10" id="cms-section-faq">
+                {/* Header */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
+                      DENTAL IMPLANT FAQ
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
+                    Frequently Asked Questions About Dental Implants
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* Accordion List */}
+                <div className="space-y-4 max-w-4xl mx-auto">
+                  {displayFaqs.map((faq) => {
+                    const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    return (
+                      <div 
+                        key={faq.id}
+                        className={`rounded-[18px] sm:rounded-[20px] transition-all duration-200 border ${
+                          isExpanded 
+                            ? 'border-[#0D9488] bg-white shadow-xs' 
+                            : 'border-slate-200/80 hover:border-slate-300 bg-white'
+                        }`}
                       >
-                        <div className="flex gap-2.5 items-start">
-                          <span className="text-xs font-black text-[#0D9488] bg-teal-50 h-5 w-5 rounded-md flex items-center justify-center shrink-0 mt-0.5">
-                            Q
-                          </span>
-                          <span className="text-xs sm:text-sm font-bold text-[#081C3A] leading-relaxed">
+                        <button
+                          type="button"
+                          onClick={() => toggleFaq(faq.id)}
+                          className="w-full text-left p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                        >
+                          <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
+                            isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
+                          }`}>
                             {faq.question}
                           </span>
-                        </div>
-                        <span className="shrink-0 p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors">
-                          {isExpanded ? (
-                            <ChevronUp className="h-4 w-4 text-[#0D9488]" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
+                          <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                            isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
+                          }`}>
+                            {isExpanded ? (
+                              <ChevronUp className="h-4.5 w-4.5" />
+                            ) : (
+                              <ChevronDown className="h-4.5 w-4.5" />
+                            )}
+                          </span>
+                        </button>
+                        
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                                <div className="pt-4">
+                                  {faq.answer}
+                                </div>
+                              </div>
+                            </motion.div>
                           )}
-                        </span>
-                      </button>
-                      
-                      <AnimatePresence initial={false}>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                            className="overflow-hidden"
-                          >
-                            <div className="px-4 pb-4 pt-1 border-t border-slate-100/50 text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-wrap pl-11">
-                              {faq.answer}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            ) : isFullMouth ? (
+              <div className="bg-white border border-slate-200/80 rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 lg:p-14 shadow-sm space-y-8 sm:space-y-10" id="cms-section-faq">
+                {/* Header */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
+                      FULL MOUTH FAQ
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
+                    Frequently Asked Questions About Full Mouth Rehabilitation
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* Accordion List */}
+                <div className="space-y-4 max-w-4xl mx-auto">
+                  {displayFaqs.map((faq) => {
+                    const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    return (
+                      <div 
+                        key={faq.id}
+                        className={`rounded-[18px] sm:rounded-[20px] transition-all duration-200 border ${
+                          isExpanded 
+                            ? 'border-[#0D9488] bg-white shadow-xs' 
+                            : 'border-slate-200/80 hover:border-slate-300 bg-white'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleFaq(faq.id)}
+                          className="w-full text-left p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                        >
+                          <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
+                            isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
+                          }`}>
+                            {faq.question}
+                          </span>
+                          <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                            isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
+                          }`}>
+                            {isExpanded ? (
+                              <ChevronUp className="h-4.5 w-4.5" />
+                            ) : (
+                              <ChevronDown className="h-4.5 w-4.5" />
+                            )}
+                          </span>
+                        </button>
+                        
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                                <div className="pt-4">
+                                  {faq.answer}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-8 shadow-3xs space-y-6" id="cms-section-faq">
+                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                  <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488]">
+                    <HelpCircle className="h-4.5 w-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-[#081C3A] uppercase tracking-wider">
+                      Patient Support Hub
+                    </h4>
+                    <h3 className="text-lg font-black text-[#081C3A] tracking-tight">
+                      {seoHeadings.faq}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {displayFaqs.map((faq) => {
+                    const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    return (
+                      <div 
+                        key={faq.id}
+                        className={`border rounded-2xl transition-all duration-300 ${
+                          isExpanded 
+                            ? 'border-[#0D9488] bg-teal-50/10' 
+                            : 'border-slate-150 hover:border-slate-200 bg-white'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleFaq(faq.id)}
+                          className="w-full text-left p-4 flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
+                        >
+                          <div className="flex gap-2.5 items-start">
+                            <span className="text-xs font-black text-[#0D9488] bg-teal-50 h-5 w-5 rounded-md flex items-center justify-center shrink-0 mt-0.5">
+                              Q
+                            </span>
+                            <span className="text-xs sm:text-sm font-bold text-[#081C3A] leading-relaxed">
+                              {faq.question}
+                            </span>
+                          </div>
+                          <span className="shrink-0 p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors">
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4 text-[#0D9488]" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </span>
+                        </button>
+                        
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-4 pb-4 pt-1 border-t border-slate-100/50 text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-wrap pl-11">
+                                {faq.answer}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )
           ) : null;
 
-          const relatedServicesElement = (mConfig.show_related_services !== false && relatedServices.length > 0) ? (
-            <div className="space-y-6 pt-6" id="cms-section-related-services">
-              <div className="text-center max-w-xl mx-auto space-y-2">
-                <span className="text-[9px] text-[#0D9488] font-black uppercase tracking-widest block">
-                  Explore More Solutions
-                </span>
-                <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
-                  Other Treatments
-                </h2>
-                <p className="text-slate-500 text-xs">
-                  Learn about other specialized cosmetic, restorative, and general dental care treatments we offer.
-                </p>
-              </div>
+          const getServiceHeroImage = (targetSlug: string) => {
+            const fromLoaded = allServicesList.find(s => s.slug === targetSlug);
+            if (fromLoaded?.hero_image && fromLoaded.hero_image.trim() !== '') {
+              return fromLoaded.hero_image;
+            }
+            const fromDefault = DEFAULT_SERVICES.find(s => s.slug === targetSlug);
+            if (fromDefault?.hero_image && fromDefault.hero_image.trim() !== '') {
+              return fromDefault.hero_image;
+            }
+            const treatmentId = targetSlug === 'full-mouth-rehabilitation' ? 'fullmouth' : targetSlug === 'crowns-bridges' ? 'crowns' : targetSlug === 'smile-makeover' ? 'smile' : targetSlug;
+            const fromTreatment = TREATMENTS.find(t => t.id === treatmentId);
+            if (fromTreatment?.image && fromTreatment.image.trim() !== '') {
+              return fromTreatment.image;
+            }
+            return '';
+          };
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {relatedServices.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.3 }}
-                    className="bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col justify-between group"
-                  >
-                    <div>
+          const dentalImplantsRelatedCards = [
+            {
+              slug: 'full-mouth-rehabilitation',
+              title: 'Full Mouth Rehabilitation',
+              description: 'Comprehensive treatment for patients with multiple missing, damaged, or severely worn teeth across both upper and lower jaws.',
+              image: getServiceHeroImage('full-mouth-rehabilitation')
+            },
+            {
+              slug: 'crowns-bridges',
+              title: 'Crowns & Bridges',
+              description: 'Restore damaged or missing teeth with high-strength, custom-milled zirconia crowns and fixed bridges.',
+              image: getServiceHeroImage('crowns-bridges')
+            },
+            {
+              slug: 'smile-makeover',
+              title: 'Smile Makeover',
+              description: 'Improve the appearance, shade, shape, and overall harmony of your smile with personalized cosmetic dental solutions.',
+              image: getServiceHeroImage('smile-makeover')
+            }
+          ];
+
+          const fullMouthRelatedCards = [
+            {
+              slug: 'dental-implants',
+              title: 'Dental Implants',
+              description: 'Permanent tooth replacement utilizing premium titanium root implants for secure, stable, and natural-looking fixed teeth.',
+              image: getServiceHeroImage('dental-implants')
+            },
+            {
+              slug: 'crowns-bridges',
+              title: 'Crowns & Bridges',
+              description: 'Restore damaged or missing teeth with high-strength, custom-milled zirconia crowns and fixed bridges.',
+              image: getServiceHeroImage('crowns-bridges')
+            },
+            {
+              slug: 'smile-makeover',
+              title: 'Smile Makeover',
+              description: 'Improve the appearance, shade, shape, and overall harmony of your smile with personalized cosmetic dental solutions.',
+              image: getServiceHeroImage('smile-makeover')
+            }
+          ];
+
+          const relatedServicesElement = (mConfig.show_related_services !== false) ? (
+            isDentalImplants ? (
+              <div className="space-y-8 sm:space-y-10 pt-6 sm:pt-10" id="cms-section-related-services">
+                {/* Centered Badge, Heading & Teal Underline */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
+                      RELATED TREATMENTS
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
+                    Related Treatments
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* 3 Equal Treatment Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
+                  {dentalImplantsRelatedCards.map((card) => (
+                    <div
+                      key={card.slug}
+                      onClick={() => handleNavigateToService(card.slug)}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                    >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={item.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600'} 
-                          alt={item.title}
+                          src={card.image} 
+                          alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <div className="p-6 space-y-2.5">
-                        <h3 className="font-display font-extrabold text-base text-[#081C3A] line-clamp-1 tracking-tight group-hover:text-[#0D9488] transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="text-slate-500 text-xs leading-relaxed line-clamp-2">
-                          {item.short_description}
-                        </p>
+                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                        <div className="space-y-2.5">
+                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                            {card.title}
+                          </h3>
+                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                            {card.description}
+                          </p>
+                        </div>
+                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                          <span>Learn Details</span>
+                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        </div>
                       </div>
                     </div>
-
-                    <div className="p-5 pt-0">
-                      <button
-                        onClick={() => handleNavigateToService(item.slug)}
-                        className="w-full py-2 bg-slate-50 hover:bg-[#0D9488]/5 border border-slate-150 text-[#081C3A] hover:text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
-                      >
-                        Learn Details
-                        <ArrowRight className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : isFullMouth ? (
+              <div className="space-y-8 sm:space-y-10 pt-6 sm:pt-10" id="cms-section-related-services">
+                {/* Centered Badge, Heading & Teal Underline */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
+                      RELATED TREATMENTS
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
+                    Related Treatments
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* 3 Equal Treatment Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
+                  {fullMouthRelatedCards.map((card) => (
+                    <div
+                      key={card.slug}
+                      onClick={() => handleNavigateToService(card.slug)}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                    >
+                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                        <img 
+                          src={card.image} 
+                          alt={card.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                        <div className="space-y-2.5">
+                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                            {card.title}
+                          </h3>
+                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                            {card.description}
+                          </p>
+                        </div>
+                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                          <span>Learn Details</span>
+                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : relatedServices.length > 0 ? (
+              <div className="space-y-6 pt-6" id="cms-section-related-services">
+                <div className="text-center max-w-xl mx-auto space-y-2">
+                  <span className="text-[9px] text-[#0D9488] font-black uppercase tracking-widest block">
+                    Explore More Solutions
+                  </span>
+                  <h2 className="font-display font-black text-2xl text-[#081C3A] tracking-tight">
+                    Other Treatments
+                  </h2>
+                  <p className="text-slate-500 text-xs">
+                    Learn about other specialized cosmetic, restorative, and general dental care treatments we offer.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  {relatedServices.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      whileHover={{ y: -4 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col justify-between group"
+                    >
+                      <div>
+                        <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                          <img 
+                            src={DEFAULT_SERVICES.find(s => s.slug === item.slug || s.id === item.id)?.hero_image || item.hero_image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600'} 
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        <div className="p-6 space-y-2.5">
+                          <h3 className="font-display font-extrabold text-base text-[#081C3A] line-clamp-1 tracking-tight group-hover:text-[#0D9488] transition-colors">
+                            {item.title}
+                          </h3>
+                          <p className="text-slate-500 text-xs leading-relaxed line-clamp-2">
+                            {item.short_description}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-5 pt-0">
+                        <button
+                          onClick={() => handleNavigateToService(item.slug)}
+                          className="w-full py-2 bg-slate-50 hover:bg-[#0D9488]/5 border border-slate-150 text-[#081C3A] hover:text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          Learn Details
+                          <ArrowRight className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ) : null
           ) : null;
 
-          const bottomCtaElement = (mConfig.show_bottom_cta !== false) ? (
-            <div className="bg-white border border-slate-150 rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl relative overflow-hidden text-center space-y-6" id="cms-section-bottom-cta">
-              <div className="max-w-xl mx-auto space-y-4 relative z-10">
-                <span className="inline-flex items-center gap-1 bg-[#0D9488] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full leading-none">
-                  Consultation Booking
-                </span>
-                <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                  {seoHeadings.bottomCta}
-                </h2>
-                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                  {mConfig.bottom_cta_description || `Book a pain-free diagnostic consultation with our specialists in Rajkot. Experience high-end treatment tailored exactly to your clinical expectations.`}
-                </p>
-              </div>
+          const dentalImplantsWhatsAppUrl = (() => {
+            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
+              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
+              : contactInfo.whatsappRaw;
+            const text = "Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:";
+            return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+          })();
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 relative z-10 pt-2">
-                <button
-                  onClick={() => {
-                    const link = mConfig.bottom_cta_primary_link;
-                    if (link && link.trim() !== '') {
-                      if (link.startsWith('http')) {
-                        window.open(link, '_blank', 'noopener,noreferrer');
+          const fullMouthWhatsAppUrl = (() => {
+            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
+              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
+              : contactInfo.whatsappRaw;
+            const text = "Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.";
+            return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+          })();
+
+          const bottomCtaElement = (mConfig.show_bottom_cta !== false) ? (
+            isDentalImplants ? (
+              <div className="relative bg-[#0B1528] border border-slate-800 rounded-[26px] sm:rounded-[32px] p-8 sm:p-14 lg:p-16 shadow-2xl overflow-hidden text-center space-y-6 sm:space-y-8" id="cms-section-bottom-cta">
+                {/* Background Clinic Interior Ambient Layer */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none" 
+                  style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1600")' }} 
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0B1528]/80 via-[#0B1528]/95 to-[#0B1528] pointer-events-none" />
+
+                <div className="max-w-2xl mx-auto space-y-4 sm:space-y-5 relative z-10">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
+                      DENTAL IMPLANT CONSULTATION
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
+                    Ready to Explore Your Dental<br />Implant Options?
+                  </h2>
+                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
+                    Book a personalised consultation to discuss your oral condition, suitable treatment options, expected treatment timeline, and estimated treatment plan.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 relative z-10 pt-2">
+                  <button
+                    onClick={() => {
+                      const link = mConfig.bottom_cta_primary_link;
+                      if (link && link.trim() !== '') {
+                        if (link.startsWith('http')) {
+                          window.open(link, '_blank', 'noopener,noreferrer');
+                        } else {
+                          window.location.hash = link;
+                        }
                       } else {
-                        window.location.hash = link;
+                        openAppointmentModal('Dental Implants - Closing CTA');
                       }
-                    } else {
-                      openAppointmentModal(`${service.title} - Bottom CTA`);
-                    }
-                  }}
-                  className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 group"
-                >
-                  <Calendar className="h-4.5 w-4.5" />
-                  <span>{mConfig.bottom_cta_primary_text || "Free Consultation"}</span>
-                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-                
-                <a
-                  href={mConfig.bottom_cta_secondary_link && mConfig.bottom_cta_secondary_link.trim() !== '' ? mConfig.bottom_cta_secondary_link : getWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="h-4.5 w-4.5" />
-                  <span>{mConfig.bottom_cta_secondary_text || "WhatsApp Us"}</span>
-                </a>
+                    }}
+                    className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                  >
+                    <Calendar className="h-4 w-4 shrink-0" />
+                    <span>BOOK YOUR CONSULTATION</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                  
+                  <a
+                    href={dentalImplantsWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="h-4 w-4 shrink-0" />
+                    <span>CHAT ON WHATSAPP</span>
+                  </a>
+                </div>
               </div>
-            </div>
+            ) : isFullMouth ? (
+              <div className="relative bg-[#0B1528] border border-slate-800 rounded-[26px] sm:rounded-[32px] p-8 sm:p-14 lg:p-16 shadow-2xl overflow-hidden text-center space-y-6 sm:space-y-8" id="cms-section-bottom-cta">
+                {/* Background Clinic Interior Ambient Layer */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none" 
+                  style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1600")' }} 
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0B1528]/80 via-[#0B1528]/95 to-[#0B1528] pointer-events-none" />
+
+                <div className="max-w-2xl mx-auto space-y-4 sm:space-y-5 relative z-10">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
+                      Indicative Cost & Plan in 24 Hours
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
+                    Get an Indicative Plan and Cost Range Before You Visit
+                  </h2>
+                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
+                    Send us your OPG on WhatsApp and receive an indicative plan and cost range within 24 hours — before you visit.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 relative z-10 pt-2">
+                  <a
+                    href={fullMouthWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="h-4 w-4 shrink-0 fill-white text-[#22C55E]" />
+                    <span>Send OPG on WhatsApp</span>
+                  </a>
+
+                  <button
+                    onClick={() => {
+                      openAppointmentModal('Full Mouth Rehabilitation - Closing CTA');
+                    }}
+                    className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                  >
+                    <Calendar className="h-4 w-4 shrink-0" />
+                    <span>BOOK YOUR APPOINTMENT</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-150 rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl relative overflow-hidden text-center space-y-6" id="cms-section-bottom-cta">
+                <div className="max-w-xl mx-auto space-y-4 relative z-10">
+                  <span className="inline-flex items-center gap-1 bg-[#0D9488] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full leading-none">
+                    Consultation Booking
+                  </span>
+                  <h2 className="font-display font-black text-3xl sm:text-4xl text-[#081C3A] tracking-tight leading-tight">
+                    {seoHeadings.bottomCta}
+                  </h2>
+                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
+                    {mConfig.bottom_cta_description || `Book a pain-free diagnostic consultation with our specialists in Rajkot. Experience high-end treatment tailored exactly to your clinical expectations.`}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 relative z-10 pt-2">
+                  <button
+                    onClick={() => {
+                      const link = mConfig.bottom_cta_primary_link;
+                      if (link && link.trim() !== '') {
+                        if (link.startsWith('http')) {
+                          window.open(link, '_blank', 'noopener,noreferrer');
+                        } else {
+                          window.location.hash = link;
+                        }
+                      } else {
+                        openAppointmentModal(`${service.title} - Bottom CTA`);
+                      }
+                    }}
+                    className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 group"
+                  >
+                    <Calendar className="h-4.5 w-4.5" />
+                    <span>{mConfig.bottom_cta_primary_text || "Free Consultation"}</span>
+                    <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                  
+                  <a
+                    href={mConfig.bottom_cta_secondary_link && mConfig.bottom_cta_secondary_link.trim() !== '' ? mConfig.bottom_cta_secondary_link : getWhatsAppUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="h-4.5 w-4.5" />
+                    <span>{mConfig.bottom_cta_secondary_text || "WhatsApp Us"}</span>
+                  </a>
+                </div>
+              </div>
+            )
           ) : null;
 
           // Dispatch switcher
@@ -3039,7 +3180,8 @@ export default function ServiceDetail({
             switch (key) {
               case 'hero':
                 return heroElement;
-
+              case 'featured_video':
+                return featuredVideoElement;
               case 'intro':
                 return introElement;
               case 'process':
@@ -3070,7 +3212,7 @@ export default function ServiceDetail({
           // Formulate order lists
           const defaultOrder = [
             'hero',
-
+            'featured_video',
             'intro',
             'process',
             'benefits',
@@ -3080,8 +3222,8 @@ export default function ServiceDetail({
             'hospital_photos',
             'team_photos',
             'faq',
-            'related_services',
-            'bottom_cta'
+            'bottom_cta',
+            'related_services'
           ];
           const currentOrder = Array.isArray(mConfig.section_order) 
             ? mConfig.section_order 
@@ -3118,145 +3260,962 @@ export default function ServiceDetail({
             return (
               <div className="space-y-8 sm:space-y-16 lg:space-y-20">
                 {heroElement}
-                {introElement}
+                {!isFullMouth && featuredVideoElement}
 
-                {/* Section 3: How We Perform Treatment (Clinical Workflow Steps) */}
-                {isDentalImplants ? (
-                  <>
-                    <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="service-workflow">
-                      <div className="space-y-3 max-w-3xl mx-auto text-center">
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                          You May Need Dental Implants If…
-                        </h2>
-                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                      </div>
-
-                      <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-                        {/* Card 1 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Have One or More Missing Teeth
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              Missing teeth are affecting your smile, chewing, or confidence.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 2 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              Your Denture Feels Loose or Uncomfortable
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              You want a more stable and fixed alternative to removable dentures.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Have a Damaged Tooth That Cannot Be Saved
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              A severely damaged or decayed tooth may need to be replaced.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 4 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Find It Difficult to Chew Properly
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              Missing teeth are making everyday eating uncomfortable or difficult.
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 5 */}
-                        <div className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex">
-                          <div className="relative w-full bg-white border border-[#E8EEF5] rounded-[22px] p-[30px] sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
-                            {/* Left accent line */}
-                            <div className="absolute left-0 top-[30px] sm:top-[36px] bottom-[30px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                            <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[22px] tracking-tight mt-0 mb-4 leading-tight">
-                              You Want a Long-Term Fixed Teeth Solution
-                            </h3>
-                            <div className="text-[#475569] text-[15px] sm:text-[16px] leading-[1.7] font-medium flex-1">
-                              You are looking for natural-looking replacement teeth designed for long-term function.
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {comparisonSection}
-                    {costSection}
-                    {timelineSection}
-                    {warrantyPolicySection}
-                  </>
-                ) : (
-                  mConfig.show_process !== false && (
-                    <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="service-workflow">
-                      <div className="space-y-3 max-w-3xl mx-auto text-center">
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                          {seoHeadings.process}
-                        </h2>
-                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                      </div>
-
-                      <div className={`grid grid-cols-1 ${displaySteps.length === 1 ? 'max-w-2xl' : displaySteps.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-start mx-auto`}>
-                        {displaySteps.map((step, idx) => (
-                          <PremiumMedicalCard
-                            key={step.id || idx}
-                            icon={<Activity />}
-                            title={step.title}
-                            imageUrl={step.image_url}
-                          >
-                            {step.description}
-                          </PremiumMedicalCard>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                )}
-
-                {/* Section 5: Who Is a Candidate for Full Mouth Rehabilitation */}
-                {(mConfig.show_candidate !== false && displayCandidateItems.length > 0) && (
-                  <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="candidate-section">
+                {/* Section 2: Symptom Qualification for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-symptom-qualification-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {seoHeadings.candidate}
+                        Is full mouth rehabilitation right for you?
                       </h2>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className={`grid grid-cols-1 ${displayCandidateItems.length === 1 ? 'max-w-2xl' : displayCandidateItems.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-7xl'} gap-4 sm:gap-8 items-start mx-auto`}>
-                      {[...displayCandidateItems]
-                        .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-                        .map((cand: any, idx: number) => (
-                          <PremiumMedicalCard
-                            key={cand.id || idx}
-                            icon={<CheckCircle2 />}
-                            title={cand.title}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto pt-8">
+                      {/* Card 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          Multiple Broken, Decayed or Loose Teeth
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          When simple fillings or individual crowns are no longer enough to save your bite.
+                        </p>
+                      </div>
+
+                      {/* Card 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          Severe Wear & Flattened Bite
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          Teeth that are heavily worn down, causing jaw pain, chewing difficulty, or a collapsed facial appearance.
+                        </p>
+                      </div>
+
+                      {/* Card 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          Missing Most or All of Your Teeth
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          Struggling with loose dentures and wanting a permanent, secure, and life-changing fixed-teeth solution.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 3: Comparison Table for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-comparison-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Option Comparison
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        What doing nothing costs
+                      </h2>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="max-w-7xl mx-auto overflow-hidden rounded-[22px] bg-white border border-[#E8EEF5] shadow-[0_12px_35px_rgba(15,23,42,0.08)]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[680px]">
+                          <thead>
+                            <tr className="border-b border-slate-200">
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
+                                Feature / Factor
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4 relative">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span>Full Mouth Rehabilitation</span>
+                                  <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-widest whitespace-nowrap">
+                                    Recommended
+                                  </span>
+                                </div>
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
+                                Continuing to patch tooth by tooth
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
+                                Full Dentures
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-sans text-xs sm:text-sm">
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Chewing restored
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Reconstructed to restore 100% full chewing power.</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Chewing ability continues to decline as more teeth fail.
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Limited chewing power (20%–30%); restricts diet significantly.
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Bite and jaw joint corrected
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Yes; fully aligns and balances dental arches to correct TMJ pain.</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                No; uneven tooth wear and tooth movement worsen TMJ stress.
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                No; slipping appliances cannot support natural joint alignment.
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Facial support restored
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Yes; supports cheeks and lips naturally, reversing collapsed look.</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                No; progressive tooth wear causes facial height collapse.
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Temporary; jawbone shrinkage over time leads to a sunken facial appearance.
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Bone loss
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Prevented; implants stimulate bone and preserve natural jaw structure.</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Continues to accelerate in missing tooth areas.
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Accelerated bone loss due to constant surface pressure on gum ridges.
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Total cost over 10 years
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Contact Us for Pricing</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                High; multiple emergency procedures and crowns accumulate a high lifetime cost.
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Ongoing expenses for adjustments, relining, adhesives, and replacements.
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Result
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Permanent, highly functional, and fully stable natural-looking teeth.</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Chronic toothaches, unstable bite, and progressive tooth loss.
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Loose, uncomfortable removable appliance that can slip while speaking or eating.
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 4: Pricing & Financing for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-pricing-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Pricing & Financing
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Full Mouth Reconstruction Costs
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        We provide completely transparent costs with structured financial options to help make full mouth reconstruction accessible and stress-free.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="max-w-4xl mx-auto overflow-hidden rounded-[22px] bg-white border border-[#E8EEF5] shadow-[0_12px_35px_rgba(15,23,42,0.08)]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[540px]">
+                          <thead>
+                            <tr className="border-b border-slate-200">
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/3">
+                                Treatment
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/3">
+                                Starting Price
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/3">
+                                Best For
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-sans text-xs sm:text-sm">
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Single-arch rehabilitation
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Rebuilding one entire arch of teeth
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Full-mouth (both arches)
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Comprehensive restoration of both upper and lower arches
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                All-on-4 — per arch, fixed teeth
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Fixed teeth on 4 dental implants per arch
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                All-on-6 — per arch, fixed teeth
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Fixed teeth on 6 dental implants per arch for maximum stability
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Full-mouth crowns (no implants needed)
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Complete natural teeth restoration using high-quality crowns
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Financing information inside table footer container, perfectly matching spacing, typography, and buttons */}
+                      <div className="p-6 sm:p-8 bg-slate-50/80 border-t border-slate-100 space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                          <div className="bg-white border border-slate-100 rounded-2xl p-5 text-left flex items-start gap-3 shadow-sm">
+                            <div className="h-9 w-9 rounded-lg bg-teal-50 flex items-center justify-center text-[#0D9488] border border-teal-100 shrink-0 mt-0.5">
+                              <CheckCircle2 className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="font-sans font-bold text-[#081C3A] text-sm sm:text-base">
+                                Zero-Interest EMI
+                              </h4>
+                              <p className="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium leading-relaxed">
+                                Convenient monthly installment plans are available at zero interest to ease the treatment cost.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="bg-white border border-slate-100 rounded-2xl p-5 text-left flex items-start gap-3 shadow-sm">
+                            <div className="h-9 w-9 rounded-lg bg-teal-50 flex items-center justify-center text-[#0D9488] border border-teal-100 shrink-0 mt-0.5">
+                              <CheckCircle2 className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="font-sans font-bold text-[#081C3A] text-sm sm:text-base">
+                                Multi-Bank Support
+                              </h4>
+                              <p className="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium leading-relaxed">
+                                We partner with leading financial providers to offer instant approvals and flexible tenures.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                          <a
+                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer"
                           >
-                            {cand.description}
-                          </PremiumMedicalCard>
-                        ))}
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>Check EMI Eligibility on WhatsApp</span>
+                          </a>
+
+                          <button
+                            onClick={() => openAppointmentModal('Full Mouth Rehabilitation - Pricing')}
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0f766e] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                          >
+                            <Calendar className="h-4 w-4 shrink-0" />
+                            <span>Request Treatment Estimate</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 5: Phased Roadmap for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-timeline-section">
+                    <div className="max-w-6xl mx-auto bg-white border border-[#E8EEF5] rounded-[28px] sm:rounded-[36px] p-6 sm:p-12 lg:p-14 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+                      {/* Heading area */}
+                      <div className="space-y-3 max-w-2xl mx-auto text-center mb-10 sm:mb-14">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                          <Clock className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                          Treatment Timeline
+                        </span>
+                        <h2 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                          Your Full Mouth Reconstruction Roadmap
+                        </h2>
+                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed text-center font-normal">
+                          We divide complex full mouth rehabilitation into structured phases to ensure maximum precision, patient comfort, and long-term treatment success.
+                        </p>
+                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+                      </div>
+
+                      {/* 4 horizontal numbered timeline steps */}
+                      <div className="relative">
+                        {/* Horizontal connector line on desktop/tablet */}
+                        <div className="hidden md:block absolute top-[36px] left-[12.5%] right-[12.5%] h-[2px] bg-[#5eead4] z-0" />
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-4 relative z-10">
+                          {/* Step 1 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-white border-2 border-[#14B8A6] flex items-center justify-center text-[#0D9488] font-bold text-xl mb-5 shadow-sm">
+                              1
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Comprehensive Planning
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              Complete planning including diagnostic records, 3D CBCT scans, and diagnostic mockups before starting treatment.
+                            </p>
+                          </div>
+
+                          {/* Step 2 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-white border-2 border-[#14B8A6] flex items-center justify-center text-[#0D9488] font-bold text-xl mb-5 shadow-sm">
+                              2
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Foundation Work & Preparation
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              Address root canal therapy, tooth extractions, and gum treatment as required.
+                            </p>
+                          </div>
+
+                          {/* Step 3 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-white border-2 border-[#14B8A6] flex items-center justify-center text-[#0D9488] font-bold text-xl mb-5 shadow-sm">
+                              3
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Implant Placement & Temporary Teeth
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              Secure implant placement and custom temporary restorations to preserve function and comfort.
+                            </p>
+                          </div>
+
+                          {/* Step 4 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-[#0D9488] border-2 border-[#0D9488] flex items-center justify-center text-white font-bold text-xl mb-5 shadow-md">
+                              4
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Final Custom Reconstruction
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              Custom final crown and bridge work to restore permanent natural appearance and chewing power.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 6: Risk Reversal / Patient Reassurance for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-reassurance-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <ShieldCheck className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        REASSURANCE & TRANSPARENCY
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Our Reassurance for Your Full Mouth Reconstruction
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        Rebuilding your smile is a major decision. We provide full clinical transparency, coordinated care, and ongoing support so you can feel completely secure at every step.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
+                      {/* Point 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[32px] sm:bottom-[32px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Full Clinical Transparency
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Full mouth rehabilitation combines multiple clinical treatments, each planned thoroughly with written documentation and transparent cost breakdowns before any work begins.
+                        </p>
+                      </div>
+
+                      {/* Point 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[32px] sm:bottom-[32px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Multi-disciplinary Care Coordination
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Your treatment plan is fully coordinated in-house under one clinic roof by our expert team. This ensures perfect synchronization and eliminates fragmented external referrals.
+                        </p>
+                      </div>
+
+                      {/* Point 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[32px] sm:bottom-[32px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Proactive Support & Follow-up
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          We outline a structured regimen of follow-ups and maintenance checks to monitor proper healing, bite accuracy, and ensure long-term functional stability.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="flex justify-center pt-2">
+                      <button
+                        onClick={() => openAppointmentModal('Full Mouth Rehabilitation - Reassurance')}
+                        className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-[#0D9488] hover:bg-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                      >
+                        <Calendar className="h-4 w-4 shrink-0" />
+                        <span>Discuss Your Custom Treatment Plan</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Symptom Qualification Section for Dental Implants */}
+                {isDentalImplants && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="symptom-qualification-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        You May Need Dental Implants If…
+                      </h2>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-8 max-w-7xl mx-auto pt-8">
+                      {/* Card 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          You Have One or More Missing Teeth
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          Missing teeth are affecting your smile, chewing, or confidence.
+                        </p>
+                      </div>
+
+                      {/* Card 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          Your Denture Feels Loose or Uncomfortable
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          You want a more stable and fixed alternative to removable dentures.
+                        </p>
+                      </div>
+
+                      {/* Card 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          You Have a Damaged Tooth That Cannot Be Saved
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          A severely damaged or decayed tooth may need to be replaced.
+                        </p>
+                      </div>
+
+                      {/* Card 4 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2 md:col-start-2">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          You Find It Difficult to Chew Properly
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          Missing teeth are making everyday eating uncomfortable or difficult.
+                        </p>
+                      </div>
+
+                      {/* Card 5 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2">
+                        {/* Left accent line */}
+                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
+                          You Want a Long-Term Fixed Teeth Solution
+                        </h3>
+                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
+                          You are looking for natural-looking replacement teeth designed for long-term function.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dental Implants Option Comparison Table Section */}
+                {isDentalImplants && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-comparison-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Option Comparison
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Dental Implants vs. Dental Bridge vs. Removable Dentures
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        Compare tooth replacement options to understand why dental implants provide the highest standard of durability, jawbone health, and natural comfort.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="max-w-7xl mx-auto overflow-hidden rounded-[22px] bg-white border border-[#E8EEF5] shadow-[0_12px_35px_rgba(15,23,42,0.08)]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[680px]">
+                          <thead>
+                            <tr className="border-b border-slate-200">
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
+                                Feature / Factor
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4 relative">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span>Dental Implants</span>
+                                  <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
+                                    Recommended
+                                  </span>
+                                </div>
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
+                                Dental Bridge
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
+                                Removable Dentures
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-sans text-xs sm:text-sm">
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Support & Tooth Impact
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Self-supported root; zero damage to adjacent healthy teeth</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Requires cutting and grinding down healthy adjacent teeth
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Rests on gum ridge with clasps; can stress remaining teeth
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Durability & Lifespan
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Lifetime permanent solution with routine dental hygiene</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Typically lasts 7–10 years before requiring replacement
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Lasts 5–7 years; requires regular adjustments as jaw changes
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Jawbone Preservation
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Preserves natural jawbone & prevents facial sagging/shrinkage</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Does not prevent bone resorption under missing tooth area
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Accelerates bone loss over time due to surface pressure
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Chewing Efficiency
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>95%–100% natural bite force; eat all your favorite foods</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                60%–70% chewing efficiency; cautious with hard foods
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                20%–30% chewing power; significant restrictions on diet
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Stability & Comfort
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>100% permanently fixed; no slipping, clicking, or adhesives</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Fixed permanently, but food can lodge under bridge pontic
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Removable; prone to slipping, sore spots, and clicking
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Maintenance & Cleaning
+                              </td>
+                              <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
+                                  <span>Regular daily brushing and flossing like natural teeth</span>
+                                </div>
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Requires special floss threaders under the bridge
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-600">
+                                Must be removed nightly and soaked in cleaning solutions
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dental Implants Transparent Pricing Section */}
+                {isDentalImplants && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-pricing-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        TRANSPARENT PRICING
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Dental Implant Cost & Pricing
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        The cost of dental implants depends on the number of missing teeth, type of implant treatment, bone condition, and whether additional procedures are required.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="max-w-4xl mx-auto overflow-hidden rounded-[22px] bg-white border border-[#E8EEF5] shadow-[0_12px_35px_rgba(15,23,42,0.08)]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[540px]">
+                          <thead>
+                            <tr className="border-b border-slate-200">
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/3">
+                                Treatment
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/3">
+                                Starting Price
+                              </th>
+                              <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/3">
+                                Best For
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-sans text-xs sm:text-sm">
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Single Tooth Implant
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Replacing one missing tooth
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Multiple Teeth Implants
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Replacing multiple missing teeth
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
+                                Full Mouth Dental Implants
+                              </td>
+                              <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
+                                Contact Us for Pricing
+                              </td>
+                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
+                                Full arch or complete teeth replacement
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="p-5 sm:p-6 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-xl">
+                          Your final treatment plan and cost will be determined after a clinical examination and treatment planning.
+                        </p>
+                        <button
+                          onClick={() => openAppointmentModal('Dental Implants')}
+                          className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#0D9488] hover:bg-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                        >
+                          <Calendar className="h-4 w-4 shrink-0" />
+                          <span>Get a Personalized Treatment Plan</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dental Implants Treatment Timeline Section */}
+                {isDentalImplants && (
+                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-timeline-section">
+                    <div className="max-w-6xl mx-auto bg-white border border-[#E8EEF5] rounded-[28px] sm:rounded-[36px] p-6 sm:p-12 lg:p-14 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+                      {/* Heading area */}
+                      <div className="space-y-3 max-w-2xl mx-auto text-center mb-10 sm:mb-14">
+                        <h2 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                          Your Dental Implant Treatment Timeline
+                        </h2>
+                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed text-center font-normal">
+                          Your treatment timeline depends on your oral condition, treatment plan, and whether any additional procedures are required.
+                        </p>
+                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
+                      </div>
+
+                      {/* 4 horizontal numbered timeline steps */}
+                      <div className="relative">
+                        {/* Horizontal connector line on desktop/tablet */}
+                        <div className="hidden md:block absolute top-[36px] left-[12.5%] right-[12.5%] h-[2px] bg-[#5eead4] z-0" />
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-4 relative z-10">
+                          {/* Step 1 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-white border-2 border-[#14B8A6] flex items-center justify-center text-[#0D9488] font-bold text-xl mb-5 shadow-sm">
+                              1
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Consultation & Assessment
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              Your teeth, gums, and jawbone are examined to determine the right implant treatment plan.
+                            </p>
+                          </div>
+
+                          {/* Step 2 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-white border-2 border-[#14B8A6] flex items-center justify-center text-[#0D9488] font-bold text-xl mb-5 shadow-sm">
+                              2
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Implant Placement
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              The dental implant is carefully placed in the planned position.
+                            </p>
+                          </div>
+
+                          {/* Step 3 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-white border-2 border-[#14B8A6] flex items-center justify-center text-[#0D9488] font-bold text-xl mb-5 shadow-sm">
+                              3
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Healing & Integration
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              The implant is given time to integrate with the jawbone for a stable foundation.
+                            </p>
+                          </div>
+
+                          {/* Step 4 */}
+                          <div className="flex flex-col items-center text-center">
+                            <div className="w-[72px] h-[72px] rounded-full bg-[#0D9488] border-2 border-[#0D9488] flex items-center justify-center text-white font-bold text-xl mb-5 shadow-md">
+                              4
+                            </div>
+                            <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
+                              Final Fixed Teeth
+                            </h3>
+                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
+                              Your custom final teeth are placed to restore function, comfort, and appearance.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dental Implants Warranty & Patient Reassurance Section */}
+                {isDentalImplants && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-warranty-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <ShieldCheck className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        WARRANTY & PATIENT REASSURANCE
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Your Dental Implant Treatment, Backed by Clear Reassurance
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        We believe patients should understand their treatment, expected care and warranty policy before proceeding. Our team is available to answer your questions and provide treatment details clearly.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
+                      {/* Point 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[32px] sm:bottom-[32px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <ShieldCheck className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Clear Warranty Policy
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Warranty terms and applicable conditions are explained clearly as part of your treatment planning.
+                        </p>
+                      </div>
+
+                      {/* Point 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[32px] sm:bottom-[32px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Personalised Treatment Planning
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Your implant treatment is planned according to your clinical condition, treatment requirements and long-term oral health.
+                        </p>
+                      </div>
+
+                      {/* Point 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[32px] sm:bottom-[32px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <HelpCircle className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Second-Opinion Reassurance
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Have questions or want another opinion? We are happy to discuss your treatment plan and help you make an informed decision.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="flex justify-center pt-2">
+                      <button
+                        onClick={() => openAppointmentModal('Dental Implants - Warranty Reassurance')}
+                        className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-[#0D9488] hover:bg-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                      >
+                        <Calendar className="h-4 w-4 shrink-0" />
+                        <span>Contact Us for Details</span>
+                      </button>
                     </div>
                   </div>
                 )}
@@ -3273,7 +4232,7 @@ export default function ServiceDetail({
                         {seoHeadings.transformations}
                       </h2>
                       <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : isRootCanal ? 'See real smile transformations of our single sitting root canal treatment patients.' : 'See real smile transformations of our patients.')}
+                        {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -3311,530 +4270,450 @@ export default function ServiceDetail({
                 {/* Section 7: Patient Testimonial Reels */}
                 {testimonialsElement}
 
-                {/* Section 8: Hospital & Team Gallery */}
-                {renderCombinedGallery()}
-
-                {/* Section 9: Cost Section (100% CMS-driven, Premium Two-column card) */}
-                {mConfig.show_cost !== false && (
-                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 space-y-5 sm:space-y-8 animate-fade-in" id="dental-implants-cost">
-                    {/* Two-column responsive card wrapper */}
-                    <div className="bg-gradient-to-br from-slate-50 via-white to-teal-50/20 border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-12 shadow-sm hover:shadow-md transition-all duration-300 max-w-7xl mx-auto">
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
-                        
-                        {/* Left Column: Heading, Highlight, Subtext, Contact Text */}
-                        <div className="lg:col-span-7 space-y-3 sm:space-y-4">
-                          <div className="space-y-2">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                              <FileText className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                              Transparent Pricing
-                            </span>
-                            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                              {mConfig.cost_heading || (isToothColouredFilling ? 'Tooth Coloured Filling Cost & Offers' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Cost & Offers' : isBracesTreatment ? 'Braces Treatment Cost & Offers' : isPediatricDentistry ? 'Pediatric Dentistry Cost / Offer' : isTeethWhitening ? 'Teeth Whitening Cost & Offer' : isCrownsAndBridges ? 'Crown & Bridges Cost & Offer' : isSmileMakeover ? 'Smile Makeover Consultation' : isInvisibleAligners ? 'Invisible Aligners Treatment Cost & Offer' : isRootCanal ? 'Single Sitting Root Canal Treatment Cost' : isFullMouth ? 'Full Mouth Rehabilitation Cost & Offer' : 'Cost of Dental Implants')}
-                            </h2>
-                          </div>
-
-                          {((mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '') || 
-                            (mConfig.cost_highlight_sub && mConfig.cost_highlight_sub.trim() !== '')) && (
-                            <div className="space-y-1.5 mt-2 bg-white/80 p-4 sm:p-5 rounded-2xl border border-teal-100/80 shadow-2xs">
-                              {mConfig.cost_highlight_text && mConfig.cost_highlight_text.trim() !== '' && (
-                                <div className="font-sans font-black text-3xl sm:text-4xl text-[#0D9488] tracking-tight">
-                                  {mConfig.cost_highlight_text}
-                                </div>
-                              )}
-                              {mConfig.cost_highlight_sub && mConfig.cost_highlight_sub.trim() !== '' && (
-                                <p className="text-[#081C3A] font-extrabold text-lg sm:text-xl tracking-tight">
-                                  {mConfig.cost_highlight_sub}
-                                </p>
-                              )}
-                            </div>
-                          )}
-
-                          <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
-                            {mConfig.cost_contact_text && mConfig.cost_contact_text.trim() !== ''
-                              ? mConfig.cost_contact_text
-                              : 'Contact our clinical team for precise fee estimates after an initial diagnostic evaluation.'
-                            }
-                          </p>
-                        </div>
-
-                        {/* Right Column: CTA Actions */}
-                        <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col gap-3.5 w-full justify-center">
-                          <a
-                            href={`tel:${String(mConfig.cost_phone_number || contactInfo?.phone || DEFAULT_CONTACT_INFO.phone).replace(/[^\d+]/g, '')}`}
-                            className="px-7 py-4 bg-[#081C3A] hover:bg-[#0c2b59] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#081C3A]/50"
-                          >
-                            <Phone className="h-4.5 w-4.5 shrink-0" />
-                            <span>{mConfig.cost_call_label || 'Call For Details'}</span>
-                          </a>
-
-                          <a
-                            href={getGlobalWhatsAppUrl(`Hello Patel Dental Hospital, I would like to book a free consultation for "${service?.title || 'Dental Treatment'}". Please share the available appointment slots.`)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            referrerPolicy="no-referrer"
-                            className="px-7 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
-                          >
-                            <MessageCircle className="h-4.5 w-4.5 shrink-0" />
-                            <span>{mConfig.cost_whatsapp_label || 'WhatsApp Us'}</span>
-                          </a>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
                 {mConfig.show_google_reviews !== false && (
                   <GooglePatientReviews
                     heading={seoHeadings.reviews}
-                    reviews={UNIVERSAL_GOOGLE_REVIEWS}
+                    reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
                   />
                 )}
 
-                {/* Why Our Method Is Superior (Repositioned immediately after Google Reviews) */}
-                {(mConfig.show_benefits !== false && !isInvisibleAligners && !isSmileMakeover && !isCrownsAndBridges && !isTeethWhitening && !isPediatricDentistry && !isBracesTreatment && !isWisdomToothSurgery && !isToothColouredFilling) && (
-                  <div className="bg-[#F8FAFC] border border-[#E8EEF5] rounded-[32px] p-8 sm:p-12 space-y-6 sm:space-y-10" id="dental-implants-superior">
+                {/* Section 8: The Reconstruction Team for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-team-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50/90 border border-teal-100/60 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                        <Users className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        THE RECONSTRUCTION TEAM
+                      </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        {seoHeadings.whyChooseUs}
+                        Led by Dr. Vipul Patel & Clinical Team
                       </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        Full mouth rehabilitation is highly complex and requires expert planning. Dr. Vipul Patel personally plans your entire reconstruction to ensure correct bite function, joint harmony, and muscular symmetry.
+                      </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
-                      {displayFeatures.map((card, idx) => (
-                        <PremiumMedicalCard
-                          key={card.id || idx}
-                          icon={<CheckCircle2 />}
-                          title={card.title}
-                          imageUrl={card.image_url || card.image}
-                        >
-                          {card.description}
-                        </PremiumMedicalCard>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto items-stretch pt-4">
+                      {/* Left: Dr. Vipul Patel Main Card */}
+                      <div className="lg:col-span-7 bg-white border border-[#E8EEF5] rounded-[28px] p-6 sm:p-8 md:p-10 shadow-[0_12px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)] hover:border-[#14B8A6] transition-all duration-300 flex flex-col md:flex-row gap-6 sm:gap-8 relative overflow-hidden">
+                        <div className="absolute left-0 top-10 bottom-10 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        
+                        {/* Profile Image Column */}
+                        <div className="w-full md:w-2/5 shrink-0">
+                          <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 relative">
+                            <img 
+                              src={drVipulImg} 
+                              alt="Dr. Vipul Patel"
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                        </div>
 
-                {/* Section 10.5: Dental Implants Specific Frequently Asked Questions */}
-                {isDentalImplants && dentalImplantFaqSection}
+                        {/* Details Column */}
+                        <div className="flex flex-col justify-between space-y-4 text-left">
+                          <div className="space-y-2">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-teal-50 text-[#0D9488] text-xs font-semibold uppercase tracking-wider border border-teal-100/40">
+                              Chief Implantologist
+                            </span>
+                            <h3 className="font-sans font-black text-[#081C3A] text-2xl tracking-tight">
+                              Dr. Vipul Patel
+                            </h3>
+                            <p className="text-slate-500 text-xs sm:text-sm font-semibold uppercase tracking-wider leading-snug">
+                              MDS, Masters in Implantology (USA)
+                            </p>
+                            <div className="h-[1px] bg-slate-100 w-full pt-1" />
+                          </div>
 
-                {/* Section 11: Bottom Call To Action (100% CMS-driven, Premium full-width block) */}
-                {mConfig.show_sec11_cta !== false && (
-                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="sec11-bottom-cta">
-                    <div 
-                      className={`relative overflow-hidden rounded-3xl py-8 px-5 sm:py-16 sm:px-12 max-w-7xl mx-auto border text-center flex flex-col items-center justify-center gap-4 sm:gap-6 ${
-                        mConfig.sec11_bg_image 
-                          ? 'border-transparent bg-cover bg-center' 
-                          : 'border-slate-200/80 bg-gradient-to-br from-slate-900 via-[#081C3A] to-slate-900 text-white shadow-md'
-                      }`}
-                      style={mConfig.sec11_bg_image ? { backgroundImage: `url(${mConfig.sec11_bg_image})` } : {}}
-                    >
-                      {/* Dark Overlay for background image readability */}
-                      {mConfig.sec11_bg_image && (
-                        <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xs z-0" />
-                      )}
-                      
-                      <div className="relative z-10 max-w-3xl space-y-4">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-teal-300 uppercase tracking-widest px-3.5 py-1 bg-teal-500/20 rounded-full border border-teal-400/30">
-                          <Sparkles className="h-3.5 w-3.5 text-teal-300 shrink-0" />
-                          {isDentalImplants ? "DENTAL IMPLANT CONSULTATION" : "Clinical Consultation"}
-                        </span>
-                        <h2 className="font-sans font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-                          {isDentalImplants ? "Ready to Explore Your Dental Implant Options?" : seoHeadings.bottomCta}
-                        </h2>
-                        {isDentalImplants ? (
-                          <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
-                            Book a personalised consultation to discuss your oral condition, suitable treatment options, expected treatment timeline, and estimated treatment plan.
-                          </p>
-                        ) : mConfig.sec11_description && mConfig.sec11_description.trim() !== '' ? (
-                          <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto text-slate-200">
-                            {mConfig.sec11_description}
-                          </p>
-                        ) : null}
+                          <div className="space-y-3 flex-1">
+                            <div className="flex items-start gap-2 text-slate-600 text-xs sm:text-sm">
+                              <CheckCircle2 className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
+                              <span>Completed Masters in Implantology (USA) with extensive advanced surgery training.</span>
+                            </div>
+                            <div className="flex items-start gap-2 text-slate-600 text-xs sm:text-sm">
+                              <CheckCircle2 className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
+                              <span>Over 12 years of implant surgery and complex full mouth rehabilitation experience.</span>
+                            </div>
+                            <div className="flex items-start gap-2 text-slate-600 text-xs sm:text-sm">
+                              <CheckCircle2 className="h-4.5 w-4.5 text-[#0D9488] shrink-0 mt-0.5" />
+                              <span>Active Life Member of Indian Society of Oral Implantology (ISOI).</span>
+                            </div>
+                          </div>
+
+                          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <span className="inline-flex items-center gap-1.5 text-xs text-[#0D9488] font-bold tracking-wide">
+                              <Award className="h-4 w-4 shrink-0" />
+                              Certified USA Diplomate & Fellow
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (setCurrentPage) {
+                                  setCurrentPage('doctors');
+                                }
+                                window.location.hash = 'doctors';
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-sm hover:shadow transition-all duration-300 cursor-pointer text-center"
+                            >
+                              LEARN MORE
+                            </button>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto min-w-[280px] sm:min-w-0 justify-center items-stretch sm:items-center mt-2">
-                        <button
-                          type="button"
-                          onClick={() => openAppointmentModal(service?.title || (isToothColouredFilling ? 'Tooth Coloured Filling' : isWisdomToothSurgery ? 'Wisdom Tooth Surgery' : isBracesTreatment ? 'Braces Treatment' : isSmileMakeover ? 'Smile Makeover' : isInvisibleAligners ? 'Invisible Aligners' : isRootCanal ? 'Single Sitting Root Canal' : isFullMouth ? 'Full Mouth Rehabilitation' : 'Dental Implants'))}
-                          className="px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
-                        >
-                          <Calendar className="h-4.5 w-4.5 shrink-0" />
-                          <span>{isDentalImplants ? 'BOOK YOUR CONSULTATION' : (mConfig.sec11_primary_label || 'Free Consultation')}</span>
-                          <ArrowRight className="h-4 w-4 shrink-0" />
-                        </button>
+                      {/* Right: FMR-specific supporting cards */}
+                      <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+                        {/* Bullet 1: Both surgeons, every case */}
+                        <div className="bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-6 shadow-[0_12px_35px_rgba(15,23,42,0.04)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)] hover:border-[#14B8A6]/60 transition-all duration-300 flex items-start gap-4 text-left relative overflow-hidden">
+                          <div className="absolute left-0 top-4 bottom-4 w-[4px] rounded-r-[4px] bg-[#14B8A6]" />
+                          <div className="h-10 w-10 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] border border-teal-100/60 shrink-0 mt-0.5">
+                            <Stethoscope className="h-5 w-5" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-sans font-bold text-[#081C3A] text-base leading-snug">
+                              Both Surgeons, Every Case
+                            </h4>
+                            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-medium">
+                              Your treatment is planned and performed collaboratively by our clinical leadership: Dr. Vipul Patel (MDS) and Dr. Kinjal Patel (BDS).
+                            </p>
+                          </div>
+                        </div>
 
-                        <a
-                          href={getGlobalWhatsAppUrl(`Hello Patel Dental Hospital, I would like to book a free consultation for "${service?.title || 'Dental Treatment'}". Please share the available appointment slots.`)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          referrerPolicy="no-referrer"
-                          className="px-8 py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center gap-2 cursor-pointer active:scale-98 focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
-                        >
-                          <MessageCircle className="h-4.5 w-4.5 shrink-0" />
-                          <span>{isDentalImplants ? 'CHAT ON WHATSAPP' : (mConfig.sec11_secondary_label || 'Chat on WhatsApp')}</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                        {/* Bullet 2: One coordinated plan */}
+                        <div className="bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-6 shadow-[0_12px_35px_rgba(15,23,42,0.04)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)] hover:border-[#14B8A6]/60 transition-all duration-300 flex items-start gap-4 text-left relative overflow-hidden">
+                          <div className="absolute left-0 top-4 bottom-4 w-[4px] rounded-r-[4px] bg-[#14B8A6]" />
+                          <div className="h-10 w-10 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] border border-teal-100/60 shrink-0 mt-0.5">
+                            <Layers className="h-5 w-5" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-sans font-bold text-[#081C3A] text-base leading-snug">
+                              One Coordinated Plan
+                            </h4>
+                            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-medium">
+                              Your full-mouth reconstruction is designed as a single coordinated workflow to ensure correct bite function, joint alignment, and consistent smile symmetry.
+                            </p>
+                          </div>
+                        </div>
 
-                {/* Section 12: Frequently Asked Questions (FAQ) (100% CMS-driven premium accordion) */}
-                {(!isDentalImplants && mConfig.show_faq_sec !== false) && (
-                  <div className="pt-6 sm:pt-14 border-t border-slate-200/60 animate-fade-in" id="sec12-faq">
-                    <div className="max-w-4xl mx-auto px-2 sm:px-4 space-y-5 sm:space-y-8">
-                      <div className="text-center space-y-3">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                          <HelpCircle className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                          Patient Support & Info
-                        </span>
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
-                          {seoHeadings.faq}
-                        </h2>
-                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                      </div>
-
-                      <div className="space-y-3.5">
-                        {(Array.isArray(mConfig.faqs) && mConfig.faqs.length > 0 ? mConfig.faqs : faqs)
-                          .filter((faq: any) => faq && faq.enabled !== false && faq.question && faq.question.trim() !== '')
-                          .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0))
-                          .map((faq: any, idx: number) => {
-                            const isExpanded = expandedImplantFaqId === faq.id;
-                            return (
-                              <div 
-                                key={faq.id || idx}
-                                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-300 ${
-                                  isExpanded 
-                                    ? 'border-[#0D9488] shadow-xs' 
-                                    : 'border-slate-200/80 hover:border-slate-300 shadow-2xs'
-                                }`}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedImplantFaqId(isExpanded ? null : faq.id)}
-                                  aria-expanded={isExpanded}
-                                  className="w-full px-6 py-4.5 flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/40"
-                                >
-                                  <span className={`font-sans font-bold text-sm sm:text-base leading-snug pr-4 transition-colors duration-200 ${
-                                    isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
-                                  }`}>
-                                    {faq.question}
-                                  </span>
-                                  <span className={`p-1.5 rounded-lg shrink-0 transition-all duration-300 ${
-                                    isExpanded ? 'bg-teal-50 text-[#0D9488] rotate-180' : 'bg-slate-100 text-slate-500'
-                                  }`}>
-                                    <ChevronDown className="h-4 w-4" />
-                                  </span>
-                                </button>
-
-                                <AnimatePresence initial={false}>
-                                  {isExpanded && (
-                                    <motion.div
-                                      initial={{ height: 0, opacity: 0 }}
-                                      animate={{ height: 'auto', opacity: 1 }}
-                                      exit={{ height: 0, opacity: 0 }}
-                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                    >
-                                      <div className="px-6 pb-5 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/80 bg-slate-50/40">
-                                        <p className="whitespace-pre-line font-medium font-sans">
-                                          {faq.answer}
-                                        </p>
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            );
-                          })}
+                        {/* Bullet 3: Written cost, honoured */}
+                        <div className="bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-6 shadow-[0_12px_35px_rgba(15,23,42,0.04)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)] hover:border-[#14B8A6]/60 transition-all duration-300 flex items-start gap-4 text-left relative overflow-hidden">
+                          <div className="absolute left-0 top-4 bottom-4 w-[4px] rounded-r-[4px] bg-[#14B8A6]" />
+                          <div className="h-10 w-10 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] border border-teal-100/60 shrink-0 mt-0.5">
+                            <FileText className="h-5 w-5" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-sans font-bold text-[#081C3A] text-base leading-snug">
+                              Written Cost, Honoured
+                            </h4>
+                            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-medium">
+                              Receive an itemised, completely transparent written treatment estimate before we begin. No hidden charges, completely predictable investment.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
+
+                {/* Section 9: Advanced Rehabilitation Technology for Full Mouth Rehabilitation */}
+                {isFullMouth && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="fmr-technology-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50/90 border border-teal-100/60 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        ADVANCED REHABILITATION TECHNOLOGY
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Precision Digital Technology Designed Around Your Treatment
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        Digital diagnostic mapping and CAD/CAM fabrication help your treatment team execute your full mouth rehabilitation with greater safety, comfort, and perfect bite alignment.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto items-stretch">
+                      {/* Card 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          3D CBCT Scan & Mapping
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Full 3D mapping of jawbone depth, density, and nerve pathways to plan optimal implant anchors and avoid critical anatomical structures.
+                        </p>
+                      </div>
+
+                      {/* Card 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Digital Intraoral Scanners
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Replaces messy physical mouth molds with a seamless, highly precise 3D digital scanner to capture comfortable, ultra-accurate models of your mouth.
+                        </p>
+                      </div>
+
+                      {/* Card 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          In-House CAD/CAM Milling
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Our clinical lab designs and mills premium, highly biological zirconia arches with computer-aided manufacturing for seamless, heavy-duty durability.
+                        </p>
+                      </div>
+
+                      {/* Card 4 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Bite Height & TMJ Diagnostics
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Advanced diagnostics to measure jaw joint orientation, ensuring your new teeth restore your optimal biological bite height and relieve TMJ stress.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dental Implants: Why Patel Dental / Why This Doctor Section */}
+                {isDentalImplants && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-why-patel-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        WHY PATEL DENTAL
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Advanced Implant Expertise Focused on Your Treatment
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        Your dental implant treatment is planned with advanced implantology expertise, digital planning and techniques designed to provide precise, personalised care.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto items-stretch">
+                      {/* Card 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Advanced Oral Implantology
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Immediate loading and complete fixed-teeth replacement approaches planned according to your clinical needs.
+                        </p>
+                      </div>
+
+                      {/* Card 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Digital & Guided Implant Planning
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Digital planning and guided surgical techniques help the team plan implant placement with greater precision.
+                        </p>
+                      </div>
+
+                      {/* Card 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Bone Grafting & Sinus Lift Expertise
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Advanced bone-regeneration and sinus-augmentation techniques are available when additional preparation is required.
+                        </p>
+                      </div>
+
+                      {/* Card 4 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Immediate Loading & Fixed Teeth
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Specialised implant protocols support fixed-teeth treatment options where clinically appropriate.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom Reassurance */}
+                    <div className="max-w-3xl mx-auto text-center pt-2">
+                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                        Your treatment plan is personalised after clinical examination and appropriate diagnostic assessment.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dental Implants: Technology — Patient Benefit Section */}
+                {isDentalImplants && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="dental-implants-technology-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        ADVANCED IMPLANT TECHNOLOGY
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        Advanced Technology Designed Around Your Implant Treatment
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        Digital planning and guided implant techniques help your treatment team plan implant placement with greater precision and a more controlled surgical approach.
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto items-stretch">
+                      {/* Card 1 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <Cpu className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Digital & Guided Surgery
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Digital planning and guided surgery support precise implant placement and help create a more controlled treatment approach.
+                        </p>
+                      </div>
+
+                      {/* Card 2 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <Activity className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          CBCT-Based Digital Workflow
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          CBCT-based digital planning helps the treatment team assess the implant site and plan the surgical workflow before treatment.
+                        </p>
+                      </div>
+
+                      {/* Card 3 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <Sparkles className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Immediate Loading Protocols
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Advanced immediate-loading protocols can support fixed teeth solutions when clinically appropriate.
+                        </p>
+                      </div>
+
+                      {/* Card 4 */}
+                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
+                        <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
+                        <div className="h-11 w-11 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] mb-5 border border-teal-100/60 shrink-0">
+                          <Layers className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
+                          Bone & Soft Tissue Planning
+                        </h3>
+                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
+                          Advanced bone and soft-tissue techniques help prepare challenging implant sites when additional treatment is required.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 11: FAQ Accordion */}
+                {faqElement}
+
+                {/* Section 12: Bottom CTA */}
+                {bottomCtaElement}
+
+                {/* Section 13: Related Services (FINAL CONTENT SECTION, immediately ABOVE Footer) */}
+                {relatedServicesElement}
               </div>
             );
           }
 
           return (
-            <div className="space-y-10">
-              {/* Pre-Grid Outer Sections */}
-              {outerBeforeGridKeys.map(key => (
-                <React.Fragment key={key}>
-                  {getSectionNode(key)}
-                </React.Fragment>
-              ))}
+            <div className="space-y-8 sm:space-y-16 lg:space-y-20">
+              {heroElement}
+              {featuredVideoElement}
 
-              {/* 2-Column Grid Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                {/* Main Left Column (Inner ordered sections) */}
-                <div className="lg:col-span-2 space-y-10">
-                  {innerGridKeys.map(key => (
-                    <React.Fragment key={key}>
-                      {getSectionNode(key)}
-                    </React.Fragment>
-                  ))}
-                </div>
-
-                {/* Sticky Right Sidebar (Preserves premium UI) */}
-                <div className="space-y-6 lg:sticky lg:top-24">
-                  {/* Quick Consultation Booking Box */}
-                  <div className="bg-gradient-to-br from-[#081C3A] to-[#0A264F] text-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-750 relative overflow-hidden space-y-5">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl -translate-y-1/3 translate-x-1/3 pointer-events-none" />
-                    
-                    <div className="space-y-2 relative z-10">
-                      <span className="text-[10px] text-teal-400 font-bold uppercase tracking-widest block">
-                        Quick Actions
-                      </span>
-                      <h4 className="font-display font-black text-xl leading-tight">
-                        Instant Solution Consultant
-                      </h4>
-                      <p className="text-slate-300 text-[11px] leading-relaxed">
-                        Secure a clinical reservation or discuss treatment estimates with our desk assistants immediately.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3 pt-2 relative z-10">
-                      <button
-                        onClick={() => openAppointmentModal(service.title)}
-                        className="w-full py-3.5 px-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 group active:scale-98"
-                      >
-                        <Calendar className="h-4 w-4" />
-                        <span>Book Clinic Slot</span>
-                        <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-
-                      <a
-                        href={getWhatsAppUrl()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-3.5 px-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                        <span>WhatsApp Assistant</span>
-                      </a>
-                    </div>
-
-                    {/* Guarantees / High trust badges */}
-                    <div className="border-t border-slate-800/80 pt-4 mt-2 space-y-2.5 relative z-10 text-[10px] text-slate-300 font-medium">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                        <span>100% Sterile Consultation Environment</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                        <span>Flexible Clinical Financing Options</span>
-                      </div>
-                    </div>
+              {/* Section 5: Interactive Before & After Smile Transformations */}
+              {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
+                <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
+                  <div className="space-y-3 max-w-3xl mx-auto text-center">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                      <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                      Transformations
+                    </span>
+                    <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                      {seoHeadings.transformations}
+                    </h2>
+                    <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+                      {mConfig.before_after_description || (isToothColouredFilling ? 'See real composite filling tooth restoration results.' : isWisdomToothSurgery ? 'See real smile transformations of our wisdom tooth surgery patients.' : isBracesTreatment ? 'See real smile transformations of our braces treatment patients.' : isSmileMakeover ? 'See real smile transformations of our smile makeover patients.' : isInvisibleAligners ? 'See real smile transformations of our invisible aligners patients.' : isFullMouth ? 'See real smile transformations of our full mouth rehabilitation patients.' : 'See real smile transformations of our patients.')}
+                    </p>
+                    <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                   </div>
 
-                  {/* Dynamic Helpline and Contact Card */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden space-y-5">
-                    <div className="space-y-1.5">
-                      <span className="text-[9px] text-teal-400 font-black uppercase tracking-widest block">
-                        Direct Helpline
-                      </span>
-                      <h4 className="font-display font-black text-lg leading-tight">
-                        Reach Patel Dental Hosp.
-                      </h4>
-                    </div>
-
-                    <div className="space-y-3.5 text-xs text-slate-300">
-                      <a 
-                        href={`tel:${(mConfig.contact_call_number || contactInfo.phoneRaw).replace(/\s+/g, '')}`} 
-                        className="flex items-start gap-2.5 hover:text-white transition group"
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
+                    {beforeAfterPairs.map((pair, pIdx) => (
+                      <div 
+                        key={pair.id || pIdx} 
+                        className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
                       >
-                        <Phone className="h-4 w-4 text-teal-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                        <div className="min-w-0">
-                          <span className="block text-[10px] text-slate-500 font-bold uppercase">Call Emergency Desk</span>
-                          <span className="font-black text-[13px]">{mConfig.contact_call_number || contactInfo.phone}</span>
-                        </div>
-                      </a>
-
-                      {(mConfig.contact_email || mConfig.contact_email === undefined) && (
-                        <a 
-                          href={`mailto:${mConfig.contact_email || contactInfo?.email || 'Pateldentalhospital1@gmail.com'}`}
-                          className="flex items-start gap-2.5 hover:text-white transition group"
-                        >
-                          <Mail className="h-4 w-4 text-teal-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                          <div className="min-w-0 flex-1">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase">Send Clinical Mail</span>
-                            <span className="truncate block font-semibold">{mConfig.contact_email || contactInfo?.email || 'Pateldentalhospital1@gmail.com'}</span>
-                          </div>
-                        </a>
-                      )}
-
-                      {(mConfig.contact_address || mConfig.contact_address === undefined) && (
-                        <div className="flex items-start gap-2.5">
-                          <MapPin className="h-4 w-4 text-teal-400 shrink-0 mt-0.5" />
-                          <div className="min-w-0 flex-1">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase">Physical Location</span>
-                            <p className="text-[11px] leading-relaxed font-semibold">
-                              {mConfig.contact_address || `${clinicName}, Rajkot, Gujarat`}
-                            </p>
-                            {mConfig.contact_map_url && (
-                              <a 
-                                href={mConfig.contact_map_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[#0D9488] hover:text-[#0F766E] text-[10px] font-black mt-1.5 transition uppercase tracking-wider"
-                              >
-                                View Interactive Map &rarr;
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Working Hours Override */}
-                      {mConfig.contact_working_hours && (
-                        <div className="flex items-start gap-2.5 pt-2.5 border-t border-slate-800/80">
-                          <Calendar className="h-4 w-4 text-teal-400 shrink-0 mt-0.5" />
-                          <div className="min-w-0 flex-1">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase">Working Hours</span>
-                            <p className="text-[11px] leading-relaxed font-semibold text-slate-200">
-                              {mConfig.contact_working_hours}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Dynamic Follow Us Social block in Sidebar */}
-                    <div className="border-t border-slate-800/80 pt-4 mt-2 space-y-2.5">
-                      <span className="block text-[10px] text-slate-500 font-bold uppercase">Connect With Specialists</span>
-                      <div className="flex items-center gap-2">
-                        {(() => {
-                          const showFb = mConfig.social_fb_enabled !== undefined ? !!mConfig.social_fb_enabled : true;
-                          const showIg = mConfig.social_ig_enabled !== undefined ? !!mConfig.social_ig_enabled : true;
-                          const showYt = false;
-                          const showLi = mConfig.social_li_enabled !== undefined ? !!mConfig.social_li_enabled : false;
-                          const showTw = mConfig.social_tw_enabled !== undefined ? !!mConfig.social_tw_enabled : false;
-                          const showWa = mConfig.social_wa_enabled !== undefined ? !!mConfig.social_wa_enabled : false;
-
-                          return (
-                            <>
-                              {showFb && (
-                                <a 
-                                  href={mConfig.social_fb_link || "https://facebook.com"} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"
-                                  title="Connect on Facebook"
-                                >
-                                  <Facebook className="h-3.5 w-3.5" />
-                                </a>
-                              )}
-                              {showIg && (
-                                <a 
-                                  href={mConfig.social_ig_link || "https://instagram.com"} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"
-                                  title="Connect on Instagram"
-                                >
-                                  <Instagram className="h-3.5 w-3.5" />
-                                </a>
-                              )}
-                              {showYt && (
-                                <a 
-                                  href={mConfig.social_yt_link || "https://youtube.com"} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"
-                                  title="Watch on Youtube"
-                                >
-                                  <Youtube className="h-3.5 w-3.5" />
-                                </a>
-                              )}
-                              {showLi && (
-                                <a 
-                                  href={mConfig.social_li_link || "https://linkedin.com"} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"
-                                  title="Connect on Linkedin"
-                                >
-                                  <Linkedin className="h-3.5 w-3.5" />
-                                </a>
-                              )}
-                              {showTw && (
-                                <a 
-                                  href={mConfig.social_tw_link || "https://twitter.com"} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"
-                                  title="Connect on Twitter"
-                                >
-                                  <Twitter className="h-3.5 w-3.5" />
-                                </a>
-                              )}
-                              {showWa && (
-                                <a 
-                                  href={mConfig.social_wa_link && mConfig.social_wa_link.trim() !== '' && mConfig.social_wa_link !== 'https://wa.me' ? mConfig.social_wa_link : getGlobalWhatsAppUrl()} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 bg-slate-800 hover:bg-[#0D9488] rounded-lg transition text-slate-400 hover:text-white"
-                                  title="Message on WhatsApp"
-                                >
-                                  <MessageSquare className="h-3.5 w-3.5" />
-                                </a>
-                              )}
-                            </>
-                          );
-                        })()}
+                        <BeforeAfterSlider
+                          beforeImage={pair.before_image}
+                          afterImage={pair.after_image}
+                          caption={pair.caption}
+                        />
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Post-Grid Outer Sections */}
-              {outerAfterGridKeys.map(key => (
-                <React.Fragment key={key}>
-                  {getSectionNode(key)}
-                </React.Fragment>
-              ))}
+              {/* Section 6: Clinical Case Gallery */}
+              {galleryElement}
+
+              {/* Section 6: Procedure Video (Loaded dynamically from CMS Instagram Reel) */}
+              {videoElement}
+
+              {/* Section 7: Patient Testimonial Reels */}
+              {testimonialsElement}
+
+              {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
+              {mConfig.show_google_reviews !== false && (
+                <GooglePatientReviews
+                  heading={seoHeadings.reviews}
+                  reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+                />
+              )}
             </div>
           );
         })()}
-
-        {/* Dynamic Floating Mobile Contact Bar */}
-        {(mConfig.contact_bar_show && !isNewArchitecture) && (
-          <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden animate-fade-in-up" id="mobile-floating-contact-bar">
-            <div className="bg-white/95 backdrop-blur-md border border-slate-200/85 rounded-2xl p-2.5 shadow-xl flex items-center gap-2 justify-around max-w-md mx-auto">
-              {mConfig.contact_bar_call_enabled && (
-                <a
-                  href={`tel:${(mConfig.contact_call_number || contactInfo.phoneRaw).replace(/\s+/g, '')}`}
-                  className="flex-1 py-3 px-3 bg-[#081C3A] text-white rounded-xl text-center font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs hover:bg-slate-900 transition active:scale-95"
-                >
-                  <Phone className="h-3.5 w-3.5" />
-                  <span>Call</span>
-                </a>
-              )}
-              {mConfig.contact_bar_whatsapp_enabled && (
-                <a
-                  href={getWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-3 px-3 bg-[#25D366] text-white rounded-xl text-center font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs hover:bg-[#20BA5A] transition active:scale-95"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" />
-                  <span>WhatsApp</span>
-                </a>
-              )}
-              {mConfig.contact_bar_appointment_enabled && (
-                <button
-                  onClick={() => openAppointmentModal(`${service.title} - Floating Bar`)}
-                  className="flex-1 py-3 px-3 bg-[#0D9488] text-white rounded-xl text-center font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs hover:bg-[#0F766E] transition active:scale-95 cursor-pointer"
-                >
-                  <Calendar className="h-3.5 w-3.5" />
-                  <span>Book Slot</span>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
 
       </div>
 
