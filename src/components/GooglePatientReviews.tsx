@@ -164,13 +164,31 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
     touchCurrentX.current = null;
   };
 
-  const displayReviews = activeReviews.length > 0
-    ? [
-        ...activeReviews.slice(-Math.min(3, activeReviews.length)),
-        ...activeReviews,
-        ...activeReviews.slice(0, Math.min(3, activeReviews.length)),
-      ]
-    : [];
+  // Check if sliding is required based on screen size and number of active reviews
+  const isSliderNeeded = activeReviews.length > visibleCards;
+
+  const displayReviews = React.useMemo(() => {
+    if (activeReviews.length === 0) return [];
+    
+    // Always prepend and append exactly 3 wrapped elements to maintain consistent index offset (currentIndex + 3)
+    const prepended = [
+      activeReviews[(activeReviews.length - 3 + activeReviews.length * 10) % activeReviews.length],
+      activeReviews[(activeReviews.length - 2 + activeReviews.length * 10) % activeReviews.length],
+      activeReviews[(activeReviews.length - 1 + activeReviews.length * 10) % activeReviews.length]
+    ];
+    
+    const appended = [
+      activeReviews[0 % activeReviews.length],
+      activeReviews[1 % activeReviews.length],
+      activeReviews[2 % activeReviews.length]
+    ];
+    
+    return [
+      ...prepended,
+      ...activeReviews,
+      ...appended
+    ];
+  }, [activeReviews]);
 
   let stepPercent = '33.3333%';
   let stepPx = 8;
@@ -190,6 +208,75 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
     transitionDuration: `${isReducedMotion ? 0 : transitionDuration}ms`,
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
     willChange: 'transform',
+  };
+
+  const renderCardContent = (review: Review) => {
+    return (
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 h-full flex flex-col justify-between shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300">
+        <div className="space-y-4">
+          {/* Rating & Date */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4.5 w-4.5 ${
+                    i < (review.rating || 5)
+                      ? 'text-amber-400 fill-amber-400'
+                      : 'text-slate-200 fill-slate-200'
+                  }`}
+                />
+              ))}
+            </div>
+            {review.review_date && review.review_date.trim() !== '' && (
+              <span className="text-[11px] text-slate-400 font-extrabold tracking-tight">
+                {review.review_date}
+              </span>
+            )}
+          </div>
+
+          {/* Review Text */}
+          <p className="text-slate-600 text-sm leading-relaxed font-medium whitespace-pre-line">
+            "{review.review_text}"
+          </p>
+        </div>
+
+        {/* Patient Profile & View Link */}
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 gap-3">
+          <div className="flex items-center gap-3">
+            {review.patient_photo_url && review.patient_photo_url.trim() !== '' ? (
+              <img
+                src={review.patient_photo_url}
+                alt={review.patient_name}
+                className="h-10 w-10 rounded-full object-cover border border-slate-200 shadow-3xs shrink-0"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-full bg-[#0D9488]/5 border border-[#0D9488]/15 text-[#0D9488] font-black flex items-center justify-center text-xs shrink-0 select-none">
+                {review.patient_name ? review.patient_name.slice(0, 2).toUpperCase() : 'PT'}
+              </div>
+            )}
+            <div className="min-w-0">
+              <h4 className="text-[#081C3A] font-black text-sm leading-tight truncate">
+                {review.patient_name}
+              </h4>
+              <span className="text-[10px] text-[#0D9488] font-bold block mt-0.5 uppercase tracking-wide">Google Reviewer</span>
+            </div>
+          </div>
+
+          {review.review_url && review.review_url.trim() !== '' && (
+            <a
+              href={review.review_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center shrink-0 gap-1 text-[11px] font-black text-[#0D9488] hover:text-[#0F766E] px-3 py-1.5 rounded-xl bg-teal-50/50 hover:bg-teal-50 transition duration-200 border border-teal-100/50 shadow-3xs"
+            >
+              <span>View on Google</span>
+            </a>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -214,7 +301,7 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
           <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto sm:mx-0 mt-3" />
         </div>
 
-        {activeReviews.length > 1 && (
+        {isSliderNeeded && (
           <div className="flex items-center justify-center gap-2.5">
             <button
               onClick={handlePrev}
@@ -236,93 +323,43 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
         )}
       </div>
 
-      {/* Cards Sliders: Desktop (3), Tablet (2), Mobile (1) */}
+      {/* Cards Slider / Static Grid Layout */}
       {activeReviews.length > 0 && (
         <div 
           className="relative max-w-7xl mx-auto overflow-hidden px-1 py-4"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div 
-            className="flex gap-6 items-stretch"
-            style={trackStyle}
-            onTransitionEnd={handleTransitionEnd}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {displayReviews.map((review, idx) => (
-              <div
-                key={`${review.id || idx}-cloned-${idx}`}
-                className="review-card-item shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
-              >
-                <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-8 h-full flex flex-col justify-between shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300">
-                  <div className="space-y-4">
-                    {/* Rating & Date */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4.5 w-4.5 ${
-                              i < (review.rating || 5)
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-200 fill-slate-200'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      {review.review_date && review.review_date.trim() !== '' && (
-                        <span className="text-[11px] text-slate-400 font-extrabold tracking-tight">
-                          {review.review_date}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Review Text */}
-                    <p className="text-slate-600 text-sm leading-relaxed font-medium whitespace-pre-line">
-                      "{review.review_text}"
-                    </p>
-                  </div>
-
-                  {/* Patient Profile & View Link */}
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 gap-3">
-                    <div className="flex items-center gap-3">
-                      {review.patient_photo_url && review.patient_photo_url.trim() !== '' ? (
-                        <img
-                          src={review.patient_photo_url}
-                          alt={review.patient_name}
-                          className="h-10 w-10 rounded-full object-cover border border-slate-200 shadow-3xs shrink-0"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full bg-[#0D9488]/5 border border-[#0D9488]/15 text-[#0D9488] font-black flex items-center justify-center text-xs shrink-0 select-none">
-                          {review.patient_name.slice(0, 2).toUpperCase()}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <h4 className="text-[#081C3A] font-black text-sm leading-tight truncate">
-                          {review.patient_name}
-                        </h4>
-                        <span className="text-[10px] text-[#0D9488] font-bold block mt-0.5 uppercase tracking-wide">Google Reviewer</span>
-                      </div>
-                    </div>
-
-                    {review.review_url && review.review_url.trim() !== '' && (
-                      <a
-                        href={review.review_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center shrink-0 gap-1 text-[11px] font-black text-[#0D9488] hover:text-[#0F766E] px-3 py-1.5 rounded-xl bg-teal-50/50 hover:bg-teal-50 transition duration-200 border border-teal-100/50 shadow-3xs"
-                      >
-                        <span>View on Google</span>
-                      </a>
-                    )}
-                  </div>
+          {isSliderNeeded ? (
+            <div 
+              className="flex gap-6 items-stretch"
+              style={trackStyle}
+              onTransitionEnd={handleTransitionEnd}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {displayReviews.map((review, idx) => (
+                <div
+                  key={`${review.id || idx}-cloned-${idx}`}
+                  className="review-card-item shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+                >
+                  {renderCardContent(review)}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto">
+              {activeReviews.map((review, idx) => (
+                <div
+                  key={review.id || idx}
+                  className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-md"
+                >
+                  {renderCardContent(review)}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
