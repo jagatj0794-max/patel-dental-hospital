@@ -106,7 +106,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
       >
         {/* After Image (Background) */}
         <img
-          src={afterImage}
+          src={afterImage || null}
           alt="After Treatment Result"
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
           loading="lazy"
@@ -119,7 +119,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           style={{ width: `${sliderPosition}%` }}
         >
           <img
-            src={beforeImage}
+            src={beforeImage || null}
             alt="Before Treatment Condition"
             style={{
               width: containerWidth,

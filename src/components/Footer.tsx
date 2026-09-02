@@ -179,8 +179,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                     <span className="text-white font-medium block">04:00 PM – 08:00 PM</span>
                   </div>
                   <div className="pt-1.5 border-t border-white/[0.06]">
-                    <span className="text-[10px] text-amber-400 font-bold block uppercase tracking-wider">Sunday Schedule</span>
-                    <span className="text-slate-400 block mt-0.5 font-medium italic">Prior Appointments Only</span>
+                    <span className="text-amber-400 block mt-0.5 font-semibold">Sunday Off</span>
                   </div>
                 </div>
               </div>

@@ -98,7 +98,7 @@ export default function Lightbox({ item, onClose, items, setCurrentIndex }: Ligh
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                   <div className="relative rounded-xl overflow-hidden border border-slate-800 h-[180px] md:h-[300px]">
                     <img
-                      src={item.beforeImg}
+                      src={item.beforeImg || null}
                       alt="Before"
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover"
@@ -109,7 +109,7 @@ export default function Lightbox({ item, onClose, items, setCurrentIndex }: Ligh
                   </div>
                   <div className="relative rounded-xl overflow-hidden border border-slate-800 h-[180px] md:h-[300px]">
                     <img
-                      src={item.afterImg}
+                      src={item.afterImg || null}
                       alt="After"
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover"

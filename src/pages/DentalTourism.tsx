@@ -1765,7 +1765,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 {/* 16:9 Image container with Zoom effect */}
                 <div className="aspect-[16/9] w-full overflow-hidden bg-slate-50 relative">
                   <img
-                    src={dest.image}
+                    src={dest.image || null}
                     alt={dest.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     referrerPolicy="no-referrer"
@@ -1956,7 +1956,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                   onClick={() => setSelectedPatient(patient)}
                 >
                   <img
-                    src={patient.image_url}
+                    src={patient.image_url || null}
                     alt="Happy Patient"
                     className="w-full h-auto object-contain rounded-[inherit] block bg-slate-50/50"
                     referrerPolicy="no-referrer"
@@ -2225,7 +2225,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={selectedPatient.image_url}
+              src={selectedPatient?.image_url || null}
               alt="Patient Gallery Full"
               className="max-h-[80vh] w-auto max-w-full object-contain rounded-2xl block"
               referrerPolicy="no-referrer"

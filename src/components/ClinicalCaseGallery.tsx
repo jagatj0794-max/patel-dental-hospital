@@ -92,7 +92,7 @@ const SlideCard: React.FC<SlideCardProps> = ({ item, category, index, onClick })
           </div>
         )}
         <img
-          src={item.image_url}
+          src={item.image_url || null}
           alt={item.caption || item.title || `${category} Case ${index + 1}`}
           onLoad={() => setIsLoaded(true)}
           draggable={false}
@@ -408,7 +408,7 @@ const PremiumLightbox: React.FC<PremiumLightboxProps> = ({ items, initialIndex, 
 
           {activeItem && (
             <img
-              src={activeItem.image_url}
+              src={activeItem.image_url || null}
               alt={activeItem.caption || activeItem.title || 'Clinical case'}
               onLoad={() => setIsLoading(false)}
               style={{
@@ -468,7 +468,7 @@ const PremiumLightbox: React.FC<PremiumLightboxProps> = ({ items, initialIndex, 
                     : 'border-slate-800 opacity-50 hover:opacity-100'
                 }`}
               >
-                <img src={item.image_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img src={item.image_url || null} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </button>
             ))}
           </div>
@@ -710,7 +710,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
                 }`}
               >
                 <img
-                  src={item.image_url}
+                  src={item.image_url || null}
                   alt={`Thumbnail ${idx + 1}`}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"

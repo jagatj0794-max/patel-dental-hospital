@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { dentalImplantsFaqs, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs } from '../data/serviceFaqs';
+import { dentalImplantsFaqs, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs, pediatricDentistryFaqs } from '../data/serviceFaqs';
 
 export interface ServiceSEOData {
   title: string;
@@ -237,7 +237,21 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string)
         description: sDesc,
         keywords: 'Child Dentist, Kids Dentist, Pediatric Dentist, Children\'s Dental Care, Kids Dentist Rajkot, Pediatric Dentist Rajkot, Cavity Prevention, Preventive Dentistry, Patel Dental Hospital',
         canonicalUrl,
-        schema: createSchema(sTitle, sDesc)
+        schema: [
+          ...createSchema(sTitle, sDesc),
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": pediatricDentistryFaqs.map((faq) => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+              }
+            }))
+          }
+        ]
       };
     }
     case 'braces-treatment': {

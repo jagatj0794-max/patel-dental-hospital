@@ -303,3 +303,76 @@ export const crownsBridgesFaqs: ServiceFaq[] = [
   }
 ];
 
+export const pediatricDentistryFaqs: ServiceFaq[] = [
+  {
+    id: 'pediatric-faq-1',
+    service_id: 'pediatric-dentistry',
+    question: 'Why should baby teeth be treated if they will eventually fall out?',
+    answer: 'Baby teeth remain important until the permanent teeth naturally replace them. Early tooth loss or untreated dental decay can negatively affect the developing permanent teeth, jaw alignment, and spacing.',
+    display_order: 10
+  },
+  {
+    id: 'pediatric-faq-2',
+    service_id: 'pediatric-dentistry',
+    question: 'When should my child have their first dental visit?',
+    answer: 'The first visit should occur by their first birthday or when their first tooth appears. Building familiarity with the dental clinic early helps prevent future anxiety.',
+    display_order: 20
+  },
+  {
+    id: 'pediatric-faq-3',
+    service_id: 'pediatric-dentistry',
+    question: 'What happens during my child\'s first visit?',
+    answer: 'The first visit is a gentle, obligation-free consultation. No clinical treatment is performed on day one unless there is an urgent need. We focus on building familiarity with the environment, checking developing teeth, and providing guidance on dental toys and routines.',
+    display_order: 30
+  },
+  {
+    id: 'pediatric-faq-4',
+    service_id: 'pediatric-dentistry',
+    question: 'How can you treat a child who is frightened or anxious?',
+    answer: 'We never rush a frightened child. Dr. Kinjal Patel has a particular focus on pediatric dentistry and anxious patients to build trust slowly at their own comfortable pace. We use dental toys and colouring activities to keep the visit playful.',
+    display_order: 40
+  },
+  {
+    id: 'pediatric-faq-5',
+    service_id: 'pediatric-dentistry',
+    question: 'Can I stay with my child during the appointment?',
+    answer: 'Yes. Parents can stay with their child throughout the entire appointment, providing constant emotional support, reassurance, and full visibility.',
+    display_order: 50
+  },
+  {
+    id: 'pediatric-faq-6',
+    service_id: 'pediatric-dentistry',
+    question: 'Will you force or restrain my child if they are scared?',
+    answer: 'No. Frightened children are never restrained or forced. If a child is not ready, familiarity is built gently over multiple comfortable visits to ensure a positive, trust-based long-term attitude.',
+    display_order: 60
+  },
+  {
+    id: 'pediatric-faq-7',
+    service_id: 'pediatric-dentistry',
+    question: 'What happens if my child is not ready for treatment?',
+    answer: 'We never force care. If your child is not ready, we will schedule short, low-pressure visits purely to build familiarity and trust, allowing them to progress at their own comfortable pace.',
+    display_order: 70
+  },
+  {
+    id: 'pediatric-faq-8',
+    service_id: 'pediatric-dentistry',
+    question: 'What treatments are available for children\'s teeth?',
+    answer: 'We offer a comprehensive range of preventive and restorative child care, including professional cleanings, fluoride therapy, tooth-coloured restorations, cavity prevention, and custom-tailored dental sealants.',
+    display_order: 80
+  },
+  {
+    id: 'pediatric-faq-9',
+    service_id: 'pediatric-dentistry',
+    question: 'How much does Pediatric Dentistry treatment cost?',
+    answer: 'The first pediatric visit is free of cost to remove initial financial risk for parents. For further preventive or restorative treatments, please contact Us for Pricing, and we will outline a transparent, customized plan.',
+    display_order: 90
+  },
+  {
+    id: 'pediatric-faq-10',
+    service_id: 'pediatric-dentistry',
+    question: 'When is treatment under general anaesthesia considered?',
+    answer: 'We always attempt gentle conventional treatment first. General anaesthesia is considered only for special-needs children or when conventional treatment is not possible and it is genuinely the kinder, safer option, never as a shortcut.',
+    display_order: 100
+  }
+];
+

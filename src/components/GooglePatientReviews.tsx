@@ -244,18 +244,9 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
         {/* Patient Profile & View Link */}
         <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 gap-3">
           <div className="flex items-center gap-3">
-            {review.patient_photo_url && review.patient_photo_url.trim() !== '' ? (
-              <img
-                src={review.patient_photo_url}
-                alt={review.patient_name}
-                className="h-10 w-10 rounded-full object-cover border border-slate-200 shadow-3xs shrink-0"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-[#0D9488]/5 border border-[#0D9488]/15 text-[#0D9488] font-black flex items-center justify-center text-xs shrink-0 select-none">
-                {review.patient_name ? review.patient_name.slice(0, 2).toUpperCase() : 'PT'}
-              </div>
-            )}
+            <div className="h-10 w-10 rounded-full bg-[#0D9488]/5 border border-[#0D9488]/15 text-[#0D9488] font-black flex items-center justify-center text-sm shrink-0 select-none">
+              {review.patient_name?.trim()?.charAt(0)?.toUpperCase() || ''}
+            </div>
             <div className="min-w-0">
               <h4 className="text-[#081C3A] font-black text-sm leading-tight truncate">
                 {review.patient_name}

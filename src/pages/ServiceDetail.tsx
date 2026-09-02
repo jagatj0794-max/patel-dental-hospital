@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_SERVICES } from '../utils/serviceData';
 import { TREATMENTS } from '../data/treatments';
-import { dentalImplantsFaqs, fullMouthFaqs, invisibleAlignersFaqs, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs } from '../data/serviceFaqs';
+import { dentalImplantsFaqs, fullMouthFaqs, invisibleAlignersFaqs, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs, pediatricDentistryFaqs } from '../data/serviceFaqs';
 import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { doctorService } from '../utils/doctorData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
@@ -27,10 +27,15 @@ import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { GooglePatientReviews } from '../components/GooglePatientReviews';
 import { RootCanalView } from '../components/service/RootCanalView';
+import { WisdomToothSurgeryView } from '../components/service/WisdomToothSurgeryView';
 import { FullMouthRehabView } from '../components/service/FullMouthRehabView';
 import { DentalImplantsView } from '../components/service/DentalImplantsView';
 import { InvisibleAlignersView } from '../components/service/InvisibleAlignersView';
 import { SmileMakeoverView } from '../components/service/SmileMakeoverView';
+import { PediatricDentistryView } from '../components/service/PediatricDentistryView';
+import { TeethWhiteningView } from '../components/service/TeethWhiteningView';
+import { BracesTreatmentView } from '../components/service/BracesTreatmentView';
+import { ToothColouredFillingView } from '../components/service/ToothColouredFillingView';
 import { useSEO } from '../utils/seo';
 import { getServiceSEO } from '../utils/serviceSeoData';
 const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
@@ -226,7 +231,7 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
                 />
               ) : (
                 <video
-                  src={uploadUrl}
+                  src={uploadUrl || null}
                   className="w-full h-full object-cover"
                   controls
                   autoPlay={false}
@@ -240,18 +245,18 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
                 className="absolute inset-0 w-full h-full cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
               >
                 {/* Thumbnail Image / Poster */}
-                {imgSrc ? (
+                {imgSrc && imgSrc.trim() !== '' ? (
                   <img
-                    src={imgSrc}
+                    src={imgSrc || null}
                     alt={`${serviceTitle} Video Thumbnail`}
                     className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                     onError={handleImgError}
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  uploadUrl ? (
+                  uploadUrl && uploadUrl.trim() !== '' ? (
                     <video
-                      src={uploadUrl}
+                      src={uploadUrl || null}
                       className="w-full h-full object-cover"
                       preload="metadata"
                       muted
@@ -408,7 +413,7 @@ export const PremiumMedicalCard: React.FC<PremiumMedicalCardProps> = ({ icon, ti
       {imageUrl && imageUrl.trim() !== '' && (
         <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-100 w-full shadow-2xs aspect-[16/10] mt-6 group-hover:shadow-xs transition-shadow">
           <img
-            src={imageUrl}
+            src={imageUrl || null}
             alt={title || "Card illustration"}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
@@ -651,20 +656,25 @@ export default function ServiceDetail({
       } catch (e) {}
     }
     if (!list || list.length === 0) {
-      return fallback.content_images;
+      return fallback.content_images || [];
     }
-    return [...list].sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+    return [...list]
+      .filter((img: any) => img && img.image_url && img.image_url.trim() !== '')
+      .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
   }, [service, fallback]);
 
   const displayGallery = React.useMemo(() => {
+    let raw: any[] = [];
     if (isNewArchitecture) {
-      const raw = Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : [];
-      return [...raw].sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
+      raw = Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : [];
+    } else if (gallery && gallery.length > 0) {
+      raw = gallery;
+    } else {
+      raw = fallback.gallery || [];
     }
-    if (gallery && gallery.length > 0) {
-      return gallery;
-    }
-    return fallback.gallery;
+    return [...raw]
+      .filter((item: any) => item && item.image_url && item.image_url.trim() !== '')
+      .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
   }, [service, gallery, fallback, mConfig, isNewArchitecture]);
 
   const displayCandidateItems = React.useMemo(() => {
@@ -1202,7 +1212,7 @@ export default function ServiceDetail({
           caption: title
         };
       })
-      .filter((p: any) => p && p.before && p.after)
+      .filter((p: any) => p && p.before && typeof p.before === 'string' && p.before.trim() !== '' && p.after && typeof p.after === 'string' && p.after.trim() !== '')
       .sort((a: any, b: any) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0));
   }, [mConfig, service, fallback, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
 
@@ -1294,10 +1304,30 @@ export default function ServiceDetail({
   // Formulate WhatsApp API direct URL
   const getWhatsAppUrl = () => {
     if (!service) return '';
-    const text = `Hi Patel Dental Hospital, I'm interested in booking a consultation for the "${service.title}" treatment. Please let me know the next available slot!`;
-    const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-      ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-      : contactInfo.whatsappRaw;
+    const text = isToothColouredFilling
+      ? "Hello, I have a cavity/broken tooth. I want to know about tooth-coloured filling."
+      : isWisdomToothSurgery
+        ? "Hello, I am experiencing wisdom tooth pain and want to consult with a maxillofacial surgeon. Here is my OPG X-ray:"
+        : isBracesTreatment
+          ? "Hello Patel Dental Hospital, I would like to know more about Braces Treatment and would like to book a consultation."
+          : isTeethWhitening
+            ? "Hello Patel Dental Hospital, I would like to know more about Teeth Whitening and would like to book a consultation."
+            : isPediatricDentistry
+              ? "Hello, I want to book a dental check-up for my child. My child's age is:"
+              : isCrownsAndBridges
+                ? "Hello, I want to know about Crowns & Bridges treatment options and cost. Here is my dental X-ray:"
+                : isSmileMakeover
+                  ? "Hello, I want to see a digital preview of my smile. Here is a photo of my current smile:"
+                  : isRootCanal
+                    ? "Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:"
+                    : isInvisibleAligners
+                      ? "Hello, I want straight teeth without visible braces. Here is a photo of my teeth:"
+                      : `Hi Patel Dental Hospital, I'm interested in booking a consultation for the "${service.title}" treatment. Please let me know the next available slot!`;
+    const num = (isToothColouredFilling || isWisdomToothSurgery || isBracesTreatment || isTeethWhitening || isPediatricDentistry || isCrownsAndBridges || isSmileMakeover || isRootCanal || isInvisibleAligners)
+      ? '919510397046'
+      : (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
+        ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
+        : contactInfo.whatsappRaw || '919510397046';
     return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
   };
 
@@ -1378,14 +1408,47 @@ export default function ServiceDetail({
         text,
         icon: <MessageCircle className="h-4 w-4" />,
         onClick: () => {
-          if (dest === 'custom') {
+          if (isToothColouredFilling) {
+            const textMsg = "Hello, I have a cavity/broken tooth. I want to know about tooth-coloured filling.";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isWisdomToothSurgery) {
+            const textMsg = "Hello, I am experiencing wisdom tooth pain and want to consult with a maxillofacial surgeon. Here is my OPG X-ray:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isBracesTreatment) {
+            const textMsg = "Hello Patel Dental Hospital, I would like to know more about Braces Treatment and would like to book a consultation.";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isTeethWhitening) {
+            const textMsg = "Hello Patel Dental Hospital, I would like to know more about Teeth Whitening and would like to book a consultation.";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isPediatricDentistry) {
+            const textMsg = "Hello, I want to book a dental check-up for my child. My child's age is:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isCrownsAndBridges) {
+            const textMsg = "Hello, I want to know about Crowns & Bridges treatment options and cost. Here is my dental X-ray:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isSmileMakeover) {
+            const textMsg = "Hello, I want to see a digital preview of my smile. Here is a photo of my current smile:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isRootCanal) {
+            const textMsg = "Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isInvisibleAligners) {
+            const textMsg = "Hello, I want straight teeth without visible braces. Here is a photo of my teeth:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isFullMouth) {
+            const textMsg = "Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (isDentalImplants) {
+            const textMsg = "Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:";
+            window.open(`https://wa.me/919510397046?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
+          } else if (dest === 'custom') {
             const url = value.startsWith('http') ? value : 'https://' + value;
             window.open(url, '_blank', 'noopener,noreferrer');
           } else {
             const textMsg = `Hi Patel Dental Hospital, I'm interested in booking a consultation for "${service?.title}".`;
             const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
               ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw || '919924225500';
+              : contactInfo.whatsappRaw || '919510397046';
             window.open(`https://wa.me/${num}?text=${encodeURIComponent(textMsg)}`, '_blank', 'noopener,noreferrer');
           }
         },
@@ -1506,9 +1569,7 @@ export default function ServiceDetail({
           const clinicName = mConfig.contact_clinic_name || "Patel Dental Hospital";
 
           const smileMakeoverWhatsAppUrl = (() => {
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw || '919924225500';
+            const num = '919510397046';
             const text = "Hello, I want to see a digital preview of my smile. Here is a photo of my current smile:";
             return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
           })();
@@ -1567,7 +1628,7 @@ export default function ServiceDetail({
                           </button>
 
                           <a
-                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:")}`}
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
@@ -1618,7 +1679,7 @@ export default function ServiceDetail({
 
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
                           <a
-                            href="https://wa.me/+91%209510397046?text=Hello%2C%20most%20of%20my%20teeth%20are%20damaged%20or%20missing.%20I%20want%20to%20know%20about%20full%20mouth%20treatment."
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
@@ -1677,11 +1738,11 @@ export default function ServiceDetail({
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2 flex-wrap">
                           <button
                             type="button"
                             onClick={() => openAppointmentModal("Invisible Aligners - Hero CTA")}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
                           >
                             <Calendar className="h-4 w-4" />
                             <span>BOOK FREE ALIGNER CONSULTATION</span>
@@ -1689,13 +1750,13 @@ export default function ServiceDetail({
                           </button>
 
                           <a
-                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, I want straight teeth without visible braces. Here is a photo of my teeth:")}`}
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I want straight teeth without visible braces. Here is a photo of my teeth:")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>Send a photo of your teeth  -  get your aligner plan</span>
+                            <span>Send a photo of your teeth</span>
                           </a>
                         </div>
                       </>
@@ -1747,7 +1808,7 @@ export default function ServiceDetail({
                           </button>
 
                           <a
-                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:")}`}
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
@@ -1854,7 +1915,315 @@ export default function ServiceDetail({
                           </button>
 
                           <a
-                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, I want to know about Crowns & Bridges treatment options and cost. Here is my dental X-ray:")}`}
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I want to know about Crowns & Bridges treatment options and cost. Here is my dental X-ray:")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                          >
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>WHATSAPP US</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : isPediatricDentistry ? (
+                      <>
+                        <div className="space-y-3">
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                            PEDIATRIC DENTISTRY
+                          </span>
+                          
+                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                            Your Child’s First Dental Visit Should Be a Happy One
+                          </h1>
+                        </div>
+
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                          A dedicated children’s chair, dental toys, and a team that never rushes a frightened child. Treated by Dr. Kinjal Patel, whose particular focus is children and anxious patients.
+                        </p>
+
+                        {/* PROOF BAR */}
+                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Fear-free approach</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">First visit free</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Children's play environment</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Special-needs care available</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => openAppointmentModal("Pediatric Dentistry - Hero CTA")}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                          >
+                            <Calendar className="h-4 w-4" />
+                            <span>Book your child's first visit — free</span>
+                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+
+                          <a
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I want to book a dental check-up for my child. My child's age is:")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                          >
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>WHATSAPP US</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : isTeethWhitening ? (
+                      (() => {
+                        const teethWhiteningWhatsAppUrl = (() => {
+                          const num = '919510397046';
+                          const text = "Hello Patel Dental Hospital, I would like to know more about Teeth Whitening and would like to book a consultation.";
+                          return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+                        })();
+                        return (
+                          <>
+                            <div className="space-y-3">
+                              <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                                Laser Teeth Whitening
+                              </span>
+                              
+                              <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                                Visibly Whiter Teeth in 30 Minutes
+                              </h1>
+                            </div>
+
+                            <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                              Get professional in-clinic laser teeth whitening using advanced CE & FDA-approved systems in just one appointment. Experience immediate results with no sensitivity for most patients. Professional take-home kits are also available.
+                            </p>
+
+                            {/* PROOF BAR */}
+                            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                                <span className="text-xs font-black text-[#081C3A] tracking-tight">30 Minutes Treatment</span>
+                              </div>
+                              <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                                <span className="text-xs font-black text-[#081C3A] tracking-tight">CE & FDA-Approved System</span>
+                              </div>
+                              <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                                <span className="text-xs font-black text-[#081C3A] tracking-tight">Enamel-Safe & Gentle</span>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                              <button
+                                type="button"
+                                onClick={() => openAppointmentModal("Teeth Whitening - Hero CTA")}
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                              >
+                                <Calendar className="h-4 w-4" />
+                                <span>Book Whitening</span>
+                                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+
+                              <a
+                                href={teethWhiteningWhatsAppUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                              >
+                                <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                                <span>WHATSAPP US</span>
+                              </a>
+                            </div>
+                          </>
+                        );
+                      })()
+                    ) : isBracesTreatment ? (
+                      <>
+                        <div className="space-y-3">
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                            Orthodontic Specialist
+                          </span>
+                          
+                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                            Braces in Rajkot — Transparent Pricing for Every System
+                          </h1>
+                        </div>
+
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                          Metal, ceramic, self-ligating and lingual braces. We publish the cost of each system so you can compare honestly, and plan your case on CBCT before bonding.
+                        </p>
+
+                        {/* PROOF BAR */}
+                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">All systems priced</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Free first assessment</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Any age</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI available</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => openAppointmentModal("Braces Treatment - Hero CTA")}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                          >
+                            <Calendar className="h-4 w-4" />
+                            <span>Book Assessment</span>
+                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+
+                          <a
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello Patel Dental Hospital, I would like to know more about Braces Treatment and would like to book a consultation.")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                          >
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>WHATSAPP US</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : isWisdomToothSurgery ? (
+                      <>
+                        <div className="space-y-3">
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                            Comfort-focused Oral Surgery
+                          </span>
+                          
+                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                            Wisdom Tooth Pain? Removed Today, Back to Work Tomorrow.
+                          </h1>
+                        </div>
+
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                          Wisdom tooth removal by a maxillofacial surgeon, using piezoelectric surgery when the tooth sits close to a nerve. Most patients return to desk work the next day.
+                        </p>
+
+                        {/* PROOF BAR */}
+                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Same-day appointments</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Maxillofacial surgeon</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Piezo nerve-safe technique</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">OPG assessment before surgery</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                          <a
+                            href="tel:9510397046"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
+                          >
+                            <Phone className="h-4 w-4" />
+                            <span>Call now — same-day appointment</span>
+                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </a>
+
+                          <a
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing wisdom tooth pain and want to consult with a maxillofacial surgeon. Here is my OPG X-ray:")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                          >
+                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                            <span>WHATSAPP US</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : isToothColouredFilling ? (
+                      <>
+                        <div className="space-y-3">
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                            COMPOSITE SHADE MATCHED RESTORATION
+                          </span>
+                          
+                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                            Fix a Cavity Now — Or a Root Canal Later
+                          </h1>
+                        </div>
+
+                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                          Tooth-coloured composite fillings, completed in a single visit, in materials that bond chemically to your tooth.
+                        </p>
+
+                        {/* PROOF BAR */}
+                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Single visit</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Matched to your tooth shade</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">No metal, no black line</span>
+                          </div>
+                          <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">US-made composite materials</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => openAppointmentModal("Tooth Coloured Filling - Hero CTA")}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                          >
+                            <Calendar className="h-4 w-4" />
+                            <span>Contact Us for Pricing</span>
+                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+
+                          <a
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have a cavity/broken tooth. I want to know about tooth-coloured filling.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
@@ -1918,7 +2287,7 @@ export default function ServiceDetail({
                   <div className="lg:col-span-5 order-1 lg:order-2">
                     <div className="relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/5] xl:aspect-square w-full bg-slate-50 rounded-2xl overflow-hidden shadow-md border border-slate-200/60 group">
                       <img
-                        src={heroImage}
+                        src={heroImage || null}
                         alt={service.title || "Dental Implants Care"}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
@@ -1994,7 +2363,7 @@ export default function ServiceDetail({
                 {/* Hero Right Media Image Section */}
                 <div className="md:col-span-5 relative min-h-[300px] md:min-h-[450px] overflow-hidden bg-slate-100">
                   <img
-                    src={heroImage}
+                    src={heroImage || null}
                     alt={service.title}
                     className="absolute inset-0 w-full h-full object-cover"
                     referrerPolicy="no-referrer"
@@ -2063,7 +2432,7 @@ export default function ServiceDetail({
                       <div key={idx} className="space-y-2 group">
                         <div className="rounded-2xl overflow-hidden aspect-[16/10] bg-slate-50 border border-[#e2e8f0] relative shadow-3xs">
                           <img
-                            src={img.image_url}
+                            src={img.image_url || null}
                             alt={img.alt_text || img.caption || 'Content Image'}
                             className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
                             referrerPolicy="no-referrer"
@@ -2172,7 +2541,7 @@ export default function ServiceDetail({
                     className="group relative bg-slate-100 border border-slate-150 rounded-2xl overflow-hidden aspect-[4/3] shadow-3xs hover:shadow-md transition-all duration-300 cursor-zoom-in"
                   >
                     <img 
-                      src={item.image_url} 
+                      src={item.image_url || null} 
                       alt={item.alt_text || item.caption || service.title}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
@@ -2270,7 +2639,7 @@ export default function ServiceDetail({
                       >
                         <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
                           <img
-                            src={imgUrl}
+                            src={imgUrl || null}
                             alt={titleText || 'Hospital Gallery Photo'}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"
@@ -2348,7 +2717,7 @@ export default function ServiceDetail({
             </div>
           ) : null;
 
-          const displayFaqs = isDentalImplants ? dentalImplantsFaqs : isRootCanal ? rootCanalFaqs : isFullMouth ? fullMouthFaqs : isInvisibleAligners ? invisibleAlignersFaqs : isSmileMakeover ? smileMakeoverFaqs : isCrownsAndBridges ? crownsBridgesFaqs : faqs;
+          const displayFaqs = isDentalImplants ? dentalImplantsFaqs : isRootCanal ? rootCanalFaqs : isFullMouth ? fullMouthFaqs : isInvisibleAligners ? invisibleAlignersFaqs : isSmileMakeover ? smileMakeoverFaqs : isCrownsAndBridges ? crownsBridgesFaqs : isPediatricDentistry ? pediatricDentistryFaqs : faqs;
 
           const faqElement = (mConfig.show_faq !== false && displayFaqs.length > 0) ? (
             isDentalImplants ? (
@@ -2362,6 +2731,77 @@ export default function ServiceDetail({
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
                     Frequently Asked Questions About Dental Implants
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* Accordion List */}
+                <div className="space-y-4 max-w-4xl mx-auto">
+                  {displayFaqs.map((faq) => {
+                    const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    return (
+                      <div 
+                        key={faq.id}
+                        className={`rounded-[18px] sm:rounded-[20px] transition-all duration-200 border ${
+                          isExpanded 
+                            ? 'border-[#0D9488] bg-white shadow-xs' 
+                            : 'border-slate-200/80 hover:border-slate-300 bg-white'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleFaq(faq.id)}
+                          className="w-full text-left p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                        >
+                          <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
+                            isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
+                          }`}>
+                            {faq.question}
+                          </span>
+                          <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                            isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
+                          }`}>
+                            {isExpanded ? (
+                              <ChevronUp className="h-4.5 w-4.5" />
+                            ) : (
+                              <ChevronDown className="h-4.5 w-4.5" />
+                            )}
+                          </span>
+                        </button>
+                        
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                                <div className="pt-4">
+                                  {faq.answer}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : isPediatricDentistry ? (
+              <div className="bg-white border border-slate-200/80 rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 lg:p-14 shadow-sm space-y-8 sm:space-y-10" id="cms-section-faq">
+                {/* Header */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
+                      PEDIATRIC DENTISTRY FAQ
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
+                    Frequently Asked Questions About Pediatric Dentistry
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -3004,6 +3444,27 @@ export default function ServiceDetail({
             }
           ];
 
+          const pediatricRelatedCards = [
+            {
+              slug: 'braces-treatment',
+              title: 'Orthodontic Braces',
+              description: 'Classic orthodontic corrections using durable ceramic or metal bracket systems to align teeth and correct growing child bite issues.',
+              image: getServiceHeroImage('braces-treatment')
+            },
+            {
+              slug: 'tooth-coloured-filling',
+              title: 'Tooth-Coloured Fillings',
+              description: 'Restore decayed or chipped primary teeth with durable, natural-looking composite fillings that blend seamlessly.',
+              image: getServiceHeroImage('tooth-coloured-filling')
+            },
+            {
+              slug: 'invisible-aligners',
+              title: 'Invisible Aligners',
+              description: 'Straighten teeth discretely with advanced clear aligners, planned completely digitally to complement active lifestyles.',
+              image: getServiceHeroImage('invisible-aligners')
+            }
+          ];
+
           const relatedServicesElement = (mConfig.show_related_services !== false) ? (
             isDentalImplants ? (
               <div className="space-y-8 sm:space-y-10 pt-6 sm:pt-10" id="cms-section-related-services">
@@ -3030,7 +3491,7 @@ export default function ServiceDetail({
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={card.image} 
+                          src={card.image || null} 
                           alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
@@ -3080,7 +3541,7 @@ export default function ServiceDetail({
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={card.image} 
+                          src={card.image || null} 
                           alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
@@ -3130,7 +3591,7 @@ export default function ServiceDetail({
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={card.image} 
+                          src={card.image || null} 
                           alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
@@ -3180,7 +3641,7 @@ export default function ServiceDetail({
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={card.image} 
+                          src={card.image || null} 
                           alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
@@ -3230,7 +3691,7 @@ export default function ServiceDetail({
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={card.image} 
+                          src={card.image || null} 
                           alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
@@ -3280,7 +3741,57 @@ export default function ServiceDetail({
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
-                          src={card.image} 
+                          src={card.image || null} 
+                          alt={card.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                        <div className="space-y-2.5">
+                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                            {card.title}
+                          </h3>
+                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                            {card.description}
+                          </p>
+                        </div>
+                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                          <span>Learn Details</span>
+                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : isPediatricDentistry ? (
+              <div className="space-y-8 sm:space-y-10 pt-6 sm:pt-10" id="cms-section-related-services">
+                {/* Centered Badge, Heading & Teal Underline */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
+                      RELATED TREATMENTS
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
+                    Related Treatments
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* 3 Equal Treatment Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
+                  {pediatricRelatedCards.map((card) => (
+                    <div
+                      key={card.slug}
+                      onClick={() => handleNavigateToService(card.slug)}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                    >
+                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                        <img 
+                          src={card.image || null} 
                           alt={card.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           referrerPolicy="no-referrer"
@@ -3363,42 +3874,38 @@ export default function ServiceDetail({
           ) : null;
 
           const dentalImplantsWhatsAppUrl = (() => {
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw;
+            const num = '919510397046';
             const text = "Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:";
             return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
           })();
 
           const rootCanalWhatsAppUrl = (() => {
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw || '919924225500';
-            const text = "Hello, I am having tooth pain and would like to book a root canal consultation.";
+            const num = '919510397046';
+            const text = "Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:";
             return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
           })();
 
           const fullMouthWhatsAppUrl = (() => {
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw;
+            const num = '919510397046';
             const text = "Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.";
             return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
           })();
 
           const invisibleAlignersWhatsAppUrl = (() => {
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw || '919924225500';
+            const num = '919510397046';
             const text = "Hello, I want straight teeth without visible braces. Here is a photo of my teeth:";
             return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
           })();
 
           const crownsBridgesWhatsAppUrl = (() => {
-            const num = (mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '')
-              ? mConfig.contact_whatsapp_number.replace(/\s+/g, '')
-              : contactInfo.whatsappRaw || '919924225500';
-            const text = "Hello, I want to know about dental crown and bridge options and costs for my teeth.";
+            const num = '919510397046';
+            const text = "Hello, I want to know about Crowns & Bridges treatment options and cost. Here is my dental X-ray:";
+            return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+          })();
+
+          const pediatricWhatsAppUrl = (() => {
+            const num = '919510397046';
+            const text = "Hello, I want to book a dental check-up for my child. My child's age is:";
             return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
           })();
 
@@ -3681,6 +4188,62 @@ export default function ServiceDetail({
                   >
                     <MessageCircle className="h-4 w-4 shrink-0 fill-white text-[#22C55E]" />
                     <span>Chat on WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+            ) : isPediatricDentistry ? (
+              <div className="relative bg-[#0B1528] border border-slate-800 rounded-[26px] sm:rounded-[32px] p-8 sm:p-14 lg:p-16 shadow-2xl overflow-hidden text-center space-y-6 sm:space-y-8" id="cms-section-bottom-cta">
+                {/* Background Clinic Interior Ambient Layer */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none" 
+                  style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1600")' }} 
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0B1528]/80 via-[#0B1528]/95 to-[#0B1528] pointer-events-none" />
+
+                <div className="max-w-2xl mx-auto space-y-4 sm:space-y-5 relative z-10">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
+                      Free First Visit
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
+                    Not Sure What Your Child Needs?
+                  </h2>
+                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
+                    Start with a free first visit. We’ll examine your child, explain what’s actually needed, and tell you if anything can safely be watched rather than treated.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 relative z-10 pt-2">
+                  <button
+                    onClick={() => {
+                      const link = mConfig.bottom_cta_primary_link;
+                      if (link && link.trim() !== '') {
+                        if (link.startsWith('http')) {
+                          window.open(link, '_blank', 'noopener,noreferrer');
+                        } else {
+                          window.location.hash = link;
+                        }
+                      } else {
+                        openAppointmentModal('Pediatric Dentistry - Closing CTA');
+                      }
+                    }}
+                    className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                  >
+                    <Calendar className="h-4 w-4 shrink-0" />
+                    <span>Book Free First Visit</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                  
+                  <a
+                    href={pediatricWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="h-4 w-4 shrink-0" />
+                    <span>WhatsApp Us</span>
                   </a>
                 </div>
               </div>
@@ -4564,6 +5127,97 @@ export default function ServiceDetail({
               );
             }
 
+            if (isPediatricDentistry) {
+              return (
+                <PediatricDentistryView
+                  heroElement={heroElement}
+                  featuredVideoElement={featuredVideoElement}
+                  videoElement={videoElement}
+                  testimonialsElement={testimonialsElement}
+                  faqElement={faqElement}
+                  bottomCtaElement={bottomCtaElement}
+                  relatedServicesElement={relatedServicesElement}
+                  mConfig={mConfig}
+                  contactInfo={contactInfo}
+                  beforeAfterPairs={beforeAfterPairs}
+                  displayGallery={displayGallery}
+                  seoHeadings={seoHeadings}
+                  openAppointmentModal={openAppointmentModal}
+                />
+              );
+            }
+
+            if (isTeethWhitening) {
+              return (
+                <TeethWhiteningView
+                  heroElement={heroElement}
+                  videoElement={videoElement}
+                  testimonialsElement={testimonialsElement}
+                  mConfig={mConfig}
+                  beforeAfterPairs={beforeAfterPairs}
+                  displayGallery={displayGallery}
+                  seoHeadings={seoHeadings}
+                  openAppointmentModal={openAppointmentModal}
+                  smileMakeoverHeroImage={getServiceHeroImage('smile-makeover')}
+                  invisibleAlignersHeroImage={getServiceHeroImage('invisible-aligners')}
+                  toothColouredFillingHeroImage={getServiceHeroImage('tooth-coloured-filling')}
+                />
+              );
+            }
+
+            if (isBracesTreatment) {
+              return (
+                <BracesTreatmentView
+                  heroElement={heroElement}
+                  videoElement={videoElement}
+                  testimonialsElement={testimonialsElement}
+                  faqElement={faqElement}
+                  bottomCtaElement={bottomCtaElement}
+                  relatedServicesElement={relatedServicesElement}
+                  mConfig={mConfig}
+                  beforeAfterPairs={beforeAfterPairs}
+                  displayGallery={displayGallery}
+                  seoHeadings={seoHeadings}
+                  openAppointmentModal={openAppointmentModal}
+                />
+              );
+            }
+
+            if (isWisdomToothSurgery) {
+              return (
+                <WisdomToothSurgeryView
+                  heroElement={heroElement}
+                  videoElement={videoElement}
+                  testimonialsElement={testimonialsElement}
+                  faqElement={faqElement}
+                  bottomCtaElement={bottomCtaElement}
+                  relatedServicesElement={relatedServicesElement}
+                  mConfig={mConfig}
+                  beforeAfterPairs={beforeAfterPairs}
+                  displayGallery={displayGallery}
+                  seoHeadings={seoHeadings}
+                  openAppointmentModal={openAppointmentModal}
+                  getServiceHeroImage={getServiceHeroImage}
+                />
+              );
+            }
+
+            if (isToothColouredFilling) {
+              return (
+                <ToothColouredFillingView
+                  heroElement={heroElement}
+                  mConfig={mConfig}
+                  openAppointmentModal={openAppointmentModal}
+                  videoElement={videoElement}
+                  testimonialsElement={testimonialsElement}
+                  beforeAfterPairs={beforeAfterPairs}
+                  displayGallery={displayGallery}
+                  seoHeadings={seoHeadings}
+                  getServiceHeroImage={getServiceHeroImage}
+                />
+              );
+            }
+
             return (
               <div className="space-y-8 sm:space-y-16 lg:space-y-20">
                 {heroElement}
@@ -4741,7 +5395,7 @@ export default function ServiceDetail({
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                src={displayGallery[lightboxIndex].image_url}
+                src={displayGallery[lightboxIndex].image_url || null}
                 alt={displayGallery[lightboxIndex].caption || service.title}
                 className="max-h-[70vh] max-w-full object-contain rounded-xl shadow-2xl"
                 referrerPolicy="no-referrer"

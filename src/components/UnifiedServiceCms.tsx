@@ -68,7 +68,17 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
       try {
         setLoading(true);
         const list = await serviceService.getServices();
-        const found = list.find(s => s.slug === serviceSlug || s.id === serviceSlug);
+        const isCrownsSlug = (slug: string) => 
+          slug === 'crowns' || 
+          slug === 'crowns-bridges' || 
+          slug === 'crown-and-bridges' || 
+          slug === 'crowns-and-bridges';
+
+        const found = list.find(s => {
+          if (s.slug === serviceSlug || s.id === serviceSlug) return true;
+          if (isCrownsSlug(serviceSlug) && (s.id === 'crowns' || isCrownsSlug(s.slug))) return true;
+          return false;
+        });
         if (found) {
           // Normalize service fields & marketing_config
           const normalized = { ...found };

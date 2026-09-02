@@ -264,7 +264,7 @@ const faqData = [
   },
   {
     question: "How long does a dental implant treatment take at a dental implant hospital in Rajkot?",
-    answer: "The complete dental implant process can take a few weeks to a few months depending on healing time and individual cases. At Patel Dental Hospital, a premier dental implant hospital in Rajkot, we also offer immediate loading fixed teeth options where applicable."
+    answer: "At Patel Dental Hospital, dental implant treatment can be completed within 10 to 12 days in suitable cases. The exact treatment timeline depends on the patient's individual dental condition, treatment plan, and healing requirements."
   },
   {
     question: "Are dental implant procedures painful?",
@@ -384,6 +384,7 @@ export default function Home({
   }, [awardsList]);
 
   const horizontalAwards = awardsList.filter(item => {
+    if (!item.image_url || item.image_url.trim() === '') return false;
     const detected = detectedOrientations[item.id];
     if (detected) {
       return detected === 'horizontal';
@@ -392,6 +393,7 @@ export default function Home({
   });
 
   const verticalAwards = awardsList.filter(item => {
+    if (!item.image_url || item.image_url.trim() === '') return false;
     const detected = detectedOrientations[item.id];
     if (detected) {
       return detected === 'vertical';
@@ -947,11 +949,11 @@ export default function Home({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0">
                 {/* COLUMN 1 */}
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
-                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/Digital Dental Experts.webp" 
+                      src="/1,-1.webp" 
                       alt="Digital Dental Experts" 
-                      className="h-[42px] w-[62px] object-contain" 
+                      className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
                   </div>
@@ -965,11 +967,11 @@ export default function Home({
 
                 {/* COLUMN 2 */}
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
-                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/Dental Implants.webp" 
+                      src="/2,-1.webp" 
                       alt="Dental Implant Specialists" 
-                      className="h-[60px] w-[60px] object-contain" 
+                      className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
                   </div>
@@ -983,11 +985,11 @@ export default function Home({
 
                 {/* COLUMN 3 */}
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
-                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/Aligners.webp" 
+                      src="/3,-1.webp" 
                       alt="Braces & Invisible Aligner Experts" 
-                      className="h-[39px] w-[58px] object-contain" 
+                      className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
                   </div>
@@ -1001,11 +1003,11 @@ export default function Home({
 
                 {/* COLUMN 4 */}
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
-                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/Root Canal.webp" 
+                      src="/4,-1.webp" 
                       alt="FMR & Root Canal Specialists" 
-                      className="h-[60px] w-[60px] object-contain" 
+                      className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
                   </div>
@@ -1019,11 +1021,11 @@ export default function Home({
 
                 {/* COLUMN 5 */}
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-slate-100 col-span-1 sm:col-span-2 lg:col-span-1 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
-                  <div className="h-16 w-16 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/Oral & Maxillofacial Surgery.png" 
+                      src="/5,-1.webp" 
                       alt="Oral & Maxillofacial Surgery" 
-                      className="h-[60px] w-[60px] object-contain" 
+                      className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
                   </div>
@@ -1190,7 +1192,7 @@ export default function Home({
                     <div className="p-3.5 md:p-4 shrink-0 mb-4 md:mb-5 transition-transform duration-300 group-hover:scale-105">
                       {isStringIcon ? (
                         <img 
-                          src={item.icon} 
+                          src={item.icon || null} 
                           alt={item.title} 
                           className={item.title === "Root Canal Treatments" || item.title === "Dental Implants"
                             ? "h-[50px] w-[34px] md:h-[66px] md:w-[44px] object-contain mx-auto"
@@ -1349,7 +1351,7 @@ export default function Home({
                       id={`home-award-vertical-${item.id}`}
                     >
                       <img
-                        src={item.image_url}
+                        src={item.image_url || null}
                         alt="Award & Recognition Vertical"
                         className="h-full w-auto object-contain object-center rounded-lg"
                         loading="lazy"
@@ -1422,7 +1424,7 @@ export default function Home({
                                 id={`home-award-horizontal-t1-${item.id}-${idx}`}
                               >
                                 <img
-                                  src={item.image_url}
+                                  src={item.image_url || null}
                                   alt="Award & Recognition Horizontal"
                                   className="h-full w-auto object-contain object-center rounded-lg"
                                   loading="eager"
@@ -1452,7 +1454,7 @@ export default function Home({
                                 id={`home-award-horizontal-t2-${item.id}-${idx}`}
                               >
                                 <img
-                                  src={item.image_url}
+                                  src={item.image_url || null}
                                   alt="Award & Recognition Horizontal"
                                   className="h-full w-auto object-contain object-center rounded-lg"
                                   loading="eager"
@@ -1518,7 +1520,7 @@ export default function Home({
               className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center rounded-2xl overflow-hidden cursor-default"
             >
               <img
-                src={selectedAward.image_url}
+                src={selectedAward.image_url || null}
                 alt="Award Full View"
                 className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                 referrerPolicy="no-referrer"
@@ -1603,7 +1605,7 @@ export default function Home({
                     {/* Image Container */}
                     <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
                       <img
-                        src={cardData.image}
+                        src={cardData.image || null}
                         alt={cardData.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
                         referrerPolicy="no-referrer"
@@ -1762,7 +1764,7 @@ export default function Home({
                 >
                   <img
                     className="w-full h-full object-cover absolute inset-0"
-                    src="/IMG_20190225_120201.jpg"
+                    src="/IMG_20190521_190345.jpg"
                     alt="Patel Dental Hospital Premium Modern Treatment Center"
                     referrerPolicy="no-referrer"
                   />
@@ -1830,7 +1832,7 @@ export default function Home({
               <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
                 <img
                    className="w-full h-full object-cover absolute inset-0 z-10"
-                   src="/_MG_3249.JPG"
+                   src="/MG_3249.webp"
                    alt="Patel Dental Hospital Advanced Clinical Care"
                    referrerPolicy="no-referrer"
                    loading="lazy"

@@ -65,6 +65,10 @@ export const FullMouthRehabView: React.FC<FullMouthRehabViewProps> = ({
   drVipulImg = '/dr. patel.png',
   setCurrentPage
 }) => {
+  const whatsappNum = '919510397046';
+  const whatsappText = "Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.";
+  const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(whatsappText)}`;
+
   return (
     <div className="space-y-8 sm:space-y-16 lg:space-y-20">
       {heroElement}
@@ -393,7 +397,7 @@ export const FullMouthRehabView: React.FC<FullMouthRehabViewProps> = ({
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                           <a
-                            href={`https://wa.me/${(mConfig.contact_whatsapp_number && mConfig.contact_whatsapp_number.trim() !== '') ? mConfig.contact_whatsapp_number.replace(/\s+/g, '') : contactInfo.whatsappRaw || '919924225500'}?text=${encodeURIComponent("Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.")}`}
+                            href={whatsappUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer"

@@ -112,7 +112,7 @@ export default function SocialService() {
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center p-2">
                     <img
-                      src={item.image_url}
+                      src={item.image_url || null}
                       alt={item.title || 'Social Service Action'}
                       className="max-w-full max-h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105 mx-auto block"
                       referrerPolicy="no-referrer"
@@ -191,7 +191,7 @@ export default function SocialService() {
               >
                 <div className="relative overflow-hidden flex items-center justify-center max-h-[70vh] bg-black p-4">
                   <img
-                    src={currentLightboxImg.image_url}
+                    src={currentLightboxImg.image_url || null}
                     alt={currentLightboxImg.title || 'Social Service Detail'}
                     className="max-h-[60vh] w-auto max-w-full object-contain mx-auto"
                     referrerPolicy="no-referrer"

@@ -93,14 +93,14 @@ export const Mp4ReelPlayer: React.FC<Mp4ReelPlayerProps> = ({
   };
 
   // Append #t=0.5 so standard HTML5 video player also defaults to 0.5s frame natively before play
-  const effectiveSrc = src ? (src.includes('#t=') ? src : `${src}#t=0.5`) : src;
+  const effectiveSrc = src && src.trim() !== '' ? (src.includes('#t=') ? src : `${src}#t=0.5`) : null;
 
   return (
     <div className={containerClassName}>
       <video
         ref={videoRef}
-        src={effectiveSrc}
-        poster={poster || posterUrl}
+        src={effectiveSrc || null}
+        poster={poster || posterUrl || null}
         controls
         playsInline
         className={className}
