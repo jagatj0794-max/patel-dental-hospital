@@ -156,6 +156,19 @@ export default function Admin({
 }: AdminProps) {
   const [activeTab, setActiveTab] = useState<SidebarTab>('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isTourismVideoEnabled, setIsTourismVideoEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchTourismVideoSetting = async () => {
+      try {
+        const enabled = await videoService.getDentalTourismVideoEnabled();
+        setIsTourismVideoEnabled(enabled);
+      } catch (err) {
+        console.error('Error fetching dental tourism video enabled setting in Admin:', err);
+      }
+    };
+    fetchTourismVideoSetting();
+  }, []);
 
   // Editable local form draft states
   const [draftHeading, setDraftHeading] = useState(heroHeading);
@@ -8219,6 +8232,27 @@ export default function Admin({
             {/* VIDEO MANAGEMENT TAB */}
             {tourismSubTab === 'video' && (
               <div className="space-y-6" id="tourism-videos-tab">
+                <CmsSectionToggle
+                  checked={isTourismVideoEnabled}
+                  onChange={async (checked) => {
+                    setIsTourismVideoEnabled(checked);
+                    setSaveMessage('Updating video section status...');
+                    try {
+                      const success = await videoService.setDentalTourismVideoEnabled(checked);
+                      if (success) {
+                        setSaveMessage(`Video section ${checked ? 'Enabled' : 'Disabled'} successfully!`);
+                      } else {
+                        setSaveMessage('Failed to save section status.');
+                      }
+                    } catch (err) {
+                      console.error('Error saving video enabled setting:', err);
+                      setSaveMessage('Error saving section status.');
+                    } finally {
+                      setTimeout(() => setSaveMessage(null), 3000);
+                    }
+                  }}
+                />
+
                 {/* Actions row */}
                 <div className="flex items-center justify-between bg-white px-6 py-4 rounded-xl border border-slate-150 shadow-3xs">
                   <div className="text-xs text-slate-500 font-medium">

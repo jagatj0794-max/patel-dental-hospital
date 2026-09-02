@@ -158,7 +158,9 @@ export const videoService = {
         return DEFAULT_VIDEOS;
       }
 
-      const remoteVideos = data.map((row: any) => {
+      const remoteVideos = data
+        .filter((row: any) => row.id !== 'setting_dental_tourism_video_enabled')
+        .map((row: any) => {
         // Match with localVideos version if exists to preserve metadata
         const localMatch = localVideos?.find(v => v.id === row.id);
 
@@ -310,7 +312,8 @@ export const videoService = {
         const { error: deleteError } = await supabase.client
           .from('videos')
           .delete()
-          .not('id', 'in', `(${videoIds.map(id => `'${id}'`).join(',')})`);
+          .not('id', 'in', `(${videoIds.map(id => `'${id}'`).join(',')})`)
+          .neq('id', 'setting_dental_tourism_video_enabled');
 
         if (deleteError) {
           console.warn('Error deleting obsolete videos:', deleteError);
@@ -319,7 +322,8 @@ export const videoService = {
         const { error: deleteError } = await supabase.client
           .from('videos')
           .delete()
-          .neq('id', 'dummy_nonexistent_id');
+          .neq('id', 'dummy_nonexistent_id')
+          .neq('id', 'setting_dental_tourism_video_enabled');
 
         if (deleteError) {
           console.warn('Error deleting all videos:', deleteError);
@@ -349,6 +353,63 @@ export const videoService = {
       return true;
     } catch (e) {
       console.error('Exception in saveVideos:', e);
+      return false;
+    }
+  },
+
+  getDentalTourismVideoEnabled: async (): Promise<boolean> => {
+    const localVal = localStorage.getItem('setting_dental_tourism_video_enabled');
+    const defaultVal = true;
+    
+    if (!isSupabaseConfigured()) {
+      return localVal !== null ? localVal === 'true' : defaultVal;
+    }
+    
+    try {
+      const { data, error } = await supabase.client
+        .from('videos')
+        .select('*')
+        .eq('id', 'setting_dental_tourism_video_enabled')
+        .maybeSingle();
+        
+      if (error || !data) {
+        return localVal !== null ? localVal === 'true' : defaultVal;
+      }
+      
+      const enabled = data.title === 'true';
+      localStorage.setItem('setting_dental_tourism_video_enabled', String(enabled));
+      return enabled;
+    } catch (e) {
+      console.warn('Error fetching dental tourism video enabled setting:', e);
+      return localVal !== null ? localVal === 'true' : defaultVal;
+    }
+  },
+
+  setDentalTourismVideoEnabled: async (enabled: boolean): Promise<boolean> => {
+    localStorage.setItem('setting_dental_tourism_video_enabled', String(enabled));
+    
+    if (!isSupabaseConfigured()) {
+      return true;
+    }
+    
+    try {
+      const { error } = await supabase.client
+        .from('videos')
+        .upsert({
+          id: 'setting_dental_tourism_video_enabled',
+          title: String(enabled),
+          treatment: 'setting',
+          display_order: 99999,
+          videoPlatform: 'youtube'
+        });
+        
+      if (error) {
+        console.error('Error saving dental tourism video enabled setting:', error);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('Exception in setDentalTourismVideoEnabled:', e);
       return false;
     }
   }
