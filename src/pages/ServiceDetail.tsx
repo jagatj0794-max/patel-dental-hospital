@@ -10,7 +10,7 @@ import {
   ChevronDown, ChevronUp, Image as ImageIcon, MessageCircle, HelpCircle, 
   ArrowRight, Phone, Heart, CheckCircle2, X, ChevronLeft,
   Activity, Stethoscope, Video, Mail, MapPin, 
-  Facebook, Instagram, Youtube, Linkedin, Twitter, MessageSquare, Star,
+  Facebook, Instagram, Linkedin, Twitter, MessageSquare, Star,
   Award, Shield, Check, Clock, Users, ShieldCheck, FileText, CheckCircle, Play,
   Cpu, Layers, Banknote, Eye
 } from 'lucide-react';
@@ -36,67 +36,10 @@ import { PediatricDentistryView } from '../components/service/PediatricDentistry
 import { TeethWhiteningView } from '../components/service/TeethWhiteningView';
 import { BracesTreatmentView } from '../components/service/BracesTreatmentView';
 import { ToothColouredFillingView } from '../components/service/ToothColouredFillingView';
+import { SurgicalTeamSection } from '../components/service/SurgicalTeamSection';
 import { useSEO } from '../utils/seo';
 import { getServiceSEO } from '../utils/serviceSeoData';
 const imgImplants = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
-
-function extractYouTubeId(url: string): string {
-  if (!url) return '';
-  const trimmedUrl = url.trim();
-  
-  try {
-    // 1. Matches embed URLs like https://www.youtube.com/embed/VIDEO_ID
-    if (trimmedUrl.includes('/embed/')) {
-      const parts = trimmedUrl.split('/embed/');
-      if (parts[1]) {
-        const id = parts[1].split(/[?#&]/)[0];
-        if (id.length === 11) return id;
-      }
-    }
-    
-    // 2. Matches short URLs like https://youtu.be/VIDEO_ID
-    if (trimmedUrl.includes('youtu.be/')) {
-      const parts = trimmedUrl.split('youtu.be/');
-      if (parts[1]) {
-        const id = parts[1].split(/[?#&]/)[0];
-        if (id.length === 11) return id;
-      }
-    }
-
-    // 3. Matches watch URLs like watch?v=VIDEO_ID or watch&v=VIDEO_ID
-    if (trimmedUrl.includes('v=')) {
-      const parts = trimmedUrl.split('v=');
-      if (parts[1]) {
-        const id = parts[1].split(/[?#&]/)[0];
-        if (id.length === 11) return id;
-      }
-    }
-    
-    // Fallback regex match for any other pattern
-    const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]{11}).*/;
-    const match = trimmedUrl.match(regExp);
-    if (match && match[1] && match[1].length === 11) {
-      return match[1];
-    }
-  } catch (e) {
-    // Ignore errors
-  }
-  
-  return '';
-}
-
-function getYouTubeEmbedUrl(url: string) {
-  const id = extractYouTubeId(url);
-  if (id) {
-    return `https://www.youtube.com/embed/${id}`;
-  }
-  return url;
-}
-
-function isYouTubeUrl(url: string) {
-  if (!url) return false;
-  return url.includes('youtube.com') || url.includes('youtu.be');
-}
 
 function isMp4Url(url: string) {
   if (!url) return false;
@@ -116,12 +59,12 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const defaultYtUrl = 'https://www.youtube.com/watch?v=SnOxxv_S2ew';
-  const source = mConfig.featured_video_source || 'youtube';
-  const youtubeUrl = (mConfig.featured_video_youtube_url || '').trim() || defaultYtUrl;
+  const defaultUrl = 'https://www.instagram.com/reel/C8qLd9MyWwG/';
+  const source = mConfig.featured_video_source || 'instagram';
+  const instagramUrl = (mConfig.featured_video_instagram_url || mConfig.featured_video_youtube_url || '').trim() || defaultUrl;
   const uploadUrl = (mConfig.featured_video_upload_url || '').trim();
 
-  const hasVideo = source === 'youtube' ? !!youtubeUrl : !!uploadUrl;
+  const hasVideo = source === 'instagram' ? !!instagramUrl : !!uploadUrl;
   const isEnabled = mConfig.featured_video_enabled !== false;
 
   if (!isEnabled || !hasVideo) {
@@ -140,34 +83,11 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
   const ctaText = mConfig.featured_video_cta_text || 'Schedule A Consultation';
   const ctaLink = mConfig.featured_video_cta_link || '';
 
-  const getYouTubeId = (url: string) => {
-    return extractYouTubeId(url);
-  };
-
-  const buildYouTubeEmbedUrl = () => {
-    const id = getYouTubeId(youtubeUrl);
-    let embedUrl = `https://www.youtube.com/embed/${id}?rel=0`;
-    
-    // Always use autoplay=0, never autoplay=1
-    embedUrl += '&autoplay=0';
-    
-    const loop = !!mConfig.featured_video_loop;
-    if (loop) embedUrl += `&loop=1&playlist=${id}`;
-    
-    return embedUrl;
-  };
-
   const getThumbnailUrl = () => {
     if (mConfig.featured_video_thumbnail_source === 'custom' && mConfig.featured_video_custom_thumbnail) {
       return mConfig.featured_video_custom_thumbnail;
     }
-    if (source === 'youtube') {
-      const ytId = getYouTubeId(youtubeUrl);
-      if (ytId) {
-        return `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
-      }
-    }
-    return '';
+    return 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60';
   };
 
   const [imgSrc, setImgSrc] = useState(getThumbnailUrl());
@@ -178,17 +98,8 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
     mConfig.featured_video_thumbnail_source,
     mConfig.featured_video_custom_thumbnail,
     source,
-    youtubeUrl
+    instagramUrl
   ]);
-
-  const handleImgError = () => {
-    if (imgSrc && imgSrc.includes('maxresdefault.jpg')) {
-      const ytId = getYouTubeId(youtubeUrl);
-      if (ytId) {
-        setImgSrc(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
-      }
-    }
-  };
 
   const handleCtaClick = () => {
     if (!ctaLink || ctaLink === '#appointment' || ctaLink === 'appointment') {
@@ -210,6 +121,10 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
     }
   };
 
+  const handleImgError = () => {
+    setImgSrc('https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60');
+  };
+
   return (
     <div 
       className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-10 md:p-14 shadow-xs hover:shadow-sm transition-shadow duration-300 relative overflow-hidden" 
@@ -221,21 +136,18 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
         <div className="w-full">
           <div className="relative aspect-video w-full bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200/60 group">
             {isPlaying ? (
-              source !== 'upload' ? (
-                <iframe
-                  src={buildYouTubeEmbedUrl()}
-                  title={`${serviceTitle} Featured Video`}
-                  className="w-full h-full border-none"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
+              source === 'upload' || isMp4Url(instagramUrl) ? (
                 <video
-                  src={uploadUrl || null}
+                  src={uploadUrl || instagramUrl || null}
                   className="w-full h-full object-cover"
                   controls
-                  autoPlay={false}
+                  autoPlay={true}
                   loop={!!mConfig.featured_video_loop}
+                />
+              ) : (
+                <InstagramEmbed
+                  url={instagramUrl}
+                  title={`${serviceTitle} Featured Video`}
                 />
               )
             ) : (
@@ -2566,7 +2478,7 @@ export default function ServiceDetail({
           ) : null;
 
           const defaultVideoUrl = (isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) 
-            ? ((isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling) ? 'https://www.youtube.com/watch?v=SnOxxv_S2ew' : 'https://www.instagram.com/reel/C8qLd9MyWwG/') 
+            ? 'https://www.instagram.com/reel/C8qLd9MyWwG/' 
             : (fallback?.procedure_video_url || fallback?.marketing_config?.procedure_video_url || '');
           const effectiveVideoUrl = (videoUrl || service?.procedure_video_url || mConfig.procedure_video_url || mConfig.video_url || defaultVideoUrl || '').trim();
           
@@ -2587,16 +2499,6 @@ export default function ServiceDetail({
                 {isMp4Url(effectiveVideoUrl) ? (
                   <div className="w-full max-w-[430px] mx-auto flex justify-center">
                     <Mp4ReelPlayer src={effectiveVideoUrl} />
-                  </div>
-                ) : isYouTubeUrl(effectiveVideoUrl) ? (
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-md bg-black">
-                    <iframe
-                      src={getYouTubeEmbedUrl(effectiveVideoUrl)}
-                      title={effectiveVideoTitle || 'Procedure Video'}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
                   </div>
                 ) : (
                   <InstagramEmbed
@@ -2688,16 +2590,6 @@ export default function ServiceDetail({
                       {isMp4Url(reelUrl) ? (
                         <div className="w-full max-w-[430px] mx-auto flex justify-center">
                           <Mp4ReelPlayer src={reelUrl} />
-                        </div>
-                      ) : isYouTubeUrl(reelUrl) ? (
-                        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
-                          <iframe
-                            src={getYouTubeEmbedUrl(reelUrl)}
-                            title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Video')}
-                            className="w-full h-full border-0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
                         </div>
                       ) : (
                         <InstagramEmbed
@@ -4446,7 +4338,9 @@ export default function ServiceDetail({
                     </div>
                   </div>
 
-                  
+                  {/* Surgical Team Section */}
+                  <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+
                   {/* Section 3: Material Comparison */}
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="material-comparison-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
@@ -4606,6 +4500,58 @@ export default function ServiceDetail({
                       </div>
                     </div>
                   </div>
+
+                  {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
+                    <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
+                      <div className="space-y-3 max-w-3xl mx-auto text-center">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                          <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                          BEFORE & AFTER TRANSFORMATIONS
+                        </span>
+                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight text-center">
+                          {seoHeadings.transformations}
+                        </h2>
+                        <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+                          {mConfig.before_after_description || "See real smile transformations of our patients."}
+                        </p>
+                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
+                        {beforeAfterPairs.map((pair, pIdx) => (
+                          <div 
+                            key={pair.id || pIdx} 
+                            className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
+                          >
+                            <BeforeAfterSlider
+                              beforeImage={pair.before_image}
+                              afterImage={pair.after_image}
+                              caption={pair.caption}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {mConfig.show_gallery !== false && (
+                    <ClinicalCaseGallery
+                      heading={seoHeadings.caseGallery}
+                      description={mConfig.gallery_description}
+                      items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
+                      singleGallery={true}
+                    />
+                  )}
+
+                  {testimonialsElement}
+
+                  {mConfig.show_google_reviews !== false && (
+                    <GooglePatientReviews
+                      heading={seoHeadings.reviews}
+                      reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+                    />
+                  )}
+
                   {/* Section 4: Transparent Pricing Table */}
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="pricing-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
@@ -4832,57 +4778,7 @@ export default function ServiceDetail({
                   </div>
 
                   {/* Section 7+: standard content elements */}
-                  {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-                    <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
-                      <div className="space-y-3 max-w-3xl mx-auto text-center">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                          <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                          BEFORE & AFTER TRANSFORMATIONS
-                        </span>
-                        <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight text-center">
-                          {seoHeadings.transformations}
-                        </h2>
-                        <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                          {mConfig.before_after_description || "See real smile transformations of our patients."}
-                        </p>
-                        <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
-                        {beforeAfterPairs.map((pair, pIdx) => (
-                          <div 
-                            key={pair.id || pIdx} 
-                            className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
-                          >
-                            <BeforeAfterSlider
-                              beforeImage={pair.before_image}
-                              afterImage={pair.after_image}
-                              caption={pair.caption}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {mConfig.show_gallery !== false && (
-                    <ClinicalCaseGallery
-                      heading={seoHeadings.caseGallery}
-                      description={mConfig.gallery_description}
-                      items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
-                      singleGallery={true}
-                    />
-                  )}
-
                   {videoElement}
-                  {testimonialsElement}
-
-                  {mConfig.show_google_reviews !== false && (
-                    <GooglePatientReviews
-                      heading={seoHeadings.reviews}
-                      reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
-                    />
-                  )}
 
                   {/* Section 8: Why Patel Dental Hospital for Crowns & Bridges */}
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="crowns-bridges-why-patel-section">
@@ -5046,6 +4942,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   smileMakeoverWhatsAppUrl={smileMakeoverWhatsAppUrl}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5064,6 +4961,7 @@ export default function ServiceDetail({
                   displayGallery={displayGallery}
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5083,6 +4981,7 @@ export default function ServiceDetail({
                   displayGallery={displayGallery}
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5123,6 +5022,7 @@ export default function ServiceDetail({
                   displayGallery={displayGallery}
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5143,6 +5043,7 @@ export default function ServiceDetail({
                   displayGallery={displayGallery}
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5161,6 +5062,7 @@ export default function ServiceDetail({
                   smileMakeoverHeroImage={getServiceHeroImage('smile-makeover')}
                   invisibleAlignersHeroImage={getServiceHeroImage('invisible-aligners')}
                   toothColouredFillingHeroImage={getServiceHeroImage('tooth-coloured-filling')}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5179,6 +5081,7 @@ export default function ServiceDetail({
                   displayGallery={displayGallery}
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5198,6 +5101,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   getServiceHeroImage={getServiceHeroImage}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }
@@ -5214,6 +5118,7 @@ export default function ServiceDetail({
                   displayGallery={displayGallery}
                   seoHeadings={seoHeadings}
                   getServiceHeroImage={getServiceHeroImage}
+                  setCurrentPage={setCurrentPage}
                 />
               );
             }

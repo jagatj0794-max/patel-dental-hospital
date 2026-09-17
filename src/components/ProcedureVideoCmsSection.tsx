@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Video, Instagram, Youtube, UploadCloud, X, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Video, Instagram, UploadCloud, X, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Service, MarketingConfig } from '../types';
 import { isSupabaseConfigured } from '../utils/supabase';
 import { uploadVideo } from '../utils/supabaseStorage';
@@ -29,23 +29,19 @@ export default function ProcedureVideoCmsSection({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Read video source or default to 'instagram' (for backward compatibility if existing is Instagram reel)
-  // Or 'youtube' if existing url is youtube, etc.
-  const getInitialSource = (): 'instagram' | 'youtube' | 'mp4' => {
-    if (mConfig.procedure_video_source) {
-      return mConfig.procedure_video_source;
+  // Read video source or default to 'instagram'
+  const getInitialSource = (): 'instagram' | 'mp4' => {
+    if (mConfig.procedure_video_source === 'mp4') {
+      return 'mp4';
     }
     const currentUrl = service.procedure_video_url || '';
-    if (currentUrl.includes('youtube.com') || currentUrl.includes('youtu.be')) {
-      return 'youtube';
-    }
     if (currentUrl.endsWith('.mp4') || currentUrl.includes('supabase.co') || currentUrl.startsWith('data:video/mp4')) {
       return 'mp4';
     }
     return 'instagram'; // default
   };
 
-  const [videoSource, setVideoSource] = useState<'instagram' | 'youtube' | 'mp4'>(getInitialSource());
+  const [videoSource, setVideoSource] = useState<'instagram' | 'mp4'>(getInitialSource());
 
   // Synchronize on mount and when service/mConfig updates
   useEffect(() => {
@@ -55,7 +51,7 @@ export default function ProcedureVideoCmsSection({
     }
   }, [mConfig.procedure_video_source, service.procedure_video_url]);
 
-  const handleSourceChange = (newSource: 'instagram' | 'youtube' | 'mp4') => {
+  const handleSourceChange = (newSource: 'instagram' | 'mp4') => {
     setVideoSource(newSource);
     updateMConfigField('procedure_video_source', newSource);
     
@@ -63,8 +59,6 @@ export default function ProcedureVideoCmsSection({
     let sourceUrl = '';
     if (newSource === 'instagram') {
       sourceUrl = mConfig.procedure_video_instagram_url || '';
-    } else if (newSource === 'youtube') {
-      sourceUrl = mConfig.procedure_video_youtube_url || '';
     } else if (newSource === 'mp4') {
       sourceUrl = mConfig.procedure_video_mp4_url || '';
     }
@@ -74,8 +68,6 @@ export default function ProcedureVideoCmsSection({
   const handleUrlInputChange = (val: string) => {
     if (videoSource === 'instagram') {
       updateMConfigField('procedure_video_instagram_url', val);
-    } else if (videoSource === 'youtube') {
-      updateMConfigField('procedure_video_youtube_url', val);
     }
     updateServiceField('procedure_video_url', val);
   };
@@ -193,7 +185,7 @@ export default function ProcedureVideoCmsSection({
               {sectionNumber}. Procedure Video
             </span>
             <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">
-              Configure procedure title, description, and source video (Instagram, YouTube, or Manual MP4)
+              Configure procedure title, description, and source video (Instagram or Manual MP4)
             </span>
           </div>
         </div>
@@ -244,7 +236,7 @@ export default function ProcedureVideoCmsSection({
             <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">
               Video Source
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => handleSourceChange('instagram')}
@@ -256,19 +248,6 @@ export default function ProcedureVideoCmsSection({
               >
                 <Instagram className="h-4 w-4 shrink-0" />
                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider">Instagram</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSourceChange('youtube')}
-                className={`flex flex-col sm:flex-row items-center justify-center gap-2 p-3 rounded-xl border text-center sm:text-left transition cursor-pointer ${
-                  videoSource === 'youtube'
-                    ? 'border-teal-500 bg-teal-50/40 text-[#0D9488]'
-                    : 'border-slate-200 hover:bg-slate-50 text-slate-600'
-                }`}
-              >
-                <Youtube className="h-4 w-4 shrink-0" />
-                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider">YouTube</span>
               </button>
 
               <button
@@ -299,21 +278,6 @@ export default function ProcedureVideoCmsSection({
                   onChange={(e) => handleUrlInputChange(e.target.value)}
                   className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
                   placeholder="e.g. https://www.instagram.com/reel/C8qLd9MyWwG/"
-                />
-              </div>
-            )}
-
-            {videoSource === 'youtube' && (
-              <div className="space-y-1.5 animate-fade-in">
-                <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">
-                  YouTube Video URL
-                </label>
-                <input
-                  type="text"
-                  value={mConfig.procedure_video_youtube_url || activeUrl}
-                  onChange={(e) => handleUrlInputChange(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white text-slate-800"
-                  placeholder="e.g. https://www.youtube.com/watch?v=SnOxxv_S2ew"
                 />
               </div>
             )}

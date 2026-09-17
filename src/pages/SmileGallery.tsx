@@ -5,10 +5,14 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Maximize2, Eye, X, ChevronLeft, ChevronRight, ImageIcon, Sparkles } from 'lucide-react';
-import { PatientMoment } from '../types';
+import { Eye } from 'lucide-react';
+import { PatientMoment, DentalVideo } from '../types';
 import PatientMomentsGallery from '../components/PatientMomentsGallery';
+import HospitalGallery from '../components/HospitalGallery';
 import { useSEO } from '../utils/seo';
+import { InstagramEmbed } from '../components/InstagramEmbed';
+import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
+import { DEFAULT_VIDEOS } from '../utils/videoData';
 
 export interface MediaImage {
   id: string;
@@ -25,215 +29,80 @@ interface SmileGalleryProps {
   onSelectItem?: (item: any, index: number) => void;
   openAppointmentModal?: (preselectedTreatment?: string) => void;
   galleryItems?: any[];
+  videosList?: DentalVideo[];
 }
 
-export default function SmileGallery({ patientMoments, mediaImages = [] }: SmileGalleryProps) {
+export default function SmileGallery({ patientMoments, mediaImages = [], videosList = [] }: SmileGalleryProps) {
   useSEO({
     title: 'Patient Smile & Clinical Gallery | Patel Dental Hospital Rajkot',
     description: 'Browse our smile gallery at Patel Dental Hospital, Rajkot. View life-changing smile makeovers, clinical cases, and state-of-the-art infrastructure of our advanced dental clinics.',
     keywords: 'Smile Gallery, Dental Clinic in Rajkot, Smile Makeover in Rajkot, Smile Designing, Before After Dental, Patient Moments, Dental Hospital Rajkot, Patel Dental Hospital Gallery'
   });
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const rawVideos = videosList && videosList.length > 0 ? videosList : DEFAULT_VIDEOS;
 
-  // Extract unique categories from mediaImages
-  const rawCategories = Array.from(new Set((mediaImages || []).map(img => img.category).filter(Boolean)));
-  const categories = ['All', ...rawCategories];
-
-  // Filtered images based on active category selection
-  const filteredImages = (mediaImages || []).filter(img => {
-    if (selectedCategory === 'All') return true;
-    return img.category === selectedCategory;
+  const videosToRender = rawVideos.map(v => {
+    const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
+    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
+    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('instagram' as const));
+    const url = platform === 'mp4' ? v.id : `https://www.instagram.com/p/${v.id}/`;
+    return {
+      ...v,
+      videoPlatform: platform,
+      platform: platform,
+      url: url,
+      thumbnail: v.thumbnail
+    };
   });
-
-  const currentLightboxImg = lightboxIndex !== null ? filteredImages[lightboxIndex] : null;
-
-  const handleNextLightbox = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (lightboxIndex !== null && filteredImages.length > 0) {
-      setLightboxIndex((lightboxIndex + 1) % filteredImages.length);
-    }
-  };
-
-  const handlePrevLightbox = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (lightboxIndex !== null && filteredImages.length > 0) {
-      setLightboxIndex((lightboxIndex - 1 + filteredImages.length) % filteredImages.length);
-    }
-  };
 
   return (
     <div id="smile-gallery-page-view" className="bg-[#FAFAFC] min-h-screen">
       {/* Patient Smile Moments Gallery */}
       <PatientMomentsGallery patientMoments={patientMoments} isStandalonePage={true} />
       
-      {/* About Us Hospital & Clinical Gallery Header */}
-      <section className="pt-16 sm:pt-20 pb-12 bg-white border-t border-b border-slate-100 relative">
+      {/* Hospital Gallery (reusable section) */}
+      <HospitalGallery mediaImages={mediaImages} />
+
+      {/* 4. Patient Video Testimonials */}
+      <section className="py-12 sm:py-20 bg-white relative z-10 border-t border-sky-100/30" id="patient-success-stories">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block">
-              Patel Dental Hospital • Hospital Infrastructure & Clinical Excellence
+          
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+            <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              PATIENT SUCCESS STORIES
             </span>
-            <h1 className="stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight">
-              Hospital Gallery
-            </h1>
-            <p className="text-slate-500 text-sm sm:text-base font-sans max-w-2xl mx-auto leading-relaxed">
-              Explore our modern dental operatories, advanced 3D CBCT imaging suites, sterile surgical zones, and clinical treatment highlights.
-            </p>
-            <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto rounded-full mt-4" />
+            <h2 className="stat-heading-premium text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-3">
+              Real Experiences from Patients at the Best Dental Hospital in Rajkot
+            </h2>
+            <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
           </div>
 
-          {/* Category Filter Pills */}
-          {categories.length > 1 && (
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                    selectedCategory === category
-                      ? 'bg-[#081C3A] text-white shadow-md shadow-[#081C3A]/10 scale-105'
-                      : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Main Gallery Grid */}
-      <section className="py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredImages.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-3xs max-w-lg mx-auto">
-              <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-700 font-bold text-sm">No gallery photos available in this category.</p>
-              <p className="text-slate-400 text-xs mt-1">Select another category or view all images.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredImages.map((img, index) => (
-                <motion.div
-                  key={img.id || index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: (index % 4) * 0.05 }}
-                  onClick={() => setLightboxIndex(index)}
-                  className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-[0_5px_16px_rgba(0,0,0,0.20)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.30)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
-                >
-                  <div className="relative w-full overflow-hidden bg-slate-50">
-                    <img
-                      src={img.url}
-                      alt={img.altText || img.title || 'Patel Dental Hospital Gallery'}
-                      className="w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-105 block"
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                    />
-                    
-                    {/* Category Badge */}
-                    {img.category && img.category !== 'Homepage Gallery' && (
-                      <span className="absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
-                        {img.category}
-                      </span>
-                    )}
-
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="bg-white/95 backdrop-blur-xs p-3 rounded-full shadow-lg transform translate-y-3 group-hover:translate-y-0 transition-all duration-300">
-                        <Maximize2 className="h-5 w-5 text-[#0D9488]" />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Lightbox Modal */}
-      <AnimatePresence>
-        {currentLightboxImg && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setLightboxIndex(null)}
-            className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
-          >
-            <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center justify-center">
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => setLightboxIndex(null)}
-                className="absolute -top-12 right-0 sm:right-0 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 justify-center items-start">
+            {videosToRender.map((video, index) => (
+              <motion.div
+                key={video.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                className="w-full max-w-[240px] mx-auto flex flex-col items-center"
               >
-                <X className="h-6 w-6" />
-              </button>
-
-              {/* Prev Button */}
-              {filteredImages.length > 1 && (
-                <button
-                  type="button"
-                  onClick={handlePrevLightbox}
-                  className="absolute left-2 sm:left-4 p-3 text-white/90 hover:text-white bg-black/40 hover:bg-black/70 rounded-full backdrop-blur-xs transition cursor-pointer z-10"
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-              )}
-
-              {/* Next Button */}
-              {filteredImages.length > 1 && (
-                <button
-                  type="button"
-                  onClick={handleNextLightbox}
-                  className="absolute right-2 sm:right-4 p-3 text-white/90 hover:text-white bg-black/40 hover:bg-black/70 rounded-full backdrop-blur-xs transition cursor-pointer z-10"
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              )}
-
-              {/* Image & Details */}
-              <div 
-                onClick={(e) => e.stopPropagation()}
-                className="bg-slate-900 rounded-2xl overflow-hidden border border-white/10 shadow-2xl max-h-[80vh] flex flex-col"
-              >
-                <div className="relative overflow-hidden flex items-center justify-center max-h-[70vh] bg-black">
-                  <img
-                    src={currentLightboxImg.url}
-                    alt={currentLightboxImg.altText || currentLightboxImg.title || 'Gallery View'}
-                    className="max-h-[70vh] w-auto max-w-full object-contain"
-                    referrerPolicy="no-referrer"
+                {video.videoPlatform === 'instagram' ? (
+                  <InstagramEmbed
+                    url={video.url || `https://www.instagram.com/p/${video.id}/`}
+                    title={video.title}
+                    thumbnail={video.thumbnail}
                   />
-                </div>
-                <div className="p-4 bg-slate-900 border-t border-white/10 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 className="font-display font-bold text-sm sm:text-base text-white">
-                      {currentLightboxImg.title}
-                    </h3>
-                    {currentLightboxImg.category && (
-                      <span className="text-[10px] font-bold text-[#11B5D8] tracking-wider uppercase">
-                        {currentLightboxImg.category} {currentLightboxImg.branch ? `• ${currentLightboxImg.branch}` : ''}
-                      </span>
-                    )}
+                ) : (
+                  <div className="w-full max-w-[240px] mx-auto flex justify-center">
+                    <Mp4ReelPlayer src={video.url || video.id} />
                   </div>
-                  {lightboxIndex !== null && (
-                    <span className="text-xs font-bold text-white/50">
-                      {lightboxIndex + 1} / {filteredImages.length}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

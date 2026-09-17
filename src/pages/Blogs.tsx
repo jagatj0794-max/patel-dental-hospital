@@ -91,15 +91,37 @@ const BLOG_POSTS: BlogPost[] = [
 interface BlogsProps {
   openAppointmentModal: (preselectedTreatment?: string) => void;
   setCurrentPage: (page: any) => void;
+  currentPage?: string;
 }
 
-export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsProps) {
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+export default function Blogs({ openAppointmentModal, setCurrentPage, currentPage }: BlogsProps) {
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(() => {
+    if (currentPage && currentPage.startsWith('blog/')) {
+      const postId = currentPage.substring('blog/'.length);
+      if (BLOG_POSTS.some(p => p.id === postId)) {
+        return postId;
+      }
+    }
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path.includes('/blog/')) {
+        const parts = path.split('/blog/');
+        if (parts[1]) {
+          const postId = parts[1].replace('/', '');
+          if (BLOG_POSTS.some(p => p.id === postId)) {
+            return postId;
+          }
+        }
+      }
+    }
+    return null;
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const selectedPost = BLOG_POSTS.find(p => p.id === selectedPostId);
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.pateldentalhospital.com';
 
   useSEO({
     title: selectedPost 
@@ -112,8 +134,8 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
       ? `${selectedPost.primaryKeyword}, ${selectedPost.secondaryKeywords.join(', ')}`
       : 'Dental Implants Rajkot, Dental Blog Rajkot, Patel Dental Hospital Blog, Best Implant Dentist Rajkot, Dentist Blog Gujarat',
     canonicalUrl: selectedPost
-      ? `${window.location.origin}/#blog/${selectedPost.id}`
-      : `${window.location.origin}/#academy`,
+      ? `${origin}/#blog/${selectedPost.id}`
+      : `${origin}/#academy`,
     ogTitle: selectedPost ? selectedPost.seoTitle : undefined,
     ogDescription: selectedPost ? selectedPost.metaDescription : undefined,
     ogImage: selectedPost ? selectedPost.image : undefined,
@@ -123,11 +145,11 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
       "@type": "BlogPosting",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": `${window.location.origin}/#blog/${selectedPost.id}`
+        "@id": `${origin}/#blog/${selectedPost.id}`
       },
       "headline": selectedPost.title,
       "description": selectedPost.metaDescription,
-      "image": `${window.location.origin}${selectedPost.image}`,
+      "image": `${origin}${selectedPost.image}`,
       "datePublished": selectedPost.id === 'dental-implants-rajkot' ? '2026-08-08' : selectedPost.id === 'braces-vs-clear-aligners' ? '2026-08-01' : '2026-07-25',
       "dateModified": selectedPost.id === 'dental-implants-rajkot' ? '2026-08-08' : selectedPost.id === 'braces-vs-clear-aligners' ? '2026-08-01' : '2026-07-25',
       "author": {
@@ -140,7 +162,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage }: BlogsPro
         "name": "Patel Dental Hospital",
         "logo": {
           "@type": "ImageObject",
-          "url": `${window.location.origin}/LOGO 3D FULL NAME WHITE (3)-1.png`
+          "url": `${origin}/LOGO 3D FULL NAME WHITE (3)-1.png`
         }
       }
     } : undefined

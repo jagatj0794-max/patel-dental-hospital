@@ -19,11 +19,17 @@ import { getWhatsAppUrl } from '../utils/contactData';
 import { DoctorBioRenderer } from '../components/DoctorBioRenderer';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
+import PatientMomentsGallery from '../components/PatientMomentsGallery';
+import HospitalGallery from '../components/HospitalGallery';
+import { PatientMoment } from '../types';
+import { MediaImage } from './SmileGallery';
 
 interface WhyChooseUsProps {
   openAppointmentModal: (preselectedTreatment?: string) => void;
   doctorsList?: Doctor[];
   videosList?: DentalVideo[];
+  patientMoments?: PatientMoment[];
+  mediaImages?: MediaImage[];
 }
 
 // Helper function to deduplicate text that may have been concatenated or duplicated
@@ -46,7 +52,13 @@ function deduplicateText(text: string): string {
   return trimmed;
 }
 
-export default function WhyChooseUs({ openAppointmentModal, doctorsList = [], videosList = [] }: WhyChooseUsProps) {
+export default function WhyChooseUs({ 
+  openAppointmentModal, 
+  doctorsList = [], 
+  videosList = [],
+  patientMoments,
+  mediaImages = []
+}: WhyChooseUsProps) {
   useSEO({
     title: 'Why Choose Us | Patel Dental Hospital Rajkot',
     description: 'Discover why Patel Dental Hospital is the leading dental clinic in Rajkot. Meet our senior specialists Dr. Vipul Patel and Dr. Kinjal Patel, explore our advanced digital dentistry technology, and view real patient testimonial videos.',
@@ -140,9 +152,9 @@ export default function WhyChooseUs({ openAppointmentModal, doctorsList = [], vi
   // Filter and map only the Instagram/MP4 Reels from the available list, keeping the exact sequence
   const mappedReels = videos.map(v => {
     const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
-    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
-    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('youtube' as const));
-    const url = platform === 'mp4' ? v.id : (platform === 'instagram' ? `https://www.instagram.com/p/${v.id}/` : `https://www.youtube.com/watch?v=${v.id}`);
+    const isInstagram = !isMp4;
+    const platform = isMp4 ? ('mp4' as const) : ('instagram' as const);
+    const url = platform === 'mp4' ? v.id : `https://www.instagram.com/p/${v.id}/`;
     return {
       ...v,
       videoPlatform: platform,
@@ -154,9 +166,9 @@ export default function WhyChooseUs({ openAppointmentModal, doctorsList = [], vi
   // Fallback to all videos if no Instagram reels are present
   const displayVideos = mappedReels.length > 0 ? mappedReels : videos.map(v => {
     const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
-    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
-    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('youtube' as const));
-    const url = platform === 'mp4' ? v.id : (platform === 'instagram' ? `https://www.instagram.com/p/${v.id}/` : `https://www.youtube.com/watch?v=${v.id}`);
+    const isInstagram = !isMp4;
+    const platform = isMp4 ? ('mp4' as const) : ('instagram' as const);
+    const url = platform === 'mp4' ? v.id : `https://www.instagram.com/p/${v.id}/`;
     return {
       ...v,
       videoPlatform: platform,
@@ -373,7 +385,7 @@ export default function WhyChooseUs({ openAppointmentModal, doctorsList = [], vi
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={video.videoPlatform === 'instagram' || video.videoPlatform === 'mp4' ? "w-full max-w-[240px] mx-auto flex flex-col items-center" : "bg-white rounded-[16px] overflow-hidden border border-slate-100 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col"}
+              className="w-full max-w-[240px] mx-auto flex flex-col items-center"
             >
               {video.videoPlatform === 'instagram' ? (
                 <InstagramEmbed
@@ -381,55 +393,21 @@ export default function WhyChooseUs({ openAppointmentModal, doctorsList = [], vi
                   title={video.title}
                   thumbnail={video.thumbnail}
                 />
-              ) : video.videoPlatform === 'mp4' ? (
+              ) : (
                 <div className="w-full max-w-[240px] mx-auto flex justify-center">
                   <Mp4ReelPlayer src={video.url || video.id} />
                 </div>
-              ) : (
-                <>
-                  <div className="aspect-video w-full bg-slate-950 relative overflow-hidden shrink-0">
-                    {activeVideos[video.id] ? (
-                      <iframe
-                        className="w-full h-full border-0 absolute inset-0 z-10"
-                        src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-                        title={video.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        loading="lazy"
-                      ></iframe>
-                    ) : (
-                      <button
-                        onClick={() => setActiveVideos(prev => ({ ...prev, [video.id]: true }))}
-                        className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group/video focus:outline-none"
-                        aria-label={`Play ${video.title}`}
-                      >
-                        <img
-                          src={video.thumbnail || `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-                          alt={video.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-[1.03]"
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                        {/* Centered Play Trigger Icon */}
-                        <div className="absolute z-20 flex items-center justify-center w-14 h-14 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#0D9488] group-hover/video:text-white transition-all duration-300 pointer-events-none">
-                          <Play className="h-6 w-6 translate-x-0.5 fill-current" />
-                        </div>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Video metadata */}
-                  <div className="p-4 sm:p-5 flex-grow flex flex-col justify-center">
-                    <h4 className="font-display font-bold text-[#0B1B33] text-[14px] sm:text-[15px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
-                      {video.title}
-                    </h4>
-                  </div>
-                </>
               )}
             </motion.div>
           ))}
         </div>
       </section>
+
+      {/* Happy Smiles & Patient Moments */}
+      <PatientMomentsGallery patientMoments={patientMoments} isStandalonePage={false} />
+
+      {/* Hospital Gallery */}
+      <HospitalGallery mediaImages={mediaImages} />
 
       {/* Trust Seal CTA Footer Panel */}
       <section className="bg-gradient-to-r from-[#0B1B33] to-[#081528] text-white py-16 text-center">

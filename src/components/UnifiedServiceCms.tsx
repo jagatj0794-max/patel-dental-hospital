@@ -861,7 +861,7 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Dynamic Testimonial Videos (Youtube / Instagram Reels / MP4)</h5>
+                  <h5 className="text-[11px] font-black text-slate-700 uppercase tracking-wider">Dynamic Testimonial Videos (Instagram Reels / MP4)</h5>
                   <button
                     type="button"
                     onClick={addTestimonialItem}
@@ -928,13 +928,13 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <label className="text-[9px] font-bold text-slate-500 uppercase">Video URL (Instagram / Youtube / MP4)</label>
+                              <label className="text-[9px] font-bold text-slate-500 uppercase">Video URL (Instagram / MP4)</label>
                               <input
                                 type="text"
                                 value={testi.video_url || ''}
                                 onChange={(e) => updateTestimonialItemField(idx, 'video_url', e.target.value)}
                                 className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
-                                placeholder="e.g. https://www.instagram.com/reel/... or YouTube Link"
+                                placeholder="e.g. https://www.instagram.com/reel/..."
                               />
                             </div>
                             <div className="space-y-1">

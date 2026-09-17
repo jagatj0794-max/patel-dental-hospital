@@ -2825,17 +2825,17 @@ export default function Admin({
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
 
   const [mediaVideos, setMediaVideos] = useState<Array<{ id: string; youtubeUrl: string; title: string; thumbnail: string }>>([
-    { id: 'vid-1', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Full Mouth Dental Implant Treatment Testimonial', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg' },
-    { id: 'vid-2', youtubeUrl: 'https://www.youtube.com/watch?v=ysz5S6PUM-U', title: 'Same Day Smile Restoration Experience', thumbnail: 'https://img.youtube.com/vi/ysz5S6PUM-U/hqdefault.jpg' },
-    { id: 'vid-3', youtubeUrl: 'https://www.youtube.com/watch?v=ScMzIvxBSi4', title: 'Aesthetic Veneers Case Study - Patel Dental', thumbnail: 'https://img.youtube.com/vi/ScMzIvxBSi4/hqdefault.jpg' },
+    { id: 'Db5A-K0MOoU', youtubeUrl: 'https://www.instagram.com/p/Db5A-K0MOoU/', title: 'Full Mouth Dental Implant Treatment Testimonial', thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786709786418_bibw3gks.webp' },
+    { id: 'Db44bY6MpcZ', youtubeUrl: 'https://www.instagram.com/p/Db44bY6MpcZ/', title: 'Same Day Smile Restoration Experience', thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711494301_bymdaaht.webp' },
+    { id: 'Db3TlVjskbU', youtubeUrl: 'https://www.instagram.com/p/Db3TlVjskbU/', title: 'Aesthetic Veneers Case Study - Patel Dental', thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711529687_9qy3kcqq.webp' },
   ]);
 
   const [previewImage, setPreviewImage] = useState<{ id: string; url: string; title: string; category?: string; branch?: string; altText?: string } | null>(null);
   const [videoDrawerOpen, setVideoDrawerOpen] = useState(false);
-  const [editingVideo, setEditingVideo] = useState<{ id: string; youtubeUrl: string; title: string; thumbnail: string; videoPlatform?: 'youtube' | 'instagram' | 'mp4' } | null>(null);
+  const [editingVideo, setEditingVideo] = useState<{ id: string; youtubeUrl: string; title: string; thumbnail: string; videoPlatform?: 'instagram' | 'mp4' } | null>(null);
   const [contactSaved, setContactSaved] = useState(false);
   const [videoUrlInput, setVideoUrlInput] = useState('');
-  const [videoPlatformInput, setVideoPlatformInput] = useState<'youtube' | 'instagram' | 'mp4'>('youtube');
+  const [videoPlatformInput, setVideoPlatformInput] = useState<'instagram' | 'mp4'>('instagram');
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
@@ -4306,26 +4306,21 @@ export default function Admin({
         // Derive mediaVideos dynamically from the synchronized videosList prop
         const mediaVideos = (videosList || []).map(v => {
           const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
-          const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
-          const platform = isMp4 ? 'mp4' : (isInstagram ? 'instagram' : 'youtube');
+          const platform = isMp4 ? 'mp4' : 'instagram';
           
           let youtubeUrl = '';
           if (platform === 'mp4') {
             youtubeUrl = v.id;
-          } else if (platform === 'instagram') {
-            youtubeUrl = `https://www.instagram.com/p/${v.id}/`;
           } else {
-            youtubeUrl = `https://www.youtube.com/watch?v=${v.id}`;
+            youtubeUrl = `https://www.instagram.com/p/${v.id}/`;
           }
 
           let thumbnail = v.thumbnail;
           if (!thumbnail) {
             if (platform === 'mp4') {
               thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
-            } else if (platform === 'instagram') {
-              thumbnail = `https://www.instagram.com/p/${v.id}/media/?size=l`;
             } else {
-              thumbnail = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+              thumbnail = `https://www.instagram.com/p/${v.id}/media/?size=l`;
             }
           }
 
@@ -4339,13 +4334,6 @@ export default function Admin({
         });
 
         // Local Media helpers
-        const getYouTubeId = (url: string): string | null => {
-          if (!url) return null;
-          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-          const match = url.match(regExp);
-          return (match && match[2].length === 11) ? match[2] : null;
-        };
-
         const getInstagramId = (url: string): string | null => {
           if (!url) return null;
           const match = url.match(/(?:instagram\.com\/(?:p|reel)\/)([A-Za-z0-9_-]+)/);
@@ -4354,20 +4342,6 @@ export default function Admin({
 
         const getInstagramAutoTitle = (url: string): string => {
           return "Patient Instagram Testimony Reel";
-        };
-
-        const getAutoTitle = (url: string): string => {
-          const ytId = getYouTubeId(url);
-          if (!ytId) return "New Patient Testimony Video";
-          const titles = [
-            "Full Mouth Dental Implant Rehabilitation - Patient Success Story",
-            "Same-Day Smile Transformation & Laser Dentistry Experience",
-            "Microscopic Root Canal & Restorative Veneers Clinical Case Study",
-            "Advanced Dental Implants & Aesthetic Smile Makeover Testimonial",
-            "Same-Day Crown Patient Care & Clinical Results Review"
-          ];
-          const index = Math.abs(ytId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % titles.length;
-          return titles[index];
         };
 
         const handleReplaceImage = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -4442,8 +4416,6 @@ export default function Admin({
           let currentPlatform = videoPlatformInput;
           if (videoUrlInput.includes('instagram.com') || videoUrlInput.includes('instagr.am')) {
             currentPlatform = 'instagram';
-          } else if (videoUrlInput.includes('youtube.com') || videoUrlInput.includes('youtu.be')) {
-            currentPlatform = 'youtube';
           } else if (videoUrlInput.startsWith('http') && (videoUrlInput.endsWith('.mp4') || videoUrlInput.includes('supabase.co'))) {
             currentPlatform = 'mp4';
           } else if (editingVideo && (editingVideo.videoPlatform === 'instagram' || editingVideo.platform === 'instagram')) {
@@ -4467,26 +4439,19 @@ export default function Admin({
             thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
             videoUrl = videoUrlInput;
           } else {
-            const isYoutube = currentPlatform === 'youtube';
-            const id = isYoutube ? getYouTubeId(videoUrlInput) : getInstagramId(videoUrlInput);
+            const id = getInstagramId(videoUrlInput);
             
             if (!id) {
-              alert(`Please enter a valid ${isYoutube ? 'YouTube' : 'Instagram'} video URL.`);
+              alert('Please enter a valid Instagram video URL.');
               return;
             }
             extractedId = id;
             
-            generatedTitle = isYoutube 
-              ? getAutoTitle(videoUrlInput) 
-              : getInstagramAutoTitle(videoUrlInput);
+            generatedTitle = getInstagramAutoTitle(videoUrlInput);
 
-            thumbnail = videoThumbnailInput || (isYoutube
-              ? `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`
-              : `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`);
+            thumbnail = videoThumbnailInput || `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
 
-            videoUrl = isYoutube
-              ? `https://www.youtube.com/watch?v=${extractedId}`
-              : `https://www.instagram.com/p/${extractedId}/`;
+            videoUrl = `https://www.instagram.com/p/${extractedId}/`;
           }
 
           let updated: DentalVideo[];
@@ -4632,32 +4597,25 @@ export default function Admin({
           setNewCategoryName('');
         };
 
-        const isYoutube = videoPlatformInput === 'youtube';
         const isInstagram = videoPlatformInput === 'instagram';
         const isMp4 = videoPlatformInput === 'mp4';
         
         let videoIdPreview = null;
-        if (isYoutube) {
-          videoIdPreview = getYouTubeId(videoUrlInput);
-        } else if (isInstagram) {
+        if (isInstagram) {
           videoIdPreview = getInstagramId(videoUrlInput);
         } else if (isMp4) {
           videoIdPreview = videoUrlInput || null;
         }
 
         let previewVideoTitle = '';
-        if (isYoutube) {
-          previewVideoTitle = videoIdPreview ? getAutoTitle(videoUrlInput) : 'Enter YouTube URL above';
-        } else if (isInstagram) {
+        if (isInstagram) {
           previewVideoTitle = videoIdPreview ? getInstagramAutoTitle(videoUrlInput) : 'Enter Instagram URL above';
         } else if (isMp4) {
           previewVideoTitle = customVideoTitle || 'Patient Testimonial';
         }
 
         let previewVideoThumbnail = '';
-        if (isYoutube) {
-          previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://img.youtube.com/vi/${videoIdPreview}/hqdefault.jpg` : '');
-        } else if (isInstagram) {
+        if (isInstagram) {
           previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://www.instagram.com/p/${videoIdPreview}/media/?size=l` : '');
         } else if (isMp4) {
           previewVideoThumbnail = videoThumbnailInput || `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
@@ -5123,7 +5081,7 @@ export default function Admin({
                     onClick={() => {
                       setEditingVideo(null);
                       setVideoUrlInput('');
-                      setVideoPlatformInput('youtube');
+                      setVideoPlatformInput('instagram');
                       setCustomVideoTitle('');
                       setVideoThumbnailInput('');
                       setIsUploadingThumbnail(false);
@@ -5182,7 +5140,7 @@ export default function Admin({
                               rel="noopener noreferrer"
                               className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5 z-20"
                             >
-                              <span>Open on {item.videoPlatform === 'instagram' ? 'Instagram' : 'YouTube'}</span>
+                              <span>Open on Instagram</span>
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           </div>
@@ -5200,7 +5158,7 @@ export default function Admin({
                               onClick={() => {
                                 setEditingVideo(item);
                                 setVideoUrlInput(item.youtubeUrl);
-                                setVideoPlatformInput(item.videoPlatform || 'youtube');
+                                setVideoPlatformInput(item.videoPlatform || 'instagram');
                                 setCustomVideoTitle(item.title || '');
                                 setVideoThumbnailInput(item.thumbnail || '');
                                 setIsUploadingThumbnail(false);
@@ -6808,7 +6766,7 @@ export default function Admin({
                           <span className="text-xs text-slate-400 font-medium block">
                             {videoPlatformInput === 'mp4'
                               ? "Live Preview displays automatically once you upload a valid .mp4 video."
-                              : `Live Preview displays automatically once you enter a valid ${videoPlatformInput === 'youtube' ? 'YouTube' : 'Instagram'} URL.`}
+                              : "Live Preview displays automatically once you enter a valid Instagram URL."}
                           </span>
                         </div>
                       )}
@@ -6822,7 +6780,7 @@ export default function Admin({
                         <select
                           value={videoPlatformInput}
                           onChange={(e) => {
-                            const val = e.target.value as 'youtube' | 'instagram' | 'mp4';
+                            const val = e.target.value as 'instagram' | 'mp4';
                             setVideoPlatformInput(val);
                             setVideoUrlInput('');
                             setVideoFile(null);
@@ -6833,7 +6791,6 @@ export default function Admin({
                           }}
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
                         >
-                          <option value="youtube">YouTube</option>
                           <option value="instagram">Instagram</option>
                           <option value="mp4">MP4 Video</option>
                         </select>
@@ -7034,19 +6991,13 @@ export default function Admin({
                                 setVideoUrlInput(val);
                                 if (val.includes('instagram.com') || val.includes('instagr.am')) {
                                   setVideoPlatformInput('instagram');
-                                } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
-                                  setVideoPlatformInput('youtube');
                                 }
                               }}
-                              placeholder={videoPlatformInput === 'youtube'
-                                ? "e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                                : "e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"}
+                              placeholder="e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"
                               className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium bg-white"
                             />
                             <p className="text-[10px] text-slate-400 font-medium">
-                              {videoPlatformInput === 'youtube'
-                                ? "The system extracts the YouTube Video ID and automatically pulls the corresponding HD thumbnail and dynamic clinical title."
-                                : "The system extracts the Instagram post or reel ID and integrates the media directly."}
+                              The system extracts the Instagram post or reel ID and integrates the media directly.
                             </p>
                           </div>
 
@@ -7734,26 +7685,21 @@ export default function Admin({
         // Derive tourismVideos dynamically
         const tourismVideos = (videosList || []).filter(v => v.treatment === 'Dental Tourism').map(v => {
           const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
-          const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
-          const platform = isMp4 ? 'mp4' : (isInstagram ? 'instagram' : 'youtube');
+          const platform = isMp4 ? 'mp4' : 'instagram';
           
           let youtubeUrl = '';
           if (platform === 'mp4') {
             youtubeUrl = v.id;
-          } else if (platform === 'instagram') {
-            youtubeUrl = `https://www.instagram.com/p/${v.id}/`;
           } else {
-            youtubeUrl = `https://www.youtube.com/watch?v=${v.id}`;
+            youtubeUrl = `https://www.instagram.com/p/${v.id}/`;
           }
 
           let thumbnail = v.thumbnail;
           if (!thumbnail) {
             if (platform === 'mp4') {
               thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
-            } else if (platform === 'instagram') {
-              thumbnail = `https://www.instagram.com/p/${v.id}/media/?size=l`;
             } else {
-              thumbnail = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+              thumbnail = `https://www.instagram.com/p/${v.id}/media/?size=l`;
             }
           }
 
@@ -7769,13 +7715,6 @@ export default function Admin({
         });
 
         // Local Media helpers
-        const getYouTubeId = (url: string): string | null => {
-          if (!url) return null;
-          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-          const match = url.match(regExp);
-          return (match && match[2].length === 11) ? match[2] : null;
-        };
-
         const getInstagramId = (url: string): string | null => {
           if (!url) return null;
           const match = url.match(/(?:instagram\.com\/(?:p|reel)\/)([A-Za-z0-9_-]+)/);
@@ -7786,24 +7725,10 @@ export default function Admin({
           return "Dental Tourism Patient Instagram Reel";
         };
 
-        const getAutoTitle = (url: string): string => {
-          const ytId = getYouTubeId(url);
-          if (!ytId) return "New Dental Tourism Video";
-          const titles = [
-            "Dental Tourism India - International Patient Experience & Tour",
-            "Same-Day Dental Implants & Smile Makeover Testimonial",
-            "Patel Dental Hospital Rajkot - Clinical Care & Travel Review"
-          ];
-          const index = Math.abs(ytId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % titles.length;
-          return titles[index];
-        };
-
         const handleSaveVideo = async () => {
           let currentPlatform = videoPlatformInput;
           if (videoUrlInput.includes('instagram.com') || videoUrlInput.includes('instagr.am')) {
             currentPlatform = 'instagram';
-          } else if (videoUrlInput.includes('youtube.com') || videoUrlInput.includes('youtu.be')) {
-            currentPlatform = 'youtube';
           } else if (videoUrlInput.startsWith('http') && (videoUrlInput.endsWith('.mp4') || videoUrlInput.includes('supabase.co'))) {
             currentPlatform = 'mp4';
           } else if (editingVideo && (editingVideo.videoPlatform === 'instagram' || editingVideo.platform === 'instagram')) {
@@ -7827,26 +7752,19 @@ export default function Admin({
             thumbnail = `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
             videoUrl = videoUrlInput;
           } else {
-            const isYoutube = currentPlatform === 'youtube';
-            const id = isYoutube ? getYouTubeId(videoUrlInput) : getInstagramId(videoUrlInput);
+            const id = getInstagramId(videoUrlInput);
             
             if (!id) {
-              alert(`Please enter a valid ${isYoutube ? 'YouTube' : 'Instagram'} video URL.`);
+              alert('Please enter a valid Instagram video URL.');
               return;
             }
             extractedId = id;
             
-            generatedTitle = customVideoTitle || (isYoutube 
-              ? getAutoTitle(videoUrlInput) 
-              : getInstagramAutoTitle(videoUrlInput));
+            generatedTitle = customVideoTitle || getInstagramAutoTitle(videoUrlInput);
 
-            thumbnail = videoThumbnailInput || (isYoutube
-              ? `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`
-              : `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`);
+            thumbnail = videoThumbnailInput || `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=60`;
 
-            videoUrl = isYoutube
-              ? `https://www.youtube.com/watch?v=${extractedId}`
-              : `https://www.instagram.com/p/${extractedId}/`;
+            videoUrl = `https://www.instagram.com/p/${extractedId}/`;
           }
 
           let updated: DentalVideo[];
@@ -7930,32 +7848,25 @@ export default function Admin({
           }
         };
 
-        const isYoutube = videoPlatformInput === 'youtube';
         const isInstagram = videoPlatformInput === 'instagram';
         const isMp4 = videoPlatformInput === 'mp4';
         
         let videoIdPreview = null;
-        if (isYoutube) {
-          videoIdPreview = getYouTubeId(videoUrlInput);
-        } else if (isInstagram) {
+        if (isInstagram) {
           videoIdPreview = getInstagramId(videoUrlInput);
         } else if (isMp4) {
           videoIdPreview = videoUrlInput || null;
         }
 
         let previewVideoTitle = '';
-        if (isYoutube) {
-          previewVideoTitle = videoIdPreview ? getAutoTitle(videoUrlInput) : 'Enter YouTube URL above';
-        } else if (isInstagram) {
+        if (isInstagram) {
           previewVideoTitle = videoIdPreview ? getInstagramAutoTitle(videoUrlInput) : 'Enter Instagram URL above';
         } else if (isMp4) {
           previewVideoTitle = customVideoTitle || 'Dental Tourism Video';
         }
 
         let previewVideoThumbnail = '';
-        if (isYoutube) {
-          previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://img.youtube.com/vi/${videoIdPreview}/hqdefault.jpg` : '');
-        } else if (isInstagram) {
+        if (isInstagram) {
           previewVideoThumbnail = videoThumbnailInput || (videoIdPreview ? `https://www.instagram.com/p/${videoIdPreview}/media/?size=l` : '');
         } else if (isMp4) {
           previewVideoThumbnail = videoThumbnailInput || `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60`;
@@ -8264,7 +8175,7 @@ export default function Admin({
                     onClick={() => {
                       setEditingVideo(null);
                       setVideoUrlInput('');
-                      setVideoPlatformInput('youtube');
+                      setVideoPlatformInput('instagram');
                       setCustomVideoTitle('');
                       setVideoThumbnailInput('');
                       setIsUploadingThumbnail(false);
@@ -8323,7 +8234,7 @@ export default function Admin({
                               rel="noopener noreferrer"
                               className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs hover:bg-black/80 text-white p-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition flex items-center gap-1.5 z-20"
                             >
-                              <span>Open on {item.videoPlatform === 'instagram' ? 'Instagram' : 'YouTube'}</span>
+                              <span>Open on Instagram</span>
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           </div>
@@ -8341,7 +8252,7 @@ export default function Admin({
                               onClick={() => {
                                 setEditingVideo(item);
                                 setVideoUrlInput(item.youtubeUrl);
-                                setVideoPlatformInput(item.videoPlatform || 'youtube');
+                                setVideoPlatformInput(item.videoPlatform || 'instagram');
                                 setCustomVideoTitle(item.title || '');
                                 setVideoThumbnailInput(item.thumbnail || '');
                                 setIsUploadingThumbnail(false);
@@ -8494,7 +8405,7 @@ export default function Admin({
                           <span className="text-xs text-slate-400 font-medium block">
                             {videoPlatformInput === 'mp4'
                               ? "Live Preview displays automatically once you upload a valid .mp4 video."
-                              : `Live Preview displays automatically once you enter a valid ${videoPlatformInput === 'youtube' ? 'YouTube' : 'Instagram'} URL.`}
+                              : "Live Preview displays automatically once you enter a valid Instagram URL."}
                           </span>
                         </div>
                       )}
@@ -8508,7 +8419,7 @@ export default function Admin({
                         <select
                           value={videoPlatformInput}
                           onChange={(e) => {
-                            const val = e.target.value as 'youtube' | 'instagram' | 'mp4';
+                            const val = e.target.value as 'instagram' | 'mp4';
                             setVideoPlatformInput(val);
                             setVideoUrlInput('');
                             setVideoFile(null);
@@ -8519,7 +8430,6 @@ export default function Admin({
                           }}
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white"
                         >
-                          <option value="youtube">YouTube</option>
                           <option value="instagram">Instagram</option>
                           <option value="mp4">MP4 Video File</option>
                         </select>
@@ -8713,19 +8623,13 @@ export default function Admin({
                                 setVideoUrlInput(val);
                                 if (val.includes('instagram.com') || val.includes('instagr.am')) {
                                   setVideoPlatformInput('instagram');
-                                } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
-                                  setVideoPlatformInput('youtube');
                                 }
                               }}
-                              placeholder={videoPlatformInput === 'youtube'
-                                ? "e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                                : "e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"}
+                              placeholder="e.g. https://www.instagram.com/reel/C8_X6N-vY2a/"
                               className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-medium bg-white"
                             />
                             <p className="text-[10px] text-slate-400 font-medium">
-                              {videoPlatformInput === 'youtube'
-                                ? "Enter a YouTube URL. The system automatically pulls details."
-                                : "Enter an Instagram reel or video URL."}
+                              Enter an Instagram reel or video URL.
                             </p>
                           </div>
 

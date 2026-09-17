@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  UserCheck, ShieldCheck, GraduationCap, Microscope, Award, Clock, BookOpen, CheckCircle2, ArrowRight, ChevronDown
+  UserCheck, ShieldCheck, GraduationCap, Microscope, Award, Clock, BookOpen, CheckCircle2, ChevronDown
 } from 'lucide-react';
 
 interface Block {
@@ -89,6 +89,7 @@ function getSectionIcon(title: string) {
 interface AccordionItem {
   title: string;
   blocks: Block[];
+  description?: string;
 }
 
 function AdvancedTrainingAccordion({ items }: { items: AccordionItem[] }) {
@@ -114,7 +115,7 @@ function AdvancedTrainingAccordion({ items }: { items: AccordionItem[] }) {
             <button
               type="button"
               onClick={() => toggle(idx)}
-              className="w-full px-5 py-4 flex items-center justify-between text-left font-display text-[#0B1B33] hover:bg-slate-50 transition-colors duration-200 select-none cursor-pointer focus:outline-none"
+              className="w-full px-5 pt-4 pb-2 flex items-center justify-between text-left font-display text-[#0B1B33] hover:bg-slate-50/50 transition-colors duration-200 select-none cursor-pointer focus:outline-none"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0 pr-4">
                 <span className="w-1.5 h-4 bg-[#0D9488] rounded-full inline-block shrink-0" />
@@ -126,6 +127,15 @@ function AdvancedTrainingAccordion({ items }: { items: AccordionItem[] }) {
                 className={`h-5 w-5 text-slate-400 transition-transform duration-300 shrink-0 ${isOpen ? 'transform rotate-180 text-[#0D9488]' : ''}`} 
               />
             </button>
+
+            {/* Always-visible description directly below heading */}
+            {item.description && (
+              <div className="pl-[38px] pr-5 pb-4">
+                <p className="text-slate-600 font-sans text-sm sm:text-[14.5px] leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            )}
 
             {/* Accordion Content */}
             <div 
@@ -145,12 +155,9 @@ function AdvancedTrainingAccordion({ items }: { items: AccordionItem[] }) {
                     return (
                       <ul key={bIdx} className="grid grid-cols-1 gap-2.5">
                         {block.items.map((bullet, iIdx) => (
-                          <li key={iIdx} className="bg-white border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-50/50 transition-all duration-200 group">
-                            <div className="flex items-start space-x-3 flex-1">
-                              <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
-                              <span className="flex-1 font-sans font-medium text-slate-700">{bullet}</span>
-                            </div>
-                            <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
+                          <li key={iIdx} className="bg-white border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-start space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-50/50 transition-all duration-200 group">
+                            <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                            <span className="flex-1 font-sans font-medium text-slate-700">{bullet}</span>
                           </li>
                         ))}
                       </ul>
@@ -434,18 +441,22 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
             accordionItems = [
               {
                 title: "Advanced implant surgery training (12 programmes)",
+                description: "Useful for those patients who do not have enough bone for full mouth rehabilitation.",
                 blocks: [{ type: 'list', items: group1 }]
               },
               {
                 title: "Digital and guided surgery (4 programmes)",
+                description: "Bloodless and sutureless, with accurate dental implant placement in the prosthetic position.",
                 blocks: [{ type: 'list', items: group2 }]
               },
               {
                 title: "Immediate loading and same-day teeth (4 programmes)",
+                description: "To give implant-supported fixed teeth in one week, which is exclusively done by Dr. Vipul Patel.",
                 blocks: [{ type: 'list', items: group3 }]
               },
               {
                 title: "Soft tissue and aesthetics (3 programmes)",
+                description: "Plastic surgery of gums and face, mouth opening surgery for patients who have insufficient mouth opening due to pan masala chewing.",
                 blocks: [{ type: 'list', items: group4 }]
               }
             ];
@@ -534,12 +545,9 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
             >
               <ul className="grid grid-cols-1 gap-2.5 my-3">
                 {listItems.map((item, iIdx) => (
-                  <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
-                    <div className="flex items-start space-x-3 flex-1">
-                      <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
-                      <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
+                  <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-start space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
+                    <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                    <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -566,12 +574,9 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
                   return (
                     <ul key={bIdx} className="grid grid-cols-1 gap-2.5 my-3">
                       {block.items.map((item, iIdx) => (
-                        <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-center justify-between space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
-                          <div className="flex items-start space-x-3 flex-1">
-                            <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
-                            <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
-                          </div>
-                          <ArrowRight className="h-4 w-4 text-[#0D9488]/40 group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 self-center" />
+                        <li key={iIdx} className="bg-slate-50/70 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex items-start space-x-3 text-gray-800 font-sans text-sm sm:text-base leading-relaxed hover:border-slate-200 hover:bg-slate-100/30 transition-all duration-200 group">
+                          <CheckCircle2 className="h-5 w-5 text-[#0D9488] shrink-0 mt-0.5" />
+                          <span className="flex-1 font-sans font-medium text-slate-800">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -623,17 +628,7 @@ export function DoctorBioRenderer({ bioText, doctorName }: { bioText?: string; d
               </div>
             )}
             {renderedContent}
-            {isAdvancedTraining && doctorName && (doctorName.toLowerCase().includes('vipul') || doctorName.toLowerCase().includes('kinjal')) && (
-              <div className="pt-2">
-                <a 
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
-                  className="inline-block text-[#0D9488] hover:text-[#0b7a70] hover:underline font-sans font-semibold text-sm sm:text-base"
-                >
-                  Download full CV (PDF)
-                </a>
-              </div>
-            )}
+            {/* Removed Download full CV (PDF) link */}
           </div>
         );
       })}

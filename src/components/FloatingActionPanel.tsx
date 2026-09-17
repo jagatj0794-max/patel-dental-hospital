@@ -8,6 +8,7 @@ import { Phone, Calendar, MessageCircle, Instagram } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ContactInfo } from '../types';
 import { getWhatsAppUrl } from '../utils/contactData';
+import { trackWhatsAppClick, trackPhoneClick, trackAppointmentCTAClick } from '../utils/analytics';
 
 interface FloatingActionPanelProps {
   openAppointmentModal: (preselectedTreatment?: string) => void;
@@ -102,6 +103,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo,
             <div className="flex items-center space-x-3 group">
               <motion.a
                 href={telephoneUrl}
+                onClick={() => trackPhoneClick(phoneRaw, 'Floating Action Panel')}
                 onMouseEnter={() => setHoveredButton('call')}
                 onMouseLeave={() => setHoveredButton(null)}
                 whileHover={{ scale: 1.08 }}
@@ -131,6 +133,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo,
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('Floating Action Panel')}
                 onMouseEnter={() => setHoveredButton('whatsapp')}
                 onMouseLeave={() => setHoveredButton(null)}
                 whileHover={{ scale: 1.08 }}
@@ -157,7 +160,10 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo,
             {/* Book Appointment CTA */}
             <div className="flex items-center space-x-3 group">
               <motion.button
-                onClick={() => openAppointmentModal()}
+                onClick={() => {
+                  trackAppointmentCTAClick('Free Consultation Icon', 'Floating Action Panel');
+                  openAppointmentModal();
+                }}
                 onMouseEnter={() => setHoveredButton('book')}
                 onMouseLeave={() => setHoveredButton(null)}
                 whileHover={{ scale: 1.08 }}
@@ -194,6 +200,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo,
           <motion.a
             id="mobile-call-action"
             href={telephoneUrl}
+            onClick={() => trackPhoneClick(phoneRaw, 'Mobile Sticky Bar')}
             whileTap={{ scale: 0.95 }}
             className="flex-1 h-11 flex items-center justify-center space-x-1 px-1 bg-gradient-to-r from-[#081C3A] via-[#0B2545] to-[#13315C] text-white font-extrabold rounded-xl border border-white/5 shadow-[0_2px_10px_rgba(8,28,58,0.25)] text-center cursor-pointer"
           >
@@ -209,6 +216,7 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo,
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('Mobile Sticky Bar')}
             whileTap={{ scale: 0.95 }}
             className="flex-1 h-11 flex items-center justify-center space-x-1 px-1 bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-extrabold rounded-xl border border-white/5 shadow-[0_2px_10px_rgba(37,211,102,0.25)] text-center cursor-pointer"
           >
@@ -221,7 +229,10 @@ export default function FloatingActionPanel({ openAppointmentModal, contactInfo,
           {/* Action Book Slot */}
           <motion.button
             id="mobile-book-action"
-            onClick={() => openAppointmentModal()}
+            onClick={() => {
+              trackAppointmentCTAClick('Free Consultation Button', 'Mobile Sticky Bar');
+              openAppointmentModal();
+            }}
             whileTap={{ scale: 0.95 }}
             className="flex-1 h-11 flex items-center justify-center space-x-1 px-1 bg-gradient-to-r from-[#11B5D8] to-[#0ea5e9] text-white font-extrabold rounded-xl border border-white/5 shadow-[0_2px_10px_rgba(17,181,216,0.25)] text-center cursor-pointer"
           >

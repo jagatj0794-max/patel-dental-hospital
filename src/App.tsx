@@ -32,21 +32,27 @@ import SameDayFix from './pages/SameDayFix';
 import SmileGallery from './pages/SmileGallery';
 import Doctors from './pages/Doctors';
 import Contact from './pages/Contact';
-import Admin from './pages/Admin';
-import AdminLogin from './pages/AdminLogin';
-import SupabaseTest from './pages/SupabaseTest';
 import ServiceDetail from './pages/ServiceDetail';
 import SocialService from './pages/SocialService';
 import Technology from './pages/Technology';
 import DentalTourism from './pages/DentalTourism';
 import Blogs from './pages/Blogs';
 import WhyChooseUs from './pages/WhyChooseUs';
+import { initAnalytics, trackAppointmentFormSubmit } from './utils/analytics';
+
+// Admin / Test pages lazy loaded
+const Admin = React.lazy(() => import('./pages/Admin'));
+const AdminLogin = React.lazy(() => import('./pages/AdminLogin'));
+const SupabaseTest = React.lazy(() => import('./pages/SupabaseTest'));
 
 import { GALLERY_ITEMS } from './data/gallery';
 
 const DOCTOR_WHATSAPP_NUMBER = "919510397046";
 
 const getPageFromUrl = (): PageId => {
+  if (typeof window === 'undefined') {
+    return 'home';
+  }
   // First check hash
   let page = window.location.hash.replace('#', '');
   if (page.startsWith('/')) {
@@ -87,9 +93,9 @@ const getPageFromUrl = (): PageId => {
   return 'home';
 };
 
-export default function App() {
+export default function App({ initialPage }: { initialPage?: PageId } = {}) {
   const [currentPage, setCurrentPage] = useState<PageId>(() => {
-    return getPageFromUrl();
+    return initialPage || getPageFromUrl();
   });
   const [session, setSession] = useState<any>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -98,6 +104,10 @@ export default function App() {
   
   // My Saved Appointments state (loaded dynamically from Supabase based on session IDs)
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  useEffect(() => {
+    initAnalytics();
+  }, []);
 
   useEffect(() => {
     const loadMyAppointments = async () => {
@@ -582,12 +592,14 @@ export default function App() {
         window.open(whatsappUrl, '_blank');
       }
 
+      trackAppointmentFormSubmit(true, { treatment: data.treatment, doctor: 'To Be Assigned' });
       return true;
-    } catch (e) {
+    } catch (e: any) {
       console.error('Exception booking appointment:', e);
       if (preOpenedWindow) {
         preOpenedWindow.close();
       }
+      trackAppointmentFormSubmit(false, { error: e?.message || 'Unknown Error' });
       return false;
     }
   };
@@ -722,6 +734,7 @@ export default function App() {
         <Blogs
           openAppointmentModal={openAppointmentModal}
           setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
         />
       );
     }
@@ -791,6 +804,7 @@ export default function App() {
             onSelectItem={(item) => setSelectedGalleryItem(item)}
             openAppointmentModal={openAppointmentModal}
             galleryItems={mappedGalleryItems}
+            videosList={videosList}
           />
         );
       case 'social-service':
@@ -803,6 +817,8 @@ export default function App() {
             openAppointmentModal={openAppointmentModal}
             doctorsList={doctorsList}
             videosList={videosList}
+            patientMoments={patientMoments}
+            mediaImages={mediaImages}
           />
         );
       case 'international':
@@ -813,6 +829,7 @@ export default function App() {
           <Blogs
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
           />
         );
       case 'doctors':
@@ -826,9 +843,27 @@ export default function App() {
           />
         );
       case 'admin/login':
-        return <AdminLogin setCurrentPage={setCurrentPage} session={session} />;
+        return (
+          <React.Suspense fallback={
+            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-slate-50">
+              <span className="animate-spin text-[#081C3A] rounded-full h-8 w-8 border-b-2 border-[#081C3A]"></span>
+              <p className="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loading Admin Login...</p>
+            </div>
+          }>
+            <AdminLogin setCurrentPage={setCurrentPage} session={session} />
+          </React.Suspense>
+        );
       case 'supabase-test':
-        return <SupabaseTest setCurrentPage={setCurrentPage} />;
+        return (
+          <React.Suspense fallback={
+            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-slate-50">
+              <span className="animate-spin text-[#081C3A] rounded-full h-8 w-8 border-b-2 border-[#081C3A]"></span>
+              <p className="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loading test tool...</p>
+            </div>
+          }>
+            <SupabaseTest setCurrentPage={setCurrentPage} />
+          </React.Suspense>
+        );
       case 'admin':
         if (isAuthLoading) {
           return (
@@ -839,27 +874,34 @@ export default function App() {
           );
         }
         return (
-          <Admin 
-            setCurrentPage={setCurrentPage} 
-            heroHeading={heroHeading}
-            setHeroHeading={setHeroHeading}
-            heroDescription={heroDescription}
-            setHeroDescription={setHeroDescription}
-            heroBgImage={heroBgImage}
-            setHeroBgImage={setHeroBgImage}
-            heroBgImageMobile={heroBgImageMobile}
-            setHeroBgImageMobile={setHeroBgImageMobile}
-            doctorsList={doctorsList}
-            setDoctorsList={setDoctorsList}
-            mediaImages={mediaImages}
-            setMediaImages={setMediaImages}
-            patientMoments={patientMoments}
-            setPatientMoments={setPatientMoments}
-            videosList={videosList}
-            setVideosList={setVideosList}
-            contactInfo={contactInfo}
-            setContactInfo={setContactInfo}
-          />
+          <React.Suspense fallback={
+            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-slate-50">
+              <span className="animate-spin text-[#081C3A] rounded-full h-8 w-8 border-b-2 border-[#081C3A]"></span>
+              <p className="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loading Admin Panel...</p>
+            </div>
+          }>
+            <Admin 
+              setCurrentPage={setCurrentPage} 
+              heroHeading={heroHeading}
+              setHeroHeading={setHeroHeading}
+              heroDescription={heroDescription}
+              setHeroDescription={setHeroDescription}
+              heroBgImage={heroBgImage}
+              setHeroBgImage={setHeroBgImage}
+              heroBgImageMobile={heroBgImageMobile}
+              setHeroBgImageMobile={setHeroBgImageMobile}
+              doctorsList={doctorsList}
+              setDoctorsList={setDoctorsList}
+              mediaImages={mediaImages}
+              setMediaImages={setMediaImages}
+              patientMoments={patientMoments}
+              setPatientMoments={setPatientMoments}
+              videosList={videosList}
+              setVideosList={setVideosList}
+              contactInfo={contactInfo}
+              setContactInfo={setContactInfo}
+            />
+          </React.Suspense>
         );
       default:
         return (

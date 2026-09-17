@@ -13,6 +13,7 @@ interface PatientMomentsGalleryProps {
   patientMoments?: PatientMoment[];
   isStandalonePage?: boolean;
   onNavigate?: (page: string) => void;
+  hideViewMoreBtn?: boolean;
 }
 
 const ROW_HEIGHT = 4; // 4px per grid auto-row unit
@@ -116,7 +117,8 @@ const GalleryCardItem: React.FC<GalleryCardItemProps> = ({ moment, index, onClic
 export default function PatientMomentsGallery({
   patientMoments,
   isStandalonePage = false,
-  onNavigate
+  onNavigate,
+  hideViewMoreBtn = false
 }: PatientMomentsGalleryProps) {
   const momentsToRender = patientMoments !== undefined && patientMoments.length > 0
     ? patientMoments
@@ -244,7 +246,7 @@ export default function PatientMomentsGallery({
         </div>
 
         {/* View More Photos toggle controls */}
-        {(!isStandalonePage || visibleCount < momentsToRender.length) && (
+        {!hideViewMoreBtn && (!isStandalonePage || visibleCount < momentsToRender.length) && (
           <div className="mt-12 sm:mt-16 flex justify-center">
             <button
               id="btn-view-more-photos"

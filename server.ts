@@ -7,6 +7,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import fs from "fs";
 
 // Load environment variables
 dotenv.config();
@@ -124,7 +125,22 @@ async function startServer() {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const requestedPath = req.path;
+      // Strip trailing slash if present
+      const cleanPath = requestedPath.endsWith('/') && requestedPath !== '/' 
+        ? requestedPath.slice(0, -1) 
+        : requestedPath;
+        
+      const htmlFile = cleanPath === '/' 
+        ? 'index.html' 
+        : path.join(cleanPath, 'index.html');
+        
+      const fullPath = path.join(distPath, htmlFile);
+      if (fs.existsSync(fullPath)) {
+        res.sendFile(fullPath);
+      } else {
+        res.sendFile(path.join(distPath, 'index.html'));
+      }
     });
     console.log('[Server] Serving production assets from dist/');
   }

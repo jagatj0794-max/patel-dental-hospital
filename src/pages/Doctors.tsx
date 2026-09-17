@@ -147,9 +147,22 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                         <GraduationCap className="h-4.5 w-4.5 text-[#0ea5e9] shrink-0 mt-0.5" />
                         <div>
                           <p className="text-[11px] font-extrabold text-[#0B1B33]">Qualification</p>
-                          <p className="text-xs text-gray-500 font-sans">
-                            {doctor.id === 'vipul' ? 'MDS, Masters in Implantology (USA)' : `${doctor.titles} (${doctor.bdsInstitution})`}
-                          </p>
+                          <div className="text-xs text-gray-500 font-sans mt-0.5 leading-normal space-y-0.5">
+                            {doctor.id === 'vipul' ? (
+                              <>
+                                <span className="block">MDS in Oral & Maxillofacial Surgery</span>
+                                <span className="block">MDS in Oral Medicine & Radiology</span>
+                                <span className="block">Mastership in Implant Prosthodontics (USA)</span>
+                              </>
+                            ) : doctor.id === 'kinjal' ? (
+                              <>
+                                <span className="block">BDS (Government Dental College, Jamnagar)</span>
+                                <span className="block">Fellowship in implant prosthodontics (USA)</span>
+                              </>
+                            ) : (
+                              <span>{doctor.titles} ({doctor.bdsInstitution})</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}

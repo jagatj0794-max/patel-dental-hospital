@@ -26,6 +26,7 @@ import { MarketingConfig } from '../../types';
 import { BeforeAfterSlider } from '../BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../ClinicalCaseGallery';
 import { GooglePatientReviews } from '../GooglePatientReviews';
+import { SurgicalTeamSection } from './SurgicalTeamSection';
 
 export interface ToothColouredFillingViewProps {
   heroElement: React.ReactNode;
@@ -48,6 +49,7 @@ export interface ToothColouredFillingViewProps {
     [key: string]: any;
   };
   getServiceHeroImage?: (slug: string) => string;
+  setCurrentPage?: (page: string) => void;
 }
 
 export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> = ({
@@ -59,7 +61,8 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
   beforeAfterPairs,
   displayGallery,
   seoHeadings,
-  getServiceHeroImage
+  getServiceHeroImage,
+  setCurrentPage
 }) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
@@ -160,6 +163,9 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
           ))}
         </div>
       </section>
+
+      {/* Surgical Team Section */}
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
 
       {/* Option Comparison Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6" id="option-comparison-section">
@@ -278,6 +284,69 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
           </div>
         </div>
       </section>
+
+      {/* 7. TREATMENT-MATCHED PROOF */}
+      {/* 1. Before & After Gallery */}
+      {mConfig?.show_before_after !== false && beforeAfterPairs && beforeAfterPairs.length > 0 && (
+        <section id="filling-before-after-gallery" className="space-y-6 sm:space-y-10 pt-5 sm:pt-10 border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="space-y-3 max-w-3xl mx-auto text-center">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
+              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+              7. TREATMENT-MATCHED PROOF &bull; Before & After Gallery
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight text-center">
+              {seoHeadings?.transformations || "Tooth Coloured Filling Transformations"}
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+              {mConfig?.before_after_description || "See real smile transformations of our tooth-coloured filling patients."}
+            </p>
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
+            {beforeAfterPairs.map((pair, pIdx) => (
+              <div 
+                key={pair.id || pIdx} 
+                className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
+              >
+                <BeforeAfterSlider
+                  beforeImage={pair.before_image}
+                  afterImage={pair.after_image}
+                  caption={pair.caption || pair.title}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 2. Clinical Case Gallery */}
+      {mConfig?.show_gallery !== false && displayGallery && displayGallery.length > 0 && (
+        <div className="border-t border-slate-200/60 pt-5 sm:pt-10 max-w-7xl mx-auto px-4 sm:px-6" id="filling-clinical-gallery">
+          <ClinicalCaseGallery
+            heading={seoHeadings?.caseGallery || "Clinical Case Gallery"}
+            description={mConfig?.gallery_description}
+            items={Array.isArray(mConfig?.gallery_items) ? mConfig?.gallery_items : displayGallery}
+            singleGallery={true}
+          />
+        </div>
+      )}
+
+      {mConfig?.show_testimonials !== false && testimonialsElement && (
+        <div className="border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6" id="filling-testimonial-reels">
+          {testimonialsElement}
+        </div>
+      )}
+
+      {/* 5. Google Patient Reviews */}
+      {mConfig?.show_google_reviews !== false && (
+        <div className="border-t border-slate-200/60 pt-5 sm:pt-10 max-w-7xl mx-auto px-4 sm:px-6" id="filling-google-reviews">
+          <GooglePatientReviews
+            heading={seoHeadings?.reviews || "Google Patient Reviews"}
+            reviews={Array.isArray(mConfig?.google_reviews) ? mConfig?.google_reviews : []}
+          />
+        </div>
+      )}
 
       {/* Transparent Pricing Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6" id="transparent-pricing-section">
@@ -461,74 +530,10 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
         </div>
       </section>
 
-      {/* 7. TREATMENT-MATCHED PROOF */}
-      {/* 1. Before & After Gallery */}
-      {mConfig?.show_before_after !== false && beforeAfterPairs && beforeAfterPairs.length > 0 && (
-        <section id="filling-before-after-gallery" className="space-y-6 sm:space-y-10 pt-5 sm:pt-10 border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="space-y-3 max-w-3xl mx-auto text-center">
-            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60 font-sans">
-              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-              7. TREATMENT-MATCHED PROOF &bull; Before & After Gallery
-            </span>
-            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight text-center">
-              {seoHeadings?.transformations || "Tooth Coloured Filling Transformations"}
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-              {mConfig?.before_after_description || "See real smile transformations of our tooth-coloured filling patients."}
-            </p>
-            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
-            {beforeAfterPairs.map((pair, pIdx) => (
-              <div 
-                key={pair.id || pIdx} 
-                className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
-              >
-                <BeforeAfterSlider
-                  beforeImage={pair.before_image}
-                  afterImage={pair.after_image}
-                  caption={pair.caption || pair.title}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 2. Clinical Case Gallery */}
-      {mConfig?.show_gallery !== false && displayGallery && displayGallery.length > 0 && (
-        <div className="border-t border-slate-200/60 pt-5 sm:pt-10 max-w-7xl mx-auto px-4 sm:px-6" id="filling-clinical-gallery">
-          <ClinicalCaseGallery
-            heading={seoHeadings?.caseGallery || "Clinical Case Gallery"}
-            description={mConfig?.gallery_description}
-            items={Array.isArray(mConfig?.gallery_items) ? mConfig?.gallery_items : displayGallery}
-            singleGallery={true}
-          />
-        </div>
-      )}
-
       {/* 3. Procedure Video */}
       {mConfig?.show_procedure_video !== false && videoElement && (
         <div className="border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6" id="filling-procedure-video">
           {videoElement}
-        </div>
-      )}
-
-      {/* 4. Patient Testimonial Reels */}
-      {mConfig?.show_testimonials !== false && testimonialsElement && (
-        <div className="border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6" id="filling-testimonial-reels">
-          {testimonialsElement}
-        </div>
-      )}
-
-      {/* 5. Google Patient Reviews */}
-      {mConfig?.show_google_reviews !== false && (
-        <div className="border-t border-slate-200/60 pt-5 sm:pt-10 max-w-7xl mx-auto px-4 sm:px-6" id="filling-google-reviews">
-          <GooglePatientReviews
-            heading={seoHeadings?.reviews || "Google Patient Reviews"}
-            reviews={Array.isArray(mConfig?.google_reviews) ? mConfig?.google_reviews : []}
-          />
         </div>
       )}
 

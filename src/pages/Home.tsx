@@ -7,11 +7,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
   HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
-  Stethoscope, Cpu, X, Maximize2, Eye, Heart, ChevronLeft, ChevronRight, Phone as PhoneIcon,
+  Stethoscope, Cpu, X, Maximize2, Eye, Heart, ChevronLeft, ChevronRight, Phone as PhoneIcon, ImageIcon,
   ChevronDown, MapPin, Clock, Mail, ExternalLink, Trophy, Instagram
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { PageId, PatientMoment, ContactInfo, Service, AwardItem } from '../types';
+import { PageId, PatientMoment, ContactInfo, Service, AwardItem, DentalVideo } from '../types';
+import { DEFAULT_VIDEOS } from '../utils/videoData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { getWhatsAppUrl } from '../utils/contactData';
 import { awardsService } from '../utils/awardsData';
@@ -135,6 +136,200 @@ const CrownsBridgesIcon = ({ className }: { className?: string }) => (
     <path d="M6 15v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4" />
     <path d="M10 15v4" strokeWidth="1.5" />
     <path d="M14 15v4" strokeWidth="1.5" />
+  </svg>
+);
+
+// Custom Patient Problem Qualification Icons (Premium Inline SVGs matching reference image exactly)
+const EatingDifficultyIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Fork (Left) */}
+    <path d="M4.5 5v3.5c0 .8.6 1.3 1.2 1.3s1.2-.5 1.2-1.3V5" />
+    <path d="M5.7 5v3.5" />
+    <path d="M5.7 9.8V19" />
+
+    {/* Tooth (Center) */}
+    <path d="M12 6.5c-1.5 0-2.5-.5-2.5 1 0 1.5.3 2.5.6 3.8.2.8.1 2.2.5 2.5.3.3.7.3.9-.1.3-.8.7-2.4.7-2.4s.4 1.6.7 2.4c.2.4.6.4.9.1.4-.3.3-1.7.5-2.5.3-1.3.6-2.3.6-3.8 0-1.5-1-1-2.5-1z" />
+
+    {/* Spoon (Right) */}
+    <path d="M18.5 5.2c-.8 0-1.5 1-1.5 2.2s.7 2.2 1.5 2.2s1.5-1 1.5-2.2s-.7-2.2-1.5-2.2z" />
+    <path d="M18.5 9.6V19" />
+  </svg>
+);
+
+const LooseToothIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Centered Tooth */}
+    <path d="M12 5.5c-2 0-3.3-.8-3.3 1.2 0 1.8.3 3 .6 4.5.3 1 .2 2.6.5 2.8.3.3.7.3.9-.1.3-.9.7-2.8.7-2.8s.4 2.2.7 2.8c.2.3.6.3.9-.1.4-.3.3-1.8.5-2.8.3-1.5.6-2.7.6-4.5 0-2-1.3-1.2-3.3-1.2z" />
+
+    {/* Shaking vibration lines */}
+    <path d="M5.5 10.5c-.4 1-.4 2.5 0 3.5" />
+    <path d="M3.5 9c-.7 1.8-.7 4.2 0 6" />
+    <path d="M18.5 10.5c.4 1 .4 2.5 0 3.5" />
+    <path d="M20.5 9c.7 1.8.7 4.2 0 6" />
+  </svg>
+);
+
+const DamagedTeethIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Tooth 1 (Left with top crack) */}
+    <path d="M6 6.5c-1 0-1.6-.4-1.6.6 0 1 .2 1.6.5 2.5.2.5.1 1.4.4 1.5.2.2.5.2.6-.1.2-.5.5-1.5.5-1.5s.3 1 .5 1.5c.2.2.5.2.6-.1.3-.2.2-1 .4-1.5.2-.9.5-1.5.5-2.5 0-1-.6-.6-1.5-.6z" />
+    <path d="M5.2 6.5l.6 2-.6.8" strokeWidth="1.5" />
+
+    {/* Tooth 2 (Middle Connected) */}
+    <path d="M12 6.5c-1 0-1.6-.4-1.6.6 0 1 .2 1.6.5 2.5.2.5.1 1.4.4 1.5.2.2.5.2.6-.1.2-.5.5-1.5.5-1.5s.3 1 .5 1.5c.2.2.5.2.6-.1.3-.2.2-1 .4-1.5.2-.9.5-1.5.5-2.5 0-1-.6-.6-1.5-.6z" />
+
+    {/* Tooth 3 (Right with top crack) */}
+    <path d="M18 6.5c-1 0-1.6-.4-1.6.6 0 1 .2 1.6.5 2.5.2.5.1 1.4.4 1.5.2.2.5.2.6-.1.2-.5.5-1.5.5-1.5s.3 1 .5 1.5c.2.2.5.2.6-.1.3-.2.2-1 .4-1.5.2-.9.5-1.5.5-2.5 0-1-.6-.6-1.5-.6z" />
+    <path d="M18.8 6.5l-.6 2 .6.8" strokeWidth="1.5" />
+  </svg>
+);
+
+const DenturesIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Upper Denture Base and Ridges */}
+    <path d="M3.5 9c0-2.5 3-4 8.5-4s8.5 1.5 8.5 4" />
+    <path d="M4 9c0 1.5 1.5 2 8 2s8-.5 8-2" />
+    <path d="M6.5 9v1.2" />
+    <path d="M9 9.3v1.5" />
+    <path d="M12 9.5v1.5" />
+    <path d="M15 9.3v1.5" />
+    <path d="M17.5 9v1.2" />
+
+    {/* Lower Denture Base and Ridges */}
+    <path d="M3.5 15c0 2.5 3 4 8.5 4s8.5-1.5 8.5-4" />
+    <path d="M4 15c0-1.5 1.5-2 8-2s8 .5 8 2" />
+    <path d="M6.5 15v-1.2" />
+    <path d="M9 14.7v-1.5" />
+    <path d="M12 14.5v-1.5" />
+    <path d="M15 14.7v-1.5" />
+    <path d="M17.5 15v-1.2" />
+  </svg>
+);
+
+const AestheticSmileIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Smiling Lip Crescent Shapes */}
+    <path d="M3 11.5c3 4.5 15 4.5 18 0" />
+    <path d="M4.5 11.5c3 2 12 2 15 0" />
+    <path d="M3 11.5c3-2 6-1 9 .5c3-1.5 6-2.5 9-.5" />
+
+    {/* Sparkle Star (Top Right) */}
+    <path d="M18.5 3c0 1.2 .3 1.5 1.5 1.5c-1.2 0-1.5 .3-1.5 1.5c0-1.2-.3-1.5-1.5-1.5c1.2 0 1.5-.3 1.5-.3" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const ToothPainIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Tooth Outline (Shifted Left) */}
+    <path d="M9 6.5c-1.5 0-2.5-.5-2.5 1 0 1.5.3 2.5.6 3.8.2.8.1 2.5.5 2.8.3.3.8.3 1 0 .3-.9.7-2.8.7-2.8s.4 1.9.7 2.8c.2.3.7.3 1 0 .4-.3.3-1.7.5-2.5.3-1.3.6-2.3.6-3.8 0-1.5-1-1-2.5-1z" />
+
+    {/* Pain lightning bolt cutting right root/crown */}
+    <path d="M17 3.5l-3 5.5h3.5l-3 4.5" />
+
+    {/* Pain/Shock lines */}
+    <path d="M18 7.5l2 .5" />
+    <path d="M16.5 11.5l1.5 1.5" />
+  </svg>
+);
+
+const ConsultationOpinionIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Left Doctor with Stethoscope */}
+    <circle cx="9" cy="7.5" r="2.5" />
+    <path d="M3.5 18c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4" />
+    <path d="M7 15.5c0 1.2.6 2 2 2s2-.8 2-2" strokeWidth="1.5" />
+    <path d="M9 17.5v1.5" strokeWidth="1.5" />
+
+    {/* Right smaller patient consultation outline */}
+    <circle cx="16.5" cy="11.5" r="1.8" />
+    <path d="M13.5 19c0-1.5 1-2 3-2s3 .5 3 2" />
+
+    {/* Medical Consultation Cross Sign */}
+    <path d="M18.5 8h3" />
+    <path d="M20 6.5V9.5" />
+  </svg>
+);
+
+const DiagnosisQuestionIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Friendly Tooth Crown Outer Shape */}
+    <path d="M12 5.5c-2 0-3.3-.8-3.3 1.2 0 1.8.3 3 .6 4.5.3 1 .2 2.6.5 2.8.3.3.7.3.9-.1.3-.9.7-2.8.7-2.8s.4 2.2.7 2.8c.2.3.6.3.9-.1.4-.3.3-1.8.5-2.8.3-1.5.6-2.7.6-4.5 0-2-1.3-1.2-3.3-1.2z" />
+
+    {/* Centered Question Mark inside the crown */}
+    <path d="M12 8.2c.8 0 1.2.4 1.2.9c0 .5-.4.8-.8 1.1c-.4.3-.4.8-.4 1.2" strokeWidth="1.5" />
+    <circle cx="12" cy="12.5" r="0.5" fill="currentColor" />
   </svg>
 );
 
@@ -301,7 +496,7 @@ interface HomeProps {
   heroBgImageMobile?: string;
   mediaImages?: Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>;
   patientMoments?: PatientMoment[];
-  videosList?: Array<{ id: string; title: string; treatment: string; videoPlatform?: 'youtube' | 'instagram' | 'mp4' }>;
+  videosList?: DentalVideo[];
   contactInfo?: ContactInfo;
 }
 
@@ -317,26 +512,20 @@ export default function Home({
   videosList = [],
   contactInfo
 }: HomeProps) {
+
   const momentsToRender = patientMoments !== undefined ? patientMoments : PATIENT_MOMENTS;
   const phoneRaw = contactInfo?.phoneRaw || '+919510397046';
   const whatsappRaw = contactInfo?.whatsappRaw || '919510397046';
   const displayPhone = contactInfo?.phone || '+91 9510397046';
   const displayWhatsapp = contactInfo?.whatsapp || '+91 9510397046';
 
-  const rawVideos = videosList && videosList.length > 0 ? videosList : [
-    { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants', videoPlatform: 'youtube' },
-    { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab', videoPlatform: 'youtube' },
-    { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners', videoPlatform: 'youtube' },
-    { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care', videoPlatform: 'youtube' },
-    { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover', videoPlatform: 'youtube' },
-    { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry', videoPlatform: 'youtube' }
-  ];
+  const rawVideos = (videosList && videosList.length > 0 ? videosList : DEFAULT_VIDEOS) as DentalVideo[];
 
-  const videosToRender = rawVideos.map(v => {
+  const videosToRender = rawVideos.map((v: DentalVideo) => {
     const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
-    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title.toLowerCase().includes('instagram')));
-    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('youtube' as const));
-    const url = platform === 'mp4' ? v.id : (platform === 'instagram' ? `https://www.instagram.com/p/${v.id}/` : `https://www.youtube.com/watch?v=${v.id}`);
+    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title?.toLowerCase().includes('instagram')));
+    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('instagram' as const));
+    const url = platform === 'mp4' ? v.id : `https://www.instagram.com/p/${v.id}/`;
     return {
       ...v,
       videoPlatform: platform,
@@ -350,6 +539,27 @@ export default function Home({
   const [activeMapBranch, setActiveMapBranch] = useState<'amin_marg' | 'gayatrinagar'>('amin_marg');
 
   const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
+
+  // Hospital Gallery States & Lightbox Logic
+  const [hospitalLightboxIndex, setHospitalLightboxIndex] = useState<number | null>(null);
+
+  const filteredHospitalImages = mediaImages || [];
+
+  const currentHospitalLightboxImg = hospitalLightboxIndex !== null ? filteredHospitalImages[hospitalLightboxIndex] : null;
+
+  const handleNextHospitalLightbox = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hospitalLightboxIndex !== null && filteredHospitalImages.length > 0) {
+      setHospitalLightboxIndex((hospitalLightboxIndex + 1) % filteredHospitalImages.length);
+    }
+  };
+
+  const handlePrevHospitalLightbox = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hospitalLightboxIndex !== null && filteredHospitalImages.length > 0) {
+      setHospitalLightboxIndex((hospitalLightboxIndex - 1 + filteredHospitalImages.length) % filteredHospitalImages.length);
+    }
+  };
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
   const [awardsList, setAwardsList] = useState<AwardItem[]>([]);
@@ -568,22 +778,37 @@ export default function Home({
               alt="Dr. Jaimin Patel and Dr. Kinjal Patel at Patel Dental Hospital reception"
               className="w-full h-full object-cover object-top lg:object-[right_top]"
               referrerPolicy="no-referrer"
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
 
           <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full relative z-20 flex flex-col justify-between flex-grow h-full">
-            {/* Left Content Area - 31.5% width, shifted 90px to the right */}
-            <div className="w-full lg:w-[31.5%] flex flex-col justify-center flex-grow pt-4 pb-12 pr-4 z-20 lg:ml-[90px] relative">
+            {/* Left Content Area - 35% - 38% width, shifted 90px to the right, sitting near the top */}
+            <div className="w-full lg:w-[38%] xl:w-[35%] flex flex-col justify-start pt-8 xl:pt-12 pb-12 pr-4 z-20 lg:ml-[90px] relative">
               
+              {/* Main Heading & Description above the award badge */}
+              <h2 className="font-display text-[26px] xl:text-[32px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-3">
+                <span className="lg:block lg:whitespace-nowrap">Eat Comfortably. Smile Confidently.</span>
+                <span className="lg:block lg:whitespace-nowrap">Feel Like Yourself Again.</span>
+              </h2>
+              <p className="text-[14px] xl:text-[15px] font-semibold text-black leading-relaxed mb-6">
+                Advanced Dental Implants, Full-Mouth Rehabilitation & Comprehensive Dentistry in JUST ONE WEEK in Rajkot
+              </p>
+
               {/* 1. Small trust badge */}
-              <span className="inline-flex items-center px-7 py-[11px] rounded-full bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[13px] md:text-[14.5px] leading-relaxed uppercase tracking-widest shadow-md mb-4 lg:mb-8 animate-fade-in">
-                <span className="text-[29px] leading-none shrink-0 mr-[14px] select-none">🏆</span> Awarded as Best Dental Hospital in India by FAMDENT
+              <span className="inline-flex items-center px-[18px] py-[10px] rounded-2xl bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[10.5px] md:text-[11.5px] leading-tight uppercase tracking-widest shadow-md mb-4 lg:mb-6 animate-fade-in w-fit">
+                <span className="text-[22px] leading-none shrink-0 mr-3 select-none">🏆</span>
+                <span className="flex flex-col text-left">
+                  <span>Awarded as Best Dental Hospital in India</span>
+                  <span className="text-[#00897B] font-black mt-0.5">by FAMDENT</span>
+                </span>
               </span>
 
               {/* 2. Headline */}
               <div className="flex flex-col text-left space-y-2 lg:space-y-3 max-w-[550px]">
                 {/* Main Heading */}
-                <h1 className="font-display text-[19px] sm:text-[24px] md:text-[28px] lg:text-[31px] xl:text-[35px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+                <h1 className="font-display text-[17px] sm:text-[21px] md:text-[24px] lg:text-[26px] xl:text-[29px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
                   WORLD CLASS{" "}
                   <span className="relative inline-block text-[#00897B]">
                     DENTAL CARE
@@ -591,11 +816,6 @@ export default function Home({
                     <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[3px] md:h-[4px] bg-[#C9A96E] rounded-full" />
                   </span>
                 </h1>
-                {/* Secondary Heading */}
-                <div className="font-display text-sm sm:text-base lg:text-[17px] font-bold text-[#1E3A5F] leading-snug pt-1">
-                  Best Dental Hospital In India <br className="hidden sm:inline" />
-                  <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
-                </div>
               </div>
 
               {/* Quick Information Cards removed from inside the hero on desktop per layout update */}
@@ -622,8 +842,49 @@ export default function Home({
                 </a>
               </div>
 
-              {/* 5. 60-80px vertical spacing after CTA buttons before the floating trust bar */}
-              <div className="h-6 lg:h-[70px] pointer-events-none" />
+              {/* Side-by-Side Doctor Profiles on Desktop */}
+              <div className="mt-6 grid grid-cols-2 gap-4 w-full max-w-[550px] animate-fade-in text-left">
+                {/* Dr. Vipul Patel Card */}
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
+                  <h3 className="font-display text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-2 border-b border-[#C9A96E]/20 pb-1.5">Dr. Vipul Patel</h3>
+                  <ul className="text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-relaxed space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>MDS in oral and maxillofacial surgery</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>MDS in oral medicine and radiology</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>Mastership in implant prosthodontics (USA)</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Dr. Kinjal Patel Card */}
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
+                  <h3 className="font-display text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-2 border-b border-[#C9A96E]/20 pb-1.5">Dr. Kinjal Patel</h3>
+                  <ul className="text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-relaxed space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>BDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>Fellowship in implant prosthodontics (USA)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>Expert in Root canal treatment and clear aligners</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* 5. Shrunk vertical spacing after CTA/doctors before the floating trust bar */}
+              <div className="h-4 lg:h-[25px] pointer-events-none" />
 
             </div>
           </div>
@@ -638,26 +899,36 @@ export default function Home({
               alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
               className="w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
 
           <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3 px-4 sm:px-6 relative z-20 pt-6 sm:pt-4 pb-4">
+            {/* Main Heading & Description above the award badge */}
+            <h2 className="font-display text-[17px] sm:text-[19px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight max-w-[95%]">
+              Eat Comfortably. Smile Confidently.<br className="hidden sm:inline" />
+              Feel Like Yourself Again.
+            </h2>
+            <p className="text-[11px] sm:text-[12px] font-semibold text-black leading-relaxed max-w-[95%] mb-1">
+              Advanced Dental Implants, Full-Mouth Rehabilitation & Comprehensive Dentistry in JUST ONE WEEK in Rajkot
+            </p>
+
             {/* 1. Small trust badge */}
-            <span className="inline-flex items-center justify-center text-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[9px] sm:text-[11px] leading-snug uppercase tracking-widest shadow-md mb-2 animate-fade-in max-w-[95%]">
-              <span className="text-[18px] sm:text-[22px] leading-none shrink-0 mr-2 select-none">🏆</span> AWARDED AS BEST DENTAL HOSPITAL IN INDIA BY FAMDENT
+            <span className="inline-flex items-center px-[14px] py-2 rounded-xl bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[8px] sm:text-[9.5px] leading-tight uppercase tracking-widest shadow-md mb-2 animate-fade-in w-fit max-w-[95%]">
+              <span className="text-[14px] sm:text-[18px] leading-none shrink-0 mr-2 select-none">🏆</span>
+              <span className="flex flex-col text-left">
+                <span>Awarded as Best Dental Hospital in India</span>
+                <span className="text-[#00897B] font-black mt-0.5">by FAMDENT</span>
+              </span>
             </span>
 
             {/* Headline */}
             <div className="flex flex-col text-center space-y-2 max-w-[450px]">
               {/* Main Heading */}
-              <h1 className="font-display text-[24px] sm:text-[24px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+              <h1 className="font-display text-[20px] sm:text-[21px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
                 WORLD CLASS <span className="text-[#00897B]">DENTAL CARE</span>
               </h1>
-              {/* Secondary Heading */}
-              <div className="font-display text-[11px] sm:text-[12.5px] font-extrabold text-[#1E3A5F] leading-snug flex flex-col space-y-2">
-                <span>Best Dental Hospital In India</span>
-                <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
-              </div>
             </div>
 
             {/* CTA Buttons */}
@@ -680,6 +951,49 @@ export default function Home({
                 <span className="whitespace-nowrap">WhatsApp Us</span>
               </a>
             </div>
+
+            {/* Removed vertically stacked cards from here to place them below hero */}
+          </div>
+        </div>
+
+        {/* Mobile View Doctor Cards: Vertically Stacked BELOW the Hero Area */}
+        <div className="block md:hidden px-4 mt-6 mb-2 space-y-3.5 max-w-[280px] sm:max-w-[380px] mx-auto text-left">
+          {/* Dr. Vipul Patel Card */}
+          <div className="bg-white/85 border border-slate-200/80 rounded-xl p-3 sm:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)]">
+            <h3 className="font-display text-[12px] sm:text-[13px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">Dr. Vipul Patel</h3>
+            <ul className="text-[10px] sm:text-[10.5px] font-semibold text-[#4A5568] leading-tight space-y-1">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>MDS in oral and maxillofacial surgery</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>MDS in oral medicine and radiology</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>Mastership in implant prosthodontics (USA)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Dr. Kinjal Patel Card */}
+          <div className="bg-white/85 border border-slate-200/80 rounded-xl p-3 sm:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)]">
+            <h3 className="font-display text-[12px] sm:text-[13px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">Dr. Kinjal Patel</h3>
+            <ul className="text-[10px] sm:text-[10.5px] font-semibold text-[#4A5568] leading-tight space-y-1">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>BDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>Fellowship in implant prosthodontics (USA)</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>Expert in Root canal treatment and clear aligners</span>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -699,24 +1013,33 @@ export default function Home({
           {/* LAYER 2: CONTENT LAYER (Left Side: Award Badge + Headline + Subtitle + CTA Buttons) */}
           <div className="relative z-20 max-w-[1200px] mx-auto px-6 sm:px-8 w-full h-full flex flex-row items-center justify-start pointer-events-auto">
             <div className="w-[42%] flex flex-col justify-center py-4 pr-2">
+              {/* Main Heading & Description above the award badge */}
+              <h2 className="font-display text-[19px] md:text-[21px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-2">
+                <span className="md:block md:whitespace-nowrap">Eat Comfortably. Smile Confidently.</span>
+                <span className="md:block md:whitespace-nowrap">Feel Like Yourself Again.</span>
+              </h2>
+              <p className="text-[12px] md:text-[12.5px] font-semibold text-black leading-relaxed mb-3.5">
+                Advanced Dental Implants, Full-Mouth Rehabilitation & Comprehensive Dentistry in JUST ONE WEEK in Rajkot
+              </p>
+
               {/* Trust Badge */}
-              <div className="inline-flex items-center self-start px-3.5 py-1.5 rounded-full bg-white/95 border border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[10px] md:text-[11px] leading-tight uppercase tracking-wider shadow-sm mb-3.5">
-                <span className="text-[14px] md:text-[16px] leading-none mr-2 select-none">🏆</span> Awarded as Best Dental Hospital by FAMDENT
+              <div className="inline-flex items-center self-start px-3 py-2 rounded-xl bg-white/95 border border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[8.5px] md:text-[9.5px] leading-tight uppercase tracking-wider shadow-sm mb-3.5 w-fit">
+                <span className="text-[12px] md:text-[14px] leading-none shrink-0 mr-2 select-none">🏆</span>
+                <span className="flex flex-col text-left">
+                  <span>Awarded as Best Dental Hospital in India</span>
+                  <span className="text-[#00897B] font-black mt-0.5">by FAMDENT</span>
+                </span>
               </div>
 
               {/* Main Headline */}
               <div className="flex flex-col text-left space-y-2">
-                <h1 className="font-display text-[24px] md:text-[26px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
+                <h1 className="font-display text-[20px] md:text-[22px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
                   WORLD CLASS{" "}
                   <span className="relative inline-block text-[#00897B]">
                     DENTAL CARE
                     <div className="absolute -bottom-1 left-0 w-full h-[3px] bg-[#C9A96E] rounded-full" />
                   </span>
                 </h1>
-                <div className="font-display text-[12.5px] md:text-[13px] font-bold text-[#1E3A5F] leading-snug pt-1">
-                  Best Dental Hospital In India <br />
-                  <span className="text-[#00897B] font-extrabold">Fix Teeth In Just One Week With Dental Implant</span>
-                </div>
               </div>
 
               {/* Action Buttons */}
@@ -739,6 +1062,8 @@ export default function Home({
                   <span className="whitespace-nowrap">WhatsApp Us</span>
                 </a>
               </div>
+
+              {/* Removed vertically stacked cards from here to place them below hero */}
             </div>
           </div>
 
@@ -754,24 +1079,83 @@ export default function Home({
 
         </div>
 
+        {/* Tablet View Doctor Cards: Side-by-Side BELOW the Hero Area */}
+        <div className="hidden md:flex lg:hidden px-6 sm:px-8 mt-6 gap-4 max-w-3xl mx-auto relative z-20">
+          {/* Dr. Vipul Patel Card */}
+          <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-[0_3px_12px_rgba(0,0,0,0.02)] flex-1 text-left">
+            <h3 className="font-display text-[11px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">Dr. Vipul Patel</h3>
+            <ul className="text-[9.5px] font-semibold text-[#4A5568] leading-tight space-y-0.5">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>MDS in oral and maxillofacial surgery</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>MDS in oral medicine and radiology</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>Mastership in implant prosthodontics (USA)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Dr. Kinjal Patel Card */}
+          <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-[0_3px_12px_rgba(0,0,0,0.02)] flex-1 text-left">
+            <h3 className="font-display text-[11px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">Dr. Kinjal Patel</h3>
+            <ul className="text-[9.5px] font-semibold text-[#4A5568] leading-tight space-y-0.5">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>BDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>Fellowship in implant prosthodontics (USA)</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>Expert in Root canal treatment and clear aligners</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Slightly Taller/Larger Premium White Feature Strip for Mobile/Tablet */}
+        <div className="block lg:hidden px-4 relative z-20 mt-10 sm:mt-12 pb-0">
+          <div className="w-full max-w-md mx-auto bg-white border border-slate-200/70 rounded-2xl py-4 px-6 shadow-[0_10px_24px_rgba(8,28,58,0.04)] flex items-center justify-center text-center">
+            <span className="font-display text-[12px] sm:text-[13px] font-black tracking-wide text-[#1E3A5F] leading-snug">
+              Advanced implant planning <span className="text-[#C9A96E] mx-2 select-none">•</span> 3D diagnostics <span className="text-[#C9A96E] mx-2 select-none">•</span> Complex dental rehabilitation
+            </span>
+          </div>
+        </div>
+
         {/* Compact Premium Visit Info Card for Mobile/Tablet (Visible on lg:hidden) - Floats over the hero image bottom border */}
-        <div className="block lg:hidden px-4 relative z-20 -mt-5 md:mt-0 pb-6">
+        <div className="block lg:hidden px-4 relative z-20 mt-0 pb-6">
           <div 
             className="w-full max-w-md mx-auto rounded-[20px] overflow-hidden bg-white border border-[#E5E7EB] shadow-md flex flex-col"
           >
             {/* SECTION 1 (Emergency Call) */}
             <div className="bg-[#1E3A5F] p-6 text-center text-white flex flex-col items-center">
-              <h3 className="font-display font-bold text-[18px] sm:text-[20px] leading-tight text-[#FFFFFF] mb-3 max-w-[280px]">
-                Call us for Emergency Dental Treatment
+              <h3 className="font-display font-bold text-[16px] sm:text-[18px] leading-snug text-[#C9A96E] mb-3 max-w-[340px]">
+                Tell Us Your Dental Problem or call us for Emergency Dental treatment in severe pain
               </h3>
               <span className="text-[11px] font-bold text-[#E6F6F4] tracking-widest uppercase mb-1">
                 Please Call Us At
               </span>
               <a 
-                href={`tel:${phoneRaw}`} 
-                className="text-[#FFFFFF] font-black text-[24px] sm:text-[28px] tracking-tight hover:text-white/90 transition-all duration-300 leading-none"
+                href="tel:+919510397046" 
+                className="text-[#FFFFFF] font-black text-[24px] sm:text-[28px] tracking-tight hover:text-white/90 transition-all duration-300 leading-none mb-4"
               >
-                {displayPhone}
+                +91 9510397046
+              </a>
+              <a
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-[40px] px-6 bg-[#25D366] hover:bg-[#20BA56] text-white text-[13px] font-black rounded-lg inline-flex items-center justify-center space-x-2 active:scale-98 transition-all duration-300 text-center cursor-pointer shadow-md w-full max-w-[240px]"
+              >
+                <MessageCircle className="h-4 w-4 shrink-0" />
+                <span className="whitespace-nowrap">WhatsApp Us</span>
               </a>
             </div>
 
@@ -836,27 +1220,50 @@ export default function Home({
         </div>
 
         {/* NEW 3-CARD INFORMATION ROW FOR DESKTOP ONLY - Luxury floating row centered horizontally */}
-        <div className="hidden lg:flex absolute left-0 right-0 bottom-0 translate-y-1/2 z-40 px-4 sm:px-6 xl:px-8 justify-center pointer-events-none" id="desktop-3-card-row-container">
-          <motion.div
-            initial={{ opacity: 0, y: 35 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="w-full max-w-[1360px] grid grid-cols-3 gap-0 relative pointer-events-auto rounded-[24px] overflow-hidden shadow-[0_25px_50px_rgba(8,28,58,0.2)] border border-slate-200/40"
-          >
+        <div className="hidden lg:flex absolute left-0 right-0 bottom-0 translate-y-[calc(50%+90px)] z-40 px-4 sm:px-6 xl:px-8 justify-center pointer-events-none" id="desktop-3-card-row-container">
+          <div className="w-full max-w-[1360px] relative">
+            
+            {/* Slightly Taller/Larger Premium White Feature Strip - Positioned Absolute Touching the Top of the 3-Card Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="absolute bottom-full left-0 right-0 mb-0 z-10 w-full bg-white border border-slate-200/70 rounded-full py-4.5 px-10 shadow-[0_12px_32px_rgba(8,28,58,0.04)] hover:shadow-[0_16px_40px_rgba(8,28,58,0.06)] pointer-events-auto flex items-center justify-center transition-all duration-300"
+            >
+              <span className="font-display text-[15px] xl:text-[16px] font-black tracking-wide text-[#1E3A5F] text-center">
+                Advanced implant planning <span className="text-[#C9A96E] mx-4 select-none">•</span> 3D diagnostics <span className="text-[#C9A96E] mx-4 select-none">•</span> Complex dental rehabilitation
+              </span>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full grid grid-cols-3 gap-0 relative pointer-events-auto rounded-[24px] overflow-hidden shadow-[0_25px_50px_rgba(8,28,58,0.2)] border border-slate-200/40"
+            >
             {/* CARD 1 — EMERGENCY DENTAL TREATMENT */}
             <div className="flex flex-col items-center justify-center text-center bg-[#1E3A5F] text-white py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300">
-              <div className="flex flex-col items-center justify-center min-w-0">
-                <h3 className="font-display text-[17px] xl:text-[20px] font-black tracking-wider uppercase text-[#C9A96E] mb-4 text-center leading-snug">
-                  CALL US FOR EMERGENCY<br />DENTAL TREATMENT
+              <div className="flex flex-col items-center justify-center min-w-0 w-full">
+                <h3 className="font-display text-[15px] xl:text-[17px] font-black text-[#C9A96E] mb-4 text-center leading-snug">
+                  Tell Us Your Dental Problem or call us for Emergency Dental treatment in severe pain
                 </h3>
                 <p className="font-sans text-[11px] xl:text-[12px] text-white/90 font-bold uppercase tracking-wider text-center leading-none mb-2">
                   PLEASE CALL US AT
                 </p>
                 <a 
-                  href={`tel:${phoneRaw}`} 
-                  className="block font-display text-[22px] xl:text-[26px] font-black text-white hover:text-[#C9A96E] transition-colors whitespace-nowrap leading-none text-center"
+                  href="tel:+919510397046" 
+                  className="block font-display text-[22px] xl:text-[26px] font-black text-white hover:text-[#C9A96E] transition-colors whitespace-nowrap leading-none text-center mb-4"
                 >
                   +91 9510397046
+                </a>
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-[40px] px-6 bg-[#25D366] hover:bg-[#20BA56] text-white text-[13px] font-black rounded-lg inline-flex items-center justify-center space-x-2 active:scale-98 transition-all duration-300 text-center cursor-pointer shadow-md"
+                >
+                  <MessageCircle className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">WhatsApp Us</span>
                 </a>
               </div>
             </div>
@@ -932,11 +1339,145 @@ export default function Home({
               </div>
             </div>
           </motion.div>
+          </div>
         </div>
       </section>
       {/* 3. Patel Dental Hospital Milestones */}
-      <section className="pt-8 sm:pt-16 lg:pt-[130px] xl:pt-[135px] pb-5 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
+      <section className="pt-8 sm:pt-16 lg:pt-[275px] xl:pt-[295px] pb-5 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Patient-Problem Qualification Section */}
+          <div className="mb-20" id="patient-problem-qualification">
+            {/* Heading */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: "any" }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h2 className="font-display text-[26px] sm:text-[34px] xl:text-[40px] font-black text-[#1E3A5F] tracking-tight leading-tight">
+                What Is Bothering You Most About <span className="text-[#008F83]">Your Teeth?</span>
+              </h2>
+              <p className="font-sans text-[14px] sm:text-[15px] text-[#4B5563] font-medium mt-3">
+                Choose what best describes your concern. We'll help you find the right solution.
+              </p>
+            </motion.div>
+
+            {/* 8 Concern Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {[
+                {
+                  text: "I have difficulty eating",
+                  icon: "/001.webp",
+                  scaleClass: "scale-[0.95]"
+                },
+                {
+                  text: "My teeth feel loose",
+                  icon: "/002.webp",
+                  scaleClass: "scale-[1.05]"
+                },
+                {
+                  text: "I have multiple damaged teeth",
+                  icon: "/003.webp",
+                  scaleClass: "scale-[1.10]"
+                },
+                {
+                  text: "I'm tired of removable dentures",
+                  icon: "/004.webp",
+                  scaleClass: "scale-[1.15]"
+                },
+                {
+                  text: "I don't like my smile",
+                  icon: "/005.webp",
+                  scaleClass: "scale-[1.30]"
+                },
+                {
+                  text: "I have severe tooth pain",
+                  icon: "/006.webp",
+                  scaleClass: "scale-[0.80]"
+                },
+                {
+                  text: "I want a second opinion",
+                  icon: "/007.webp",
+                  scaleClass: "scale-[1.00]"
+                },
+                {
+                  text: "I'm not sure what treatment I need",
+                  icon: "/008.webp",
+                  scaleClass: "scale-[1.05]"
+                }
+              ].map((item, index) => {
+                const isStringIcon = typeof item.icon === 'string';
+                const IconComponent = item.icon as React.ComponentType<{ className?: string }>;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: "any" }}
+                    transition={{ duration: 0.4, delay: index * 0.04 }}
+                    onClick={() => openAppointmentModal()}
+                    className="group bg-white rounded-[20px] p-6 border border-slate-200/60 shadow-[0_4px_20px_rgba(8,28,58,0.02)] hover:shadow-[0_12px_32px_rgba(8,28,58,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center text-center justify-center min-h-[160px] cursor-pointer"
+                  >
+                    {/* Centered Icon */}
+                    <div className="w-24 h-24 flex items-center justify-center mb-4 shrink-0 transition-transform group-hover:scale-105 duration-300">
+                      {isStringIcon ? (
+                        <img 
+                          src={item.icon as string} 
+                          alt={item.text} 
+                          className={`w-full h-full object-contain ${item.scaleClass || 'scale-100'}`} 
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <IconComponent className="w-full h-full object-contain" />
+                      )}
+                    </div>
+
+                    {/* Centered Content Wording */}
+                    <h4 className="font-display text-[15px] xl:text-[16px] font-black text-[#1E3A5F] leading-snug max-w-[220px]">
+                      {item.text}
+                    </h4>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Evaluation CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-[#E5F5F5]/60 border border-[#008F83]/10 rounded-[24px] p-6 sm:p-8 lg:p-10 shadow-[0_12px_32px_rgba(0,143,131,0.03)] flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10 text-left"
+            >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-5 flex-grow min-w-0">
+                {/* Visual Icon Badge mimicking the checklist graphic */}
+                <div className="w-16 h-16 rounded-2xl bg-[#008F83]/10 text-[#008F83] flex items-center justify-center shrink-0 shadow-inner">
+                  <Stethoscope className="h-8 w-8" />
+                </div>
+                
+                <div className="max-w-3xl">
+                  <h3 className="font-display text-[18px] sm:text-[22px] xl:text-[24px] font-black text-[#1E3A5F] leading-tight mb-2">
+                    Not Sure Which Treatment Is Right for You? Start With an Evaluation and discuss your TREATMENT PLAN …
+                  </h3>
+                  <p className="font-sans text-[13.5px] sm:text-[14.5px] text-[#4B5563] font-medium leading-relaxed">
+                    Tell us what's bothering you. If you already have an opg X-ray or CBCT, bring or share it. After proper examination, we can explain the suitable treatment options.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0 w-full lg:w-auto">
+                <button
+                  onClick={() => openAppointmentModal()}
+                  className="w-full lg:w-auto inline-flex items-center justify-center space-x-2 text-[12.5px] font-black uppercase tracking-widest text-white bg-[#008F83] hover:bg-[#007a70] py-4 px-8 rounded-xl transition-all duration-300 cursor-pointer text-center shadow-[0_6px_20px_rgba(0,143,131,0.2)] hover:shadow-[0_8px_24px_rgba(0,143,131,0.35)] transform hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  <Calendar className="h-4.5 w-4.5 shrink-0" />
+                  <span className="whitespace-nowrap">Book a FREE Consultation</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+
           {/* New Horizontal Feature Section - Visible on Desktop, Tablet, and Mobile */}
           <motion.div 
             initial={{ opacity: 0.1, y: 10 }}
@@ -1254,7 +1795,7 @@ export default function Home({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
-                className={video.videoPlatform === 'instagram' || video.videoPlatform === 'mp4' ? "w-full max-w-[240px] mx-auto flex flex-col items-center" : "bg-white rounded-[16px] overflow-hidden border border-slate-100 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col"}
+                className="w-full max-w-[240px] mx-auto flex flex-col items-center"
               >
                 {video.videoPlatform === 'instagram' ? (
                   <InstagramEmbed
@@ -1262,55 +1803,10 @@ export default function Home({
                     title={video.title}
                     thumbnail={video.thumbnail}
                   />
-                ) : video.videoPlatform === 'mp4' ? (
+                ) : (
                   <div className="w-full max-w-[240px] mx-auto flex justify-center">
                     <Mp4ReelPlayer src={video.url || video.id} />
                   </div>
-                ) : (
-                  <>
-                    <div className="aspect-video w-full bg-slate-900 relative overflow-hidden shrink-0">
-                      {activeVideos[video.id] ? (
-                        <iframe
-                          className="w-full h-full border-0 absolute inset-0 z-10"
-                          src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-                          title={video.title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          loading="lazy"
-                        ></iframe>
-                      ) : (
-                        <button
-                          onClick={() => setActiveVideos(prev => ({ ...prev, [video.id]: true }))}
-                          className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group/video focus:outline-none"
-                          aria-label={`Play ${video.title}`}
-                        >
-                          <img
-                            src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-                            alt={video.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-105"
-                            loading="lazy"
-                            referrerPolicy="no-referrer"
-                          />
-                          {/* Play Button Icon */}
-                          <div className="absolute z-20 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#0D9488] group-hover/video:text-white transition-all duration-300 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="w-6 h-6 md:w-7 md:h-7 translate-x-0.5"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                        </button>
-                      )}
-                    </div>
-                    <div className="p-4 sm:p-5 flex-grow flex flex-col justify-center">
-                      <h4 className="font-display font-bold text-[#081C3A] text-[14px] sm:text-[15px] leading-snug group-hover:text-[#0D9488] transition-colors duration-300">
-                        {video.title}
-                      </h4>
-                    </div>
-                  </>
                 )}
               </motion.div>
             ))}
@@ -1530,11 +2026,145 @@ export default function Home({
         )}
       </AnimatePresence>
 
+      {/* 4.5 Our Clinic — Hospital Gallery Section */}
+      <section className="pt-16 sm:pt-20 pb-16 sm:pb-20 bg-white border-t border-b border-slate-100 relative z-10" id="our-clinic-gallery">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight">
+              OUR CLINIC
+            </h2>
+          </div>
+
+          {filteredHospitalImages.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-3xs max-w-lg mx-auto">
+              <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-700 font-bold text-sm">No gallery photos available.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredHospitalImages.map((img, index) => (
+                <motion.div
+                  key={img.id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: (index % 4) * 0.05 }}
+                  onClick={() => setHospitalLightboxIndex(index)}
+                  className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-[0_5px_16px_rgba(0,0,0,0.20)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.30)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
+                >
+                  <div className="relative w-full overflow-hidden bg-slate-50">
+                    <img
+                      src={img.url}
+                      alt={img.altText || img.title || 'Patel Dental Hospital Gallery'}
+                      className="w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-105 block"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                    />
+                    
+                    {/* Category Badge */}
+                    {img.category && img.category !== 'Homepage Gallery' && (
+                      <span className="absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
+                        {img.category}
+                      </span>
+                    )}
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="bg-white/95 backdrop-blur-xs p-3 rounded-full shadow-lg transform translate-y-3 group-hover:translate-y-0 transition-all duration-300">
+                        <Maximize2 className="h-5 w-5 text-[#0D9488]" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Hospital Gallery Lightbox Modal */}
+      <AnimatePresence>
+        {currentHospitalLightboxImg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setHospitalLightboxIndex(null)}
+            className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
+          >
+            <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center justify-center">
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setHospitalLightboxIndex(null)}
+                className="absolute -top-12 right-0 sm:right-0 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              {/* Prev Button */}
+              <button
+                type="button"
+                onClick={handlePrevHospitalLightbox}
+                className="absolute left-2 sm:-left-16 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                type="button"
+                onClick={handleNextHospitalLightbox}
+                className="absolute right-2 sm:-right-16 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+
+              <img
+                src={currentHospitalLightboxImg.url}
+                alt={currentHospitalLightboxImg.altText || currentHospitalLightboxImg.title || 'Gallery View'}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                referrerPolicy="no-referrer"
+              />
+              
+              {currentHospitalLightboxImg.title && (
+                <p className="text-white text-center mt-4 text-sm font-semibold">
+                  {currentHospitalLightboxImg.title}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 5. Happy Smiles & Patient Moments Gallery */}
       <PatientMomentsGallery 
         patientMoments={momentsToRender} 
         onNavigate={(page) => setCurrentPage(page as PageId)} 
+        hideViewMoreBtn={true}
       />
+
+      {/* Centered Gallery CTA Buttons */}
+      <div className="bg-white pb-12 sm:pb-16 pt-4 px-4 relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto">
+        <button
+          onClick={() => {
+            setCurrentPage('gallery');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="w-full sm:w-auto px-8 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center flex items-center justify-center space-x-2 shadow-sm hover:shadow-md transform hover:-translate-y-[2px] active:scale-98"
+        >
+          <ImageIcon className="h-4 w-4 shrink-0 text-[#081C3A]" />
+          <span>View More Photos</span>
+        </button>
+
+        <button
+          onClick={() => openAppointmentModal()}
+          className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center flex items-center justify-center space-x-2 transform hover:-translate-y-[2px] active:scale-98"
+        >
+          <Calendar className="h-4 w-4 shrink-0 text-white" />
+          <span>Book Free Consultation</span>
+        </button>
+      </div>
 
       {/* Services Section */}
       <section className="pt-8 sm:pt-16 lg:pt-32 pb-16 lg:pb-32 bg-[#FAFAFC] relative z-10 border-t border-slate-100" id="services">
@@ -2011,7 +2641,7 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
-                  src="/IMG_3610.JPG"
+                  src="/IMG_3610.webp"
                   alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"

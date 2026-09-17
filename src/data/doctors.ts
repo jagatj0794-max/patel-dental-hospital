@@ -4,7 +4,7 @@ export const DEFAULT_DOCTORS: Doctor[] = [
   {
     id: 'kinjal',
     name: 'Dr. Kinjal Patel',
-    titles: 'BDS',
+    titles: 'BDS (Government Dental College, Jamnagar), Fellowship in implant prosthodontics (USA)',
     designation: 'Cosmetic/Aesthetic Dentist & Implantologist',
     img: '/Dr kinjal patel 2.png',
     briefIntro: `PROFESSIONAL PROFILE
@@ -99,8 +99,8 @@ AWARDS & RECOGNITION
   {
     id: 'vipul',
     name: 'Dr. Vipul Patel',
-    titles: 'MDS, Masters in Implantology (USA)',
-    designation: 'Cosmetic/Aesthetic Dentist & Implantologist',
+    titles: 'MDS in Oral & Maxillofacial Surgery, MDS in Oral Medicine & Radiology, Mastership in Implant Prosthodontics (USA)',
+    designation: 'Maxillofacial Surgeon & Implantologist',
     img: '/dr. patel.png',
     briefIntro: `PROFESSIONAL PROFILE
 

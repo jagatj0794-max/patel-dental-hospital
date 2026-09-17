@@ -45,9 +45,9 @@ import {
 import { useSEO } from '../utils/seo';
 import { internationalPatientsService } from '../utils/internationalPatientsData';
 import { beforeAfterService } from '../utils/beforeAfterData';
-import { InternationalPatientImage, DentalVideo, BeforeAfterEntry } from '../types';
+import { InternationalPatientImage, DentalVideo, BeforeAfterEntry, Service } from '../types';
 import { GooglePatientReviews } from '../components/GooglePatientReviews';
-import { UNIVERSAL_GOOGLE_REVIEWS } from '../utils/serviceData';
+import { UNIVERSAL_GOOGLE_REVIEWS, serviceService } from '../utils/serviceData';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { videoService } from '../utils/videoData';
@@ -157,40 +157,92 @@ const dentalTourismFaqs = [
 
 const internationalTreatments = [
   {
+    id: "implants-srv",
+    slug: "dental-implants",
     title: "Dental Implants",
     description: "Replace missing teeth with natural-looking, functional teeth.",
-    icon: "/1..webp",
+    image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
     route: "services/dental-implants"
   },
   {
+    id: "smile-srv",
+    slug: "smile-makeover",
     title: "Smile Makeover",
     description: "Transform the appearance of your smile with personalised cosmetic dentistry.",
-    icon: "/2..webp",
+    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
     route: "services/smile-makeover"
   },
   {
+    id: "fmr-srv",
+    slug: "full-mouth-rehabilitation",
     title: "Full-Mouth Rehabilitation",
     description: "Comprehensive reconstruction for severely damaged, worn or missing teeth.",
-    icon: "/3..webp",
+    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
     route: "services/full-mouth-rehabilitation"
   },
   {
+    id: "crowns",
+    slug: "crowns-and-bridges",
     title: "Zirconia Crowns & Bridges",
     description: "Restore damaged or missing teeth with metal-free, premium Zirconia restorations.",
-    icon: "/4..webp",
-    route: "services/crowns-bridges"
+    image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+    route: "services/crowns-and-bridges"
   },
   {
-    title: "Root Canal Treatment",
+    id: "rct",
+    slug: "root-canal-treatment",
+    title: "Single Sitting Root Canal Treatment",
     description: "Save infected teeth and eliminate pain with comfortable, single-visit root canal therapy.",
-    icon: "/6..webp",
+    image: "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
     route: "services/root-canal-treatment"
   },
   {
-    title: "Aligners & Orthodontics",
+    id: "aligners-srv",
+    slug: "invisible-aligners",
+    title: "Invisible Aligners",
     description: "Straighten your teeth comfortably and discreetly with custom, virtually invisible aligners.",
-    icon: "/5..webp",
+    image: "https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800",
     route: "services/invisible-aligners"
+  },
+  {
+    id: "kids",
+    slug: "pediatric-dentistry",
+    title: "Pediatric Dentistry",
+    description: "Gentle, warm, and highly protective pediatric dental care to nurture lifelong healthy smiles.",
+    image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+    route: "services/pediatric-dentistry"
+  },
+  {
+    id: "whitening-srv",
+    slug: "teeth-whitening",
+    title: "Teeth Whitening",
+    description: "Brighten your smile dramatically with our safe, fast, and highly effective teeth whitening procedures.",
+    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+    route: "services/teeth-whitening"
+  },
+  {
+    id: "braces-srv",
+    slug: "braces-treatment",
+    title: "Braces Treatment",
+    description: "Classic orthodontic corrections using durable ceramic, metal, or self-ligating bracket systems.",
+    image: "https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800",
+    route: "services/braces-treatment"
+  },
+  {
+    id: "wisdom-srv",
+    slug: "wisdom-tooth-surgery",
+    title: "Wisdom Tooth Surgery",
+    description: "Safe, pain-free, surgical extraction of impacted or painful wisdom teeth.",
+    image: "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
+    route: "services/wisdom-tooth-surgery"
+  },
+  {
+    id: "filling-srv",
+    slug: "tooth-coloured-filling",
+    title: "Tooth Coloured Filling (Composite Filling)",
+    description: "Seamlessly restore decayed or damaged teeth with natural-looking, metal-free composite fillings.",
+    image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+    route: "services/tooth-coloured-filling"
   }
 ];
 
@@ -272,6 +324,44 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
   const [tourismVideos, setTourismVideos] = React.useState<DentalVideo[]>([]);
   const [activeVideos, setActiveVideos] = React.useState<Record<string, boolean>>({});
   const [isVideoSectionEnabled, setIsVideoSectionEnabled] = React.useState<boolean>(true);
+  const [dbServices, setDbServices] = React.useState<Service[]>([]);
+
+  React.useEffect(() => {
+    let active = true;
+    serviceService.getServices().then(res => {
+      if (res && active) {
+        setDbServices(res);
+      }
+    }).catch(err => {
+      console.error("Error loading services for dental tourism page:", err);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const getCardData = (defaultSlug: string, defaultTitle: string, defaultImage: string, id?: string) => {
+    const lookupSlugs = [
+      defaultSlug,
+      defaultSlug.replace(/-and-/g, '-'),
+      defaultSlug.replace(/-bridges/g, '-bridges'),
+      defaultSlug === 'invisible-aligners' ? 'clear-aligners' : null,
+      defaultSlug === 'pediatric-dentistry' ? 'kids-dentistry' : null,
+      defaultSlug === 'tooth-coloured-filling' ? 'tooth-coloured-filling' : null,
+      defaultSlug === 'wisdom-tooth-surgery' ? 'wisdom-tooth-surgery' : null,
+    ].filter(Boolean) as string[];
+
+    const dbSvc = dbServices.find(s => 
+      (id && s.id === id) ||
+      lookupSlugs.includes(s.slug) || 
+      s.title.toLowerCase() === defaultTitle.toLowerCase()
+    );
+
+    return {
+      title: dbSvc?.title || defaultTitle,
+      image: dbSvc?.homepage_card_image || dbSvc?.hero_image || defaultImage,
+    };
+  };
 
   React.useEffect(() => {
     let active = true;
@@ -454,6 +544,17 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                     GET MY FREE TREATMENT PLAN
                     <ArrowRight className="h-4.5 w-4.5" />
                   </button>
+                  <a
+                    href="https://wa.me/919510397046"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider bg-[#25D366] text-white hover:bg-[#128C7E] transition-all duration-300 shadow-[0_4px_14px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.4)] cursor-pointer w-full sm:w-auto"
+                  >
+                    <svg className="h-4.5 w-4.5 fill-current shrink-0" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.062 5.248 5.303 0 11.771 0c3.14 0 6.082 1.22 8.293 3.438 2.212 2.219 3.432 5.175 3.43 8.323-.005 6.525-5.245 11.773-11.711 11.773-1.996 0-3.951-.512-5.69-1.492L0 24zm6.47-4.43c1.615.96 3.2 1.47 5.24 1.472 5.37 0 9.73-4.363 9.734-9.739.002-2.585-1.002-5.01-2.83-6.84C16.837 2.617 14.41 1.61 11.82 1.61c-5.38 0-9.75 4.362-9.754 9.735-.001 2.06.541 4.07 1.57 5.82l-.99 3.6 3.69-.97a9.66 9.66 0 004.72 1.235zm9.89-6.89c-.27-.13-1.61-.79-1.86-.88-.25-.09-.43-.13-.61.13-.18.27-.69.88-.85 1.05-.15.18-.31.2-.58.07-.27-.13-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.15-.27-.02-.42.11-.55.12-.12.27-.31.4-.47.13-.15.18-.27.27-.45.09-.18.04-.33-.02-.47-.07-.13-.61-1.47-.83-2.01-.22-.53-.45-.45-.61-.46h-.52c-.18 0-.47.07-.72.34-.25.27-.96.94-.96 2.3s.99 2.68 1.13 2.87c.14.19 1.95 2.97 4.72 4.17.66.29 1.17.46 1.57.59.66.21 1.26.18 1.73.11.53-.08 1.61-.66 1.84-1.29.23-.63.23-1.18.16-1.29-.07-.11-.25-.18-.52-.31z"/>
+                    </svg>
+                    WHATSAPP US
+                  </a>
                 </div>
               </div>
 
@@ -545,15 +646,28 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
 
               {/* CTA and Reassurance Section */}
               <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={() => openAppointmentModal('Get My Free Treatment Plan')}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#00897B] text-white hover:bg-[#00796B] transition-all duration-300 shadow-[0_4px_14px_rgba(0,137,123,0.3)] hover:shadow-[0_6px_20px_rgba(0,137,123,0.4)] cursor-pointer w-full sm:w-auto"
-                >
-                  <Calendar className="h-4 w-4 shrink-0" />
-                  GET MY FREE TREATMENT PLAN
-                  <ArrowRight className="h-4 w-4 shrink-0" />
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={() => openAppointmentModal('Get My Free Treatment Plan')}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#00897B] text-white hover:bg-[#00796B] transition-all duration-300 shadow-[0_4px_14px_rgba(0,137,123,0.3)] hover:shadow-[0_6px_20px_rgba(0,137,123,0.4)] cursor-pointer w-full sm:w-auto"
+                  >
+                    <Calendar className="h-4 w-4 shrink-0" />
+                    GET MY FREE TREATMENT PLAN
+                    <ArrowRight className="h-4 w-4 shrink-0" />
+                  </button>
+                  <a
+                    href="https://wa.me/919510397046"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#25D366] text-white hover:bg-[#128C7E] transition-all duration-300 shadow-[0_4px_14px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.4)] cursor-pointer w-full sm:w-auto"
+                  >
+                    <svg className="h-4 w-4 fill-current shrink-0" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.062 5.248 5.303 0 11.771 0c3.14 0 6.082 1.22 8.293 3.438 2.212 2.219 3.432 5.175 3.43 8.323-.005 6.525-5.245 11.773-11.711 11.773-1.996 0-3.951-.512-5.69-1.492L0 24zm6.47-4.43c1.615.96 3.2 1.47 5.24 1.472 5.37 0 9.73-4.363 9.734-9.739.002-2.585-1.002-5.01-2.83-6.84C16.837 2.617 14.41 1.61 11.82 1.61c-5.38 0-9.75 4.362-9.754 9.735-.001 2.06.541 4.07 1.57 5.82l-.99 3.6 3.69-.97a9.66 9.66 0 004.72 1.235zm9.89-6.89c-.27-.13-1.61-.79-1.86-.88-.25-.09-.43-.13-.61.13-.18.27-.69.88-.85 1.05-.15.18-.31.2-.58.07-.27-.13-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.15-.27-.02-.42.11-.55.12-.12.27-.31.4-.47.13-.15.18-.27.27-.45.09-.18.04-.33-.02-.47-.07-.13-.61-1.47-.83-2.01-.22-.53-.45-.45-.61-.46h-.52c-.18 0-.47.07-.72.34-.25.27-.96.94-.96 2.3s.99 2.68 1.13 2.87c.14.19 1.95 2.97 4.72 4.17.66.29 1.17.46 1.57.59.66.21 1.26.18 1.73.11.53-.08 1.61-.66 1.84-1.29.23-.63.23-1.18.16-1.29-.07-.11-.25-.18-.52-.31z"/>
+                    </svg>
+                    WHATSAPP US
+                  </a>
+                </div>
               </div>
 
             </div>
@@ -643,15 +757,28 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
               </div>
 
               {/* Compact CTA Button */}
-              <button
-                type="button"
-                onClick={() => openAppointmentModal('Get My Free Treatment Plan')}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider bg-[#00897B] text-white hover:bg-[#00796B] transition-all duration-300 shadow-md cursor-pointer"
-              >
-                <Calendar className="h-4 w-4 shrink-0" />
-                <span>GET FREE PLAN</span>
-                <ArrowRight className="h-4 w-4 shrink-0" />
-              </button>
+              <div className="flex flex-col gap-2.5 w-full">
+                <button
+                  type="button"
+                  onClick={() => openAppointmentModal('Get My Free Treatment Plan')}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider bg-[#00897B] text-white hover:bg-[#00796B] transition-all duration-300 shadow-md cursor-pointer"
+                >
+                  <Calendar className="h-4 w-4 shrink-0" />
+                  <span>GET FREE PLAN</span>
+                  <ArrowRight className="h-4 w-4 shrink-0" />
+                </button>
+                <a
+                  href="https://wa.me/919510397046"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider bg-[#25D366] text-white hover:bg-[#128C7E] transition-all duration-300 shadow-md cursor-pointer"
+                >
+                  <svg className="h-4 w-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.062 5.248 5.303 0 11.771 0c3.14 0 6.082 1.22 8.293 3.438 2.212 2.219 3.432 5.175 3.43 8.323-.005 6.525-5.245 11.773-11.711 11.773-1.996 0-3.951-.512-5.69-1.492L0 24zm6.47-4.43c1.615.96 3.2 1.47 5.24 1.472 5.37 0 9.73-4.363 9.734-9.739.002-2.585-1.002-5.01-2.83-6.84C16.837 2.617 14.41 1.61 11.82 1.61c-5.38 0-9.75 4.362-9.754 9.735-.001 2.06.541 4.07 1.57 5.82l-.99 3.6 3.69-.97a9.66 9.66 0 004.72 1.235zm9.89-6.89c-.27-.13-1.61-.79-1.86-.88-.25-.09-.43-.13-.61.13-.18.27-.69.88-.85 1.05-.15.18-.31.2-.58.07-.27-.13-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.15-.27-.02-.42.11-.55.12-.12.27-.31.4-.47.13-.15.18-.27.27-.45.09-.18.04-.33-.02-.47-.07-.13-.61-1.47-.83-2.01-.22-.53-.45-.45-.61-.46h-.52c-.18 0-.47.07-.72.34-.25.27-.96.94-.96 2.3s.99 2.68 1.13 2.87c.14.19 1.95 2.97 4.72 4.17.66.29 1.17.46 1.57.59.66.21 1.26.18 1.73.11.53-.08 1.61-.66 1.84-1.29.23-.63.23-1.18.16-1.29-.07-.11-.25-.18-.52-.31z"/>
+                  </svg>
+                  <span>WHATSAPP US</span>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -692,7 +819,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
               
               {/* Description */}
               <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
-                Modern digital diagnostics, treatment planning and contemporary dental techniques.
+                Modern digital 3D diagnostics, treatment planning and contemporary dental techniques.
               </p>
             </div>
 
@@ -1134,18 +1261,18 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 </thead>
                 <tbody className="divide-y divide-[#E2E8F0]">
                   {[
-                    { treatment: "Single Dental Implant", usa: "$3,000–$5,000", uk: "£2,500–£4,000", aus: "AUD 4,200–6,500", can: "CAD 3,800–5,500", india: "₹30,000–₹45,000", savings: "84–93%" },
+                    { treatment: "Single Dental Implant", usa: "$3,000–$5,000", uk: "£2,500–£4,000", aus: "AUD 4,200–6,500", can: "CAD 3,800–5,500", india: "₹25,000–₹45,000", savings: "84–93%" },
                     { treatment: "Root Canal Treatment", usa: "$1,000–$1,500", uk: "£800–£1,200", aus: "AUD 1,500–2,500", can: "CAD 1,300–2,000", india: "₹4,000–₹6,000", savings: "94–97%" },
                     { treatment: "Full Mouth Rehabilitation", usa: "$25,000–$40,000", uk: "£20,000–£32,000", aus: "AUD 35,000–55,000", can: "CAD 32,000–48,000", india: "₹2,50,000–₹4,50,000", savings: "81–93%" },
-                    { treatment: "Smile Makeover", usa: "$12,000–$20,000", uk: "£10,000–£16,000", aus: "AUD 18,000–30,000", can: "CAD 16,000–25,000", india: "₹1,20,000–₹2,00,000", savings: "83–94%" },
+                    { treatment: "Smile Makeover", usa: "$12,000–$20,000", uk: "£10,000–£16,000", aus: "AUD 18,000–30,000", can: "CAD 16,000–25,000", india: "₹60,000–₹1,50,000", savings: "83–94%" },
                     { treatment: "Clear Aligners", usa: "$4,000–$7,000", uk: "£3,500–£5,500", aus: "AUD 6,000–9,000", can: "CAD 5,500–8,000", india: "₹60,000–₹1,50,000", savings: "63–91%" },
                     { treatment: "Crowns & Bridges", usa: "$1,200–$2,000", uk: "£900–£1,500", aus: "AUD 1,800–3,000", can: "CAD 1,600–2,500", india: "₹8,000–₹15,000", savings: "87–96%" },
                     { treatment: "Teeth Whitening", usa: "$600–$800", uk: "£500–£800", aus: "AUD 900–1,500", can: "CAD 800–1,300", india: "₹7,000–₹10,000", savings: "83–92%" },
                     { treatment: "Kids Dentistry", usa: "$400–$800", uk: "£300–£600", aus: "AUD 900–1,500", can: "CAD 800–1,300", india: "₹4,500–₹8,000", savings: "83–95%" },
-                    { treatment: "Wisdom Tooth Treatment", usa: "$600–$1,000", uk: "£500–£800", aus: "AUD 250–500", can: "CAD 250–450", india: "₹1,500–₹2,500", savings: "94–98%" },
-                    { treatment: "Composite Filling", usa: "$200–$400", uk: "£150–£300", aus: "AUD 2,000–3,500", can: "CAD 1,800–3,000", india: "₹12,000–₹18,000", savings: "76–91%" },
-                    { treatment: "Dental Veneers", usa: "$1,500–$2,500", uk: "£1,200–£2,000", aus: "AUD 2,000–4,000", can: "CAD 2,000–3,500", india: "₹20,000–₹35,000", savings: "76–92%" },
-                    { treatment: "Dentures", usa: "$1,500–$3,000", uk: "£1,200–£2,500", aus: "AUD 2,000–4,000", can: "CAD 2,000–3,500", india: "₹20,000–₹35,000", savings: "76–93%" }
+                    { treatment: "Wisdom Tooth Treatment", usa: "$600–$1,000", uk: "£500–£800", aus: "AUD 250–500", can: "CAD 250–450", india: "₹5,000–₹10,000", savings: "94–98%" },
+                    { treatment: "Composite Filling", usa: "$200–$400", uk: "£150–£300", aus: "AUD 2,000–3,500", can: "CAD 1,800–3,000", india: "₹5,000–₹10,000", savings: "76–91%" },
+                    { treatment: "Dental Veneers", usa: "$1,500–$2,500", uk: "£1,200–£2,000", aus: "AUD 2,000–4,000", can: "CAD 2,000–3,500", india: "₹10,000–₹20,000", savings: "76–92%" },
+                    { treatment: "Dentures", usa: "$1,500–$3,000", uk: "£1,200–£2,500", aus: "AUD 2,000–4,000", can: "CAD 2,000–3,500", india: "₹20,000–₹50,000", savings: "76–93%" }
                   ].map((row, idx) => (
                     <tr 
                       key={idx} 
@@ -1202,7 +1329,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
           {/* Centered Line-Art Treatment Cards Grid (3 Columns) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-10 max-w-sm md:max-w-none mx-auto">
             {internationalTreatments.map((treatment, idx) => {
-              const IconComponent = treatment.icon as any;
+              const cardData = getCardData(treatment.slug, treatment.title, treatment.image, treatment.id);
               return (
                 <motion.div
                   key={idx}
@@ -1210,49 +1337,47 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  className="w-full bg-[#E6F6F4] rounded-[24px] border border-slate-200/60 shadow-[0_8px_30px_rgba(8,28,58,0.03)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 p-6 sm:p-12 flex flex-col items-center justify-between h-full text-center group"
+                  className="w-full bg-[#E6F6F4] rounded-[24px] border border-slate-200/60 shadow-[0_8px_30px_rgba(8,28,58,0.03)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col items-center justify-between h-full text-center group overflow-hidden"
                 >
-                  {/* Thin, Centered Line-Style Dental Icon */}
-                  <div className="flex justify-center mb-4 sm:mb-8 text-[#0B1D3A] group-hover:text-[#0D9488] transition-colors duration-300">
-                    {typeof IconComponent === 'string' ? (
-                      <img 
-                        src={IconComponent} 
-                        alt={treatment.title} 
-                        className="h-16 w-16 sm:h-24 sm:w-24 object-contain" 
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <IconComponent className="h-16 w-16 sm:h-24 sm:w-24" strokeWidth={1.2} />
-                    )}
+                  {/* Service Image spanning full width */}
+                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50 shrink-0">
+                    <img 
+                      src={cardData.image} 
+                      alt={cardData.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
 
-                  {/* Centered Title */}
-                  <h3 className="font-sans font-bold text-[#0B1D3A] text-[18px] sm:text-[22px] leading-snug text-center mb-2 sm:mb-4">
-                    {treatment.title}
-                  </h3>
+                  <div className="p-6 sm:p-12 pt-4 sm:pt-8 flex flex-col items-center flex-grow w-full">
+                    {/* Centered Title */}
+                    <h3 className="font-sans font-bold text-[#0B1D3A] text-[18px] sm:text-[22px] leading-snug text-center mb-2 sm:mb-4">
+                      {cardData.title}
+                    </h3>
 
-                  {/* Centered Description */}
-                  {treatment.description ? (
-                    <p className="text-slate-600 text-xs sm:text-[14.5px] leading-relaxed text-center font-medium max-w-sm mx-auto flex-grow mb-4 sm:mb-8">
-                      {treatment.description}
-                    </p>
-                  ) : null}
+                    {/* Centered Description */}
+                    {treatment.description ? (
+                      <p className="text-slate-600 text-xs sm:text-[14.5px] leading-relaxed text-center font-medium max-w-sm mx-auto flex-grow mb-4 sm:mb-8">
+                        {treatment.description}
+                      </p>
+                    ) : null}
 
-                  {/* Centered Learn More CTA */}
-                  <div className="pt-4 sm:pt-6 border-t border-slate-150/60 w-full flex justify-center mt-auto">
-                    <button
-                      onClick={() => {
-                        if (setCurrentPage && treatment.route) {
-                          setCurrentPage(treatment.route);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        } else {
-                          openAppointmentModal(treatment.title);
-                        }
-                      }}
-                      className="text-[#0D9488] hover:text-[#0F766E] font-bold text-xs sm:text-base tracking-wide flex items-center justify-center gap-1.5 transition-colors duration-200 cursor-pointer group/btn"
-                    >
-                      Learn More <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
-                    </button>
+                    {/* Centered Learn More CTA */}
+                    <div className="pt-4 sm:pt-6 border-t border-slate-150/60 w-full flex justify-center mt-auto">
+                      <button
+                        onClick={() => {
+                          if (setCurrentPage && treatment.route) {
+                            setCurrentPage(treatment.route);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          } else {
+                            openAppointmentModal(cardData.title);
+                          }
+                        }}
+                        className="text-[#0D9488] hover:text-[#0F766E] font-bold text-xs sm:text-base tracking-wide flex items-center justify-center gap-1.5 transition-colors duration-200 cursor-pointer group/btn"
+                      >
+                        Learn More <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -1334,8 +1459,10 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 <p className="font-extrabold text-[#0B1D3A] text-base sm:text-lg font-sans tracking-tight">
                   Dr. Vipul Patel
                 </p>
-                <p className="text-[#0D9488] font-bold text-xs uppercase tracking-wider mt-0.5 font-sans">
-                  Chief Dental Implantologist
+                <p className="text-[#0D9488] font-bold text-xs uppercase tracking-wider mt-1 font-sans space-y-1">
+                  <span className="block">MDS in Oral & Maxillofacial Surgery</span>
+                  <span className="block">MDS in Oral Medicine & Radiology</span>
+                  <span className="block">Mastership in Implant Prosthodontics (USA)</span>
                 </p>
               </div>
             </div>
@@ -1374,6 +1501,121 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             ))}
           </div>
 
+        </div>
+      </section>
+
+      {/* NRI Patient Testimonial Videos Section */}
+      {isVideoSectionEnabled && (
+        <section className="py-12 md:py-16 bg-white border-t border-slate-100" id="nri-patient-testimonials-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            {/* Section Heading */}
+            <div className="max-w-3xl mx-auto mb-16 space-y-4">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B1D3A] tracking-tight leading-tight uppercase">
+                NRI PATIENT TESTIMONIAL VIDEOS
+              </h2>
+              <div className="flex items-center justify-center gap-1.5 text-[#00897B] font-bold text-xs sm:text-sm tracking-wider uppercase">
+                <Video className="h-4 w-4" />
+                <span>NRI Patient Testimonials</span>
+              </div>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium">
+                Hear directly from our NRI and international patients about their seamless dental journeys and world-class care at Patel Dental Hospital.
+              </p>
+            </div>
+
+            {/* Video Cards Grid / Empty State */}
+            {tourismVideos && tourismVideos.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-center items-stretch text-left max-w-7xl mx-auto">
+                {tourismVideos.map((video, index) => {
+                  const isMp4 = video.videoPlatform === 'mp4' || video.platform === 'mp4' || video.id?.endsWith('.mp4') || video.id?.includes('supabase.co');
+                  const isInstagram = !isMp4;
+                  return (
+                    <div
+                      key={video.id || index}
+                      className="w-full max-w-[240px] mx-auto flex flex-col items-center justify-center"
+                    >
+                      {isInstagram ? (
+                        <InstagramEmbed
+                          url={video.url || `https://www.instagram.com/p/${video.id}/`}
+                          title={video.title}
+                          thumbnail={video.thumbnail}
+                        />
+                      ) : (
+                        <div className="w-full max-w-[240px] mx-auto flex justify-center">
+                          <Mp4ReelPlayer src={video.url || video.id} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="max-w-md mx-auto p-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center space-y-3">
+                <Video className="h-8 w-8 text-slate-300" />
+                <p className="text-slate-500 text-sm font-semibold">
+                  No patient testimonial videos available yet.
+                </p>
+                <p className="text-slate-400 text-xs font-normal">
+                  Testimonial videos added in the Admin CMS under 'Dental Tourism' treatment will automatically appear here.
+                </p>
+              </div>
+            )}
+
+          </div>
+        </section>
+      )}
+
+      {/* Happy Patients from Across the Globe Section */}
+      {galleryPatients && galleryPatients.length > 0 && (
+        <section className="py-12 md:py-16 bg-[#FAFAFC] border-t border-slate-100" id="happy-patients-gallery-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            {/* Section Heading */}
+            <div className="max-w-3xl mx-auto mb-16 space-y-4">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B1D3A] tracking-tight leading-tight">
+                Happy Patients from Across the Globe
+              </h2>
+              <div className="flex items-center justify-center gap-1.5 text-[#00897B] font-bold text-xs sm:text-sm tracking-wider uppercase">
+                <Globe2 className="h-4 w-4" />
+                <span>International Patient Gallery</span>
+              </div>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium">
+                International patients from different countries trust Patel Dental Hospital for world-class dental treatment.
+              </p>
+            </div>
+
+            {/* Dynamic Masonry Gallery - Pinterest style with complete image display and zero cropping */}
+            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 [column-fill:_balance] mx-auto max-w-7xl text-left">
+              {galleryPatients.map((patient, index) => (
+                <div
+                  key={patient.id || index}
+                  id={`patient-gallery-card-${patient.id}`}
+                  className="break-inside-avoid bg-white rounded-[20px] overflow-hidden border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.015)] hover:shadow-[0_12px_30px_rgba(8,28,58,0.06)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col mb-6"
+                  onClick={() => setSelectedPatient(patient)}
+                >
+                  <img
+                    src={patient.image_url || null}
+                    alt="Happy Patient"
+                    className="w-full h-auto object-contain rounded-[inherit] block bg-slate-50/50"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Patient Reviews Section */}
+      <section className="py-12 md:py-16 bg-white border-t border-slate-100" id="dental-tourism-reviews-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <GooglePatientReviews
+            label="PATIENT TESTIMONIALS"
+            heading="What Our International Patients Say"
+            description="Real experiences from patients who travelled to Patel Dental Hospital, Rajkot for world-class dental treatment."
+            reviews={UNIVERSAL_GOOGLE_REVIEWS}
+          />
         </div>
       </section>
 
@@ -1927,170 +2169,6 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             </p>
           </div>
 
-        </div>
-      </section>
-
-      {/* Happy Patients from Across the Globe Section */}
-      {galleryPatients && galleryPatients.length > 0 && (
-        <section className="py-12 md:py-16 bg-[#FAFAFC] border-t border-slate-100" id="happy-patients-gallery-section">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            
-            {/* Section Heading */}
-            <div className="max-w-3xl mx-auto mb-16 space-y-4">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B1D3A] tracking-tight leading-tight">
-                Happy Patients from Across the Globe
-              </h2>
-              <div className="flex items-center justify-center gap-1.5 text-[#00897B] font-bold text-xs sm:text-sm tracking-wider uppercase">
-                <Globe2 className="h-4 w-4" />
-                <span>International Patient Gallery</span>
-              </div>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium">
-                International patients from different countries trust Patel Dental Hospital for world-class dental treatment.
-              </p>
-            </div>
-
-            {/* Dynamic Masonry Gallery - Pinterest style with complete image display and zero cropping */}
-            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 [column-fill:_balance] mx-auto max-w-7xl text-left">
-              {galleryPatients.map((patient, index) => (
-                <div
-                  key={patient.id || index}
-                  id={`patient-gallery-card-${patient.id}`}
-                  className="break-inside-avoid bg-white rounded-[20px] overflow-hidden border border-slate-100/80 shadow-[0_4px_20px_rgba(8,28,58,0.015)] hover:shadow-[0_12px_30px_rgba(8,28,58,0.06)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col mb-6"
-                  onClick={() => setSelectedPatient(patient)}
-                >
-                  <img
-                    src={patient.image_url || null}
-                    alt="Happy Patient"
-                    className="w-full h-auto object-contain rounded-[inherit] block bg-slate-50/50"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* NRI Patient Testimonial Videos Section */}
-      {isVideoSectionEnabled && (
-        <section className="py-12 md:py-16 bg-white border-t border-slate-100" id="nri-patient-testimonials-section">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            
-            {/* Section Heading */}
-            <div className="max-w-3xl mx-auto mb-16 space-y-4">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B1D3A] tracking-tight leading-tight uppercase">
-                NRI PATIENT TESTIMONIAL VIDEOS
-              </h2>
-              <div className="flex items-center justify-center gap-1.5 text-[#00897B] font-bold text-xs sm:text-sm tracking-wider uppercase">
-                <Video className="h-4 w-4" />
-                <span>NRI Patient Testimonials</span>
-              </div>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium">
-                Hear directly from our NRI and international patients about their seamless dental journeys and world-class care at Patel Dental Hospital.
-              </p>
-            </div>
-
-            {/* Video Cards Grid / Empty State */}
-            {tourismVideos && tourismVideos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-center items-stretch text-left max-w-7xl mx-auto">
-                {tourismVideos.map((video, index) => (
-                  <div
-                    key={video.id || index}
-                    className={video.videoPlatform === 'instagram' || video.videoPlatform === 'mp4' ? "w-full max-w-[240px] mx-auto flex flex-col items-center justify-center" : "bg-white rounded-[20px] overflow-hidden border border-slate-100 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300 group flex flex-col h-full"}
-                  >
-                    {video.videoPlatform === 'instagram' ? (
-                      <InstagramEmbed
-                        url={video.url || `https://www.instagram.com/p/${video.id}/`}
-                        title={video.title}
-                        thumbnail={video.thumbnail}
-                      />
-                    ) : video.videoPlatform === 'mp4' ? (
-                      <div className="w-full max-w-[240px] mx-auto flex justify-center">
-                        <Mp4ReelPlayer src={video.url || video.id} />
-                      </div>
-                    ) : (
-                      <>
-                        <div className="aspect-video w-full bg-slate-950 relative overflow-hidden shrink-0">
-                          {activeVideos[video.id] ? (
-                            <iframe
-                              className="w-full h-full border-0 absolute inset-0 z-10"
-                              src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-                              title={video.title}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                              allowFullScreen
-                              loading="lazy"
-                            ></iframe>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => setActiveVideos(prev => ({ ...prev, [video.id]: true }))}
-                              className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group/video focus:outline-none"
-                              aria-label={`Play ${video.title}`}
-                            >
-                              <img
-                                src={video.thumbnail || `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-                                alt={video.title}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-[1.03]"
-                                loading="lazy"
-                                referrerPolicy="no-referrer"
-                              />
-                              {/* Centered Play Trigger Icon */}
-                              <div className="absolute z-20 flex items-center justify-center w-14 h-14 rounded-full bg-white/95 text-[#00897B] shadow-md group-hover/video:scale-110 group-hover/video:bg-[#00897B] group-hover/video:text-white transition-all duration-300 pointer-events-none">
-                                <Play className="h-6 w-6 translate-x-0.5 fill-current" />
-                              </div>
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Video metadata */}
-                        <div className="p-5 flex-grow flex flex-col justify-between space-y-4">
-                          <div className="space-y-2">
-                            <span className="inline-block text-[10px] font-black text-[#00897B] bg-[#E6F6F4] border border-[#00897B]/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                              {video.treatment}
-                            </span>
-                            <h4 className="font-sans font-extrabold text-[#0B1D3A] text-sm sm:text-base leading-snug group-hover:text-[#00897B] transition-colors duration-300">
-                              {video.title}
-                            </h4>
-                          </div>
-                          
-                          <div className="text-slate-400 text-[11px] font-bold uppercase tracking-wider pt-3 border-t border-slate-50 flex items-center justify-between">
-                            <span>Verified NRI Testimonial</span>
-                            <span className="text-[#0ea5e9] flex items-center gap-0.5">
-                              <Star className="h-3 w-3 fill-current text-amber-400" /> Featured
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="max-w-md mx-auto p-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center space-y-3">
-                <Video className="h-8 w-8 text-slate-300" />
-                <p className="text-slate-500 text-sm font-semibold">
-                  No patient testimonial videos available yet.
-                </p>
-                <p className="text-slate-400 text-xs font-normal">
-                  Testimonial videos added in the Admin CMS under 'Dental Tourism' treatment will automatically appear here.
-                </p>
-              </div>
-            )}
-
-          </div>
-        </section>
-      )}
-
-      {/* Patient Reviews Section */}
-      <section className="py-12 md:py-16 bg-white border-t border-slate-100" id="dental-tourism-reviews-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <GooglePatientReviews
-            label="PATIENT TESTIMONIALS"
-            heading="What Our International Patients Say"
-            description="Real experiences from patients who travelled to Patel Dental Hospital, Rajkot for world-class dental treatment."
-            reviews={UNIVERSAL_GOOGLE_REVIEWS}
-          />
         </div>
       </section>
 

@@ -27,6 +27,7 @@ import { ServiceGalleryItem, MarketingConfig } from '../../types';
 import { BeforeAfterSlider } from '../BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../ClinicalCaseGallery';
 import { GooglePatientReviews } from '../GooglePatientReviews';
+import { SurgicalTeamSection } from './SurgicalTeamSection';
 
 export interface BracesTreatmentViewProps {
   heroElement: React.ReactNode;
@@ -50,6 +51,7 @@ export interface BracesTreatmentViewProps {
     [key: string]: any;
   };
   openAppointmentModal: (preselectedTreatment?: string) => void;
+  setCurrentPage?: (page: string) => void;
 }
 
 export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
@@ -63,7 +65,8 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
   beforeAfterPairs,
   displayGallery,
   seoHeadings,
-  openAppointmentModal
+  openAppointmentModal,
+  setCurrentPage
 }) => {
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>('braces-faq-1');
 
@@ -282,6 +285,9 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
         </div>
       </section>
 
+      {/* Surgical Team Section */}
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+
       {/* SECTION 3: Treatment / Option Comparison */}
       <section id="braces-option-comparison-section" className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="space-y-3 max-w-3xl mx-auto text-center mb-10 sm:mb-14">
@@ -462,6 +468,63 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
           </div>
         </div>
       </section>
+
+      {/* SECTION 7: Interactive Before & After Smile Transformations */}
+      {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
+        <section className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6" id="before-after-gallery-section">
+          <div className="space-y-3 max-w-3xl mx-auto text-center">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+              Transformations
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+              {seoHeadings.transformations}
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+              {mConfig.before_after_description || 'See real smile transformations of our patients.'}
+            </p>
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-7xl mx-auto">
+            {beforeAfterPairs.map((pair, pIdx) => (
+              <div 
+                key={pair.id || pIdx} 
+                className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col h-full"
+              >
+                <BeforeAfterSlider
+                  beforeImage={pair.before_image}
+                  afterImage={pair.after_image}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 8: Clinical Case Gallery */}
+      {mConfig.show_gallery !== false && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6">
+          <ClinicalCaseGallery
+            heading={seoHeadings.caseGallery}
+            description={mConfig.gallery_description}
+            items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
+            singleGallery={true}
+          />
+        </section>
+      )}
+
+      {testimonialsElement}
+
+      {/* SECTION 11: Google Patient Reviews */}
+      {mConfig.show_google_reviews !== false && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6">
+          <GooglePatientReviews
+            heading={seoHeadings.reviews}
+            reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+          />
+        </section>
+      )}
 
       {/* SECTION 4: Transparent Pricing */}
       <section id="braces-transparent-pricing" className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -689,66 +752,8 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
         </div>
       </section>
 
-      {/* SECTION 7: Interactive Before & After Smile Transformations */}
-      {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-        <section className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6" id="before-after-gallery-section">
-          <div className="space-y-3 max-w-3xl mx-auto text-center">
-            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-              Transformations
-            </span>
-            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-              {seoHeadings.transformations}
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-              {mConfig.before_after_description || 'See real smile transformations of our patients.'}
-            </p>
-            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-7xl mx-auto">
-            {beforeAfterPairs.map((pair, pIdx) => (
-              <div 
-                key={pair.id || pIdx} 
-                className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col h-full"
-              >
-                <BeforeAfterSlider
-                  beforeImage={pair.before_image}
-                  afterImage={pair.after_image}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* SECTION 8: Clinical Case Gallery */}
-      {mConfig.show_gallery !== false && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6">
-          <ClinicalCaseGallery
-            heading={seoHeadings.caseGallery}
-            description={mConfig.gallery_description}
-            items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
-            singleGallery={true}
-          />
-        </section>
-      )}
-
       {/* SECTION 9: Procedure Video */}
       {videoElement}
-
-      {/* SECTION 10: Patient Testimonial Reels */}
-      {testimonialsElement}
-
-      {/* SECTION 11: Google Patient Reviews */}
-      {mConfig.show_google_reviews !== false && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6">
-          <GooglePatientReviews
-            heading={seoHeadings.reviews}
-            reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
-          />
-        </section>
-      )}
 
       {/* SECTION 8: Why Patel Dental / Why This Doctor */}
       <section className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60 max-w-7xl mx-auto px-4 sm:px-6" id="braces-why-patel-section">

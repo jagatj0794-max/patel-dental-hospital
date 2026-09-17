@@ -8,6 +8,7 @@ import { Menu, X, Phone, Calendar, MapPin, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageId, ContactInfo } from '../types';
 import { serviceService, isApprovedServiceSlug } from '../utils/serviceData';
+import { trackPhoneClick, trackAppointmentCTAClick } from '../utils/analytics';
 
 interface NavbarProps {
   currentPage: PageId;
@@ -144,7 +145,10 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
         className="bg-gradient-to-r from-[#1488CC] via-[#20B2AA] to-[#6BCB3C] w-full h-[40px] opacity-100 transition-all duration-300 overflow-hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between text-white text-[13px] font-medium tracking-wide">
-          <div className="flex items-center space-x-0 gap-1.5 sm:gap-[10px]">
+          <div 
+            onClick={() => trackPhoneClick(contactInfo?.phoneRaw || '+919510397046', 'Navbar Top Bar')}
+            className="flex items-center space-x-0 gap-1.5 sm:gap-[10px] cursor-pointer hover:opacity-90 active:scale-95 transition-all"
+          >
             <Phone className="h-4.5 w-4.5 sm:h-[21px] sm:w-[21px] shrink-0" fill="#FF4D4F" stroke="#FF4D4F" />
             <span className="font-bold text-[13.5px] sm:text-[17px] text-white leading-none select-all">{contactInfo?.phone || '+91 9510397046'}</span>
           </div>
@@ -233,7 +237,10 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             <div className="hidden lg:flex items-center shrink-0">
               <button
                 id="navbar-cta-appointment"
-                onClick={() => openAppointmentModal()}
+                onClick={() => {
+                  trackAppointmentCTAClick('Free Consultation Button', 'Navbar Header');
+                  openAppointmentModal();
+                }}
                 className="flex items-center text-[13px] xl:text-[14px] font-bold text-white bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] hover:from-[#0F766E] hover:to-[#0284c7] px-5 py-2.5 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] cursor-pointer hover:shadow-lg transition-all duration-300 transform active:scale-95"
               >
                 <Calendar className="h-4 w-4 mr-2" />
@@ -321,6 +328,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
               <div className="pt-6 mt-2 pb-6 space-y-3">
                 <button
                   onClick={() => {
+                    trackAppointmentCTAClick('Free Consultation Button', 'Navbar Mobile Drawer');
                     setIsOpen(false);
                     openAppointmentModal();
                   }}

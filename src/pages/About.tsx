@@ -126,8 +126,8 @@ export default function About({ openAppointmentModal }: AboutProps) {
   // Doctor Highlight details from doctors.ts
   const drVipul = {
     name: 'Dr. Vipul Patel',
-    titles: 'BDS',
-    designation: 'Cosmetic/Aesthetic Dentist & Implantologist',
+    titles: 'MDS in Oral & Maxillofacial Surgery, MDS in Oral Medicine & Radiology, Mastership in Implant Prosthodontics (USA)',
+    designation: 'Maxillofacial Surgeon & Implantologist',
     img: '/dr. patel.png',
     briefIntro: 'Dr. Vipul Patel is a highly experienced Cosmetic/Aesthetic Dentist, Implantologist and Dental Surgeon practicing at Patel Dental Hospital, Rajkot. He has extensive experience in Implant Dentistry, Full Mouth Rehabilitation, Smile Makeovers, Root Canal Treatments and Advanced Restorative Dentistry. His focus is on precision, patient comfort and long-term treatment success.',
     quote: 'Dr. Vipul Patel is committed to delivering advanced dental care with personalized treatment planning and modern technology.',
@@ -157,7 +157,7 @@ export default function About({ openAppointmentModal }: AboutProps) {
   const teamMembers = [
     {
       name: 'Dr. Vipul Patel',
-      designation: 'Cosmetic/Aesthetic Dentist & Implantologist',
+      designation: 'Maxillofacial Surgeon & Implantologist',
       img: '/dr. patel.png'
     },
     {

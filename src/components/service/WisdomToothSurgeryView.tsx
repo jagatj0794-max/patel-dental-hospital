@@ -36,6 +36,7 @@ import { ServiceGalleryItem, MarketingConfig } from '../../types';
 import { BeforeAfterSlider } from '../BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../ClinicalCaseGallery';
 import { GooglePatientReviews } from '../GooglePatientReviews';
+import { SurgicalTeamSection } from './SurgicalTeamSection';
 import { TREATMENTS } from '../../data/treatments';
 import { DEFAULT_SERVICES } from '../../utils/serviceData';
 
@@ -62,6 +63,7 @@ export interface WisdomToothSurgeryViewProps {
   };
   openAppointmentModal: (preselectedTreatment?: string) => void;
   getServiceHeroImage?: (slug: string) => string;
+  setCurrentPage?: (page: string) => void;
 }
 
 export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
@@ -76,7 +78,8 @@ export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
   displayGallery,
   seoHeadings,
   openAppointmentModal,
-  getServiceHeroImage: getServiceHeroImageFromProps
+  getServiceHeroImage: getServiceHeroImageFromProps,
+  setCurrentPage
 }) => {
   const handleNavigateToService = (targetSlug: string) => {
     window.location.hash = `#services/${targetSlug}`;
@@ -305,6 +308,9 @@ export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
         </div>
       </section>
 
+      {/* Surgical Team Section */}
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+
       {/* SECTION 3: Comparison */}
       <section id="wisdom-option-comparison-section" className="max-w-7xl mx-auto px-4 sm:px-6 scroll-mt-20">
         <div className="space-y-3 max-w-3xl mx-auto text-center mb-10 sm:mb-14">
@@ -393,6 +399,161 @@ export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
           </div>
         </div>
       </section>
+
+      {/* SECTION 7: Treatment-Matched Proof in specified order */}
+      {/* 1. Before & After */}
+      {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
+        <div className="space-y-6 sm:space-y-10 pt-4 sm:pt-10 border-t border-slate-200/60" id="before-after-gallery-section">
+          <div className="space-y-3 max-w-3xl mx-auto text-center">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+              Transformations
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+              {seoHeadings.transformations || 'Wisdom Tooth Transformations'}
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+              {mConfig.before_after_description || 'See real smile transformations of our patients.'}
+            </p>
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
+            {beforeAfterPairs.map((pair, pIdx) => (
+              <div 
+                key={pair.id || pIdx} 
+                className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col h-full justify-between"
+              >
+                <BeforeAfterSlider
+                  beforeImage={pair.before_image}
+                  afterImage={pair.after_image}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 2. Clinical Case Gallery */}
+      {mConfig.show_gallery !== false && (
+        <div className="space-y-6 sm:space-y-8 pt-4 sm:pt-10 border-t border-slate-200/60" id="wisdom-clinical-case-gallery">
+          {/* Header Title Section */}
+          <div className="space-y-3 max-w-3xl mx-auto text-center">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+              Clinical Cases
+            </span>
+            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+              {seoHeadings.caseGallery || 'Clinical Case Gallery'}
+            </h2>
+            {mConfig.gallery_description && (
+              <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium">
+                {mConfig.gallery_description}
+              </p>
+            )}
+            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+          </div>
+
+          {/* Direct, clean layout displaying the images close together with a minimal gap */}
+          {(() => {
+            const galleryItems = (Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery)
+              .filter(item => item && item.image_url && item.image_url.trim() !== '');
+
+            if (galleryItems.length === 0) return null;
+
+            return (
+              <div className="max-w-5xl mx-auto px-4 sm:px-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 justify-center items-center">
+                  {galleryItems.map((item, idx) => (
+                    <div 
+                      key={item.id || idx}
+                      className="relative rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] border border-slate-100 flex items-center justify-center bg-white group cursor-zoom-in transition-all duration-300 p-2"
+                      onClick={() => setCustomLightboxIndex(idx)}
+                    >
+                      <img
+                        src={item.image_url}
+                        alt={item.caption || item.title || `Clinical View ${idx + 1}`}
+                        className="max-h-[220px] sm:max-h-[260px] md:max-h-[300px] w-auto max-w-full object-contain mx-auto rounded-lg select-none transition-transform duration-300 group-hover:scale-[1.015]"
+                        referrerPolicy="no-referrer"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCustomLightboxIndex(idx);
+                        }}
+                        className="absolute top-4 right-4 bg-white/90 hover:bg-[#0D9488] text-slate-700 hover:text-white p-2 rounded-full border border-slate-200/80 shadow-xs transition-all opacity-0 group-hover:opacity-100"
+                        title="Expand Image"
+                      >
+                        <Maximize2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* Premium Lightbox Overlay for clinical gallery zoom */}
+      <AnimatePresence>
+        {customLightboxIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-md"
+            onClick={() => setCustomLightboxIndex(null)}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setCustomLightboxIndex(null)}
+              className="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10 p-2.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#0D9488] z-50"
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            {/* Main Image Container */}
+            <div className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center">
+              {(() => {
+                const galleryItems = (Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery)
+                  .filter(item => item && item.image_url && item.image_url.trim() !== '');
+                const currentItem = galleryItems[customLightboxIndex];
+                if (!currentItem) return null;
+
+                return (
+                  <motion.div
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.95, opacity: 0 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                    className="relative max-h-[85vh] max-w-full flex items-center justify-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <img
+                      src={currentItem.image_url}
+                      alt={currentItem.caption || currentItem.title || "Clinical view"}
+                      className="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl border border-white/10"
+                      referrerPolicy="no-referrer"
+                    />
+                  </motion.div>
+                );
+              })()}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {testimonialsElement}
+
+      {/* 5. Google Patient Review */}
+      {mConfig.show_google_reviews !== false && (
+        <GooglePatientReviews
+          heading={seoHeadings.reviews || 'Google Patient Reviews'}
+          reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+        />
+      )}
 
       {/* SECTION 4: Transparent Pricing */}
       <section id="wisdom-transparent-pricing" className="max-w-7xl mx-auto px-4 sm:px-6 scroll-mt-20">
@@ -692,164 +853,8 @@ export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
         </div>
       </section>
 
-      {/* SECTION 7: Treatment-Matched Proof in specified order */}
-      {/* 1. Before & After */}
-      {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-        <div className="space-y-6 sm:space-y-10 pt-4 sm:pt-10 border-t border-slate-200/60" id="before-after-gallery-section">
-          <div className="space-y-3 max-w-3xl mx-auto text-center">
-            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-              Transformations
-            </span>
-            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-              {seoHeadings.transformations || 'Wisdom Tooth Transformations'}
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-              {mConfig.before_after_description || 'See real smile transformations of our patients.'}
-            </p>
-            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-stretch max-w-7xl mx-auto">
-            {beforeAfterPairs.map((pair, pIdx) => (
-              <div 
-                key={pair.id || pIdx} 
-                className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col h-full justify-between"
-              >
-                <BeforeAfterSlider
-                  beforeImage={pair.before_image}
-                  afterImage={pair.after_image}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 2. Clinical Case Gallery */}
-      {mConfig.show_gallery !== false && (
-        <div className="space-y-6 sm:space-y-8 pt-4 sm:pt-10 border-t border-slate-200/60" id="wisdom-clinical-case-gallery">
-          {/* Header Title Section */}
-          <div className="space-y-3 max-w-3xl mx-auto text-center">
-            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-              <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-              Clinical Cases
-            </span>
-            <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-              {seoHeadings.caseGallery || 'Clinical Case Gallery'}
-            </h2>
-            {mConfig.gallery_description && (
-              <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium">
-                {mConfig.gallery_description}
-              </p>
-            )}
-            <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-          </div>
-
-          {/* Direct, clean layout displaying the images close together with a minimal gap */}
-          {(() => {
-            const galleryItems = (Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery)
-              .filter(item => item && item.image_url && item.image_url.trim() !== '');
-
-            if (galleryItems.length === 0) return null;
-
-            return (
-              <div className="max-w-5xl mx-auto px-4 sm:px-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 justify-center items-center">
-                  {galleryItems.map((item, idx) => (
-                    <div 
-                      key={item.id || idx}
-                      className="relative rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] border border-slate-100 flex items-center justify-center bg-white group cursor-zoom-in transition-all duration-300 p-2"
-                      onClick={() => setCustomLightboxIndex(idx)}
-                    >
-                      <img
-                        src={item.image_url}
-                        alt={item.caption || item.title || `Clinical View ${idx + 1}`}
-                        className="max-h-[220px] sm:max-h-[260px] md:max-h-[300px] w-auto max-w-full object-contain mx-auto rounded-lg select-none transition-transform duration-300 group-hover:scale-[1.015]"
-                        referrerPolicy="no-referrer"
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCustomLightboxIndex(idx);
-                        }}
-                        className="absolute top-4 right-4 bg-white/90 hover:bg-[#0D9488] text-slate-700 hover:text-white p-2 rounded-full border border-slate-200/80 shadow-xs transition-all opacity-0 group-hover:opacity-100"
-                        title="Expand Image"
-                      >
-                        <Maximize2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* Premium Lightbox Overlay for clinical gallery zoom */}
-      <AnimatePresence>
-        {customLightboxIndex !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-md"
-            onClick={() => setCustomLightboxIndex(null)}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setCustomLightboxIndex(null)}
-              className="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10 p-2.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#0D9488] z-50"
-            >
-              <X className="h-6 w-6" />
-            </button>
-
-            {/* Main Image Container */}
-            <div className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center">
-              {(() => {
-                const galleryItems = (Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery)
-                  .filter(item => item && item.image_url && item.image_url.trim() !== '');
-                const currentItem = galleryItems[customLightboxIndex];
-                if (!currentItem) return null;
-
-                return (
-                  <motion.div
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="relative max-h-[85vh] max-w-full flex items-center justify-center"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <img
-                      src={currentItem.image_url}
-                      alt={currentItem.caption || currentItem.title || "Clinical view"}
-                      className="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl border border-white/10"
-                      referrerPolicy="no-referrer"
-                    />
-                  </motion.div>
-                );
-              })()}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* 3. Procedure Video */}
       {videoElement}
-
-      {/* 4. Patient Testimonial Reels */}
-      {testimonialsElement}
-
-      {/* 5. Google Patient Review */}
-      {mConfig.show_google_reviews !== false && (
-        <GooglePatientReviews
-          heading={seoHeadings.reviews || 'Google Patient Reviews'}
-          reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
-        />
-      )}
 
       {/* ================================================== */}
       {/* SECTION 8: Why This Clinic / Surgeon */}

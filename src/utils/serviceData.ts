@@ -920,7 +920,7 @@ export const DEFAULT_SERVICES: Service[] = [
     ],
     features: [],
     procedure_video_title: 'Crown & Bridges Procedure Video',
-    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
     patient_testimonials: [],
     hospital_team_photos: [],
     marketing_config: {
@@ -960,7 +960,7 @@ export const DEFAULT_SERVICES: Service[] = [
       before_after_description: 'See real crown & bridge tooth restoration transformations.',
       before_after_pairs: [],
       procedure_video_title: 'Crown & Bridges Procedure Video',
-      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
       testimonials_section_title: 'Patient Testimonials',
       hospital_team_title: 'Hospital & Team Gallery',
       cost_heading: 'Crown & Bridges Cost & Offer',
@@ -1011,7 +1011,7 @@ export const DEFAULT_SERVICES: Service[] = [
     ],
     features: [],
     procedure_video_title: 'Teeth Whitening Procedure Video',
-    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
     patient_testimonials: [],
     hospital_team_photos: [],
     marketing_config: {
@@ -1039,7 +1039,7 @@ export const DEFAULT_SERVICES: Service[] = [
       before_after_description: 'See real teeth whitening treatment transformations.',
       before_after_pairs: [],
       procedure_video_title: 'Teeth Whitening Procedure Video',
-      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
       testimonials_section_title: 'Patient Testimonials',
       hospital_team_title: 'Hospital & Team Gallery',
       cost_heading: 'Teeth Whitening Cost & Offer',
@@ -1153,7 +1153,7 @@ export const DEFAULT_SERVICES: Service[] = [
     ],
     features: [],
     procedure_video_title: 'Pediatric Dentistry Procedure Video',
-    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
     patient_testimonials: [],
     hospital_team_photos: [],
     marketing_config: {
@@ -1237,7 +1237,7 @@ export const DEFAULT_SERVICES: Service[] = [
         }
       ],
       procedure_video_title: 'Pediatric Dentistry Procedure Video',
-      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
       testimonials_section_title: 'Patient Testimonials',
       hospital_team_title: 'Hospital & Team Gallery',
       cost_heading: 'Pediatric Dentistry Cost / Offer',
@@ -1309,12 +1309,12 @@ export const DEFAULT_SERVICES: Service[] = [
       }
     ],
     procedure_video_title: 'Braces Treatment Procedure Video',
-    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
     patient_testimonials: [
       {
         id: 'testi-1',
         patient_name: 'Patient Braces Treatment Journey',
-        video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+        video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
         treatment_name: 'Braces Treatment',
         display_order: 10
       }
@@ -1346,13 +1346,13 @@ export const DEFAULT_SERVICES: Service[] = [
         }
       ],
       procedure_video_title: 'Braces Treatment Procedure Video',
-      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
       testimonials_section_title: 'Patient Testimonials',
       patient_testimonials: [
         {
           id: 'testi-1',
           patient_name: 'Patient Braces Treatment Journey',
-          video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+          video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
           treatment_name: 'Braces Treatment',
           display_order: 10
         }
@@ -1421,12 +1421,12 @@ export const DEFAULT_SERVICES: Service[] = [
       }
     ],
     procedure_video_title: 'Wisdom Tooth Removal Video Animation',
-    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
     patient_testimonials: [
       {
         id: 'testi-1',
         patient_name: 'Patient Wisdom Tooth Surgery Journey',
-        video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+        video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
         treatment_name: 'Wisdom Tooth Surgery',
         display_order: 10
       }
@@ -1458,13 +1458,13 @@ export const DEFAULT_SERVICES: Service[] = [
         }
       ],
       procedure_video_title: 'Wisdom Tooth Removal Video Animation',
-      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
       testimonials_section_title: 'Patient Testimonials',
       patient_testimonials: [
         {
           id: 'testi-1',
           patient_name: 'Patient Wisdom Tooth Surgery Journey',
-          video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+          video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
           treatment_name: 'Wisdom Tooth Surgery',
           display_order: 10
         }
@@ -1534,12 +1534,12 @@ export const DEFAULT_SERVICES: Service[] = [
       }
     ],
     procedure_video_title: 'Composite Filling Video Animation',
-    procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+    procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
     patient_testimonials: [
       {
         id: 'fill-testi-1',
         patient_name: 'Patient Tooth Coloured Filling Journey',
-        video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+        video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
         treatment_name: 'Tooth Coloured Filling',
         display_order: 10
       }
@@ -1583,13 +1583,13 @@ export const DEFAULT_SERVICES: Service[] = [
         }
       ],
       procedure_video_title: 'Composite Filling Video Animation',
-      procedure_video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+      procedure_video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
       testimonials_section_title: 'Patient Testimonials',
       patient_testimonials: [
         {
           id: 'fill-testi-1',
           patient_name: 'Patient Tooth Coloured Filling Journey',
-          video_url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+          video_url: 'https://www.instagram.com/p/DbS7_fJMTYC/',
           treatment_name: 'Tooth Coloured Filling',
           display_order: 10
         }
@@ -2874,7 +2874,7 @@ export const serviceService = {
               candidate_section_title: mConfigObj.candidate_section_title ?? 'Crown & Bridge Materials',
               candidate_items: (Array.isArray(mConfigObj.candidate_items) && mConfigObj.candidate_items.length > 0) ? mConfigObj.candidate_items : defaultMCfg.candidate_items,
               procedure_video_title: mConfigObj.procedure_video_title ?? 'Crown & Bridges Procedure Video',
-              procedure_video_url: mConfigObj.procedure_video_url ?? 'https://www.youtube.com/watch?v=SnOxxv_S2ew',
+              procedure_video_url: mConfigObj.procedure_video_url ?? 'https://www.instagram.com/p/DbS7_fJMTYC/',
               cost_heading: mConfigObj.cost_heading ?? 'Crown & Bridges Cost & Offer',
               sec11_heading: mConfigObj.sec11_heading ?? 'Book Your Crown & Bridges Consultation',
               phone_number: mConfigObj.phone_number ?? '+91 9510397046',

@@ -96,11 +96,11 @@ export interface ContactInfo {
 }
 
 export interface DentalVideo {
-  id: string; // YouTube Video ID or Instagram shortcode or video URL
+  id: string; // Instagram shortcode or video URL
   title: string;
   treatment: string;
-  videoPlatform?: 'youtube' | 'instagram' | 'mp4';
-  platform?: 'youtube' | 'instagram' | 'mp4';
+  videoPlatform?: 'instagram' | 'mp4';
+  platform?: 'instagram' | 'mp4';
   url?: string;
   youtubeUrl?: string;
   thumbnail?: string;
@@ -197,8 +197,6 @@ export interface MarketingConfig {
   social_facebook_enabled?: boolean;
   social_instagram?: string;
   social_instagram_enabled?: boolean;
-  social_youtube?: string;
-  social_youtube_enabled?: boolean;
   social_linkedin?: string;
   social_linkedin_enabled?: boolean;
   social_twitter?: string;

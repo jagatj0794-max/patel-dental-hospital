@@ -7,16 +7,76 @@ import { DentalVideo } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export const DEFAULT_VIDEOS: DentalVideo[] = [
-  { id: 'cyai6CjMD0s', title: 'Dental Implants Treatment Experience', treatment: 'Dental Implants', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=cyai6CjMD0s', thumbnail: 'https://img.youtube.com/vi/cyai6CjMD0s/hqdefault.jpg', category: 'Dental Implants', createdAt: new Date().toISOString() },
-  { id: 'SnOxxv_S2ew', title: 'Full Mouth Rehabilitation Success Story', treatment: 'Full Mouth Rehab', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=SnOxxv_S2ew', thumbnail: 'https://img.youtube.com/vi/SnOxxv_S2ew/hqdefault.jpg', category: 'Full Mouth Rehab', createdAt: new Date().toISOString() },
-  { id: '2okui6RFf_k', title: 'Life-changing Invisible Aligners Transformation', treatment: 'Invisible Aligners', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=2okui6RFf_k', thumbnail: 'https://img.youtube.com/vi/2okui6RFf_k/hqdefault.jpg', category: 'Invisible Aligners', createdAt: new Date().toISOString() },
-  { id: '-eoVpGDqCRs', title: 'Patient Testimonial on Digital Dental Care', treatment: 'Advanced Dental Care', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=-eoVpGDqCRs', thumbnail: 'https://img.youtube.com/vi/-eoVpGDqCRs/hqdefault.jpg', category: 'Advanced Dental Care', createdAt: new Date().toISOString() },
-  { id: 'VZyPnTzlR9U', title: 'Complete Smile Makeover & Dental Implants', treatment: 'Smile Makeover', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=VZyPnTzlR9U', thumbnail: 'https://img.youtube.com/vi/VZyPnTzlR9U/hqdefault.jpg', category: 'Smile Makeover', createdAt: new Date().toISOString() },
-  { id: 'DBejq69FOGI', title: 'Painless Treatment and Care Experience', treatment: 'General Dentistry', videoPlatform: 'youtube', platform: 'youtube', url: 'https://www.youtube.com/watch?v=DBejq69FOGI', thumbnail: 'https://img.youtube.com/vi/DBejq69FOGI/hqdefault.jpg', category: 'General Dentistry', createdAt: new Date().toISOString() }
+  {
+    id: 'Db5A-K0MOoU',
+    title: 'Patient Instagram Testimony Reel',
+    treatment: 'Patient Testimonial',
+    videoPlatform: 'instagram',
+    platform: 'instagram',
+    url: 'https://www.instagram.com/p/Db5A-K0MOoU/',
+    thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786709786418_bibw3gks.webp',
+    category: 'Patient Testimonial',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'Db44bY6MpcZ',
+    title: 'Patient Instagram Testimony Reel',
+    treatment: 'Patient Testimonial',
+    videoPlatform: 'instagram',
+    platform: 'instagram',
+    url: 'https://www.instagram.com/p/Db44bY6MpcZ/',
+    thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711494301_bymdaaht.webp',
+    category: 'Patient Testimonial',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'Db3TlVjskbU',
+    title: 'Patient Instagram Testimony Reel',
+    treatment: 'Patient Testimonial',
+    videoPlatform: 'instagram',
+    platform: 'instagram',
+    url: 'https://www.instagram.com/p/Db3TlVjskbU/',
+    thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711529687_9qy3kcqq.webp',
+    category: 'Patient Testimonial',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'Dbw9nUbsIhX',
+    title: 'Patient Instagram Testimony Reel',
+    treatment: 'Patient Testimonial',
+    videoPlatform: 'instagram',
+    platform: 'instagram',
+    url: 'https://www.instagram.com/p/Dbw9nUbsIhX/',
+    thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711563273_bur5nwj7.webp',
+    category: 'Patient Testimonial',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'DbuhvNfs0Xy',
+    title: 'Patient Instagram Testimony Reel',
+    treatment: 'Patient Testimonial',
+    videoPlatform: 'instagram',
+    platform: 'instagram',
+    url: 'https://www.instagram.com/p/DbuhvNfs0Xy/',
+    thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711587495_xhn94bp9.webp',
+    category: 'Patient Testimonial',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'DbpVYL7MS65',
+    title: 'Patient Instagram Testimony Reel',
+    treatment: 'Patient Testimonial',
+    videoPlatform: 'instagram',
+    platform: 'instagram',
+    url: 'https://www.instagram.com/p/DbpVYL7MS65/',
+    thumbnail: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711609917_8sr25k9f.webp',
+    category: 'Patient Testimonial',
+    createdAt: new Date().toISOString()
+  }
 ];
 
-export const detectPlatform = (video: any): 'youtube' | 'instagram' | 'mp4' => {
-  if (!video) return 'youtube';
+export const detectPlatform = (video: any): 'instagram' | 'mp4' => {
+  if (!video) return 'instagram';
 
   // 1. Explicit check of platform fields
   if (video.platform === 'mp4' || video.videoPlatform === 'mp4' || video.videoplatform === 'mp4') {
@@ -25,18 +85,12 @@ export const detectPlatform = (video: any): 'youtube' | 'instagram' | 'mp4' => {
   if (video.platform === 'instagram' || video.videoPlatform === 'instagram' || video.videoplatform === 'instagram') {
     return 'instagram';
   }
-  if (video.platform === 'youtube' || video.videoPlatform === 'youtube' || video.videoplatform === 'youtube') {
-    return 'youtube';
-  }
 
-  // 2. Detect from url, youtubeUrl, or similar fields if present
-  const url = video.url || video.youtubeUrl || '';
+  // 2. Detect from url or similar fields if present
+  const url = video.url || '';
   if (url) {
     if (url.includes('instagram.com') || url.includes('instagr.am')) {
       return 'instagram';
-    }
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      return 'youtube';
     }
     if (url.endsWith('.mp4') || url.includes('supabase.co')) {
       return 'mp4';
@@ -47,9 +101,6 @@ export const detectPlatform = (video: any): 'youtube' | 'instagram' | 'mp4' => {
   const id = video.id || '';
   if (id.startsWith('instagram__') || id.includes('instagram')) {
     return 'instagram';
-  }
-  if (id.startsWith('youtube__') || id.includes('youtube')) {
-    return 'youtube';
   }
   if (id.endsWith('.mp4') || id.includes('supabase.co')) {
     return 'mp4';
@@ -67,13 +118,7 @@ export const detectPlatform = (video: any): 'youtube' | 'instagram' | 'mp4' => {
     return 'instagram';
   }
 
-  // 6. Default YouTube videos
-  const defaultYoutubeIds = ['cyai6CjMD0s', 'SnOxxv_S2ew', '2okui6RFf_k', '-eoVpGDqCRs', 'VZyPnTzlR9U', 'DBejq69FOGI', 'dQw4w9WgXcQ', 'ysz5S6PUM-U', 'ScMzIvxBSi4'];
-  if (defaultYoutubeIds.includes(id)) {
-    return 'youtube';
-  }
-
-  return 'youtube';
+  return 'instagram';
 };
 
 export const videoService = {
@@ -130,7 +175,7 @@ export const videoService = {
           title: video.title,
           treatment: video.treatment,
           display_order: idx,
-          videoPlatform: video.videoPlatform || 'youtube'
+          videoPlatform: video.videoPlatform || 'instagram'
         }));
 
         const { error: seedError } = await supabase.client
@@ -193,9 +238,9 @@ export const videoService = {
 
         const id = row.id;
         const platform = detectedPlatform;
-        const url = platform === 'mp4' ? id : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/` : `https://www.youtube.com/watch?v=${id}`);
+        const url = platform === 'mp4' ? id : `https://www.instagram.com/p/${id}/`;
         
-        const thumbnail = customThumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${id}/media/?size=l` : `https://img.youtube.com/vi/${id}/hqdefault.jpg`));
+        const thumbnail = customThumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : `https://www.instagram.com/p/${id}/media/?size=l`);
         const createdAt = row.created_at || new Date().toISOString();
 
         return {
@@ -205,7 +250,6 @@ export const videoService = {
           videoPlatform: platform,
           platform: platform,
           url: url,
-          youtubeUrl: url,
           thumbnail: thumbnail,
           category: originalTreatment,
           createdAt: createdAt
@@ -247,8 +291,8 @@ export const videoService = {
 
     const enrichedVideos = uniqueInput.map((video) => {
       const platform = video.platform || video.videoPlatform || detectPlatform(video);
-      const url = video.url || video.youtubeUrl || (platform === 'mp4' ? video.id : (platform === 'instagram' ? `https://www.instagram.com/p/${video.id}/` : `https://www.youtube.com/watch?v=${video.id}`));
-      const thumbnail = video.thumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : (platform === 'instagram' ? `https://www.instagram.com/p/${video.id}/media/?size=l` : `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`));
+      const url = video.url || (platform === 'mp4' ? video.id : `https://www.instagram.com/p/${video.id}/`);
+      const thumbnail = video.thumbnail || (platform === 'mp4' ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` : `https://www.instagram.com/p/${video.id}/media/?size=l`);
       const createdAt = video.createdAt || new Date().toISOString();
       const title = video.title || 'Patient Testimonial';
       const category = video.category || video.treatment || 'Patient Testimonial';
@@ -260,7 +304,6 @@ export const videoService = {
         videoPlatform: platform,
         platform: platform,
         url: url,
-        youtubeUrl: url,
         thumbnail: thumbnail,
         category: category,
         createdAt: createdAt
@@ -288,9 +331,7 @@ export const videoService = {
 
         const defaultThumb = platform === 'mp4' 
           ? `https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=60` 
-          : (platform === 'instagram' 
-              ? `https://www.instagram.com/p/${video.id}/media/?size=l` 
-              : `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`);
+          : `https://www.instagram.com/p/${video.id}/media/?size=l`;
 
         if (video.thumbnail && video.thumbnail !== defaultThumb) {
           savedTreatment = `${savedTreatment}||thumb:${video.thumbnail}`;
@@ -400,7 +441,7 @@ export const videoService = {
           title: String(enabled),
           treatment: 'setting',
           display_order: 99999,
-          videoPlatform: 'youtube'
+          videoPlatform: 'instagram'
         });
         
       if (error) {

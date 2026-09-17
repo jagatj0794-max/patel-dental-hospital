@@ -13,12 +13,15 @@ import {
   Calendar, 
   Cpu, 
   Activity, 
-  Layers 
+  Layers,
+  Award,
+  Users
 } from 'lucide-react';
 import { ServiceGalleryItem, MarketingConfig } from '../../types';
 import { BeforeAfterSlider } from '../BeforeAfterSlider';
 import { ClinicalCaseGallery } from '../ClinicalCaseGallery';
 import { GooglePatientReviews } from '../GooglePatientReviews';
+import { SurgicalTeamSection } from './SurgicalTeamSection';
 
 export interface DentalImplantsViewProps {
   heroElement: React.ReactNode;
@@ -43,6 +46,7 @@ export interface DentalImplantsViewProps {
     [key: string]: any;
   };
   openAppointmentModal: (preselectedTreatment?: string) => void;
+  setCurrentPage?: (page: string) => void;
 }
 
 export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
@@ -57,7 +61,8 @@ export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
   beforeAfterPairs,
   displayGallery,
   seoHeadings,
-  openAppointmentModal
+  openAppointmentModal,
+  setCurrentPage
 }) => {
   return (
     <div className="space-y-8 sm:space-y-16 lg:space-y-20">
@@ -79,10 +84,10 @@ export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
                         {/* Left accent line */}
                         <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          You Have One or More Missing Teeth
+                          You Have Difficulty in Chewing Due to One or More Missing Teeth
                         </h3>
                         <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
-                          Missing teeth are affecting your smile, chewing, or confidence.
+                          Missing teeth can make chewing difficult and affect your everyday eating experience.
                         </p>
                       </div>
 
@@ -91,10 +96,10 @@ export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
                         {/* Left accent line */}
                         <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Your Denture Feels Loose or Uncomfortable
+                          Your Denture Feels Loose or Uncomfortable and You Want a Fixed, Stable Solution
                         </h3>
                         <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
-                          You want a more stable and fixed alternative to removable dentures.
+                          You want a more stable and fixed alternative to a loose or uncomfortable denture.
                         </p>
                       </div>
 
@@ -103,38 +108,18 @@ export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
                         {/* Left accent line */}
                         <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          You Have a Damaged Tooth That Cannot Be Saved
+                          You Have a Painful Damaged Tooth That Cannot Be Saved and You Want a Permanent Solution
                         </h3>
                         <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
-                          A severely damaged or decayed tooth may need to be replaced.
-                        </p>
-                      </div>
-
-                      {/* Card 4 */}
-                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2 md:col-start-2">
-                        {/* Left accent line */}
-                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          You Find It Difficult to Chew Properly
-                        </h3>
-                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
-                          Missing teeth are making everyday eating uncomfortable or difficult.
-                        </p>
-                      </div>
-
-                      {/* Card 5 */}
-                      <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-[36px] shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left md:col-span-2">
-                        {/* Left accent line */}
-                        <div className="absolute left-0 top-5 bottom-5 sm:top-[36px] sm:bottom-[36px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
-                        <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[26px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          You Want a Long-Term Fixed Teeth Solution
-                        </h3>
-                        <p className="text-[#475569] text-[15px] sm:text-[17px] leading-[1.6] sm:leading-[1.8] font-medium flex-1">
-                          You are looking for natural-looking replacement teeth designed for long-term function.
+                          A painful, severely damaged tooth that cannot be saved may need to be replaced with a permanent tooth replacement solution.
                         </p>
                       </div>
                     </div>
                   </div>
+
+
+                {/* NEW TWO-DOCTOR SHORT PROFILE SECTION */}
+                <SurgicalTeamSection setCurrentPage={setCurrentPage} />
 
 
                 {/* Dental Implants Option Comparison Table Section */}
@@ -286,6 +271,62 @@ export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
                       </div>
                     </div>
                   </div>
+
+
+                {/* Section 5: Interactive Before & After Smile Transformations */}
+                {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
+                  <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
+                    <div className="space-y-3 max-w-3xl mx-auto text-center">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
+                        <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
+                        Transformations
+                      </span>
+                      <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
+                        {seoHeadings.transformations}
+                      </h2>
+                      <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
+                        {mConfig.before_after_description || 'See real smile transformations of our patients.'}
+                      </p>
+                      <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
+                      {beforeAfterPairs.map((pair, pIdx) => (
+                        <div 
+                          key={pair.id || pIdx} 
+                          className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
+                        >
+                          <BeforeAfterSlider
+                            beforeImage={pair.before_image}
+                            afterImage={pair.after_image}
+                            caption={pair.caption}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 6: Clinical Case Gallery */}
+                {mConfig.show_gallery !== false && (
+                  <ClinicalCaseGallery
+                    heading={seoHeadings.caseGallery}
+                    description={mConfig.gallery_description}
+                    items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
+                    singleGallery={false}
+                  />
+                )}
+
+                {/* Section 7: Patient Testimonial Reels */}
+                {testimonialsElement}
+
+                {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
+                {mConfig.show_google_reviews !== false && (
+                  <GooglePatientReviews
+                    heading={seoHeadings.reviews}
+                    reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+                  />
+                )}
 
 
                 {/* Dental Implants Transparent Pricing Section */}
@@ -521,63 +562,8 @@ export const DentalImplantsView: React.FC<DentalImplantsViewProps> = ({
 
 
 
-        {/* Section 5: Interactive Before & After Smile Transformations */}
-        {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (
-          <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="before-after-gallery-section">
-            <div className="space-y-3 max-w-3xl mx-auto text-center">
-              <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
-                <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                Transformations
-              </span>
-              <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                {seoHeadings.transformations}
-              </h2>
-              <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                {mConfig.before_after_description || 'See real smile transformations of our patients.'}
-              </p>
-              <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 items-start max-w-7xl mx-auto">
-              {beforeAfterPairs.map((pair, pIdx) => (
-                <div 
-                  key={pair.id || pIdx} 
-                  className="bg-white border border-[#E5EEF5] rounded-[20px] p-4 sm:p-5 shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300"
-                >
-                  <BeforeAfterSlider
-                    beforeImage={pair.before_image}
-                    afterImage={pair.after_image}
-                    caption={pair.caption}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Section 6: Clinical Case Gallery */}
-        {mConfig.show_gallery !== false && (
-          <ClinicalCaseGallery
-            heading={seoHeadings.caseGallery}
-            description={mConfig.gallery_description}
-            items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
-            singleGallery={false}
-          />
-        )}
-
         {/* Section 6: Procedure Video (Loaded dynamically from CMS Instagram Reel) */}
         {videoElement}
-
-        {/* Section 7: Patient Testimonial Reels */}
-        {testimonialsElement}
-
-        {/* Section 10: Google Patient Reviews (100% CMS-driven premium slider) */}
-        {mConfig.show_google_reviews !== false && (
-          <GooglePatientReviews
-            heading={seoHeadings.reviews}
-            reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
-          />
-        )}
 
 
                 

@@ -6,10 +6,11 @@
 import React from 'react';
 import { 
   Phone, MapPin, Clock, Heart, Shield, Mail, 
-  Facebook, Instagram, Youtube, Calendar, 
+  Facebook, Instagram, Calendar, 
   ChevronRight, ExternalLink, ShieldCheck, HeartHandshake, Award, BadgeCheck, Sparkles 
 } from 'lucide-react';
 import { PageId, ContactInfo } from '../types';
+import { trackPhoneClick } from '../utils/analytics';
 
 interface FooterProps {
   setCurrentPage: (page: PageId) => void;
@@ -37,8 +38,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
   // Social handles
   const socials = [
     { name: 'Facebook', icon: Facebook, url: 'https://facebook.com', hoverColor: 'hover:bg-blue-600' },
-    { name: 'Instagram', icon: Instagram, url: 'https://instagram.com', hoverColor: 'hover:bg-pink-600' },
-    { name: 'YouTube', icon: Youtube, url: 'https://youtube.com', hoverColor: 'hover:bg-red-600' }
+    { name: 'Instagram', icon: Instagram, url: 'https://instagram.com', hoverColor: 'hover:bg-pink-600' }
   ];
 
   return (
@@ -237,6 +237,7 @@ Rajkot – 360001, Gujarat, India.`}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/[0.04]">
                 <a 
                   href={`tel:${contactInfo?.phoneRaw || '+919510397046'}`} 
+                  onClick={() => trackPhoneClick(contactInfo?.phoneRaw || '+919510397046', 'Footer - Amin Marg Branch')}
                   className="inline-flex items-center space-x-1.5 text-xs font-extrabold text-white hover:text-brand-cyan transition-colors"
                 >
                   <Phone className="h-3.5 w-3.5 text-[#11B5D8]" />
@@ -281,6 +282,7 @@ Rajkot – 360001, Gujarat, India.`}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/[0.04]">
                 <a 
                   href={`tel:${contactInfo?.phoneRaw || '+919510397046'}`} 
+                  onClick={() => trackPhoneClick(contactInfo?.phoneRaw || '+919510397046', 'Footer - Gayatrinagar Branch')}
                   className="inline-flex items-center space-x-1.5 text-xs font-extrabold text-white hover:text-brand-cyan transition-colors"
                 >
                   <Phone className="h-3.5 w-3.5 text-[#11B5D8]" />

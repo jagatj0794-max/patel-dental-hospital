@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { PageId } from '../types';
 import BeforeAfterSlider from '../components/BeforeAfterSlider';
 import { serviceService } from '../utils/serviceData';
+import { InstagramEmbed } from '../components/InstagramEmbed';
 
 // Images
 import teethCleaningImg from '../assets/images/teeth_cleaning_1780610893042.png';
@@ -80,7 +81,6 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
     { name: 'Facebook', url: 'https://facebook.com', color: 'hover:bg-blue-600' },
     { name: 'Instagram', url: 'https://instagram.com', color: 'hover:bg-pink-600' },
     { name: 'Twitter', url: 'https://twitter.com', color: 'hover:bg-sky-500' },
-    { name: 'YouTube', url: 'https://youtube.com', color: 'hover:bg-red-600' },
     { name: 'WhatsApp', url: getWhatsAppUrl(), color: 'hover:bg-green-500' },
     { name: 'LinkedIn', url: 'https://linkedin.com', color: 'hover:bg-blue-700' }
   ];
@@ -487,45 +487,12 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
             <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full mt-4" />
           </div>
 
-          <div className="bg-white rounded-3xl border border-slate-100 p-4 md:p-6 shadow-xl max-w-3xl mx-auto">
-            <div className="aspect-video w-full bg-slate-900 rounded-2xl relative overflow-hidden shadow-inner">
-              {activeVideos['whitening-proc-vid'] ? (
-                <iframe
-                  className="w-full h-full border-0 absolute inset-0 z-10"
-                  src="https://www.youtube.com/embed/t_p6L6q-C-8?autoplay=1&rel=0"
-                  title="Teeth Whitening Procedure Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  loading="lazy"
-                ></iframe>
-              ) : (
-                <button
-                  onClick={() => setActiveVideos(prev => ({ ...prev, 'whitening-proc-vid': true }))}
-                  className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group focus:outline-none"
-                  aria-label="Play Teeth Whitening Procedure Video"
-                >
-                  <img
-                    src="https://img.youtube.com/vi/t_p6L6q-C-8/hqdefault.jpg"
-                    alt="Teeth Whitening Procedure Overview"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors duration-300 pointer-events-none" />
-                  {/* Play Button Icon */}
-                  <div className="absolute z-20 flex items-center justify-center w-16 h-16 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover:scale-110 group-hover:bg-[#0D9488] group-hover:text-white transition-all duration-300 pointer-events-none">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-7 h-7 translate-x-0.5"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </button>
-              )}
-            </div>
+          <div className="max-w-md mx-auto">
+            <InstagramEmbed
+              url="https://www.instagram.com/p/Db5A-K0MOoU/"
+              title="Teeth Whitening Procedure Overview"
+              thumbnail="https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786709786418_bibw3gks.webp"
+            />
           </div>
         </div>
       </section>
@@ -639,45 +606,12 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
             <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full mt-4" />
           </div>
 
-          <div className="bg-white rounded-3xl border border-slate-100 p-4 md:p-6 shadow-xl max-w-3xl mx-auto">
-            <div className="aspect-video w-full bg-slate-900 rounded-2xl relative overflow-hidden shadow-inner">
-              {activeVideos['patient-review-vid'] ? (
-                <iframe
-                  className="w-full h-full border-0 absolute inset-0 z-10"
-                  src="https://www.youtube.com/embed/cyai6CjMD0s?autoplay=1&rel=0"
-                  title="Patient Review Testimonial Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  loading="lazy"
-                ></iframe>
-              ) : (
-                <button
-                  onClick={() => setActiveVideos(prev => ({ ...prev, 'patient-review-vid': true }))}
-                  className="absolute inset-0 w-full h-full z-10 flex items-center justify-center cursor-pointer group focus:outline-none"
-                  aria-label="Play Patient Review Testimonial Video"
-                >
-                  <img
-                    src="https://img.youtube.com/vi/cyai6CjMD0s/hqdefault.jpg"
-                    alt="Patient Testimonial Review"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors duration-300 pointer-events-none" />
-                  {/* Play Button Icon */}
-                  <div className="absolute z-20 flex items-center justify-center w-16 h-16 rounded-full bg-white/95 text-[#0D9488] shadow-md group-hover:scale-110 group-hover:bg-[#0D9488] group-hover:text-white transition-all duration-300 pointer-events-none">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-7 h-7 translate-x-0.5"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </button>
-              )}
-            </div>
+          <div className="max-w-md mx-auto">
+            <InstagramEmbed
+              url="https://www.instagram.com/p/Db44bY6MpcZ/"
+              title="Patient Review Testimonial Video"
+              thumbnail="https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786711494301_bymdaaht.webp"
+            />
           </div>
         </div>
       </section>

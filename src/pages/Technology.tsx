@@ -100,6 +100,9 @@ export default function Technology() {
             <h1 className="stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight">
               Our Technology
             </h1>
+            <p className="text-slate-600 max-w-2xl mx-auto font-sans text-sm sm:text-base leading-relaxed mt-3 px-2">
+              We invest in state-of-the-art digital dentistry equipment to ensure highly accurate treatment planning, predictable outcomes, and absolute patient comfort.
+            </p>
             <div className="h-[3.5px] w-16 bg-gradient-to-r from-indigo-500 to-[#11B5D8] mx-auto rounded-full mt-4" />
           </div>
         </div>
