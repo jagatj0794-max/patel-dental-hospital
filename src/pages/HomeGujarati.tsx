@@ -1,0 +1,2939 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  ShieldCheck, Sparkles, Award, Star, ArrowRight, Video, Calendar, PhoneCall, 
+  HelpCircle, HardDrive, CheckCircle, MessageCircle, Phone, Smile, Users, Activity,
+  Stethoscope, Cpu, X, Maximize2, Eye, Heart, ChevronLeft, ChevronRight, Phone as PhoneIcon, ImageIcon,
+  ChevronDown, MapPin, Clock, Mail, ExternalLink, Trophy, Instagram
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { PageId, PatientMoment, ContactInfo, Service, AwardItem, DentalVideo } from '../types';
+import { DEFAULT_VIDEOS } from '../utils/videoData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
+import { getWhatsAppUrl } from '../utils/contactData';
+import { awardsService } from '../utils/awardsData';
+import { supabase, isSupabaseConfigured } from '../utils/supabase';
+import { InstagramEmbed } from '../components/InstagramEmbed';
+import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
+
+// Custom SVG Premium Dental-Specific Representation Icons
+const DentalImplantIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M6 3c-1.2 0-2.4.8-2.4 2.2 0 2.2 1.2 3.2 1.6 5.3C5.6 12 5 13 5 14h14c0-1-.6-2-.2-3.5.4-2.1 1.6-3.1 1.6-5.3 0-1.4-1.2-2.2-2.4-2.2-1.6 0-2.4 1-4 1s-2.4-1-4-1z" />
+    <path d="M12 14v4M10 18h4" />
+    <path d="M10 20l4-1" strokeWidth="1.5" />
+    <path d="M10 22l4-1" strokeWidth="1.5" />
+  </svg>
+);
+
+const FullMouthIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M5 14a7 7 0 0 1 14 0" />
+    <path d="M7 14c0-2.8 2.2-5 5-5s5 2.2 5 5" />
+    <path d="M12 9V5" />
+    <path d="M9.5 10.5L7.5 8" />
+    <path d="M14.5 10.5l2-2.5" />
+    <circle cx="12" cy="4" r="1.5" />
+    <circle cx="7" cy="7" r="1.5" />
+    <circle cx="17" cy="7" r="1.5" />
+    <path d="M22 22v-2a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v2" />
+  </svg>
+);
+
+const RootCanalIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M18 3c-1 0-1.8.4-2.4 1-.6-.6-1.4-1-2.4-1s-1.8.4-2.4 1c-.6-.6-1.4-1-2.4-1S6.6 3.4 6 4C6 6 7 8 7 11c0 3-3 4.5-3 7s3 4 5 4c3 0 2-4.5 3-4.5s0 4.5 3 4.5c2 0 5-1.5 5-4s-3-4-3-7c0-3 1-5 1-7 0-.6-.4-1.2-1-1.2z" />
+    <path d="M12 7v5" strokeWidth="1.5" />
+    <path d="M12 12c-0.8 1.2-1.5 2.2-1.5 4.5" strokeWidth="1.5" />
+    <path d="M12 12c0.8 1.2 1.5 2.2 1.5 4.5" strokeWidth="1.5" />
+  </svg>
+);
+
+const ClearAlignerIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M12 3a8 8 0 0 0-8 8c0 3 1.5 4.5 2 7.5.2 1.2-.5 2.5-.2 3.5.2.8.8 1 1.6 1 .8 0 2.2-1.5 2.6-3.5C10.5 17 11.2 16 12 16s1.5 1 2 3.5c.4 2 1.8 3.5 2.6 3.5.8 0 1.4-.2 1.6-1 .3-1-.4-2.3-.2-3.5.5-3 2-4.5 2-7.5a8 8 0 0 0-8-8z" />
+    <path d="M7 11s2-1 5-1 5 1 5 1" strokeDasharray="2 2" />
+    <path d="M8 15h8" strokeWidth="1.5" />
+    <path d="M12 6V4" />
+    <path d="M12 14v2" />
+  </svg>
+);
+
+const SmileMakeoverIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M5 11c0 3.87 3.13 7 7 7s7-3.13 7-7" />
+    <path d="M7 11h10" />
+    <path d="M12 11V7" strokeWidth="1.5" />
+    <path d="M15 11l1-2.5" strokeWidth="1.5" />
+    <path d="M9 11L8 8.5" strokeWidth="1.5" />
+    <path d="M19 4a.5.5 0 0 1 .5.5c0 .33-.3.5-.5.5h-.5a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h.5z" fill="currentColor" />
+    <path d="M18 2l.5 1.5L20 4l-1.5.5L18 6l-.5-1.5L16 4l1.5-.5z" fill="currentColor" stroke="none" />
+    <path d="M4 6l.5 1.5L6 8l-1.5.5L4 10l-.5-1.5L2 8l1.5-.5z" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const CrownsBridgesIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M3 6l3 9h12l3-9-4 3-4-4-4 4-4-3z" />
+    <path d="M6 15v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4" />
+    <path d="M10 15v4" strokeWidth="1.5" />
+    <path d="M14 15v4" strokeWidth="1.5" />
+  </svg>
+);
+
+// Custom Patient Problem Qualification Icons (Premium Inline SVGs matching reference image exactly)
+const EatingDifficultyIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Fork (Left) */}
+    <path d="M4.5 5v3.5c0 .8.6 1.3 1.2 1.3s1.2-.5 1.2-1.3V5" />
+    <path d="M5.7 5v3.5" />
+    <path d="M5.7 9.8V19" />
+
+    {/* Tooth (Center) */}
+    <path d="M12 6.5c-1.5 0-2.5-.5-2.5 1 0 1.5.3 2.5.6 3.8.2.8.1 2.2.5 2.5.3.3.7.3.9-.1.3-.8.7-2.4.7-2.4s.4 1.6.7 2.4c.2.4.6.4.9.1.4-.3.3-1.7.5-2.5.3-1.3.6-2.3.6-3.8 0-1.5-1-1-2.5-1z" />
+
+    {/* Spoon (Right) */}
+    <path d="M18.5 5.2c-.8 0-1.5 1-1.5 2.2s.7 2.2 1.5 2.2s1.5-1 1.5-2.2s-.7-2.2-1.5-2.2z" />
+    <path d="M18.5 9.6V19" />
+  </svg>
+);
+
+const LooseToothIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Centered Tooth */}
+    <path d="M12 5.5c-2 0-3.3-.8-3.3 1.2 0 1.8.3 3 .6 4.5.3 1 .2 2.6.5 2.8.3.3.7.3.9-.1.3-.9.7-2.8.7-2.8s.4 2.2.7 2.8c.2.3.6.3.9-.1.4-.3.3-1.8.5-2.8.3-1.5.6-2.7.6-4.5 0-2-1.3-1.2-3.3-1.2z" />
+
+    {/* Shaking vibration lines */}
+    <path d="M5.5 10.5c-.4 1-.4 2.5 0 3.5" />
+    <path d="M3.5 9c-.7 1.8-.7 4.2 0 6" />
+    <path d="M18.5 10.5c.4 1 .4 2.5 0 3.5" />
+    <path d="M20.5 9c.7 1.8.7 4.2 0 6" />
+  </svg>
+);
+
+const DamagedTeethIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Tooth 1 (Left with top crack) */}
+    <path d="M6 6.5c-1 0-1.6-.4-1.6.6 0 1 .2 1.6.5 2.5.2.5.1 1.4.4 1.5.2.2.5.2.6-.1.2-.5.5-1.5.5-1.5s.3 1 .5 1.5c.2.2.5.2.6-.1.3-.2.2-1 .4-1.5.2-.9.5-1.5.5-2.5 0-1-.6-.6-1.5-.6z" />
+    <path d="M5.2 6.5l.6 2-.6.8" strokeWidth="1.5" />
+
+    {/* Tooth 2 (Middle Connected) */}
+    <path d="M12 6.5c-1 0-1.6-.4-1.6.6 0 1 .2 1.6.5 2.5.2.5.1 1.4.4 1.5.2.2.5.2.6-.1.2-.5.5-1.5.5-1.5s.3 1 .5 1.5c.2.2.5.2.6-.1.3-.2.2-1 .4-1.5.2-.9.5-1.5.5-2.5 0-1-.6-.6-1.5-.6z" />
+
+    {/* Tooth 3 (Right with top crack) */}
+    <path d="M18 6.5c-1 0-1.6-.4-1.6.6 0 1 .2 1.6.5 2.5.2.5.1 1.4.4 1.5.2.2.5.2.6-.1.2-.5.5-1.5.5-1.5s.3 1 .5 1.5c.2.2.5.2.6-.1.3-.2.2-1 .4-1.5.2-.9.5-1.5.5-2.5 0-1-.6-.6-1.5-.6z" />
+    <path d="M18.8 6.5l-.6 2 .6.8" strokeWidth="1.5" />
+  </svg>
+);
+
+const DenturesIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Upper Denture Base and Ridges */}
+    <path d="M3.5 9c0-2.5 3-4 8.5-4s8.5 1.5 8.5 4" />
+    <path d="M4 9c0 1.5 1.5 2 8 2s8-.5 8-2" />
+    <path d="M6.5 9v1.2" />
+    <path d="M9 9.3v1.5" />
+    <path d="M12 9.5v1.5" />
+    <path d="M15 9.3v1.5" />
+    <path d="M17.5 9v1.2" />
+
+    {/* Lower Denture Base and Ridges */}
+    <path d="M3.5 15c0 2.5 3 4 8.5 4s8.5-1.5 8.5-4" />
+    <path d="M4 15c0-1.5 1.5-2 8-2s8 .5 8 2" />
+    <path d="M6.5 15v-1.2" />
+    <path d="M9 14.7v-1.5" />
+    <path d="M12 14.5v-1.5" />
+    <path d="M15 14.7v-1.5" />
+    <path d="M17.5 15v-1.2" />
+  </svg>
+);
+
+const AestheticSmileIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Smiling Lip Crescent Shapes */}
+    <path d="M3 11.5c3 4.5 15 4.5 18 0" />
+    <path d="M4.5 11.5c3 2 12 2 15 0" />
+    <path d="M3 11.5c3-2 6-1 9 .5c3-1.5 6-2.5 9-.5" />
+
+    {/* Sparkle Star (Top Right) */}
+    <path d="M18.5 3c0 1.2 .3 1.5 1.5 1.5c-1.2 0-1.5 .3-1.5 1.5c0-1.2-.3-1.5-1.5-1.5c1.2 0 1.5-.3 1.5-.3" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const ToothPainIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Tooth Outline (Shifted Left) */}
+    <path d="M9 6.5c-1.5 0-2.5-.5-2.5 1 0 1.5.3 2.5.6 3.8.2.8.1 2.5.5 2.8.3.3.8.3 1 0 .3-.9.7-2.8.7-2.8s.4 1.9.7 2.8c.2.3.7.3 1 0 .4-.3.3-1.7.5-2.5.3-1.3.6-2.3.6-3.8 0-1.5-1-1-2.5-1z" />
+
+    {/* Pain lightning bolt cutting right root/crown */}
+    <path d="M17 3.5l-3 5.5h3.5l-3 4.5" />
+
+    {/* Pain/Shock lines */}
+    <path d="M18 7.5l2 .5" />
+    <path d="M16.5 11.5l1.5 1.5" />
+  </svg>
+);
+
+const ConsultationOpinionIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Left Doctor with Stethoscope */}
+    <circle cx="9" cy="7.5" r="2.5" />
+    <path d="M3.5 18c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4" />
+    <path d="M7 15.5c0 1.2.6 2 2 2s2-.8 2-2" strokeWidth="1.5" />
+    <path d="M9 17.5v1.5" strokeWidth="1.5" />
+
+    {/* Right smaller patient consultation outline */}
+    <circle cx="16.5" cy="11.5" r="1.8" />
+    <path d="M13.5 19c0-1.5 1-2 3-2s3 .5 3 2" />
+
+    {/* Medical Consultation Cross Sign */}
+    <path d="M18.5 8h3" />
+    <path d="M20 6.5V9.5" />
+  </svg>
+);
+
+const DiagnosisQuestionIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Friendly Tooth Crown Outer Shape */}
+    <path d="M12 5.5c-2 0-3.3-.8-3.3 1.2 0 1.8.3 3 .6 4.5.3 1 .2 2.6.5 2.8.3.3.7.3.9-.1.3-.9.7-2.8.7-2.8s.4 2.2.7 2.8c.2.3.6.3.9-.1.4-.3.3-1.8.5-2.8.3-1.5.6-2.7.6-4.5 0-2-1.3-1.2-3.3-1.2z" />
+
+    {/* Centered Question Mark inside the crown */}
+    <path d="M12 8.2c.8 0 1.2.4 1.2.9c0 .5-.4.8-.8 1.1c-.4.3-.4.8-.4 1.2" strokeWidth="1.5" />
+    <circle cx="12" cy="12.5" r="0.5" fill="currentColor" />
+  </svg>
+);
+
+const TeethWhiteningIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M12 5c-1.5 0-3 .5-3 3 0 2.5 1 4 1 6.5 0 2.5-2.5 3.5-2.5 5 0 .8.7 1.5 1.5 1.5 1.5 0 1-2 3-2s1.5 2 3 2c.8 0 1.5-.7 1.5-1.5 0-1.5-2.5-2.5-2.5-5 0-2.5 1-4 1-6.5 0-2.5-1.5-3-3-3z" />
+    <path d="M18 4l.5 1.5L20 6l-1.5.5L18 8l-.5-1.5L16 6l1.5-.5z" fill="currentColor" stroke="none" />
+    <path d="M6 7l.25 1L7 8.25l-.75.25L6 9.25l-.25-1L5 8.25l.75-.25z" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const PediatricDentistryIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M12 5c-1.5 0-3 .5-3 3 0 2.5 1 4 1 6.5 0 2.5-2.5 3.5-2.5 5 0 .8.7 1.5 1.5 1.5 1.5 0 1-2 3-2s1-2 3-2c1.5 0 1 2 3 2c.8 0 1.5-.7 1.5-1.5 0-1.5-2.5-2.5-2.5-5 0-2.5 1-4 1-6.5 0-2.5-1.5-3-3-3z" />
+    <path d="M10 9a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" fill="currentColor" stroke="none" />
+    <path d="M15 9a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" fill="currentColor" stroke="none" />
+    <path d="M10.5 11.5c.5.5 1 .8 1.5.8s1-.3 1.5-.8" />
+    <path d="M6 5l.5 1L8 6.5 7 7l-.5 1-.5-1-1-.5 1-.5z" fill="currentColor" stroke="none" />
+    <path d="M18 6l.25.75.75.25-.75.25-.25.75-.25-.75-.75-.25.75-.25z" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const BracesTreatmentIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M4 11c0 3.87 3.13 7 7 7s7-3.13 7-7" />
+    <path d="M4 11h16" />
+    <path d="M7 9v4" />
+    <path d="M12 9v4" />
+    <path d="M17 9v4" />
+    <rect x="6" y="10" width="2" height="2" fill="currentColor" />
+    <rect x="11" y="10" width="2" height="2" fill="currentColor" />
+    <rect x="16" y="10" width="2" height="2" fill="currentColor" />
+  </svg>
+);
+
+const WisdomToothSurgeryIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M12 5c-1.5 0-3 .5-3 3 0 2.5 1 4 1 6.5 0 2.5-2.5 3.5-2.5 5 0 .8.7 1.5 1.5 1.5 1.5 0 1-2 3-2s1-2 3-2c1.5 0 1 2 3 2c.8 0 1.5-.7 1.5-1.5 0-1.5-2.5-2.5-2.5-5 0-2.5 1-4 1-6.5 0-2.5-1.5-3-3-3z" />
+    <path d="M19 5h-4v4h4V5z" strokeWidth="1" />
+    <path d="M17 3v8" />
+    <path d="M13 7h8" />
+  </svg>
+);
+
+const ToothColouredFillingIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M12 5c-1.5 0-3 .5-3 3 0 2.5 1 4 1 6.5 0 2.5-2.5 3.5-2.5 5 0 .8.7 1.5 1.5 1.5 1.5 0 1-2 3-2s1-2 3-2c1.5 0 1 2 3 2c.8 0 1.5-.7 1.5-1.5 0-1.5-2.5-2.5-2.5-5 0-2.5 1-4 1-6.5 0-2.5-1.5-3-3-3z" />
+    <path d="M12 9a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" fill="currentColor" stroke="none" />
+    <path d="M18 5l1.5 1.5L21 5l-1.5-1.5z" fill="currentColor" stroke="none" />
+  </svg>
+);
+const clinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800';
+const heroBannerBg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
+const doctorsImg = 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800';
+import AnimatedCounter from '../components/AnimatedCounter';
+const sameDayTeethImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const dentalImplantsImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const fullMouthRehabImg = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const clearAlignersImg = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
+const rootCanalImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const smileMakeoverImg = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800';
+const crownsBridgesImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const teethCleaningImg = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const kidsDentistryImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const bracesImg = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
+const wisdomToothImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
+const compositeFillingImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
+const fdaApprovedImplantImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+
+const patelDentistPatient1 = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
+const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
+import { GALLERY_ITEMS } from '../data/gallery';
+import { PATIENT_MOMENTS } from '../data/patientMoments';
+import PatientMomentsGallery from '../components/PatientMomentsGallery';
+
+
+
+const faqData = [
+  {
+    question: "પટેલ ડેન્ટલ હોસ્પિટલને રાજકોટની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ શા માટે માનવામાં આવે છે?",
+    answer: "પટેલ ડેન્ટલ હોસ્પિટલને રાજકોટ અને ગુજરાતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે ઓળખવામાં આવે છે, જેનું કારણ તેની અદ્યતન 3D CBCT ઇમેજિંગ, અનુભવી નિષ્ણાતો (ચીફ ઇમ્પ્લાન્ટોલોજિસ્ટ અને રૂટ કેનાલ નિષ્ણાતો સહિત), આંતરરાષ્ટ્રીય સ્ટેરિલાઇઝેશન ધોરણો અને 45,000થી વધુ સંતુષ્ટ દર્દીઓ છે."
+  },
+  {
+    question: "રાજકોટની ડેન્ટલ ઇમ્પ્લાન્ટ હોસ્પિટલમાં ડેન્ટલ ઇમ્પ્લાન્ટની સારવારમાં કેટલો સમય લાગે છે?",
+    answer: "પટેલ ડેન્ટલ હોસ્પિટલમાં યોગ્ય કેસોમાં ડેન્ટલ ઇમ્પ્લાન્ટની સારવાર 10 થી 12 દિવસમાં પૂર્ણ કરી શકાય છે. સારવારનો ચોક્કસ સમયગાળો દર્દીની વ્યક્તિગત દાંતની સ્થિતિ, સારવારના પ્લાન અને હીલિંગની જરૂરિયાતો પર આધારિત રહે છે."
+  },
+  {
+    question: "શું ડેન્ટલ ઇમ્પ્લાન્ટની પ્રક્રિયા પીડાદાયક હોય છે?",
+    answer: "રાજકોટમાં અમારી ડેન્ટલ ક્લિનિક ખાતે ડેન્ટલ ઇમ્પ્લાન્ટની પ્રક્રિયા અદ્યતન લોકલ એનેસ્થેસિયા અને માઇક્રો-સર્જિકલ પ્રોટોકોલ હેઠળ કરવામાં આવે છે, જેથી સારવારનો અનુભવ લગભગ પીડારહિત અને આરામદાયક રહે."
+  },
+  {
+    question: "ડેન્ટલ ઇમ્પ્લાન્ટ કેટલા સમય સુધી ચાલે છે?",
+    answer: "રાજકોટમાં અમારી અદ્યતન ડેન્ટલ ક્લિનિક ખાતે યોગ્ય મોઢાની કાળજી અને નિયમિત ચેકઅપ સાથે ડેન્ટલ ઇમ્પ્લાન્ટ ઘણા દાયકાઓ સુધી અને ઘણીવાર જીવનભર ટકી શકે છે."
+  },
+  {
+    question: "રાજકોટમાં ફુલ માઉથ રિહેબિલિટેશન અને સ્માઇલ મેકઓવર શું છે?",
+    answer: "રાજકોટમાં ફુલ માઉથ રિહેબિલિટેશન અને સ્માઇલ મેકઓવરમાં દાંતને ફરીથી બનાવવાની, ક્ષતિગ્રસ્ત દાંતને સુધારવાની અને કોસ્મેટિક ડેન્ટિસ્ટ્રીની વ્યાપક સારવારનો સમાવેશ થાય છે, જે જડબાના સાંધાની કાર્યક્ષમતા પુનઃસ્થાપિત કરવામાં અને સુંદર તથા આત્મવિશ્વાસપૂર્ણ સ્મિત બનાવવામાં મદદ કરે છે."
+  },
+  {
+    question: "રાજકોટમાં એલાઇનર સારવાર માટે શું ઇનવિઝિબલ એલાઇનર્સ પરંપરાગત બ્રેસિસ કરતાં વધુ સારા છે?",
+    answer: "ઇનવિઝિબલ એલાઇનર્સ પારદર્શક, દૂર કરી શકાય તેવા અને આરામદાયક હોય છે, તેથી દાંતને ઓછા દેખાય તે રીતે સીધા કરવા ઇચ્છતા કિશોરો અને પુખ્ત વયના લોકો માટે તે પરંપરાગત મેટલ બ્રેસિસનો લોકપ્રિય આધુનિક ઓર્થોડોન્ટિક વિકલ્પ છે."
+  },
+  {
+    question: "શું તમારી પાસે રાજકોટમાં રૂટ કેનાલ નિષ્ણાત અને ઇન-હાઉસ 3D CBCT સ્કેનિંગની સુવિધા છે?",
+    answer: "હા, પટેલ ડેન્ટલ હોસ્પિટલમાં રાજકોટમાં અનુભવી રૂટ કેનાલ નિષ્ણાત તેમજ ચોક્કસ સિંગલ-સિટિંગ રૂટ કેનાલ સારવાર અને ઇમ્પ્લાન્ટ સર્જરી માટે અદ્યતન ઇન-હાઉસ 3D CBCT સ્કેનિંગ ટેક્નોલોજીની સુવિધા છે."
+  },
+  {
+    question: "રાજકોટની શ્રેષ્ઠ ડેન્ટલ ક્લિનિકમાં હું એપોઇન્ટમેન્ટ કેવી રીતે બુક કરી શકું?",
+    answer: "તમે અમારા રાજકોટ હોટલાઇન નંબર +91 9510397046 પર સીધો કોલ કરીને, WhatsApp દ્વારા સંપર્ક કરીને અથવા અમારી વેબસાઇટ પરનું ઑનલાઇન કન્સલ્ટેશન ફોર્મ ભરીને એપોઇન્ટમેન્ટ બુક કરી શકો છો."
+  }
+];
+
+interface HomeProps {
+  setCurrentPage: (page: PageId) => void;
+  openAppointmentModal: () => void;
+  heroHeading?: string;
+  heroDescription?: string;
+  heroBgImage?: string;
+  heroBgImageMobile?: string;
+  mediaImages?: Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>;
+  patientMoments?: PatientMoment[];
+  videosList?: DentalVideo[];
+  contactInfo?: ContactInfo;
+}
+
+export default function HomeGujarati({ 
+  setCurrentPage, 
+  openAppointmentModal,
+  heroHeading = "Dental Implant, Aligner &\nFMR Specialists\nin Rajkot",
+  heroDescription = "Trusted smiles. Advanced care. Exceptional results.",
+  heroBgImage = "",
+  heroBgImageMobile = "",
+  mediaImages = [],
+  patientMoments,
+  videosList = [],
+  contactInfo
+}: HomeProps) {
+
+  const momentsToRender = patientMoments !== undefined ? patientMoments : PATIENT_MOMENTS;
+  const phoneRaw = contactInfo?.phoneRaw || '+919510397046';
+  const whatsappRaw = contactInfo?.whatsappRaw || '919510397046';
+  const displayPhone = contactInfo?.phone || '+91 9510397046';
+  const displayWhatsapp = contactInfo?.whatsapp || '+91 9510397046';
+
+  const rawVideos = (videosList && videosList.length > 0 ? videosList : DEFAULT_VIDEOS) as DentalVideo[];
+
+  const videosToRender = rawVideos.map((v: DentalVideo) => {
+    const isMp4 = v.videoPlatform === 'mp4' || v.platform === 'mp4' || v.id.endsWith('.mp4') || v.id.includes('supabase.co');
+    const isInstagram = !isMp4 && (v.videoPlatform === 'instagram' || v.platform === 'instagram' || v.id === 'DbS7_fJMTYC' || (v.title && v.title?.toLowerCase().includes('instagram')));
+    const platform = isMp4 ? ('mp4' as const) : (isInstagram ? ('instagram' as const) : ('instagram' as const));
+    const url = platform === 'mp4' ? v.id : `https://www.instagram.com/p/${v.id}/`;
+    return {
+      ...v,
+      videoPlatform: platform,
+      platform: platform,
+      url: url
+    };
+  });
+  const [visibleCount, setVisibleCount] = useState(12);
+  const [selectedMomentIndex, setSelectedMomentIndex] = useState<number | null>(null);
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(0);
+  const [activeMapBranch, setActiveMapBranch] = useState<'amin_marg' | 'gayatrinagar'>('amin_marg');
+
+  const [activeVideos, setActiveVideos] = useState<Record<string, boolean>>({});
+
+  // Hospital Gallery States & Lightbox Logic
+  const [hospitalLightboxIndex, setHospitalLightboxIndex] = useState<number | null>(null);
+
+  const filteredHospitalImages = mediaImages || [];
+
+  const currentHospitalLightboxImg = hospitalLightboxIndex !== null ? filteredHospitalImages[hospitalLightboxIndex] : null;
+
+  const handleNextHospitalLightbox = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hospitalLightboxIndex !== null && filteredHospitalImages.length > 0) {
+      setHospitalLightboxIndex((hospitalLightboxIndex + 1) % filteredHospitalImages.length);
+    }
+  };
+
+  const handlePrevHospitalLightbox = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hospitalLightboxIndex !== null && filteredHospitalImages.length > 0) {
+      setHospitalLightboxIndex((hospitalLightboxIndex - 1 + filteredHospitalImages.length) % filteredHospitalImages.length);
+    }
+  };
+
+  const [dbServices, setDbServices] = useState<Service[]>([]);
+  const [awardsList, setAwardsList] = useState<AwardItem[]>([]);
+  const [detectedOrientations, setDetectedOrientations] = useState<Record<string, 'horizontal' | 'vertical'>>({});
+
+  useEffect(() => {
+    if (!awardsList || awardsList.length === 0) return;
+    
+    awardsList.forEach(item => {
+      if (!item.image_url) return;
+      if (detectedOrientations[item.id]) return;
+
+      const img = new window.Image();
+      img.referrerPolicy = "no-referrer";
+      img.onload = () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        const orientation = height > width ? 'vertical' : 'horizontal';
+        setDetectedOrientations(prev => ({
+          ...prev,
+          [item.id]: orientation
+        }));
+      };
+      img.onerror = () => {
+        setDetectedOrientations(prev => ({
+          ...prev,
+          [item.id]: item.orientation || 'horizontal'
+        }));
+      };
+      img.src = item.image_url;
+    });
+  }, [awardsList]);
+
+  const horizontalAwards = awardsList.filter(item => {
+    if (!item.image_url || item.image_url.trim() === '') return false;
+    const detected = detectedOrientations[item.id];
+    if (detected) {
+      return detected === 'horizontal';
+    }
+    return item.orientation === 'horizontal' || !item.orientation;
+  });
+
+  const verticalAwards = awardsList.filter(item => {
+    if (!item.image_url || item.image_url.trim() === '') return false;
+    const detected = detectedOrientations[item.id];
+    if (detected) {
+      return detected === 'vertical';
+    }
+    return item.orientation === 'vertical';
+  });
+
+  const [selectedAward, setSelectedAward] = useState<AwardItem | null>(null);
+
+  const sequenceRef = useRef<HTMLDivElement>(null);
+  const [marqueeDistance, setMarqueeDistance] = useState<number>(0);
+
+  useEffect(() => {
+    const sequenceElement = sequenceRef.current;
+    if (!sequenceElement) return;
+
+    const updateWidth = () => {
+      const rect = sequenceElement.getBoundingClientRect();
+      if (rect.width > 0) {
+        setMarqueeDistance(rect.width);
+      }
+    };
+
+    updateWidth();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateWidth();
+    });
+    resizeObserver.observe(sequenceElement);
+
+    const images = sequenceElement.querySelectorAll('img');
+    images.forEach(img => {
+      if (img.complete) {
+        updateWidth();
+      } else {
+        img.addEventListener('load', updateWidth);
+      }
+    });
+
+    return () => {
+      resizeObserver.disconnect();
+      images.forEach(img => {
+        img.removeEventListener('load', updateWidth);
+      });
+    };
+  }, [horizontalAwards]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedAward(null);
+      }
+    };
+    if (selectedAward) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedAward]);
+
+  useEffect(() => {
+    if (selectedAward) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedAward]);
+
+  React.useEffect(() => {
+    serviceService.getServices().then(res => {
+      if (res) {
+        setDbServices(res);
+      }
+    }).catch(err => {
+      console.error("Error loading services for home page:", err);
+    });
+
+    awardsService.getAwards().then(res => {
+      setAwardsList(res || []);
+    }).catch(err => {
+      console.error("Error loading awards for home page:", err);
+    });
+  }, []);
+
+  const getCardData = (defaultSlug: string, defaultTitle: string, defaultImage: string, id?: string) => {
+    const lookupSlugs = [
+      defaultSlug,
+      defaultSlug.replace(/-and-/g, '-'),
+      defaultSlug.replace(/-bridges/g, '-bridges'),
+      defaultSlug === 'invisible-aligners' ? 'clear-aligners' : null,
+      defaultSlug === 'pediatric-dentistry' ? 'kids-dentistry' : null,
+      defaultSlug === 'tooth-coloured-filling' ? 'tooth-coloured-filling' : null,
+      defaultSlug === 'wisdom-tooth-surgery' ? 'wisdom-tooth-surgery' : null,
+    ].filter(Boolean) as string[];
+
+    const dbSvc = dbServices.find(s => 
+      (id && s.id === id) ||
+      lookupSlugs.includes(s.slug) || 
+      s.title.toLowerCase() === defaultTitle.toLowerCase()
+    );
+
+    const mConfig = dbSvc ? (typeof dbSvc.marketing_config === 'string'
+      ? (() => { try { return JSON.parse(dbSvc.marketing_config) } catch(e) { return {} } })()
+      : (dbSvc.marketing_config || {})
+    ) : {};
+
+    // Helper to extract first 2-3 sentences safely
+    const getSentenceFallback = (text: string | null | undefined): string | null => {
+      if (!text) return null;
+      // Strip common markdown elements
+      const cleanText = text
+        .replace(/[*#`_\-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!cleanText) return null;
+      
+      const sentences = cleanText
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+        
+      if (sentences.length === 0) return null;
+      return sentences.slice(0, 3).join(' ');
+    };
+
+    const isDentalImplants = defaultSlug === 'dental-implants' || dbSvc?.slug === 'dental-implants';
+    const isRootCanal = defaultSlug === 'root-canal-treatment' || dbSvc?.slug === 'root-canal-treatment';
+
+    const homepageDesc = dbSvc?.homepage_short_description?.trim()
+      ? dbSvc.homepage_short_description.trim()
+      : (isDentalImplants
+          ? "Dental implant is an artificial tooth placed in your mouth for better chewing efficiency and enhance patient's smile and life.\n\nIt is ideal for replacement of missing and loose teeth due to pyorrhea.\n\nPatel Dental Hospital provides fixed teeth in just one week with best dental implant."
+          : getSentenceFallback(dbSvc?.description || dbSvc?.short_description));
+
+    const greenHighlightLine = mConfig.green_highlight_line !== undefined 
+      ? mConfig.green_highlight_line 
+      : (isDentalImplants 
+          ? DEFAULT_GREEN_HIGHLIGHT_LINE 
+          : (isRootCanal ? DEFAULT_RCT_GREEN_HIGHLIGHT_LINE : ""));
+
+    let titleVal = dbSvc?.title || defaultTitle;
+    let shortDescVal = homepageDesc;
+    let greenHighlightLineVal = greenHighlightLine;
+
+    if (defaultSlug === 'dental-implants') {
+      titleVal = "ડેન્ટલ ઇમ્પ્લાન્ટ્સ";
+      shortDescVal = `ડેન્ટલ ઇમ્પ્લાન્ટ એ મોઢામાં મૂકવામાં આવતો કૃત્રિમ દાંત છે, જે ચાવવાની કાર્યક્ષમતા સુધારવામાં અને દર્દીના સ્મિત તથા જીવનની ગુણવત્તા વધારવામાં મદદ કરે છે.
+
+પાયરોરિયાના કારણે ગુમ થયેલા અને હલતા દાંતને બદલવા માટે તે આદર્શ છે.
+
+પટેલ ડેન્ટલ હોસ્પિટલ શ્રેષ્ઠ ડેન્ટલ ઇમ્પ્લાન્ટ દ્વારા માત્ર એક અઠવાડિયામાં દાંતને સ્થિર કરવાની સારવાર પ્રદાન કરે છે.`;
+      greenHighlightLineVal = "અદ્યતન ટેકનોલોજીની મદદથી માત્ર એક અઠવાડિયામાં ડેન્ટલ ઇમ્પ્લાન્ટ દ્વારા ગુમ થયેલા દાંતને બદલો";
+    } else if (defaultSlug === 'root-canal-treatment') {
+      titleVal = "સિંગલ સિટિંગ રૂટ કેનલ ટ્રીટમેન્ટ";
+      shortDescVal = `જ્યારે દાંતનો સડો દાંતની નસ સુધી પહોંચે છે, ત્યારે દર્દીને ખૂબ જ દુખાવો થાય છે. આવી સ્થિતિમાં ડેન્ટિસ્ટ દાંતના સડેલા અને ચેપગ્રસ્ત તમામ ભાગોને દૂર કરીને ફાઇલ્સ અને દવાની મદદથી રૂટ કેનલને સાફ કરે છે. રૂટ કેનલ સિસ્ટમને સાફ અને જંતુમુક્ત કર્યા બાદ, અમારા ડેન્ટિસ્ટ ગટ્ટા પર્ચા અને MTA જેવી બાયોકોમ્પેટિબલ સામગ્રીથી કેનલને ભરે છે.`;
+      greenHighlightLineVal = "પટેલ ડેન્ટલ હોસ્પિટલમાં દર્દીનો કિંમતી સમય બચાવવા માટે અમે માત્ર એક જ મુલાકાતમાં રૂટ કેનલ ટ્રીટમેન્ટ પૂર્ણ કરીએ છીએ.";
+    } else if (defaultSlug === 'full-mouth-rehabilitation') {
+      titleVal = "ફુલ માઉથ રિહેબિલિટેશન";
+      shortDescVal = `ઉપરના અને નીચેના બંને જડબામાં તમામ દાંત, પેઢાં અને ટેમ્પોરોમેન્ડિબ્યુલર જોઈન્ટને ફરીથી બનાવવાની અથવા સુધારવાની પ્રક્રિયાને ફુલ માઉથ રિહેબિલિટેશન, રિકન્સ્ટ્રક્શન અથવા રિસ્ટોરેશન કહેવામાં આવે છે.`;
+      greenHighlightLineVal = "ઉપરના અને નીચેના બંને જડબામાં તમામ દાંત, પેઢાં અને ટેમ્પોરોમેન્ડિબ્યુલર જોઈન્ટને ફરીથી બનાવવાની અથવા સુધારવાની પ્રક્રિયાને ફુલ માઉથ રિહેબિલિટેશન, રિકન્સ્ટ્રક્શન અથવા રિસ્ટોરેશન કહેવામાં આવે છે.";
+    } else if (defaultSlug === 'invisible-aligners') {
+      titleVal = "ઇનવિઝિબલ અલાઈનર્સ";
+      shortDescVal = `નિષ્ણાતો અને અદ્યતન સોફ્ષવેરની મદદથી તમારા માટે ખાસ બનાવવામાં આવેલા કસ્ટમ અલાઈનર્સની શ્રેણી દ્વારા દાંતને સીધા અને યોગ્ય ગોઠવણીમાં લાવવાની આધુનિક પદ્ધતિ. અમારા અલાઈનર ટ્રે સ્મૂથ, આરામદાયક અને લગભગ અદૃશ્ય પ્લાસ્ટિકમાંથી બનાવવામાં આવે છે, જેને તમે સરળતાથી દાંત પર પહેરી શકો છો. અમારા ઇનવિઝિબલ અલાઈનર્સ વાયર અથવા બ્રેકેટ્સના ઉપયોગ વિના તમારા દાંતને ધીમે ધીમે અને હળવેથી યોગ્ય સ્થિતિમાં લાવે છે.`;
+      greenHighlightLineVal = "નિષ્ણાતો અને અદ્યતન સોફ્ટવેરની મદદથી તમારા માટે ખાસ બનાવવામાં આવેલા કસ્ટમ અલાઈનર્સની શ્રેણી દ્વારા દાંતને સીધા અને યોગ્ય ગોઠવણીમાં લાવવાની આધુનિક પદ્ધતિ.";
+    } else if (defaultSlug === 'smile-makeover') {
+      titleVal = "સ્માઇલ મેકઓવર";
+      shortDescVal = `સ્માઇલ મેકઓવર એ દાંતનો દેખાવ, સમપ્રમાણતા અને સમગ્ર ચહેરાના સૌંદર્યને સુધારવા માટે તમારી જરૂરિયાત અનુસાર તૈયાર કરવામાં આવતી વ્યાપક કોસ્મેટિક ડેન્ટલ સારવાર છે.`;
+      greenHighlightLineVal = "વ્યક્તિગત સ્માઇલ મેકઓવર સારવાર દ્વારા તમારા આત્મવિશ્વાસ અને દાંતના સૌંદર્યમાં વધારો કરો.";
+    } else if (defaultSlug === 'crowns-and-bridges') {
+      titleVal = "ક્રાઉન્સ અને બ્રિજ";
+      shortDescVal = `ડેન્ટલ ક્રાઉન એ ખાસ બનાવવામાં આવતી કેપ છે, જે ક્ષતિગ્રસ્ત, સડેલા અથવા રૂટ કેનલની સારવાર કરાયેલા દાંતને ઢાંકે છે અને તેના મૂળ આકાર, મજબૂતી અને દેખાવને પુનઃસ્થાપિત કરવામાં મદદ કરે છે. ડેન્ટલ બ્રિજ કુદરતી નજીકના દાંત અથવા ઇમ્પ્લાન્ટ વચ્ચે કૃત્રિમ દાંત (પોન્ટિક્સ)ને આધાર આપીને એક અથવા વધુ ગુમ થયેલા દાંતને બદલે છે. જ્યારે ગુમ થયેલા દાંતને સમયસર બદલવામાં આવતા નથી, ત્યારે નજીકના દાંત ખાલી જગ્યામાં ખસી શકે છે, જેના કારણે બાઇટ કોલેપ્સ, ચાવવામાં ફેરહાર અને ટેમ્પોરોમેન્ડિબ્યુલર (TM) જોઈન્ટ પર તાણ આવી શકે છે.`;
+      greenHighlightLineVal = "ક્રાઉન્સ અને બ્રિજ દ્વારા ગુમ થયેલા દાંતને બદલવાથી ચાવવાની કાર્યક્ષમતા પુનઃસ્થાપિત થાય છે, બાઇટ કોલેપ્સ અટકાવવામાં મદદ મળે છે અને TM જોઈન્ટની યોગ્ય ગોઠવણી જાળવવામાં મદદ મળે છે.";
+    } else if (defaultSlug === 'teeth-whitening') {
+      titleVal = "દાંત સફેદ કરવાની સારવાર";
+      shortDescVal = `દાંત સફેદ કરવાની સારવારમાં કુદરતી દાંતને સફેદ કરવા માટે વિવિધ પ્રક્રિયાઓનો ઉપયોગ કરવામાં આવે છે. ગુજરાત, ભારતની શ્રેષ્ઠ ડેન્ટલ કેર હોસ્પિટલ — પટેલ ડેન્ટલ હોસ્પિટલમાં દાંત સફેદ કરવા માટે સ્કેલિંગ, પોલિશિંગ, બ્લીચિંગ અને અલ્ટ્રાવાયોલેટ થેરાપી જેવી પ્રક્રિયાઓનો ઉપયોગ કરવામાં આવે છે. તમારા દાંતને સફેદ કરવાની આ સૌથી સરળ, સુરક્ષિત અને કિફાયતી રીતોમાંની એક છે.`;
+      greenHighlightLineVal = "50% સુધીની બચત";
+    } else if (defaultSlug === 'pediatric-dentistry') {
+      titleVal = "પીડિયાટ્રિક ડેન્ટિસ્ટ્રી";
+      shortDescVal = `પીડિયાટ્રિક ડેન્ટિસ્ટ પાસે બાળકના વિકાસના દરેક તબક્કે તેના દાંત, પેઢાં અને જડબાંની સંભાળ રાખવા માટે જરૂરી તાલીમ અને અનુભવ હોય છે. પટેલ ડેન્ટલ હોસ્પિટલમાં અમે આરામદાયક વાતાવરણ પ્રદાન કરીએ છીએ અને અમારા પીડિયાટ્રિક ડેન્ટિસ્ટ દરેક બાળક સાથે મૈત્રીપૂર્ણ અભિગમ રાખે છે, જેથી તેઓ ચિંતા અને ભયમુક્ત રહે. રાજકોટની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલોમાંની એક તરીકે, અમારી પાસે બાળકો માટે ખાસ ડેન્ટલ ચેર છે, જે તેમને પ્રેમાળ અને આનંદદાયક વાતાવરણ પૂરું પાડે છે.`;
+      greenHighlightLineVal = "પીડિયાટ્રિક ડેન્ટિસ્ટ્રી શિશુ અવસ્થાથી કિશોરાવસ્થા સુધી બાળકોના મોઢાના સ્વાસ્થ્યની જાળવણી માટે સમર્પિત છે.";
+    } else if (defaultSlug === 'braces-treatment') {
+      titleVal = "બ્રેસિસ સારવાર";
+      shortDescVal = `બ્રેસિસનો ઉપયોગ દાંતની ખોટી ગોઠવણી અને વાંકા દાંતને સુધારવા માટે કરવામાં આવે છે. પટેલ ડેન્ટલ હોસ્પિટલમાં અમે સેલ્ફ-લિગેટિંગ અને નોન-સેલ્ફ-લિગેટિંગ મેટલ તથા સિરામિક બ્રેકેટ્સનો ઉપયોગ કરીને આધુનિક ઓર્થોડોન્ટિક સારવાર પ્રદાન કરીએ છીએ. દરેક સારવાર સિસ્ટમ માટે પારદર્શક કિંમત આપવામાં આવે છે.`;
+      greenHighlightLineVal = "બ્રેસિસ અને અલાઈનર્સ પર 30% સુધીની છૂટ મેળવો";
+    } else if (defaultSlug === 'wisdom-tooth-surgery') {
+      titleVal = "વિઝડમ ટૂથ સર્જરી";
+      shortDescVal = `વિઝડમ દાંત મોઢાના ઉપરના અને નીચેના પાછળના ખૂણામાં આવેલા ચાર કાયમી પુખ્ત દાઢના દાંત હોય છે. સામાન્ય રીતે કુલ ચાર વિઝડમ દાંત હોય છે. જો વિઝડમ દાંતને વધવા માટે પૂરતી જગ્યા ન મળે, તો તે દુખાવો, ચેપ અને ક્યારેક પેઢાંમાં પરુ ભરાવાનું કારણ બની શકે છે, જેના કારણે ગંભીર કિસ્સાઓમાં સોજો આવી શકે છે.`;
+      greenHighlightLineVal = "પીડારહિત અને ઝડપી વિઝડમ ટૂથ રિમૂવલ સર્જરી";
+    } else if (defaultSlug === 'tooth-coloured-filling') {
+      titleVal = "ટૂથ કલર્ડ ફિલિંગ (કમ્પોઝિટ ફિલિંગ)";
+      shortDescVal = `કમ્પોઝિટ ફિલિંગ અદ્યતન સિરામિક અને રેઝિન સામગ્રીમાંથી બનાવવામાં આવે છે, જે કુદરતી દાંત સાથે રાસાયણિક રીતે જોડાય છે અને દાંતની કાર્યક્ષમતા તથા દેખાવ બંનેને પુનઃસ્થાપિત કરવામાં મદદ કરે છે.`;
+      greenHighlightLineVal = "સુંદર સ્મિત માટે કુદરતી દાંતના રંગની ફિલિંગ";
+    }
+
+    return {
+      title: titleVal,
+      image: dbSvc?.homepage_card_image || dbSvc?.hero_image || defaultImage,
+      shortDesc: shortDescVal,
+      slug: dbSvc?.slug || defaultSlug,
+      isActive: dbSvc ? dbSvc.is_active : true,
+      mConfig,
+      greenHighlightLine: greenHighlightLineVal
+    };
+  };
+
+  return (
+    <div id="home-page-view" className="relative pt-0 bg-gradient-to-b from-sky-100/40 via-sky-50/20 to-transparent">
+
+      {/* 1 & 2. Hero Section & BOTTOM TRUST BAR */}
+      <section className="relative z-30 w-full bg-[#FAFAFC] pb-0 lg:pb-0" id="immersive-clinical-hero">
+        
+        {/* DESKTOP HERO VIEW (ONLY visible on desktop/large tablet screens) */}
+        <div className="hidden lg:flex relative w-full h-[900px] min-h-[810px] flex-col justify-between pt-[140px] pb-0">
+          {/* Background Image & Wide Gradient Overlay */}
+          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+            {/* 
+              TODO:
+              Replace hero collage with doctor's original photo / hospital photo / staff photo once assets are provided.
+            */}
+            <img
+              src={heroBgImage || "/parel doctor.png"}
+              alt="Dr. Jaimin Patel and Dr. Kinjal Patel at Patel Dental Hospital reception"
+              className="w-full h-full object-cover object-top lg:object-[right_top]"
+              referrerPolicy="no-referrer"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </div>
+
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full relative z-20 flex flex-col justify-between flex-grow h-full">
+            {/* Left Content Area - 35% - 38% width, shifted 90px to the right, sitting near the top */}
+            <div className="w-full lg:w-[38%] xl:w-[35%] flex flex-col justify-start pt-8 xl:pt-12 pb-12 pr-4 z-20 lg:ml-[90px] relative">
+              
+              {/* Main Heading & Description above the award badge */}
+              <h2 className="font-display text-[26px] xl:text-[32px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-3">
+                <span className="lg:block lg:whitespace-nowrap">આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.</span>
+                <span className="lg:block lg:whitespace-nowrap">ફરીથી તમારા જેવા અનુભવો.</span>
+              </h2>
+              <p className="text-[14px] xl:text-[15px] font-semibold text-black leading-relaxed mb-6">
+                અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
+              </p>
+
+              {/* 1. Small trust badge */}
+              <span className="inline-flex items-center px-[18px] py-[10px] rounded-2xl bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[10.5px] md:text-[11.5px] leading-tight uppercase tracking-widest shadow-md mb-4 lg:mb-6 animate-fade-in w-fit">
+                <span className="text-[22px] leading-none shrink-0 mr-3 select-none">🏆</span>
+                <span className="flex flex-col text-left">
+                  <span className="gujarati-text">ભારતમાં શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત</span>
+                  <span className="text-[#00897B] gujarati-text mt-0.5">FAMDENT દ્વારા</span>
+                </span>
+              </span>
+
+              {/* 2. Headline */}
+              <div className="flex flex-col text-left space-y-2 lg:space-y-3 max-w-[550px]">
+                {/* Main Heading */}
+                <h1 className="font-display text-[17px] sm:text-[21px] md:text-[24px] lg:text-[26px] xl:text-[29px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+                  વર્લ્ડ-ક્લાસ{" "}
+                  <span className="relative inline-block text-[#00897B]">
+                    ડેન્ટલ કેર
+                    {/* Subtle underline accent */}
+                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[3px] md:h-[4px] bg-[#C9A96E] rounded-full" />
+                  </span>
+                </h1>
+              </div>
+
+              {/* Quick Information Cards removed from inside the hero on desktop per layout update */}
+
+              {/* Two CTA buttons positioned exactly below description/trust statement */}
+              <div className="mt-6 lg:mt-8 flex flex-col sm:flex-row items-center justify-start gap-4 w-full max-w-[450px]">
+                <button
+                  id="hero-primary-cta"
+                  onClick={openAppointmentModal}
+                  className="h-[56px] px-8 w-full sm:flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[16.5px] font-extrabold rounded-[16px] shadow-[0_12px_30px_rgba(0,137,123,0.22)] hover:shadow-[0_15px_35px_rgba(0,137,123,0.32)] cursor-pointer transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
+                >
+                  <Calendar className="h-5 w-5 shrink-0" />
+                  <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
+                </button>
+
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-[56px] w-full sm:flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[16.5px] font-extrabold rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
+                >
+                  <MessageCircle className="h-5 w-5 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
+                  <span className="whitespace-nowrap">WhatsApp કરો</span>
+                </a>
+              </div>
+
+              {/* Side-by-Side Doctor Profiles on Desktop */}
+              <div className="mt-6 grid grid-cols-2 gap-4 w-full max-w-[550px] animate-fade-in text-left">
+                {/* Dr. Vipul Patel Card */}
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
+                  <h3 className="font-display text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-2 border-b border-[#C9A96E]/20 pb-1.5">ડૉ. વિપુલ પટેલ</h3>
+                  <ul className="text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-relaxed space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Dr. Kinjal Patel Card */}
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
+                  <h3 className="font-display text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-2 border-b border-[#C9A96E]/20 pb-1.5">ડૉ. કિંજલ પટેલ</h3>
+                  <ul className="text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-relaxed space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>BDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
+                      <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* 5. Shrunk vertical spacing after CTA/doctors before the floating trust bar */}
+              <div className="h-4 lg:h-[25px] pointer-events-none" />
+
+            </div>
+          </div>
+        </div>
+
+        {/* MOBILE HERO VIEW (ONLY visible on mobile screens < 768px) */}
+        <div className="block md:hidden relative w-full h-[640px] sm:h-[720px] overflow-hidden bg-white pt-[88px] sm:pt-[100px]">
+          {/* Mobile Background Image */}
+          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+            <img 
+              src={heroBgImageMobile || heroBgImage || "/patel mobile hero.jpeg"} 
+              alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
+              className="w-full h-full object-cover object-[center_top]"
+              referrerPolicy="no-referrer"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </div>
+
+          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3 px-4 sm:px-6 relative z-20 pt-6 sm:pt-4 pb-4">
+            {/* Main Heading & Description above the award badge */}
+            <h2 className="font-display text-[17px] sm:text-[19px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight max-w-[95%]">
+              આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.<br className="hidden sm:inline" />
+              ફરીથી તમારા જેવા અનુભવો.
+            </h2>
+            <p className="text-[11px] sm:text-[12px] font-semibold text-black leading-relaxed max-w-[95%] mb-1">
+              અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
+            </p>
+
+            {/* 1. Small trust badge */}
+            <span className="inline-flex items-center px-[14px] py-2 rounded-xl bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[8px] sm:text-[9.5px] leading-tight uppercase tracking-widest shadow-md mb-2 animate-fade-in w-fit max-w-[95%]">
+              <span className="text-[14px] sm:text-[18px] leading-none shrink-0 mr-2 select-none">🏆</span>
+              <span className="flex flex-col text-left">
+                <span className="gujarati-text">ભારતમાં શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત</span>
+                <span className="text-[#00897B] gujarati-text mt-0.5">FAMDENT દ્વારા</span>
+              </span>
+            </span>
+
+            {/* Headline */}
+            <div className="flex flex-col text-center space-y-2 max-w-[450px]">
+              {/* Main Heading */}
+              <h1 className="font-display text-[20px] sm:text-[21px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+                વર્લ્ડ-ક્લાસ <span className="text-[#00897B]">ડેન્ટલ કેર</span>
+              </h1>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-4 sm:pt-3">
+              <button
+                onClick={() => openAppointmentModal()}
+                className="h-[38px] sm:h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+              >
+                <Calendar className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] shrink-0" />
+                <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
+              </button>
+
+              <a
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-[38px] sm:h-[46px] flex-1 bg-white text-[#00897B] text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] border-2 border-[#00897B] hover:border-[#00796B] hover:bg-[#00897B]/5 shadow-[0_5px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+              >
+                <MessageCircle className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] shrink-0 fill-[#00897B]/10 text-[#00897B]" strokeWidth={2.5} />
+                <span className="whitespace-nowrap">WhatsApp કરો</span>
+              </a>
+            </div>
+
+            {/* Removed vertically stacked cards from here to place them below hero */}
+          </div>
+        </div>
+
+        {/* Mobile View Doctor Cards: Vertically Stacked BELOW the Hero Area */}
+        <div className="block md:hidden px-4 mt-6 mb-2 space-y-3.5 max-w-[280px] sm:max-w-[380px] mx-auto text-left">
+          {/* Dr. Vipul Patel Card */}
+          <div className="bg-white/85 border border-slate-200/80 rounded-xl p-3 sm:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)]">
+            <h3 className="font-display text-[12px] sm:text-[13px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. વિપુલ પટેલ</h3>
+            <ul className="text-[10px] sm:text-[10.5px] font-semibold text-[#4A5568] leading-tight space-y-1">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Dr. Kinjal Patel Card */}
+          <div className="bg-white/85 border border-slate-200/80 rounded-xl p-3 sm:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)]">
+            <h3 className="font-display text-[12px] sm:text-[13px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. કિંજલ પટેલ</h3>
+            <ul className="text-[10px] sm:text-[10.5px] font-semibold text-[#4A5568] leading-tight space-y-1">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>BDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* TABLET HERO VIEW (ONLY visible on tablet screens: 768px <= width < 1024px) */}
+        <div className="hidden md:block lg:hidden relative w-full h-[520px] md:h-[540px] overflow-hidden bg-[#EEF5F3] pt-[88px] pb-0 border-b border-[#00897B]/20">
+          
+          {/* LAYER 1: INDEPENDENT BACKGROUND LAYER (Background Asset Only - Zero Doctors) */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
+            <img
+              src="/patel-tablet-bg.webp"
+              alt="Background"
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          {/* LAYER 2: CONTENT LAYER (Left Side: Award Badge + Headline + Subtitle + CTA Buttons) */}
+          <div className="relative z-20 max-w-[1200px] mx-auto px-6 sm:px-8 w-full h-full flex flex-row items-center justify-start pointer-events-auto">
+            <div className="w-[42%] flex flex-col justify-center py-4 pr-2">
+              {/* Main Heading & Description above the award badge */}
+              <h2 className="font-display text-[19px] md:text-[21px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-2">
+                <span className="md:block md:whitespace-nowrap">આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.</span>
+                <span className="md:block md:whitespace-nowrap">ફરીથી તમારા જેવા અનુભવો.</span>
+              </h2>
+              <p className="text-[12px] md:text-[12.5px] font-semibold text-black leading-relaxed mb-3.5">
+                અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
+              </p>
+
+              {/* Trust Badge */}
+              <div className="inline-flex items-center self-start px-3 py-2 rounded-xl bg-white/95 border border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[8.5px] md:text-[9.5px] leading-tight uppercase tracking-wider shadow-sm mb-3.5 w-fit">
+                <span className="text-[12px] md:text-[14px] leading-none shrink-0 mr-2 select-none">🏆</span>
+                <span className="flex flex-col text-left">
+                  <span className="gujarati-text">ભારતમાં શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત</span>
+                  <span className="text-[#00897B] gujarati-text mt-0.5">FAMDENT દ્વારા</span>
+                </span>
+              </div>
+
+              {/* Main Headline */}
+              <div className="flex flex-col text-left space-y-2">
+                <h1 className="font-display text-[20px] md:text-[22px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
+                  વર્લ્ડ-ક્લાસ{" "}
+                  <span className="relative inline-block text-[#00897B]">
+                    ડેન્ટલ કેર
+                    <div className="absolute -bottom-1 left-0 w-full h-[3px] bg-[#C9A96E] rounded-full" />
+                  </span>
+                </h1>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-5 flex flex-row items-center justify-start gap-3 w-full max-w-[340px]">
+                <button
+                  onClick={openAppointmentModal}
+                  className="h-[42px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[11px] font-extrabold rounded-[12px] shadow-[0_8px_20px_rgba(0,137,123,0.15)] hover:shadow-[0_12px_24px_rgba(0,137,123,0.28)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                >
+                  <Calendar className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
+                </button>
+
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-[42px] flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[11px] font-extrabold rounded-[12px] border-2 border-[#00897B] hover:border-[#00796B] shadow-sm cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                >
+                  <MessageCircle className="h-4 w-4 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
+                  <span className="whitespace-nowrap">WhatsApp કરો</span>
+                </a>
+              </div>
+
+              {/* Removed vertically stacked cards from here to place them below hero */}
+            </div>
+          </div>
+
+          {/* LAYER 3: INDEPENDENT DOCTOR IMAGE LAYER (Foreground Transparent Doctor Asset Only) */}
+          <div className="absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 flex items-end justify-end pointer-events-none pr-1 md:pr-4">
+            <img
+              src="/Teblate hero image-1.webp"
+              alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
+              className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+        </div>
+
+        {/* Tablet View Doctor Cards: Side-by-Side BELOW the Hero Area */}
+        <div className="hidden md:flex lg:hidden px-6 sm:px-8 mt-6 gap-4 max-w-3xl mx-auto relative z-20">
+          {/* Dr. Vipul Patel Card */}
+          <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-[0_3px_12px_rgba(0,0,0,0.02)] flex-1 text-left">
+            <h3 className="font-display text-[11px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. વિપુલ પટેલ</h3>
+            <ul className="text-[9.5px] font-semibold text-[#4A5568] leading-tight space-y-0.5">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Dr. Kinjal Patel Card */}
+          <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-[0_3px_12px_rgba(0,0,0,0.02)] flex-1 text-left">
+            <h3 className="font-display text-[11px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. કિંજલ પટેલ</h3>
+            <ul className="text-[9.5px] font-semibold text-[#4A5568] leading-tight space-y-0.5">
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>BDS</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
+                <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Slightly Taller/Larger Premium White Feature Strip for Mobile/Tablet */}
+        <div className="block lg:hidden px-4 relative z-20 mt-10 sm:mt-12 pb-0">
+          <div className="w-full max-w-md mx-auto bg-white border border-slate-200/70 rounded-2xl py-4 px-6 shadow-[0_10px_24px_rgba(8,28,58,0.04)] flex items-center justify-center text-center">
+            <span className="font-display text-[12px] sm:text-[13px] font-black tracking-wide text-[#1E3A5F] leading-snug">
+              અદ્યતન ઇમ્પ્લાન્ટ પ્લાનિંગ <span className="text-[#C9A96E] mx-2 select-none">•</span> 3D ડાયગ્નોસ્ટિક્સ <span className="text-[#C9A96E] mx-2 select-none">•</span> જટિલ ડેન્ટલ રિહેબિલિટેશન
+            </span>
+          </div>
+        </div>
+
+        {/* Compact Premium Visit Info Card for Mobile/Tablet (Visible on lg:hidden) - Floats over the hero image bottom border */}
+        <div className="block lg:hidden px-4 relative z-20 mt-0 pb-6">
+          <div 
+            className="w-full max-w-md mx-auto rounded-[20px] overflow-hidden bg-white border border-[#E5E7EB] shadow-md flex flex-col"
+          >
+            {/* SECTION 1 (Emergency Call) */}
+            <div className="bg-[#1E3A5F] p-6 text-center text-white flex flex-col items-center">
+              <h3 className="font-display font-bold text-[16px] sm:text-[18px] leading-snug text-[#C9A96E] mb-3 max-w-[340px]">
+                તમારી દાંતની સમસ્યા અમને જણાવો અથવા તીવ્ર દુખાવામાં ઇમરજન્સી ડેન્ટલ સારવાર માટે અમને કૉલ કરો
+              </h3>
+              <span className="text-[11px] font-bold text-[#E6F6F4] tracking-widest uppercase mb-1">
+                કૃપા કરીને અમને આ નંબર પર કૉલ કરો
+              </span>
+              <a 
+                href="tel:+919510397046" 
+                className="text-[#FFFFFF] font-black text-[24px] sm:text-[28px] tracking-tight hover:text-white/90 transition-all duration-300 leading-none mb-4"
+              >
+                +91 9510397046
+              </a>
+              <a
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-[40px] px-6 bg-[#25D366] hover:bg-[#20BA56] text-white text-[13px] font-black rounded-lg inline-flex items-center justify-center space-x-2 active:scale-98 transition-all duration-300 text-center cursor-pointer shadow-md w-full max-w-[240px]"
+              >
+                <MessageCircle className="h-4 w-4 shrink-0" />
+                <span className="whitespace-nowrap">WhatsApp કરો</span>
+              </a>
+            </div>
+
+            {/* SECTION 2 (Opening Hours) */}
+            <div className="bg-[#00897B] p-6 text-center text-white flex flex-col items-center">
+              <div className="flex items-center justify-center space-x-2 mb-3">
+                <Clock className="h-5 w-5 shrink-0 text-[#FFFFFF]" />
+                <h4 className="font-display font-bold text-[18px] text-[#FFFFFF]">
+                  કામકાજના કલાકો
+                </h4>
+              </div>
+              
+              <p className="font-bold text-[14px] text-[#E6F6F4] mb-4">
+                સોમવાર - શનિવાર
+              </p>
+
+              <div className="w-full grid grid-cols-2 gap-4 max-w-xs">
+                <div className="text-center">
+                  <span className="text-[11px] font-bold text-[#E6F6F4] tracking-wider uppercase block">સવાર</span>
+                  <span className="font-black text-[14px] block mt-1 text-[#FFFFFF]">09:00 AM - 01:00 PM</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-[11px] font-bold text-[#E6F6F4] tracking-wider uppercase block">સાંજ</span>
+                  <span className="font-black text-[14px] block mt-1 text-[#FFFFFF]">04:00 PM - 08:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3 (Book Appointment) */}
+            <div className="bg-[#E6F6F4] p-6 text-center flex flex-col items-center">
+              <h4 className="font-display font-bold text-[18px] text-[#1E3A5F] mb-2">
+                ફ્રી પુછપરછ
+              </h4>
+              <p className="font-display font-extrabold text-[12px] tracking-wider uppercase leading-none text-[#00897B]">
+                પટેલ ડેન્ટલ હોસ્પિટલ
+              </p>
+              <p className="text-[11px] font-semibold text-[#4B5563] mt-1 max-w-[280px]">
+                FAMDENT દ્વારા શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત
+              </p>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 w-full mt-5 max-w-xs">
+                <button
+                  onClick={() => openAppointmentModal()}
+                  className="h-[44px] bg-[#00897B] hover:bg-[#00796B] text-[#FFFFFF] text-[13px] font-bold rounded-lg flex items-center justify-center active:scale-98 transition-all duration-300 shadow-sm text-center cursor-pointer"
+                >
+                  ફ્રી પુછપરછ
+                </button>
+
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-[44px] bg-[#FFFFFF] hover:bg-[#00897B] text-[#00897B] hover:text-[#FFFFFF] text-[13px] font-bold rounded-lg border-2 border-[#00897B] flex items-center justify-center active:scale-98 transition-all duration-300 text-center cursor-pointer"
+                >
+                  <span className="whitespace-nowrap">WhatsApp કરો</span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* NEW 3-CARD INFORMATION ROW FOR DESKTOP ONLY - Luxury floating row centered horizontally */}
+        <div className="hidden lg:flex absolute left-0 right-0 bottom-0 translate-y-[calc(50%+90px)] z-40 px-4 sm:px-6 xl:px-8 justify-center pointer-events-none" id="desktop-3-card-row-container">
+          <div className="w-full max-w-[1360px] relative">
+            
+            {/* Slightly Taller/Larger Premium White Feature Strip - Positioned Absolute Touching the Top of the 3-Card Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="absolute bottom-full left-0 right-0 mb-0 z-10 w-full bg-white border border-slate-200/70 rounded-full py-4.5 px-10 shadow-[0_12px_32px_rgba(8,28,58,0.04)] hover:shadow-[0_16px_40px_rgba(8,28,58,0.06)] pointer-events-auto flex items-center justify-center transition-all duration-300"
+            >
+              <span className="font-display text-[15px] xl:text-[16px] font-black tracking-wide text-[#1E3A5F] text-center">
+                અદ્યતન ઇમ્પ્લાન્ટ પ્લાનિંગ <span className="text-[#C9A96E] mx-4 select-none">•</span> 3D ડાયગ્નોસ્ટિક્સ <span className="text-[#C9A96E] mx-4 select-none">•</span> જટિલ ડેન્ટલ રિહેબિલિટેશન
+              </span>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full grid grid-cols-3 gap-0 relative pointer-events-auto rounded-[24px] overflow-hidden shadow-[0_25px_50px_rgba(8,28,58,0.2)] border border-slate-200/40"
+            >
+            {/* CARD 1 — EMERGENCY DENTAL TREATMENT */}
+            <div className="flex flex-col items-center justify-center text-center bg-[#1E3A5F] text-white py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300">
+              <div className="flex flex-col items-center justify-center min-w-0 w-full">
+                <h3 className="font-display text-[15px] xl:text-[17px] font-black text-[#C9A96E] mb-4 text-center leading-snug">
+                  તમારી દાંતની સમસ્યા અમને જણાવો અથવા તીવ્ર દુખાવામાં ઇમરજન્સી ડેન્ટલ સારવાર માટે અમને કૉલ કરો
+                </h3>
+                <p className="font-sans text-[11px] xl:text-[12px] text-white/90 font-bold uppercase tracking-wider text-center leading-none mb-2">
+                  કૃપા કરીને અમને આ નંબર પર કૉલ કરો
+                </p>
+                <a 
+                  href="tel:+919510397046" 
+                  className="block font-display text-[22px] xl:text-[26px] font-black text-white hover:text-[#C9A96E] transition-colors whitespace-nowrap leading-none text-center mb-4"
+                >
+                  +91 9510397046
+                </a>
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-[40px] px-6 bg-[#25D366] hover:bg-[#20BA56] text-white text-[13px] font-black rounded-lg inline-flex items-center justify-center space-x-2 active:scale-98 transition-all duration-300 text-center cursor-pointer shadow-md"
+                >
+                  <MessageCircle className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">WhatsApp કરો</span>
+                </a>
+              </div>
+            </div>
+
+            {/* CARD 2 — OPENING HOURS */}
+            <div className="flex flex-col justify-start bg-[#008F83] text-white py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300">
+              <h3 className="font-display text-[22px] xl:text-[26px] font-bold text-white mb-4 text-left leading-none">
+                કામકાજના કલાકો
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Monday - Saturday */}
+                <div className="flex items-start space-x-4">
+                  <div className="h-10 w-10 bg-[#8BC34A] rounded-full flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-white leading-tight">
+                      સોમવાર - શનિવાર
+                    </h4>
+                    <p className="font-sans text-[14px] xl:text-[15px] text-white/90 font-medium mt-1 leading-snug">
+                      09:00 AM - 01:00 PM
+                    </p>
+                    <p className="font-sans text-[14px] xl:text-[15px] text-white/90 font-medium leading-snug">
+                      04:00 PM - 08:00 PM
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sunday */}
+                <div className="flex items-start space-x-4">
+                  <div className="h-10 w-10 bg-[#8BC34A] rounded-full flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[15px] xl:text-[16px] font-bold text-white leading-tight">
+                      રવિવાર
+                    </h4>
+                    <p className="font-sans text-[14px] xl:text-[15px] text-[#FFCDD2] font-extrabold mt-1 uppercase tracking-wider leading-snug">
+                      બંધ
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CARD 3 — FREE CONSULTATION */}
+            <div 
+              className="flex items-center space-x-6 bg-[#E5F5F5] text-[#1E3A5F] py-8 px-8 xl:py-10 xl:px-10 min-h-[190px] xl:min-h-[215px] transition-all duration-300"
+            >
+              <div className="h-14 w-14 bg-[#008F83] rounded-full flex items-center justify-center text-white shrink-0 shadow-md">
+                <Calendar className="h-7 w-7" />
+              </div>
+              <div className="flex-grow min-w-0">
+                <h3 className="font-display text-[17px] xl:text-[20px] font-black tracking-widest uppercase text-[#008F83] mb-1.5 whitespace-nowrap">
+                  ફ્રી પુછપરછ
+                </h3>
+                <div className="text-[#1E3A5F] font-black text-[14px] xl:text-[15.5px] leading-tight mt-1">
+                  પટેલ ડેન્ટલ હોસ્પિટલ
+                </div>
+                <p className="font-sans text-[11px] xl:text-[12px] text-[#4B5563] font-semibold leading-tight mt-1.5">
+                  FAMDENT દ્વારા શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત
+                </p>
+                <div className="mt-4">
+                  <button 
+                    onClick={() => openAppointmentModal()}
+                    className="w-full inline-flex items-center justify-center space-x-2 text-[12px] xl:text-[13px] font-black uppercase tracking-widest text-white bg-[#008F83] hover:bg-[#007a70] py-3.5 px-6 rounded-xl transition-all duration-300 cursor-pointer text-center shadow-[0_4px_12px_rgba(0,143,131,0.25)] hover:shadow-[0_6px_16px_rgba(0,143,131,0.4)] transform hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <Calendar className="h-4 w-4 shrink-0" />
+                    <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          </div>
+        </div>
+      </section>
+      {/* 3. Patel Dental Hospital Milestones */}
+      <section className="pt-8 sm:pt-16 lg:pt-[275px] xl:pt-[295px] pb-5 sm:pb-12 md:pb-16 bg-[#F8FAFC] relative z-10 border-t border-sky-100/30 overflow-hidden" id="achievements-and-trust">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Patient-Problem Qualification Section */}
+          <div className="mb-20" id="patient-problem-qualification">
+            {/* Heading */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: "any" }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h2 className="font-display text-[26px] sm:text-[34px] xl:text-[40px] font-black text-[#1E3A5F] tracking-tight leading-tight">
+                તમારા દાંતમાં તમને સૌથી વધુ શું <span className="text-[#008F83]">પરેશાન કરે છે?</span>
+              </h2>
+              <p className="font-sans text-[14px] sm:text-[15px] text-[#4B5563] font-semibold mt-3">
+                તમારી સમસ્યાને સૌથી સારી રીતે દર્શાવતો વિકલ્પ પસંદ કરો. અમે તમને યોગ્ય સારવાર શોધવામાં મદદ કરીશું.
+              </p>
+            </motion.div>
+
+            {/* 8 Concern Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {[
+                {
+                  text: "મને ખાવામાં તકલીફ થાય છે",
+                  icon: "/001.webp",
+                  scaleClass: "scale-[0.95]"
+                },
+                {
+                  text: "મારા દાંત હલતા લાગે છે",
+                  icon: "/002.webp",
+                  scaleClass: "scale-[1.05]"
+                },
+                {
+                  text: "મારા ઘણા દાંત ખરાબ થઈ ગયા છે",
+                  icon: "/003.webp",
+                  scaleClass: "scale-[1.10]"
+                },
+                {
+                  text: "હું કાઢી શકાય તેવા દાંતથી કંટાળી ગયો/ગઈ છું",
+                  icon: "/004.webp",
+                  scaleClass: "scale-[1.15]"
+                },
+                {
+                  text: "મને મારું સ્મિત ગમતું નથી",
+                  icon: "/005.webp",
+                  scaleClass: "scale-[1.30]"
+                },
+                {
+                  text: "મને દાંતમાં ખૂબ જ દુખાવો થાય છે",
+                  icon: "/006.webp",
+                  scaleClass: "scale-[0.80]"
+                },
+                {
+                  text: "મારે બીજો અભિપ્રાય લેવો છે",
+                  icon: "/007.webp",
+                  scaleClass: "scale-[1.00]"
+                },
+                {
+                  text: "મને ખાતરી નથી કે મારે કઈ સારવારની જરૂર છે",
+                  icon: "/008.webp",
+                  scaleClass: "scale-[1.05]"
+                }
+              ].map((item, index) => {
+                const isStringIcon = typeof item.icon === 'string';
+                const IconComponent = item.icon as React.ComponentType<{ className?: string }>;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: "any" }}
+                    transition={{ duration: 0.4, delay: index * 0.04 }}
+                    onClick={() => openAppointmentModal()}
+                    className="group bg-white rounded-[20px] p-6 border border-slate-200/60 shadow-[0_4px_20px_rgba(8,28,58,0.02)] hover:shadow-[0_12px_32px_rgba(8,28,58,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center text-center justify-center min-h-[160px] cursor-pointer"
+                  >
+                    {/* Centered Icon */}
+                    <div className="w-24 h-24 flex items-center justify-center mb-4 shrink-0 transition-transform group-hover:scale-105 duration-300">
+                      {isStringIcon ? (
+                        <img 
+                          src={item.icon as string} 
+                          alt={item.text} 
+                          className={`w-full h-full object-contain ${item.scaleClass || 'scale-100'}`} 
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <IconComponent className="w-full h-full object-contain" />
+                      )}
+                    </div>
+
+                    {/* Centered Content Wording */}
+                    <h4 className="font-display text-[15px] xl:text-[16px] font-black text-[#1E3A5F] leading-snug max-w-[220px]">
+                      {item.text}
+                    </h4>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Evaluation CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-[#E5F5F5]/60 border border-[#008F83]/10 rounded-[24px] p-6 sm:p-8 lg:p-10 shadow-[0_12px_32px_rgba(0,143,131,0.03)] flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10 text-left"
+            >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-5 flex-grow min-w-0">
+                {/* Visual Icon Badge mimicking the checklist graphic */}
+                <div className="w-16 h-16 rounded-2xl bg-[#008F83]/10 text-[#008F83] flex items-center justify-center shrink-0 shadow-inner">
+                  <Stethoscope className="h-8 w-8" />
+                </div>
+                
+                <div className="max-w-3xl">
+                  <h3 className="font-display text-[18px] sm:text-[22px] xl:text-[24px] font-black text-[#1E3A5F] leading-tight mb-2">
+                    તમારા માટે કઈ સારવાર યોગ્ય છે તેની ખાતરી નથી? મૂલ્યાંકનથી શરૂઆત કરો અને તમારા સારવારના પ્લાન વિશે ચર્ચા કરો ...
+                  </h3>
+                  <p className="font-sans text-[13.5px] sm:text-[14.5px] text-[#4B5563] font-semibold leading-relaxed">
+                    તમને શું પરેશાન કરી રહ્યું છે તે અમને જણાવો. જો તમારી પાસે પહેલેથી OPG X-ray અથવા CBCT હોય, તો તેને સાથે લાવો અથવા શેર કરો. યોગ્ય તપાસ કર્યા બાદ, અમે તમારા માટે યોગ્ય સારવારના વિકલ્પો સમજાવી શકીએ છીએ.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0 w-full lg:w-auto">
+                <button
+                  onClick={() => openAppointmentModal()}
+                  className="w-full lg:w-auto inline-flex items-center justify-center space-x-2 text-[12.5px] font-black uppercase tracking-widest text-white bg-[#008F83] hover:bg-[#007a70] py-4 px-8 rounded-xl transition-all duration-300 cursor-pointer text-center shadow-[0_6px_20px_rgba(0,143,131,0.2)] hover:shadow-[0_8px_24px_rgba(0,143,131,0.35)] transform hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  <Calendar className="h-4.5 w-4.5 shrink-0" />
+                  <span className="whitespace-nowrap">ફ્રી પુછપરછ બુક કરો</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* New Horizontal Feature Section - Visible on Desktop, Tablet, and Mobile */}
+          <motion.div 
+            initial={{ opacity: 0.1, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: "any" }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="block lg:mt-[55px] mb-16"
+          >
+            <div className="w-full bg-white rounded-[24px] border border-slate-200/50 shadow-[0_15px_40px_rgba(8,28,58,0.06)] overflow-hidden">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0">
+                {/* COLUMN 1 */}
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/1,-1.webp" 
+                      alt="Digital Dental Experts" 
+                      className="h-20 w-20 object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-extrabold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    ડિજિટલ ડેન્ટલ નિષ્ણાતો
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-semibold leading-relaxed">
+                    અદ્યતન ડિજિટલ નિદાન<br />અને સારવાર
+                  </p>
+                </div>
+
+                {/* COLUMN 2 */}
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/2,-1.webp" 
+                      alt="Dental Implant Specialists" 
+                      className="h-20 w-20 object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-extrabold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    ડેન્ટલ ઇમ્પ્લાન્ટ<br />નિષ્ણાતો
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-semibold leading-relaxed">
+                    અદ્યતન ઇમ્પ્લાન્ટ સોલ્યુશન્સ
+                  </p>
+                </div>
+
+                {/* COLUMN 3 */}
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/3,-1.webp" 
+                      alt="Braces & Invisible Aligner Experts" 
+                      className="h-20 w-20 object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-extrabold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    બ્રેસિસ અને ઇનવિઝિબલ<br />એલાઇનર નિષ્ણાતો
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-semibold leading-relaxed">
+                    આધુનિક ઇનવિઝિબલ<br />ઓર્થોડોન્ટિક્સ
+                  </p>
+                </div>
+
+                {/* COLUMN 4 */}
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/4,-1.webp" 
+                      alt="FMR & Root Canal Specialists" 
+                      className="h-20 w-20 object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-extrabold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    FMR અને રૂટ કેનાલ<br />નિષ્ણાતો
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-semibold leading-relaxed">
+                    સંપૂર્ણ સ્માઇલ ડિઝાઇનિંગ<br />અને ફુલ માઉથ<br />રિહેબિલિટેશન
+                  </p>
+                </div>
+
+                {/* COLUMN 5 */}
+                <div className="flex flex-col items-center text-center p-6 sm:p-8 border-slate-100 col-span-1 sm:col-span-2 lg:col-span-1 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
+                  <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <img 
+                      src="/5,-1.webp" 
+                      alt="Oral & Maxillofacial Surgery" 
+                      className="h-20 w-20 object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  <h4 className="font-display text-[15px] xl:text-[16px] font-extrabold text-[#1E3A5F] tracking-wide mt-5 mb-2 leading-snug">
+                    ઓરલ અને મેક્સિલોફેશિયલ<br />સર્જરી
+                  </h4>
+                  <p className="font-sans text-[12px] xl:text-[13px] text-[#4B5563] font-semibold leading-relaxed">
+                    અદ્યતન ઓરલ સર્જરી અને<br />ચહેરાની પુનઃરચના
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12">
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
+              પટેલ ડેન્ટલ હોસ્પિટલ એક નજરમાં
+            </h2>
+            <p className="stat-subtitle-premium gujarati-text text-[#4A5D78] text-[12px] sm:text-[14px] md:text-[15px] tracking-wide leading-relaxed">
+              રાજકોટ, ગુજરાતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલમાં હજારો સફળ સ્મિત પાછળના વિશ્વસનીય આંકડા
+            </p>
+            <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mt-2 sm:mt-3 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3.5 md:gap-5 lg:gap-6">
+            {[
+              {
+                value: 14,
+                suffix: "+",
+                title: "Years Experience",
+                titleGuj: "વર્ષોનો અનુભવ",
+                subtitle: "Serving Since 2012",
+                icon: "/calendar-filled-svgrepo-com.svg",
+                color: "text-purple-500",
+                bgColor: "bg-purple-50/50",
+                borderColor: "border-purple-100/40",
+              },
+              {
+                value: 20000,
+                suffix: "+",
+                title: "Families",
+                titleGuj: "પરિવારો",
+                subtitle: "Trusted Community",
+                icon: "/family-silhouette-svgrepo-com.svg",
+                color: "text-[#11B5D8]",
+                bgColor: "bg-sky-50",
+                borderColor: "border-sky-100",
+              },
+              {
+                value: 3000,
+                suffix: "+",
+                title: "NRI Patients",
+                titleGuj: "NRI દર્દીઓ",
+                subtitle: "Global Smile Standards",
+                icon: "/world-1-svgrepo-com.svg",
+                color: "text-[#14B8A6]",
+                bgColor: "bg-[#F0FDFA]",
+                borderColor: "border-[#CCFBF1]",
+              },
+              {
+                value: 16000,
+                suffix: "+",
+                title: "Dental Implants",
+                titleGuj: "ડેન્ટલ ઇમ્પ્લાન્ટ્સ",
+                subtitle: "Fixed Teeth Solutions",
+                icon: "/Dental Implant svg.svg",
+                color: "text-rose-500",
+                bgColor: "bg-rose-50/50",
+                borderColor: "border-rose-100/40",
+              },
+              {
+                value: 800,
+                suffix: "+",
+                title: "Full Mouth Rehabilitation",
+                titleGuj: "ફુલ માઉથ રિહેબિલિટેશન",
+                subtitle: "Comprehensive Rehabilitation",
+                icon: "/Full Mouth.webp",
+                color: "text-amber-500",
+                bgColor: "bg-amber-50/50",
+                borderColor: "border-amber-100/40",
+              },
+              {
+                value: 30000,
+                suffix: "+",
+                title: "Root Canal Treatments",
+                titleGuj: "રૂટ કેનાલ ટ્રીટમેન્ટ્સ",
+                subtitle: "Single Sitting Specialization",
+                icon: "/Root Canal Treatments.svg.svg",
+                color: "text-[#10B981]",
+                bgColor: "bg-emerald-50/50",
+                borderColor: "border-emerald-100/40",
+              },
+              {
+                value: 6000,
+                suffix: "+",
+                title: "Braces",
+                titleGuj: "બ્રેસિસ",
+                subtitle: "Orthodontic Solutions",
+                icon: "/braces-teeth-svgrepo-com.svg",
+                color: "text-blue-500",
+                bgColor: "bg-blue-50/50",
+                borderColor: "border-blue-100/40",
+              },
+              {
+                value: 1500,
+                suffix: "+",
+                title: "Aligners",
+                titleGuj: "એલાઇનર્સ",
+                subtitle: "Clear Smile Alignment",
+                icon: "/Aligners svg.svg",
+                color: "text-[#0ea5e9]",
+                bgColor: "bg-blue-50/70",
+                borderColor: "border-blue-100/50",
+              },
+              {
+                value: 1000,
+                suffix: "+",
+                title: "Smile Designing",
+                titleGuj: "સ્માઇલ ડિઝાઇનિંગ",
+                subtitle: "Aesthetic Smile Customization",
+                icon: "/Smile Designing.webp",
+                color: "text-teal-500",
+                bgColor: "bg-teal-50/50",
+                borderColor: "border-teal-100/40",
+              },
+              {
+                value: 10000,
+                suffix: "+",
+                title: "Oral & Maxillofacial Surgeries",
+                titleGuj: "ઓરલ અને મેક્સિલોફેશિયલ સર્જરી",
+                subtitle: "Expert Surgical Solutions",
+                icon: "/Oral & Maxillofacial Surgeries svg.svg",
+                color: "text-indigo-500",
+                bgColor: "bg-indigo-50/50",
+                borderColor: "border-indigo-100/40",
+              },
+              {
+                value: 10,
+                suffix: "+",
+                title: "Awards Won",
+                titleGuj: "મેળવેલા એવોર્ડ્સ",
+                subtitle: "National & Regional Excellence",
+                icon: "/awards-svgrepo-com.svg",
+                color: "text-[#0284c7]",
+                bgColor: "bg-cyan-50/60",
+                borderColor: "border-cyan-100/50",
+              },
+              {
+                value: 5,
+                suffix: "★",
+                title: "on Justdial & Google",
+                titleGuj: "રેટિંગ\nJustdial અને Google પર",
+                subtitle: "Top Rated Hospital",
+                icon: "/star-svgrepo-com.svg",
+                color: "text-amber-500",
+                bgColor: "bg-amber-50/60",
+                borderColor: "border-[#CCFBF1]",
+              },
+            ].map((item: any, index) => {
+              const isStringIcon = typeof item.icon === 'string';
+              const IconComponent = item.icon;
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  className="bg-white/98 backdrop-blur-[1px] border border-slate-100 shadow-[0_5px_15px_rgba(8,28,58,0.02)] hover:shadow-[0_15px_45px_rgba(8,28,58,0.06)] transition-all duration-300 rounded-[12px] md:rounded-[20px] p-5 md:p-6 flex flex-col justify-center min-h-[190px] md:min-h-[220px] h-full group relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  
+                  {/* Single unified premium layout for both mobile & desktop */}
+                  <div className="flex flex-col items-center justify-center text-center relative z-10 w-full h-full">
+                    {/* Icon on top */}
+                    <div className="p-3.5 md:p-4 shrink-0 mb-4 md:mb-5 transition-transform duration-300 group-hover:scale-105">
+                      {isStringIcon ? (
+                        <img 
+                          src={item.icon || null} 
+                          alt={item.title} 
+                          className={item.title === "Root Canal Treatments" || item.title === "Dental Implants"
+                            ? "h-[50px] w-[34px] md:h-[66px] md:w-[44px] object-contain mx-auto"
+                            : item.title === "Aligners"
+                            ? "h-[34px] w-[50px] md:h-[44px] md:w-[66px] object-contain mx-auto"
+                            : item.title === "Full Mouth Rehabilitation"
+                            ? "h-[54px] w-[54px] md:h-[72px] md:w-[72px] object-contain mx-auto"
+                            : item.title === "NRI Patients"
+                            ? "h-[48px] w-[48px] md:h-[64px] md:w-[64px] object-contain mx-auto"
+                            : item.title === "Oral & Maxillofacial Surgeries" || item.title === "Smile Designing"
+                            ? "h-[52px] w-[52px] md:h-[68px] md:w-[68px] object-contain mx-auto"
+                            : "h-[38px] w-[38px] md:h-[50px] md:w-[50px] object-contain mx-auto"
+                          }
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <IconComponent className={`h-[38px] w-[38px] md:h-[50px] md:w-[50px] ${item.color}`} />
+                      )}
+                    </div>
+                    {/* Large number in the center (Elegant: 600 semi-bold weight) */}
+                   <div
+  className="stat-number-premium text-[#081C3A] text-[26px] sm:text-[30px] md:text-[36px] lg:text-[40px] leading-none mb-4"
+  style={{ fontFamily: "Heebo, sans-serif", fontWeight: 600 }}
+>
+  <AnimatedCounter value={item.value} suffix={item.suffix} />
+</div>
+                    {/* Service label/Title below the number */}
+                    <span className="stat-label-premium gujarati-text text-[#4A5D78] text-[10.5px] min-[360px]:text-[11.5px] md:text-[13px] lg:text-[14px] tracking-wide leading-normal w-full block px-0.5 whitespace-pre-line">
+                      {item.titleGuj || item.title}
+                    </span>
+                  </div>
+ 
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Patient Video Testimonials */}
+      <section className="py-12 sm:py-20 bg-white relative z-10 border-t border-sky-100/30" id="patient-success-stories">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              દર્દીઓની સફળતાની કહાનીઓ
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-3">
+              રાજકોટની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલના દર્દીઓના વાસ્તવિક અનુભવો
+            </h2>
+            <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 justify-center items-start">
+            {videosToRender.map((video, index) => (
+              <motion.div
+                key={video.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                className="w-full max-w-[240px] mx-auto flex flex-col items-center"
+              >
+                {video.videoPlatform === 'instagram' ? (
+                  <InstagramEmbed
+                    url={video.url || `https://www.instagram.com/p/${video.id}/`}
+                    title={video.title}
+                    thumbnail={video.thumbnail}
+                  />
+                ) : (
+                  <div className="w-full max-w-[240px] mx-auto flex justify-center">
+                    <Mp4ReelPlayer src={video.url || video.id} />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+
+
+        </div>
+      </section>
+
+      {/* Awards Section */}
+      <section className="py-12 sm:py-20 bg-slate-50/50 relative z-10 border-t border-sky-100/30" id="awards-and-recognitions">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              સન્માન અને પુરસ્કારો
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-3">
+              પુરસ્કારો અને સિદ્ધિઓ
+            </h2>
+            <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
+          </div>
+
+          {awardsList && awardsList.length > 0 ? (
+            <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto" id="awards-rows-container">
+              {/* Row 1: Portrait/Vertical Awards */}
+              <div className="w-full" id="awards-row-vertical">
+                <div className="flex gap-6 sm:gap-8 overflow-x-auto pb-4 pt-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                  {verticalAwards.map((item, idx) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: idx * 0.05 }}
+                      onClick={() => setSelectedAward(item)}
+                      className="flex-shrink-0 cursor-pointer h-44 sm:h-56 md:h-64 lg:h-72 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                      id={`home-award-vertical-${item.id}`}
+                    >
+                      <img
+                        src={item.image_url || null}
+                        alt="Award & Recognition Vertical"
+                        className="h-full w-auto object-contain object-center rounded-lg"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                      />
+                    </motion.div>
+                  ))}
+                  {verticalAwards.length === 0 && (
+                    <div className="text-center py-6 text-slate-400 text-xs w-full">
+                      No portrait awards available.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Row 2: Landscape/Horizontal Awards */}
+              <div className="w-full overflow-hidden" id="awards-row-horizontal">
+                {horizontalAwards.length > 0 ? (
+                  <div className="relative w-full">
+                    {/* Style block for continuous smooth scrolling */}
+                    <style dangerouslySetInnerHTML={{__html: `
+                      @keyframes marquee-horizontal {
+                        0% {
+                          transform: translate3d(0, 0, 0);
+                        }
+                        100% {
+                          transform: translate3d(calc(-1 * var(--marquee-distance, 0px)), 0, 0);
+                        }
+                      }
+                      .animate-marquee-horizontal {
+                        animation: marquee-horizontal 110s linear infinite;
+                      }
+                      .animate-marquee-horizontal:hover,
+                      #awards-row-horizontal:hover .animate-marquee-horizontal {
+                        animation-play-state: paused;
+                      }
+                      @media (prefers-reduced-motion: reduce) {
+                        .animate-marquee-horizontal {
+                          animation: none !important;
+                          overflow-x: auto !important;
+                          display: flex !important;
+                          width: 100% !important;
+                        }
+                      }
+                    `}} />
+                    
+                    {/* The marquee wrapper with hidden overflow */}
+                    <div className="flex overflow-hidden w-full select-none pb-4 pt-2">
+                      <div 
+                        className="flex flex-nowrap w-max animate-marquee-horizontal"
+                        style={{ '--marquee-distance': `${marqueeDistance}px` } as React.CSSProperties}
+                      >
+                        {/* Track 1 */}
+                        <div ref={sequenceRef} className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8">
+                          {(() => {
+                            let baseItems = [...horizontalAwards];
+                            if (baseItems.length > 0 && baseItems.length < 10) {
+                              const multiplier = Math.ceil(10 / baseItems.length);
+                              let temp: typeof baseItems = [];
+                              for (let i = 0; i < multiplier; i++) {
+                                temp = [...temp, ...baseItems];
+                              }
+                              baseItems = temp;
+                            }
+                            return baseItems.map((item, idx) => (
+                              <div
+                                key={`track1-${item.id}-${idx}`}
+                                onClick={() => setSelectedAward(item)}
+                                className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                                id={`home-award-horizontal-t1-${item.id}-${idx}`}
+                              >
+                                <img
+                                  src={item.image_url || null}
+                                  alt="Award & Recognition Horizontal"
+                                  className="h-full w-auto object-contain object-center rounded-lg"
+                                  loading="eager"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </div>
+                            ));
+                          })()}
+                        </div>
+                        {/* Track 2 - Identical clone for seamless loop */}
+                        <div className="flex gap-6 sm:gap-8 flex-shrink-0 pr-6 sm:pr-8" aria-hidden="true">
+                          {(() => {
+                            let baseItems = [...horizontalAwards];
+                            if (baseItems.length > 0 && baseItems.length < 10) {
+                              const multiplier = Math.ceil(10 / baseItems.length);
+                              let temp: typeof baseItems = [];
+                              for (let i = 0; i < multiplier; i++) {
+                                temp = [...temp, ...baseItems];
+                              }
+                              baseItems = temp;
+                            }
+                            return baseItems.map((item, idx) => (
+                              <div
+                                key={`track2-${item.id}-${idx}`}
+                                onClick={() => setSelectedAward(item)}
+                                className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                                id={`home-award-horizontal-t2-${item.id}-${idx}`}
+                              >
+                                <img
+                                  src={item.image_url || null}
+                                  alt="Award & Recognition Horizontal"
+                                  className="h-full w-auto object-contain object-center rounded-lg"
+                                  loading="eager"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </div>
+                            ));
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-slate-400 text-xs w-full">
+                    No landscape awards available.
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-3xs max-w-2xl mx-auto">
+              <div className="w-12 h-12 rounded-full bg-teal-50 text-[#0D9488] flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                🏆
+              </div>
+              <p className="text-slate-500 text-sm font-medium">
+                Awards & Recognitions will be displayed here.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedAward && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setSelectedAward(null)}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6 md:p-10 cursor-zoom-out"
+          >
+            {/* Close Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedAward(null);
+              }}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full transition-all duration-200 z-[10000] cursor-pointer"
+              aria-label="Close Lightbox"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Content Container */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center rounded-2xl overflow-hidden cursor-default"
+            >
+              <img
+                src={selectedAward.image_url || null}
+                alt="Award Full View"
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 4.5 Our Clinic — Hospital Gallery Section */}
+      <section className="pt-16 sm:pt-20 pb-16 sm:pb-20 bg-white border-t border-b border-slate-100 relative z-10" id="our-clinic-gallery">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl tracking-wider uppercase leading-tight">
+              અમારી ક્લિનિક
+            </h2>
+            <p className="gujarati-text text-[#4B5563] text-[13px] sm:text-[15px] max-w-2xl mx-auto mt-3 tracking-wide leading-relaxed">
+              પટેલ ડેન્ટલ હોસ્પિટલની આધુનિક સુવિધાઓ, અદ્યતન સારવાર અને દર્દીઓ માટે આરામદાયક વાતાવરણની એક ઝલક જુઓ.
+            </p>
+          </div>
+
+          {filteredHospitalImages.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-3xs max-w-lg mx-auto">
+              <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-700 font-bold text-sm">No gallery photos available.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredHospitalImages.map((img, index) => (
+                <motion.div
+                  key={img.id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: (index % 4) * 0.05 }}
+                  onClick={() => setHospitalLightboxIndex(index)}
+                  className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-[0_5px_16px_rgba(0,0,0,0.20)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.30)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
+                >
+                  <div className="relative w-full overflow-hidden bg-slate-50">
+                    <img
+                      src={img.url}
+                      alt={img.altText || img.title || 'Patel Dental Hospital Gallery'}
+                      className="w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-105 block"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                    />
+                    
+                    {/* Category Badge */}
+                    {img.category && img.category !== 'Homepage Gallery' && (
+                      <span className="absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
+                        {img.category}
+                      </span>
+                    )}
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="bg-white/95 backdrop-blur-xs p-3 rounded-full shadow-lg transform translate-y-3 group-hover:translate-y-0 transition-all duration-300">
+                        <Maximize2 className="h-5 w-5 text-[#0D9488]" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Hospital Gallery Lightbox Modal */}
+      <AnimatePresence>
+        {currentHospitalLightboxImg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setHospitalLightboxIndex(null)}
+            className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
+          >
+            <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center justify-center">
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setHospitalLightboxIndex(null)}
+                className="absolute -top-12 right-0 sm:right-0 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              {/* Prev Button */}
+              <button
+                type="button"
+                onClick={handlePrevHospitalLightbox}
+                className="absolute left-2 sm:-left-16 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                type="button"
+                onClick={handleNextHospitalLightbox}
+                className="absolute right-2 sm:-right-16 p-2 text-white/80 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+
+              <img
+                src={currentHospitalLightboxImg.url}
+                alt={currentHospitalLightboxImg.altText || currentHospitalLightboxImg.title || 'Gallery View'}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                referrerPolicy="no-referrer"
+              />
+              
+              {currentHospitalLightboxImg.title && (
+                <p className="text-white text-center mt-4 text-sm font-semibold">
+                  {currentHospitalLightboxImg.title}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 5. Happy Smiles & Patient Moments Gallery */}
+      <PatientMomentsGallery 
+        patientMoments={momentsToRender} 
+        onNavigate={(page) => setCurrentPage(page as PageId)} 
+        hideViewMoreBtn={true}
+        customBadge="પટેલ ડેન્ટલ હોસ્પિટલ - રાજકોટની ડેન્ટલ ક્લિનિક"
+        customTitle="ખુશનુમા સ્મિત અને દર્દીઓની યાદગાર પળો"
+      />
+
+      {/* Centered Gallery CTA Buttons */}
+      <div className="bg-white pb-12 sm:pb-16 pt-4 px-4 relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto">
+        <button
+          onClick={() => {
+            setCurrentPage('gallery');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="w-full sm:w-auto px-8 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center flex items-center justify-center space-x-2 shadow-sm hover:shadow-md transform hover:-translate-y-[2px] active:scale-98"
+        >
+          <ImageIcon className="h-4 w-4 shrink-0 text-[#081C3A]" />
+          <span>View More Photos</span>
+        </button>
+
+        <button
+          onClick={() => openAppointmentModal()}
+          className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center flex items-center justify-center space-x-2 transform hover:-translate-y-[2px] active:scale-98"
+        >
+          <Calendar className="h-4 w-4 shrink-0 text-white" />
+          <span>Book Free Consultation</span>
+        </button>
+      </div>
+
+      {/* Services Section */}
+      <section className="pt-8 sm:pt-16 lg:pt-32 pb-16 lg:pb-32 bg-[#FAFAFC] relative z-10 border-t border-slate-100" id="services">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
+              સેવાઓ
+            </h2>
+            <p className="stat-subtitle-premium gujarati-text text-[#4A5D78] text-[12px] sm:text-[14px] md:text-[15px] tracking-wide leading-relaxed">
+              રાજકોટમાં શ્રેષ્ઠ ડેન્ટલ ક્લિનિક ખાતે એક જ છત નીચે અદ્યતન ડેન્ટલ સારવાર
+            </p>
+            <div className="h-[3px] w-16 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mt-4 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 xl:gap-12 max-w-full mx-auto items-stretch">
+            {/* Dynamic Services Cards from CMS */}
+            {(() => {
+              const SERVICES_CARDS_CONFIG = [
+                { id: 'implants-srv', slug: 'dental-implants', title: 'Dental Implants', defaultImg: fdaApprovedImplantImg, delay: 0 },
+                { id: 'rct', slug: 'root-canal-treatment', title: 'Single Sitting Root Canal Treatment', defaultImg: rootCanalImg, delay: 0.05 },
+                { id: 'fmr-srv', slug: 'full-mouth-rehabilitation', title: 'Full Mouth Rehabilitation', defaultImg: fullMouthRehabImg, delay: 0.1 },
+                { id: 'aligners-srv', slug: 'invisible-aligners', title: 'Invisible Aligners', defaultImg: clearAlignersImg, delay: 0.15 },
+                { id: 'smile-srv', slug: 'smile-makeover', title: 'Smile Makeover', defaultImg: smileMakeoverImg, delay: 0.2 },
+                { id: 'crowns', slug: 'crowns-and-bridges', title: 'Crowns & Bridges', defaultImg: crownsBridgesImg, delay: 0.25 },
+                { id: 'whitening-srv', slug: 'teeth-whitening', title: 'Teeth Whitening', defaultImg: teethCleaningImg, delay: 0.3 },
+                { id: 'kids', slug: 'pediatric-dentistry', title: 'Pediatric Dentistry', defaultImg: kidsDentistryImg, delay: 0.35 },
+                { id: 'braces-srv', slug: 'braces-treatment', title: 'Braces Treatment', defaultImg: bracesImg, delay: 0.4 },
+                { id: 'wisdom-srv', slug: 'wisdom-tooth-surgery', title: 'Wisdom Tooth Surgery', defaultImg: wisdomToothImg, delay: 0.45 },
+                { id: 'filling-srv', slug: 'tooth-coloured-filling', title: 'Tooth Coloured Filling (Composite Filling)', defaultImg: compositeFillingImg, delay: 0.5 },
+              ];
+
+              return SERVICES_CARDS_CONFIG.map((cfg) => {
+                const cardData = getCardData(cfg.slug, cfg.title, cfg.defaultImg, cfg.id);
+                if (!cardData.isActive) return null;
+
+                const mConfig = cardData.mConfig;
+                const appointmentText = mConfig.cta_appointment_text || 'Free Consultation';
+                const appointmentDest = mConfig.cta_appointment_dest || 'appointment';
+                const appointmentDestValue = mConfig.cta_appointment_dest_value || '';
+
+                const handleAppointmentClick = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  if (appointmentDest === 'appointment') {
+                    openAppointmentModal();
+                  } else if (appointmentDest === 'internal') {
+                    setCurrentPage(appointmentDestValue);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else if (appointmentDest === 'external') {
+                    const url = appointmentDestValue.startsWith('http') ? appointmentDestValue : 'https://' + appointmentDestValue;
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                  }
+                };
+
+                return (
+                  <motion.div
+                    key={cfg.slug}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: cfg.delay }}
+                    className="w-full h-full bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgba(8,28,58,0.04)] hover:shadow-[0_24px_50px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-350 group flex flex-col cursor-pointer"
+                    onClick={() => {
+                      setCurrentPage(`services/${cardData.slug}`);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
+                    {/* Image Container */}
+                    <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
+                      <img
+                        src={cardData.image || null}
+                        alt={cardData.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+
+                    {/* Green Highlight Line directly below the image */}
+                    {cardData.greenHighlightLine && (
+                      <div className="bg-[#14B8A6] text-white py-3 px-6 text-center text-xs sm:text-sm font-bold tracking-wide leading-relaxed border-b border-teal-600/10 gujarati-text">
+                        {cardData.greenHighlightLine}
+                      </div>
+                    )}
+
+                    {/* Content Block */}
+                    <div className="p-8 sm:p-10 xl:p-12 flex flex-col justify-between flex-grow">
+                      <div className="space-y-5 text-left">
+                        <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[28px] leading-tight gujarati-title">
+                          {cardData.title}
+                        </h3>
+                        
+                        <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 font-sans gujarati-text">
+                          {cardData.shortDesc ? cardData.shortDesc.split(/\r?\n/).map((p) => p.trim()).filter(Boolean).map((para, idx) => (
+                            <p key={idx}>{para}</p>
+                          )) : null}
+                        </div>
+                      </div>
+
+                      {/* Buttons block */}
+                      <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
+                        {mConfig.cta_appointment_enabled !== false && (
+                          <button
+                            onClick={handleAppointmentClick}
+                            className="flex-1 px-6 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center gujarati-text"
+                          >
+                            ફ્રી પુછપરછ
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentPage(`services/${cardData.slug}`);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="flex-1 px-6 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center gujarati-text"
+                        >
+                          વધુ વાંચો
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              });
+            })()}          </div>
+
+        </div>
+      </section>
+
+
+
+
+      {/* 9. Book Your Consultation Today */}
+      <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="book-consultation-cta">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-[#081C3A]/[0.02] via-[#0D9488]/[0.01] to-white rounded-[32px] border border-slate-100 p-8 sm:p-12 lg:p-16 shadow-[0_10px_45px_rgba(8,28,58,0.03)] hover:shadow-[0_20px_55px_rgba(8,28,58,0.06)] transition-all duration-500 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#0D9488]/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-[#11B5D8]/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+              {/* Left Side Content - lg:col-span-5 */}
+              <div className="lg:col-span-5 flex flex-col justify-center text-left">
+                <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-wider uppercase mb-3 block">
+                  પટેલ ડેન્ટલ હોસ્પિટલ – એડવાન્સ્ડ ઇમ્પ્લાન્ટ અને FMR સેન્ટર
+                </span>
+                
+                <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-4">
+                  આજે તમારું કન્સલ્ટેશન બુક કરો
+                </h2>
+
+                <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mb-6 rounded-full" />
+
+                <p className="text-slate-550 text-[14px] sm:text-[15px] font-medium leading-relaxed mb-8 gujarati-text">
+                  પટેલ ડેન્ટલ હોસ્પિટલ, રાજકોટ ખાતે અદ્યતન ડેન્ટલ કેર સાથે આત્મવિશ્વાસભર્યા સ્મિત તરફનું પ્રથમ પગલું ભરો. આજે જ રાજકોટમાં અમારા અનુભવી ડેન્ટલ ઇમ્પ્લાન્ટ સ્પેશિયાલિસ્ટ અને રૂટ કેનાલ સ્પેશિયાલિસ્ટ સાથે કન્સલ્ટ કરો.
+                </p>
+
+                {/* Key Highlights list */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                  {[
+                    { title: "ડિજિટલ ડેન્ટલ નિષ્ણાતો", desc: "અદ્યતન ડિજિટલ નિદાન અને સારવાર" },
+                    { title: "ડેન્ટલ ઇમ્પ્લાન્ટ નિષ્ણાતો", desc: "અદ્યતન ઇમ્પ્લાન્ટ સોલ્યુશન્સ" },
+                    { title: "બ્રેસિસ અને ઇનવિઝિબલ એલાઇનર નિષ્ણાતો", desc: "આધુનિક ઇનવિઝિબલ ઓર્થોડોન્ટિક્સ" },
+                    { title: "FMR અને રૂટ કેનાલ નિષ્ણાતો", desc: "કોમ્પ્રિહેન્સિવ સ્માઇલ ડિઝાઇનિંગ અને ફુલ માઉથ રિહેબિલિટેશન" },
+                    { title: "ઓરલ અને મેક્સિલોફેશિયલ સર્જરી", desc: "અદ્યતન ઓરલ સર્જરી અને ફેશિયલ રિકન્સ્ટ્રક્શન" }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start space-x-2.5">
+                      <div className="w-5 h-5 rounded-full bg-[#E0F2FE] border border-[#BAE6FD] flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle className="h-3 w-3 text-[#0ea5e9] stroke-[3]" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-slate-700 text-[13px] sm:text-[13.5px] font-bold leading-tight gujarati-title">
+                          {item.title}
+                        </span>
+                        <span className="text-slate-500 text-[11px] sm:text-[12px] font-medium leading-tight mt-0.5 gujarati-text">
+                          {item.desc}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Contact Phone & Actions Block */}
+                <div className="pt-6 border-t border-slate-100">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-[#F0FDFA] border border-[#CCFBF1] flex items-center justify-center text-[#0D9488]">
+                      <PhoneCall className="h-4.5 w-4.5 stroke-[2.5]" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-[11px] font-bold tracking-wider uppercase leading-none gujarati-text">ઇમરજન્સી કૉલ અને બુકિંગ</p>
+                      <a href={`tel:${phoneRaw}`} className="text-[#081C3A] text-lg font-black hover:text-[#0D9488] transition-colors duration-200">
+                        {displayPhone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {/* Primary Button */}
+                    <button
+                      onClick={() => openAppointmentModal()}
+                      className="flex-1 flex items-center justify-center text-[13px] sm:text-[14px] font-bold text-white bg-[#0D9488] hover:bg-[#0F766E] px-6 py-4 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95 text-center gujarati-text"
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      ફ્રી પુછપરછ
+                    </button>
+                    
+                    {/* Secondary Button */}
+                    <a
+                      href={getWhatsAppUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center text-[13px] sm:text-[14px] font-bold text-[#0D9488] bg-slate-50 border border-slate-100 hover:bg-[#F0FDFA] hover:border-[#CCFBF1] px-6 py-4 rounded-xl cursor-pointer transition-all duration-350 text-center gujarati-text"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2 text-[#25D366] fill-[#25D366]/10" />
+                      WhatsApp કરો
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side Image - lg:col-span-7 */}
+              <div className="lg:col-span-7 w-full flex flex-col justify-center">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.98, x: 30 }}
+                  whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="aspect-video w-full bg-slate-50 rounded-[24px] overflow-hidden shadow-[0_15px_40px_rgba(8,28,58,0.12)] border border-white/60 relative"
+                >
+                  <img
+                    className="w-full h-full object-cover absolute inset-0"
+                    src="/IMG_20190521_190345.jpg"
+                    alt="Patel Dental Hospital Premium Modern Treatment Center"
+                    referrerPolicy="no-referrer"
+                  />
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+
+
+      {/* 12. Advanced Dental Care With A Personal Touch */}
+      <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="advanced-care-personal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              વ્યક્તિગત કાળજી સાથે અદ્યતન ડેન્ટલ કેર
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-3">
+              વ્યક્તિગત કાળજી સાથે અદ્યતન ડેન્ટલ કેર
+            </h2>
+            <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mb-4 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
+            
+            {/* Left Side: Content */}
+            <div className="space-y-6 sm:space-y-8">
+              <div className="space-y-2.5">
+                <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-wider uppercase block">
+                  પટેલ ડેન્ટલ હોસ્પિટલ – એડવાન્સ્ડ ઇમ્પ્લાન્ટ અને FMR સેન્ટર
+                </span>
+                <h3 className="font-display font-[900] text-[#081C3A] text-[24px] sm:text-[30px] md:text-[34px] leading-tight tracking-tight gujarati-title">
+                  સ્વસ્થ અને આત્મવિશ્વાસભર્યું સ્મિત બનાવવું
+                </h3>
+              </div>
+
+              <div className="text-slate-600 text-[14.5px] sm:text-[15.5px] font-medium leading-relaxed space-y-4 gujarati-text">
+                <p>
+                  રાજકોટ, ગુજરાતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે ઓળખાતી પટેલ ડેન્ટલ હોસ્પિટલમાં, અમે અદ્યતન ટેકનોલોજી સાથે વ્યક્તિગત કાળજીનું સંયોજન કરીને ઉત્તમ ક્લિનિકલ પરિણામો પ્રદાન કરીએ છીએ. અમારી વિશેષ સારવારમાં રાજકોટમાં ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ માઉથ રિહેબિલિટેશન, ઇનવિઝિબલ એલાઇનર્સ, રૂટ કેનાલ ટ્રીટમેન્ટ્સ અને કોસ્મેટિક ડેન્ટિસ્ટ્રીનો સમાવેશ થાય છે.
+                </p>
+                <p>
+                  તમને રાજકોટમાં ડેન્ટલ ઇમ્પ્લાન્ટ સ્પેશિયાલિસ્ટ, રાજકોટમાં રૂટ કેનાલ સ્પેશિયાલિસ્ટ અથવા રાજકોટમાં સંપૂર્ણ સ્માઇલ મેકઓવર સારવારની જરૂર હોય, અમારું ધ્યાન દર્દી-કેન્દ્રિત કાળજી દ્વારા તમારો આત્મવિશ્વાસ, આરામ અને લાંબા ગાળાનું ઓરલ હેલ્થ પુનઃસ્થાપિત કરવા પર છે.
+                </p>
+                <p>
+                  45,000થી વધુ સંતુષ્ટ દર્દીઓ અને 11+ વર્ષના ક્લિનિકલ અનુભવ સાથે, પટેલ ડેન્ટલ હોસ્પિટલ રાજકોટની અગ્રણી ડેન્ટલ ઇમ્પ્લાન્ટ હોસ્પิตલ તરીકે અને ભારતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલોમાંની એક તરીકે વિશ્વસનીય છે.
+                </p>
+              </div>
+
+
+            </div>
+
+            {/* Right Side: Responsive Premium Dental Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full"
+            >
+              <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
+                <img
+                   className="w-full h-full object-cover absolute inset-0 z-10"
+                   src="/MG_3249.webp"
+                   alt="Patel Dental Hospital Advanced Clinical Care"
+                   referrerPolicy="no-referrer"
+                   loading="lazy"
+                />
+              </div>
+            </motion.div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 13. What Our Patients Say */}
+      <section className="py-12 sm:py-24 bg-slate-50/50 relative z-10 border-t border-slate-100" id="patient-reviews">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              દર્દીઓના પ્રતિભાવો
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
+              અમારા દર્દીઓ શું કહે છે
+            </h2>
+            <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mb-4 rounded-full" />
+            <p className="stat-subtitle-premium gujarati-text text-[#4A5D78] text-[12px] sm:text-[14px] md:text-[15px] tracking-wide leading-relaxed">
+              રાજકોટ, ગુજરાતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલના દર્દીઓના વાસ્તવિક Google રિવ્યૂઝ
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            {[
+              {
+                name: 'Ranjanben Gothi',
+                review: 'I have taken treatment of dental implant teeth today. 4.5 years completed after fixing my teeth. I am very happy and can chew each and every fruit. Dr Vipul and Dr Kinjal have provided excellent treatment. Best dental hospital in Rajkot.'
+              },
+              {
+                name: 'Sahina Savan',
+                review: 'I had a great experience at Patel Dental Hospital. They give the utmost time, care and attention to every patient. My implant treatment was easy, painless and comfortable. Dr Vipul Patel and the team were extremely supportive.'
+              },
+              {
+                name: 'Uma Shah',
+                review: 'I was diagnosed with a rare jawbone and dental condition and consulted Dr Vipul Patel for treatment. From the first interaction, the approach was professional, transparent and reassuring. The treatment quality was excellent and I highly recommend Patel Dental Hospital.'
+              },
+              {
+                name: 'Rahul Makvana',
+                review: 'Patel Dental Hospital is very clean and hygienic. The staff and doctors are caring and supportive. Excellent patient experience and professional treatment.'
+              }
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="bg-white border border-slate-100 rounded-[20px] p-6 sm:p-7 shadow-[0_4px_25px_rgba(8,28,58,0.02)] hover:shadow-[0_20px_45px_rgba(8,28,58,0.08)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between h-full group"
+              >
+                <div className="flex flex-col h-full justify-between">
+                  <div>
+                    {/* Stars and Google G Icon */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-0.5 text-amber-500">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-amber-500 stroke-amber-500" />
+                        ))}
+                      </div>
+                      <div className="shrink-0 bg-slate-50 p-1.5 rounded-lg border border-slate-100 group-hover:bg-slate-100/70 transition-colors">
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                          <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z" fill="#FBBC05" />
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Review text */}
+                    <p className="text-slate-600 text-[13.5px] sm:text-[14px] leading-relaxed mb-6 font-medium italic group-hover:text-slate-700 transition-colors">
+                      "{item.review}"
+                    </p>
+                  </div>
+
+                  {/* Reviewer and badge */}
+                  <div className="border-t border-slate-100/80 pt-4 mt-auto">
+                    <p className="font-display font-[900] text-[#081C3A] text-[15px] sm:text-[15.5px] leading-tight mb-1">
+                      {item.name}
+                    </p>
+                    <div className="flex items-center gap-1.5 text-[#0D9488] text-[10.5px] font-bold tracking-wider uppercase gujarati-text">
+                      <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#0D9488]" />
+                      <span>વેરિફાઇડ Google રિવ્યૂ</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 14. Need Help With Your Smile? */}
+      <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="need-help-cta">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              પટેલ ડેન્ટલ હોસ્પિટલ – એડવાન્સ્ડ ઇમ્પ્લાન્ટ & FMR સેન્ટર
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-3">
+              તમારા સ્મિત માટે મદદ જોઈએ?
+            </h2>
+            <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mb-4 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
+            
+            {/* Left Side: Content */}
+            <div className="space-y-6 sm:space-y-8">
+              <div className="space-y-3">
+                <h3 className="font-display font-[900] text-[#081C3A] text-[28px] sm:text-[34px] md:text-[40px] leading-tight tracking-tight gujarati-title">
+                  મદદ જોઈએ?
+                </h3>
+                <p className="text-slate-600 text-[14.5px] sm:text-[16px] font-medium leading-relaxed gujarati-text">
+                  વધુ સ્વસ્થ અને આત્મવિશ્વાસભર્યા સ્મિત તરફ પહેલું પગલું ભરો. આજે રાજકોટની શ્રેષ્ઠ ડેન્ટલ ક્લિનિકમાં તમારું કન્સલ્ટેશન શેડ્યૂલ કરો.
+                </p>
+              </div>
+
+              {/* Contact Info card */}
+              <div className="p-6 bg-slate-50/70 border border-slate-100 rounded-2xl flex items-center gap-4 hover:shadow-[0_8px_30px_rgba(8,28,58,0.03)] transition-all duration-300">
+                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-[#0D9488] shrink-0 border border-teal-100/50">
+                  <Phone className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-0.5 gujarati-text">
+                    સીધો સંપર્ક હોટલાઇન
+                  </span>
+                  <a 
+                    href={`tel:${phoneRaw}`} 
+                    className="block font-display font-black text-[#081C3A] text-[18px] sm:text-[22px] hover:text-[#0D9488] transition-colors"
+                  >
+                    {displayPhone}
+                  </a>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <button
+                  onClick={() => openAppointmentModal()}
+                  className="inline-flex items-center justify-center text-[14px] font-bold text-white bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] hover:from-[#0284c7] hover:to-[#0369a1] px-8 py-4 rounded-xl shadow-[0_4px_14px_0_rgba(14,165,233,0.3)] hover:shadow-lg cursor-pointer transition-all duration-300 transform active:scale-95 text-center gujarati-text"
+                >
+                  <Calendar className="h-4.5 w-4.5 mr-2" />
+                  ફ્રી પુછપરછ
+                </button>
+                
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center text-[14px] font-bold text-[#0D9488] bg-[#EBFDFB] hover:bg-[#CCFBF1] px-8 py-4 rounded-xl border border-[#CCFBF1] hover:shadow-md cursor-pointer transition-all duration-300 transform active:scale-95 text-center gujarati-text"
+                >
+                  <svg className="w-4.5 h-4.5 mr-2 fill-current" viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12.012 2c-5.506 0-9.988 4.482-9.988 9.988 0 1.761.46 3.473 1.332 4.978l-1.354 4.947 5.074-1.329c1.455.795 3.09 1.215 4.751 1.217h.004c5.503 0 10.015-4.482 10.015-9.988 0-2.668-1.039-5.176-2.927-7.065C17.142 2.927 14.654 2 12.012 2zm6.918 13.916c-.302.851-1.481 1.564-2.03 1.614-.543.05-1.085.253-3.486-.698-2.887-1.144-4.708-4.088-4.851-4.28-.142-.191-1.151-1.536-1.151-2.929 0-1.392.711-2.078.966-2.355.255-.276.553-.346.737-.346.184 0 .368.002.528.01.169.008.397-.064.622.482.23.559.78 1.901.848 2.039.068.139.113.301.021.485-.092.184-.139.299-.276.46-.139.162-.291.36-.416.483-.139.138-.284.288-.121.567.162.279.722 1.189 1.549 1.921.1.088.194.175.289.261 1.071.954 1.884 1.222 2.184 1.373.3.151.474.126.651-.077.177-.203.76-.884.966-1.186.205-.302.41-.252.691-.151.282.101 1.782.84 2.091.995.31.156.516.233.593.364.077.132.077.76-.225 1.611z" />
+                  </svg>
+                  WhatsApp કરો
+                </a>
+              </div>
+            </div>
+
+            {/* Right Side: Image with beautiful wrapper */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full"
+            >
+              <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
+                <img
+                  src="/IMG_3610.webp"
+                  alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+                  referrerPolicy="no-referrer"
+                />
+                
+                {/* Visual Accent Badge */}
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md border border-slate-200/50 py-1.5 px-3 rounded-xl shadow-sm flex items-center gap-1.5 z-20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#0D9488] animate-pulse"></div>
+                  <span className="text-[#081C3A] text-[11px] font-bold tracking-wider uppercase gujarati-text">
+                    અમારી રાજકોટ ક્લિનિકમાં આપનું સ્વાગત છે
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 15. Frequently Asked Questions (Moved above Footer) */}
+      <section className="py-12 sm:py-24 bg-slate-50/40 relative z-10 border-t border-slate-100" id="frequently-asked-questions">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
+              પટેલ ડેન્ટલ હોસ્પિટલ FAQ
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase mb-2">
+              વારંવાર પૂછાતા પ્રશ્નો
+            </h2>
+            <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mb-4 rounded-full" />
+            <p className="stat-subtitle-premium gujarati-text text-[#4A5D78] text-[12px] sm:text-[14px] md:text-[15px] tracking-wide leading-relaxed">
+              પટેલ ડેન્ટલ હોસ્પિટલની સારવાર વિશે સામાન્ય પ્રશ્નો
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqData.map((faq, idx) => {
+              const isOpen = expandedFaqIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white border border-slate-100 rounded-[20px] shadow-[0_4px_25px_rgba(8,28,58,0.015)] overflow-hidden hover:shadow-[0_12px_35px_rgba(8,28,58,0.035)] hover:border-slate-200/60 transition-all duration-300"
+                >
+                  <button
+                    onClick={() => setExpandedFaqIndex(isOpen ? null : idx)}
+                    className="w-full text-left px-6 py-5 sm:px-8 sm:py-6 flex items-center justify-between gap-4 cursor-pointer focus:outline-none group select-none"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="font-display font-extrabold text-[#081C3A] text-[15px] sm:text-[16.5px] leading-snug group-hover:text-[#0D9488] transition-colors duration-200 gujarati-title">
+                      {faq.question}
+                    </span>
+                    <div className={`p-1.5 rounded-lg border border-slate-100/70 flex items-center justify-center shrink-0 transition-all duration-300 ${isOpen ? 'bg-[#EBFDFB] border-[#CCFBF1] text-[#0D9488] rotate-180' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100/70 group-hover:text-[#081C3A]'}`}>
+                      <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                    </div>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 sm:px-8 sm:pb-7 pt-0 border-t border-slate-50 text-slate-500 text-[13.5px] sm:text-[14px] leading-relaxed font-semibold gujarati-text">
+                          {faq.answer}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 16. Visit Patel Dental Hospital */}
+      <section className="py-16 sm:py-24 bg-white relative z-10 border-t border-slate-100" id="visit-hospital">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Centered Heading */}
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+            <span className="text-[#0D9488] gujarati-text font-bold text-[11px] sm:text-[12px] tracking-widest uppercase block mb-1">
+              અમારી ક્લિનિક્સ શોધો
+            </span>
+            <h2 className="stat-heading-premium gujarati-title text-[#081C3A] text-[15px] sm:text-[18px] md:text-[24px] lg:text-[26px] tracking-wider leading-snug uppercase">
+              પટેલ ડેન્ટલ હોસ્પિટલની મુલાકાત લો
+            </h2>
+            <div className="h-[3px] w-14 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto mt-4 rounded-full" />
+            <p className="stat-subtitle-premium gujarati-text text-[#4A5D78] text-[12px] sm:text-[14px] md:text-[15px] tracking-wide leading-relaxed mt-3">
+              રાજકોટની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલની અમારી મેઈન એમિન માર્ગ અથવા ગાયત્રીનગર બ્રાન્ચની મુલાકાત લો.
+            </p>
+          </div>
+
+          {/* Two Equal Width Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+            
+            {/* Card 1: Main Branch (Amin Marg) */}
+            <div 
+              id="branch-card-amin-marg"
+              className="bg-white rounded-[18px] border border-[#E6F6F4] p-[28px] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                {/* Heading */}
+                <div>
+                  <h3 className="font-display font-[900] text-[#1E3A5F] text-lg sm:text-xl md:text-2xl flex items-center gap-2 gujarati-title">
+                    <span className="shrink-0">🏥</span> પટેલ ડેન્ટલ હોસ્પિટલ
+                  </h3>
+                  <p className="text-xs sm:text-sm font-bold text-[#00897B] tracking-wider uppercase mt-1 gujarati-text">
+                    એમિન માર્ગ બ્રાન્ચ
+                  </p>
+                </div>
+
+                {/* Address */}
+                <div className="pt-3 border-t border-slate-100 space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5 gujarati-text">
+                    <span className="shrink-0 text-sm">📍</span> સરનામું
+                  </span>
+                  <p className="text-[#4B5563] font-semibold text-[13.5px] sm:text-[14px] leading-relaxed whitespace-pre-line gujarati-text">
+                    પટેલ ડેન્ટલ હોસ્પિટલ બિઝનેસ સેન્ટ્રમ કોમ્પ્લેક્સ, 1st ફ્લોર, કિંગ્સ હાઇટ્સની સામે, ગોલ્ડન સુપર માર્કેટની બાજુમાં, પંડિત દીનદયાળ ઉપાધ્યાય રોડ, રાજનગર ચોકથી એમિન માર્ગ તરફ, રાજકોટ – 360001
+                  </p>
+                </div>
+
+                {/* Phone */}
+                <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                  <span className="shrink-0 text-sm">☎</span>
+                  <a 
+                    href="tel:+919510397046" 
+                    className="text-[#00897B] font-extrabold text-[14.5px] hover:underline"
+                  >
+                    +91 9510397046
+                  </a>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
+                <a
+                  href="https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"
+                >
+                  <span className="mr-1.5 shrink-0">📍</span> ડાયરેક્શન મેળવો
+                </a>
+                <a
+                  href="tel:+919510397046"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#1E3A5F] hover:bg-[#00897B] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"
+                >
+                  <span className="mr-1.5 shrink-0">📞</span> હમણાં કૉલ કરો
+                </a>
+              </div>
+            </div>
+
+            {/* Card 2: Gayatrinagar Branch */}
+            <div 
+              id="branch-card-gayatrinagar"
+              className="bg-white rounded-[18px] border border-[#E6F6F4] p-[28px] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                {/* Heading */}
+                <div>
+                  <h3 className="font-display font-[900] text-[#1E3A5F] text-lg sm:text-xl md:text-2xl flex items-center gap-2 gujarati-title">
+                    <span className="shrink-0">🏥</span> પટેલ ડેન્ટલ હોસ્પિટલ
+                  </h3>
+                  <p className="text-xs sm:text-sm font-bold text-[#00897B] tracking-wider uppercase mt-1 gujarati-text">
+                    ગાયત્રીનગર બ્રાન્ચ
+                  </p>
+                </div>
+
+                {/* Address */}
+                <div className="pt-3 border-t border-slate-100 space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5 gujarati-text">
+                    <span className="shrink-0 text-sm">📍</span> સરનામું
+                  </span>
+                  <p className="text-[#4B5563] font-semibold text-[13.5px] sm:text-[14px] leading-relaxed whitespace-pre-line gujarati-text">
+                    પટેલ ડેન્ટલ હોસ્પિટલ, 1st ફ્લોર, રામેશ્વર કોમ્પ્લેક્સ, SBI બેંકની સામે, ગાયત્રીનગર રોડ, જલારામ ચોક, ભક્તિનગર સર્કલ, રાજકોટ
+                  </p>
+                </div>
+
+                {/* Phone */}
+                <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                  <span className="shrink-0 text-sm">☎</span>
+                  <a 
+                    href="tel:+919510397046" 
+                    className="text-[#00897B] font-extrabold text-[14.5px] hover:underline"
+                  >
+                    +91 9510397046
+                  </a>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
+                <a
+                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"
+                >
+                  <span className="mr-1.5 shrink-0">📍</span> ડાયરેક્શન મેળવો
+                </a>
+                <a
+                  href="tel:+919510397046"
+                  className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#1E3A5F] hover:bg-[#00897B] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"
+                >
+                  <span className="mr-1.5 shrink-0">📞</span> હમણાં કૉલ કરો
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+    </div>
+  );
+}

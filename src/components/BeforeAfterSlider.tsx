@@ -6,13 +6,17 @@ interface BeforeAfterSliderProps {
   afterImage: string;
   caption?: string;
   aspectRatio?: string;
+  beforeLabel?: string;
+  afterLabel?: string;
 }
 
 export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   beforeImage,
   afterImage,
   caption,
-  aspectRatio = 'aspect-[4/3]'
+  aspectRatio = 'aspect-[4/3]',
+  beforeLabel = 'Before',
+  afterLabel = 'After'
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(600);
@@ -136,13 +140,13 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         {/* Labels & Badges */}
         <div className="absolute top-3 left-3 z-20 pointer-events-none">
           <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-rose-600/90 border border-rose-400 px-3 py-1 rounded-xl shadow-md backdrop-blur-xs">
-            Before
+            {beforeLabel}
           </span>
         </div>
 
         <div className="absolute top-3 right-3 z-20 pointer-events-none">
           <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider block bg-emerald-600/90 border border-emerald-400 px-3 py-1 rounded-xl shadow-md backdrop-blur-xs">
-            After
+            {afterLabel}
           </span>
         </div>
 

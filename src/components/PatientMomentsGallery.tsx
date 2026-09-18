@@ -14,6 +14,8 @@ interface PatientMomentsGalleryProps {
   isStandalonePage?: boolean;
   onNavigate?: (page: string) => void;
   hideViewMoreBtn?: boolean;
+  customTitle?: string;
+  customBadge?: string;
 }
 
 const ROW_HEIGHT = 4; // 4px per grid auto-row unit
@@ -118,7 +120,9 @@ export default function PatientMomentsGallery({
   patientMoments,
   isStandalonePage = false,
   onNavigate,
-  hideViewMoreBtn = false
+  hideViewMoreBtn = false,
+  customTitle,
+  customBadge
 }: PatientMomentsGalleryProps) {
   const momentsToRender = patientMoments !== undefined && patientMoments.length > 0
     ? patientMoments
@@ -218,11 +222,11 @@ export default function PatientMomentsGallery({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="text-[#0D9488] font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block">
-            PATEL DENTAL HOSPITAL - DENTAL CLINIC IN RAJKOT
+          <span className={`text-[#0D9488] ${customBadge ? 'gujarati-text' : ''} font-bold text-[11px] sm:text-[12px] tracking-widest uppercase mb-2 block`}>
+            {customBadge || "PATEL DENTAL HOSPITAL - DENTAL CLINIC IN RAJKOT"}
           </span>
-          <h2 className="stat-heading-premium text-[#081C3A] text-[18px] sm:text-[22px] md:text-[28px] lg:text-[32px] font-black tracking-wider leading-snug uppercase mb-3">
-            Happy Smiles & Patient Moments
+          <h2 className={`stat-heading-premium ${customTitle ? 'gujarati-title' : ''} text-[#081C3A] text-[18px] sm:text-[22px] md:text-[28px] lg:text-[32px] font-black tracking-wider leading-snug uppercase mb-3`}>
+            {customTitle || "Happy Smiles & Patient Moments"}
           </h2>
           <div className="h-[2px] w-12 bg-gradient-to-r from-[#11B5D8] to-[#0EA5C6] mx-auto rounded-full" />
         </div>

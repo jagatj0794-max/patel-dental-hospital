@@ -27,17 +27,24 @@ import Lightbox from './components/Lightbox';
 
 // Pages
 import Home from './pages/Home';
+import HomeGujarati from './pages/HomeGujarati';
 import About from './pages/About';
 import SameDayFix from './pages/SameDayFix';
 import SmileGallery from './pages/SmileGallery';
+import SmileGalleryGujarati from './pages/SmileGalleryGujarati';
 import Doctors from './pages/Doctors';
+import DoctorsGujarati from './pages/DoctorsGujarati';
 import Contact from './pages/Contact';
 import ServiceDetail from './pages/ServiceDetail';
 import SocialService from './pages/SocialService';
+import SocialServiceGujarati from './pages/SocialServiceGujarati';
 import Technology from './pages/Technology';
+import TechnologyGujarati from './pages/TechnologyGujarati';
 import DentalTourism from './pages/DentalTourism';
+import DentalTourismGujarati from './pages/DentalTourismGujarati';
 import Blogs from './pages/Blogs';
 import WhyChooseUs from './pages/WhyChooseUs';
+import WhyChooseUsGujarati from './pages/WhyChooseUsGujarati';
 import { initAnalytics, trackAppointmentFormSubmit } from './utils/analytics';
 
 // Admin / Test pages lazy loaded
@@ -104,6 +111,17 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
   
   // My Saved Appointments state (loaded dynamically from Supabase based on session IDs)
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  // English ↔ Gujarati language switch foundation state (Default is Gujarati)
+  const [language, setLanguage] = useState<'en' | 'gu'>(() => {
+    const saved = safeStorage.getItem('app_language');
+    return (saved as 'en' | 'gu') || 'gu';
+  });
+
+  const handleSetLanguage = (lang: 'en' | 'gu') => {
+    setLanguage(lang);
+    safeStorage.setItem('app_language', lang);
+  };
 
   useEffect(() => {
     initAnalytics();
@@ -741,7 +759,20 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
 
     switch (currentPage) {
       case 'home':
-        return (
+        return language === 'gu' ? (
+          <HomeGujarati 
+            setCurrentPage={setCurrentPage} 
+            openAppointmentModal={openAppointmentModal} 
+            heroHeading={heroHeading}
+            heroDescription={heroDescription}
+            heroBgImage={heroBgImage}
+            heroBgImageMobile={heroBgImageMobile}
+            mediaImages={mediaImages}
+            patientMoments={patientMoments}
+            videosList={videosList}
+            contactInfo={contactInfo}
+          />
+        ) : (
           <Home 
             setCurrentPage={setCurrentPage} 
             openAppointmentModal={openAppointmentModal} 
@@ -797,7 +828,16 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           />
         );
       case 'gallery':
-        return (
+        return language === 'gu' ? (
+          <SmileGalleryGujarati
+            patientMoments={patientMoments}
+            mediaImages={mediaImages}
+            onSelectItem={(item) => setSelectedGalleryItem(item)}
+            openAppointmentModal={openAppointmentModal}
+            galleryItems={mappedGalleryItems}
+            videosList={videosList}
+          />
+        ) : (
           <SmileGallery
             patientMoments={patientMoments}
             mediaImages={mediaImages}
@@ -808,11 +848,19 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           />
         );
       case 'social-service':
-        return <SocialService />;
+        return language === 'gu' ? <SocialServiceGujarati /> : <SocialService />;
       case 'technology':
-        return <Technology />;
+        return language === 'gu' ? <TechnologyGujarati /> : <Technology />;
       case 'why-choose-us':
-        return (
+        return language === 'gu' ? (
+          <WhyChooseUsGujarati 
+            openAppointmentModal={openAppointmentModal}
+            doctorsList={doctorsList}
+            videosList={videosList}
+            patientMoments={patientMoments}
+            mediaImages={mediaImages}
+          />
+        ) : (
           <WhyChooseUs 
             openAppointmentModal={openAppointmentModal}
             doctorsList={doctorsList}
@@ -822,7 +870,11 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           />
         );
       case 'international':
-        return <DentalTourism openAppointmentModal={openAppointmentModal} setCurrentPage={setCurrentPage} />;
+        return language === 'gu' ? (
+          <DentalTourismGujarati openAppointmentModal={openAppointmentModal} setCurrentPage={setCurrentPage} />
+        ) : (
+          <DentalTourism openAppointmentModal={openAppointmentModal} setCurrentPage={setCurrentPage} />
+        );
       case 'academy':
       case 'blogs':
         return (
@@ -833,7 +885,11 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           />
         );
       case 'doctors':
-        return <Doctors openAppointmentModal={openAppointmentModal} doctorsList={doctorsList} />;
+        return language === 'gu' ? (
+          <DoctorsGujarati openAppointmentModal={openAppointmentModal} doctorsList={doctorsList} />
+        ) : (
+          <Doctors openAppointmentModal={openAppointmentModal} doctorsList={doctorsList} />
+        );
       case 'contact':
         return (
           <Contact
@@ -934,6 +990,8 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           setCurrentPage={setCurrentPage}
           openAppointmentModal={() => openAppointmentModal()}
           contactInfo={contactInfo}
+          language={language}
+          setLanguage={handleSetLanguage}
         />
       )}
 
@@ -999,6 +1057,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           setCurrentPage={setCurrentPage}
           openAppointmentModal={() => openAppointmentModal()}
           contactInfo={contactInfo}
+          language={language}
         />
       )}
 

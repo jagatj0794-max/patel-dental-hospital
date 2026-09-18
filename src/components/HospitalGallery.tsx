@@ -10,9 +10,19 @@ import { MediaImage } from '../pages/SmileGallery';
 
 interface HospitalGalleryProps {
   mediaImages: MediaImage[];
+  customBadge?: string;
+  customTitle?: string;
+  customDescription?: string;
+  isGujarati?: boolean;
 }
 
-export default function HospitalGallery({ mediaImages = [] }: HospitalGalleryProps) {
+export default function HospitalGallery({ 
+  mediaImages = [],
+  customBadge,
+  customTitle,
+  customDescription,
+  isGujarati = false
+}: HospitalGalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
@@ -48,14 +58,14 @@ export default function HospitalGallery({ mediaImages = [] }: HospitalGalleryPro
       <section className="pt-16 sm:pt-20 pb-12 bg-white border-t border-b border-slate-100 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-[#0D9488] font-bold text-xs tracking-widest uppercase block">
-              Patel Dental Hospital • Hospital Infrastructure & Clinical Excellence
+            <span className={`text-[#0D9488] font-bold text-xs tracking-widest uppercase block ${isGujarati ? 'gujarati-text' : ''}`}>
+              {customBadge || "Patel Dental Hospital • Hospital Infrastructure & Clinical Excellence"}
             </span>
-            <h1 className="stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight">
-              Hospital Gallery
+            <h1 className={`stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight ${isGujarati ? 'gujarati-text' : ''}`}>
+              {customTitle || "Hospital Gallery"}
             </h1>
-            <p className="text-slate-500 text-sm sm:text-base font-sans max-w-2xl mx-auto leading-relaxed">
-              Explore our modern dental operatories, advanced 3D CBCT imaging suites, sterile surgical zones, and clinical treatment highlights.
+            <p className={`text-slate-500 text-sm sm:text-base font-sans max-w-2xl mx-auto leading-relaxed ${isGujarati ? 'gujarati-text' : ''}`}>
+              {customDescription || "Explore our modern dental operatories, advanced 3D CBCT imaging suites, sterile surgical zones, and clinical treatment highlights."}
             </p>
             <div className="h-[3px] w-16 bg-gradient-to-r from-[#0D9488] to-[#11B5D8] mx-auto rounded-full mt-4" />
           </div>
@@ -68,13 +78,19 @@ export default function HospitalGallery({ mediaImages = [] }: HospitalGalleryPro
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${isGujarati ? 'gujarati-text' : ''} ${
                     selectedCategory === category
                       ? 'bg-[#081C3A] text-white shadow-md shadow-[#081C3A]/10 scale-105'
                       : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600'
                   }`}
                 >
-                  {category}
+                  {isGujarati
+                    ? category === 'All'
+                      ? 'બધા'
+                      : category === 'Homepage Gallery'
+                      ? 'હોમપેજ ગેલેરી'
+                      : category
+                    : category}
                 </button>
               ))}
             </div>
@@ -88,8 +104,12 @@ export default function HospitalGallery({ mediaImages = [] }: HospitalGalleryPro
           {filteredImages.length === 0 ? (
             <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-3xs max-w-lg mx-auto">
               <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-700 font-bold text-sm">No gallery photos available in this category.</p>
-              <p className="text-slate-400 text-xs mt-1">Select another category or view all images.</p>
+              <p className={`text-slate-700 font-bold text-sm ${isGujarati ? 'gujarati-text' : ''}`}>
+                {isGujarati ? 'આ કેટેગરીમાં કોઈ ફોટા ઉપલબ્ધ નથી.' : 'No gallery photos available in this category.'}
+              </p>
+              <p className={`text-slate-400 text-xs mt-1 ${isGujarati ? 'gujarati-text' : ''}`}>
+                {isGujarati ? 'બીજી કેટેગરી પસંદ કરો અથવા બધા ફોટા જુઓ.' : 'Select another category or view all images.'}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

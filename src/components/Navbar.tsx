@@ -15,6 +15,8 @@ interface NavbarProps {
   setCurrentPage: (page: PageId) => void;
   openAppointmentModal: () => void;
   contactInfo?: ContactInfo;
+  language: 'en' | 'gu';
+  setLanguage: (lang: 'en' | 'gu') => void;
 }
 
 const navHierarchy = [
@@ -53,7 +55,7 @@ const navHierarchy = [
   }
 ];
 
-export default function Navbar({ currentPage, setCurrentPage, openAppointmentModal, contactInfo }: NavbarProps) {
+export default function Navbar({ currentPage, setCurrentPage, openAppointmentModal, contactInfo, language, setLanguage }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -152,10 +154,28 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             <Phone className="h-4.5 w-4.5 sm:h-[21px] sm:w-[21px] shrink-0" fill="#FF4D4F" stroke="#FF4D4F" />
             <span className="font-bold text-[13.5px] sm:text-[17px] text-white leading-none select-all">{contactInfo?.phone || '+91 9510397046'}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Rajkot, Gujarat, India</span>
-            <span className="sm:hidden">Rajkot, India</span>
+          <div className="flex items-center space-x-4 lg:space-x-6">
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden sm:inline">Rajkot, Gujarat, India</span>
+              <span className="sm:hidden">Rajkot, India</span>
+            </div>
+            
+            {/* Desktop Language Switch (Top Bar Placement) */}
+            <div id="desktop-language-toggle" className="hidden lg:inline-flex items-center bg-white/15 rounded-lg p-0.5 border border-white/25">
+              <button 
+                onClick={() => setLanguage('gu')} 
+                className={`px-3 py-1 rounded-md text-[12px] font-bold transition-all duration-200 ${language === 'gu' ? 'bg-white text-[#0D9488] shadow-sm' : 'text-white/85 hover:text-white hover:bg-white/5'}`}
+              >
+                ગુજરાતી
+              </button>
+              <button 
+                onClick={() => setLanguage('en')} 
+                className={`px-3 py-1 rounded-md text-[12px] font-bold transition-all duration-200 ${language === 'en' ? 'bg-white text-[#0D9488] shadow-sm' : 'text-white/85 hover:text-white hover:bg-white/5'}`}
+              >
+                English
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -248,8 +268,23 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
               </button>
             </div>
 
-            {/* Mobile Menu Burger */}
-            <div className="lg:hidden flex items-center space-x-2">
+            {/* Mobile Menu Burger & Language Toggle */}
+            <div className="lg:hidden flex items-center space-x-3">
+              <div id="mobile-language-toggle" className="inline-flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+                <button 
+                  onClick={() => setLanguage('gu')} 
+                  className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${language === 'gu' ? 'bg-white text-[#0D9488] shadow-sm' : 'text-slate-500 hover:text-[#0D9488]'}`}
+                >
+                  ગુજરાતી
+                </button>
+                <button 
+                  onClick={() => setLanguage('en')} 
+                  className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${language === 'en' ? 'bg-white text-[#0D9488] shadow-sm' : 'text-slate-500 hover:text-[#0D9488]'}`}
+                >
+                  EN
+                </button>
+              </div>
+
               <button
                 id="mobile-menu-burger"
                 onClick={() => setIsOpen(!isOpen)}
@@ -325,7 +360,25 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                 </div>
               ))}
 
-              <div className="pt-6 mt-2 pb-6 space-y-3">
+              <div className="pt-6 mt-2 pb-6 space-y-4">
+                <div className="pt-4 flex flex-col items-center justify-center space-y-2 border-t border-gray-100">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Select Language / ભાષા પસંદ કરો</span>
+                  <div className="inline-flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 w-full max-w-xs">
+                    <button 
+                      onClick={() => setLanguage('gu')} 
+                      className={`flex-1 text-center py-2.5 rounded-lg text-xs font-bold transition-all ${language === 'gu' ? 'bg-white text-[#0D9488] shadow-md' : 'text-slate-500 hover:text-[#0D9488]'}`}
+                    >
+                      ગુજરાતી (Default)
+                    </button>
+                    <button 
+                      onClick={() => setLanguage('en')} 
+                      className={`flex-1 text-center py-2.5 rounded-lg text-xs font-bold transition-all ${language === 'en' ? 'bg-white text-[#0D9488] shadow-md' : 'text-slate-500 hover:text-[#0D9488]'}`}
+                    >
+                      English
+                    </button>
+                  </div>
+                </div>
+
                 <button
                   onClick={() => {
                     trackAppointmentCTAClick('Free Consultation Button', 'Navbar Mobile Drawer');
