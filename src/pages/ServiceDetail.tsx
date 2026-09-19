@@ -717,11 +717,25 @@ export default function ServiceDetail({
   }, [service, mConfig, isNewArchitecture]);
 
   const displayTestimonials = React.useMemo(() => {
+    if (service && service.patient_testimonials) {
+      if (Array.isArray(service.patient_testimonials)) {
+        if (service.patient_testimonials.length > 0) {
+          return service.patient_testimonials;
+        }
+      } else if (typeof service.patient_testimonials === 'string' && service.patient_testimonials.trim() !== '') {
+        try {
+          const parsed = JSON.parse(service.patient_testimonials);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        } catch (e) {}
+      }
+    }
     if (isNewArchitecture && Array.isArray(mConfig.testimonials) && mConfig.testimonials.length > 0) {
       return mConfig.testimonials;
     }
     return Array.isArray(mConfig.testimonials) ? mConfig.testimonials : [];
-  }, [mConfig, isNewArchitecture]);
+  }, [service, mConfig, isNewArchitecture]);
 
   const videoUrl = service?.procedure_video_url || fallback.procedure_video_url;
   const videoTitle = service?.procedure_video_title || fallback.procedure_video_title;
@@ -2882,7 +2896,19 @@ export default function ServiceDetail({
             return url !== '';
           });
 
-          const testimonialsTitle = seoHeadings.keywordPlural + " Patient Testimonials & Success Stories";
+          let testimonialsTitle = seoHeadings.keywordPlural + " Patient Testimonials & Success Stories";
+          if (language === 'gu') {
+            if (isDentalImplants) {
+              testimonialsTitle = "ડેન્ટલ ઇમ્પ્લાન્ટના પેશન્ટના અનુભવો અને સફળતાની કહાનીઓ";
+            } else {
+              const headingVal = mConfig.testimonials_heading || 'Patient Testimonial Reels';
+              if (headingVal === 'Patient Testimonial Reels') {
+                testimonialsTitle = "પેશન્ટના અનુભવના વિડિયો";
+              } else {
+                testimonialsTitle = headingVal;
+              }
+            }
+          }
 
           const testimonialsElement = (mConfig.show_testimonials !== false && validTestimonialVideos.length > 0) ? (
             <div className="py-10 border-t border-slate-100 space-y-8 animate-fade-in" id="cms-section-testimonials">
@@ -2903,19 +2929,27 @@ export default function ServiceDetail({
                     <div key={t.id || idx} className="flex flex-col items-center w-full">
                       {isMp4Url(reelUrl) ? (
                         <div className="w-full max-w-[430px] mx-auto flex justify-center">
-                          <Mp4ReelPlayer src={reelUrl} />
+                          <Mp4ReelPlayer src={reelUrl} poster={t.thumbnail || undefined} />
                         </div>
                       ) : (
                         <InstagramEmbed
                           url={reelUrl}
                           title={patientName ? `${patientName} Testimonial` : (testimonialsTitle || 'Patient Testimonial Reel')}
+                          thumbnail={t.thumbnail || undefined}
                         />
                       )}
-                      {patientName && patientName !== 'Patient Name' && (
-                        <span className="text-xs font-bold text-slate-700 mt-2 text-center block">
-                          {patientName}
-                        </span>
-                      )}
+                      <div className="mt-3 text-center">
+                        {patientName && patientName !== 'Patient Name' && (
+                          <h4 className="text-xs sm:text-sm font-bold text-[#081C3A] block">
+                            {patientName}
+                          </h4>
+                        )}
+                        {t.treatment_name && t.treatment_name !== 'Treatment Label' && (
+                          <span className="text-[10px] font-semibold text-teal-600 block mt-0.5 uppercase tracking-wider">
+                            {language === 'gu' && (t.treatment_name === 'Dental Implants' || t.treatment_name.toLowerCase().trim() === 'dental implants') ? 'ડેન્ટલ ઇમ્પ્લાન્ટ' : t.treatment_name}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

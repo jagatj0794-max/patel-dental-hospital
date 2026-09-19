@@ -904,7 +904,7 @@ export default function Home({
             />
           </div>
 
-          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3 px-4 sm:px-6 relative z-20 pt-6 sm:pt-4 pb-4">
+          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3 px-4 sm:px-6 relative z-20 pt-4 sm:pt-3 pb-4 -translate-y-1">
             {/* Main Heading & Description above the award badge */}
             <h2 className="font-display text-[17px] sm:text-[19px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight max-w-[95%]">
               Eat Comfortably. Smile Confidently.<br className="hidden sm:inline" />
@@ -932,7 +932,7 @@ export default function Home({
             </div>
 
             {/* CTA Buttons */}
-            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-4 sm:pt-3">
+            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-4 sm:pt-3 -translate-y-3">
               <button
                 onClick={() => openAppointmentModal()}
                 className="h-[38px] sm:h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
