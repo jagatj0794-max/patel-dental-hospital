@@ -18,9 +18,10 @@ interface GooglePatientReviewsProps {
   reviews: Review[];
   label?: string;
   description?: string;
+  language?: string;
 }
 
-export function GooglePatientReviews({ heading, reviews, label, description }: GooglePatientReviewsProps) {
+export function GooglePatientReviews({ heading, reviews, label, description, language }: GooglePatientReviewsProps) {
   // Use CMS/configured reviews directly and filter/sort them
   const activeReviews = (reviews || [])
     .filter(r => r.enabled !== false && r.patient_name?.trim() !== '')
@@ -236,7 +237,7 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
           </div>
 
           {/* Review Text */}
-          <p className="text-slate-600 text-sm leading-relaxed font-medium whitespace-pre-line">
+          <p className={`${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'} text-sm leading-relaxed whitespace-pre-line`}>
             "{review.review_text}"
           </p>
         </div>
@@ -251,7 +252,9 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
               <h4 className="text-[#081C3A] font-black text-sm leading-tight truncate">
                 {review.patient_name}
               </h4>
-              <span className="text-[10px] text-[#0D9488] font-bold block mt-0.5 uppercase tracking-wide">Google Reviewer</span>
+              <span className="text-[10px] text-[#0D9488] font-bold block mt-0.5 uppercase tracking-wide">
+                {language === 'gu' ? "Google રિવ્યૂઅર" : "Google Reviewer"}
+              </span>
             </div>
           </div>
 
@@ -262,7 +265,7 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
               rel="noopener noreferrer"
               className="inline-flex items-center shrink-0 gap-1 text-[11px] font-black text-[#0D9488] hover:text-[#0F766E] px-3 py-1.5 rounded-xl bg-teal-50/50 hover:bg-teal-50 transition duration-200 border border-teal-100/50 shadow-3xs"
             >
-              <span>View on Google</span>
+              <span>{language === 'gu' ? "Google પર જુઓ" : "View on Google"}</span>
             </a>
           )}
         </div>
@@ -277,7 +280,7 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
         <div className="space-y-3 text-center sm:text-left">
           <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
             <Star className="h-3.5 w-3.5 text-[#0D9488] fill-[#0D9488] shrink-0" />
-            {label || "Google Reviews"}
+            {label || (language === 'gu' ? "Google રિવ્યૂઝ" : "Google Reviews")}
           </span>
           {heading && heading.trim() !== '' && (
             <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight">
@@ -285,7 +288,7 @@ export function GooglePatientReviews({ heading, reviews, label, description }: G
             </h2>
           )}
           {description && description.trim() !== '' && (
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl font-medium mt-1">
+            <p className={`${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'} text-sm sm:text-base leading-relaxed max-w-2xl mt-1`}>
               {description}
             </p>
           )}

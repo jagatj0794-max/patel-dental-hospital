@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { dentalImplantsFaqs, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs, pediatricDentistryFaqs } from '../data/serviceFaqs';
+import { dentalImplantsFaqs, DENTAL_IMPLANTS_FAQS_GU, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs, CROWNS_BRIDGES_FAQS_GU, pediatricDentistryFaqs } from '../data/serviceFaqs';
 
 export interface ServiceSEOData {
   title: string;
@@ -13,7 +13,7 @@ export interface ServiceSEOData {
   schema: any[];
 }
 
-export const getServiceSEO = (slug: string, title: string, fallbackDesc: string) => {
+export const getServiceSEO = (slug: string, title: string, fallbackDesc: string, language?: 'en' | 'gu') => {
   const canonicalUrl = `https://www.pateldentalhospital.com/#services/${slug}`;
 
   const createSchema = (srvTitle: string, srvDesc: string) => {
@@ -109,14 +109,17 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string)
           {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": dentalImplantsFaqs.map((faq) => ({
-              "@type": "Question",
-              "name": faq.question,
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": faq.answer
-              }
-            }))
+            "mainEntity": dentalImplantsFaqs.map((faq) => {
+              const translation = language === 'gu' ? DENTAL_IMPLANTS_FAQS_GU[faq.question] : null;
+              return {
+                "@type": "Question",
+                "name": translation ? translation.question : faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": translation ? translation.answer : faq.answer
+                }
+              };
+            })
           }
         ]
       };
@@ -206,14 +209,17 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string)
           {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": crownsBridgesFaqs.map((faq) => ({
-              "@type": "Question",
-              "name": faq.question,
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": faq.answer
-              }
-            }))
+            "mainEntity": crownsBridgesFaqs.map((faq) => {
+              const translation = language === 'gu' ? CROWNS_BRIDGES_FAQS_GU[faq.question] : null;
+              return {
+                "@type": "Question",
+                "name": translation ? translation.question : faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": translation ? translation.answer : faq.answer
+                }
+              };
+            })
           }
         ]
       };

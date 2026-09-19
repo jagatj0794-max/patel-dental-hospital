@@ -35,6 +35,7 @@ import SmileGalleryGujarati from './pages/SmileGalleryGujarati';
 import Doctors from './pages/Doctors';
 import DoctorsGujarati from './pages/DoctorsGujarati';
 import Contact from './pages/Contact';
+import ContactGujarati from './pages/ContactGujarati';
 import ServiceDetail from './pages/ServiceDetail';
 import SocialService from './pages/SocialService';
 import SocialServiceGujarati from './pages/SocialServiceGujarati';
@@ -43,6 +44,7 @@ import TechnologyGujarati from './pages/TechnologyGujarati';
 import DentalTourism from './pages/DentalTourism';
 import DentalTourismGujarati from './pages/DentalTourismGujarati';
 import Blogs from './pages/Blogs';
+import BlogsGujarati from './pages/BlogsGujarati';
 import WhyChooseUs from './pages/WhyChooseUs';
 import WhyChooseUsGujarati from './pages/WhyChooseUsGujarati';
 import { initAnalytics, trackAppointmentFormSubmit } from './utils/analytics';
@@ -55,6 +57,25 @@ const SupabaseTest = React.lazy(() => import('./pages/SupabaseTest'));
 import { GALLERY_ITEMS } from './data/gallery';
 
 const DOCTOR_WHATSAPP_NUMBER = "919510397046";
+
+const TREATMENT_TRANSLATIONS: Record<string, string> = {
+  'General Consultation': 'જનરલ કન્સલ્ટેશન (સામાન્ય તપાસ)',
+  'Dental Implants': 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ (ફિક્સ દાંત)',
+  'Same Day Fix Teeth': 'સેમ ડે ફિક્સ ટીથ (૨૪ કલાકમાં ફિક્સ દાંત)',
+  'Full Mouth Rehabilitation': 'ફુલ માઉથ રિહેબિલિટેશન (આખા મોંની સારવાર)',
+  'Single Sitting Root Canal Treatment': 'સિંગલ સીટિંગ રૂટ કેનાલ ટ્રીટમેન્ટ',
+  'Braces Treatment': 'બ્રેસીસ ટ્રીટમેન્ટ (દાંતના તાર)',
+  'Invisible Aligners': 'ઇનવિઝિબલ એલાઇનર્સ (અદ્રશ્ય તાર)',
+  'Kids Dentistry': 'બાળકોની ડેન્ટિસ્ટ્રી (બાળકોના દાંતની સારવાર)',
+  'Cosmetic Dentistry': 'કોસ્મેટિક ડેન્ટિસ્ટ્રી (સ્મિત સુધારણા)',
+  'Gum Treatment': 'પેઢાની સારવાર (પાયોરિયાની સારવાર)',
+  'Teeth Cleaning': 'દાંતની સફાઈ અને પોલિશિંગ',
+  'Wisdom Tooth Removal': 'ડાઢ કઢાવવી (શાણપણની ડાઢની સારવાર)',
+  'Dentures': 'ચોકઠું (નવા કૃત્રિમ દાંત)',
+  'Crowns & Bridges': 'ક્રોન અને બ્રિજ (દાંત પર કેપ બેસાડવી)',
+  'Smile Makeover': 'સ્માઈલ મેકઓવર (સંપૂર્ણ સ્મિત સુધારણા)',
+  'Oral Surgery': 'ઓરલ સર્જરી (મોંની શસ્ત્રક્રિયા)'
+};
 
 const getPageFromUrl = (): PageId => {
   if (typeof window === 'undefined') {
@@ -743,12 +764,19 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           slug={slug}
           openAppointmentModal={openAppointmentModal}
           setCurrentPage={setCurrentPage}
+          language={language}
         />
       );
     }
 
     if (currentPage.startsWith('blog/')) {
-      return (
+      return language === 'gu' ? (
+        <BlogsGujarati
+          openAppointmentModal={openAppointmentModal}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+        />
+      ) : (
         <Blogs
           openAppointmentModal={openAppointmentModal}
           setCurrentPage={setCurrentPage}
@@ -796,6 +824,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             slug="dental-implants"
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
+            language={language}
           />
         );
       case 'aligners':
@@ -806,6 +835,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             slug="invisible-aligners"
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
+            language={language}
           />
         );
       case 'kids':
@@ -816,6 +846,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             slug="pediatric-dentistry"
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
+            language={language}
           />
         );
       case 'braces':
@@ -825,6 +856,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             slug="braces-treatment"
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
+            language={language}
           />
         );
       case 'gallery':
@@ -877,7 +909,13 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
         );
       case 'academy':
       case 'blogs':
-        return (
+        return language === 'gu' ? (
+          <BlogsGujarati
+            openAppointmentModal={openAppointmentModal}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+          />
+        ) : (
           <Blogs
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
@@ -891,7 +929,13 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           <Doctors openAppointmentModal={openAppointmentModal} doctorsList={doctorsList} />
         );
       case 'contact':
-        return (
+        return language === 'gu' ? (
+          <ContactGujarati
+            preselectedTreatment={appointmentTreatment}
+            onBookAppointment={handleBookAppointment}
+            contactInfo={contactInfo}
+          />
+        ) : (
           <Contact
             preselectedTreatment={appointmentTreatment}
             onBookAppointment={handleBookAppointment}
@@ -1101,10 +1145,10 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
               <div className="bg-brand-navy p-6 text-white flex justify-between items-center relative">
                 <div className="space-y-1">
                   <h3 className="font-display font-extrabold text-lg leading-none">
-                    Free Consultation
+                    {language === 'gu' ? 'ફ્રી પુછપરછ' : 'Free Consultation'}
                   </h3>
                   <span className="text-[11px] text-brand-cyan font-semibold block uppercase tracking-wider">
-                    Dental Consultation
+                    {language === 'gu' ? 'ડેન્ટલ કન્સલ્ટેશન' : 'Dental Consultation'}
                   </span>
                 </div>
                 <button
@@ -1141,33 +1185,35 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
                     >
                       {bookingError && (
                         <div className="p-3 bg-red-50 border border-red-150 rounded-xl text-red-600 text-xs font-semibold">
-                          {bookingError}
+                          {language === 'gu' && (bookingError.includes('This time slot is already booked') || bookingError.includes('already booked'))
+                            ? 'આ સમય પહેલેથી જ બુક થઈ ગયો છે. કૃપા કરીને બીજો ઉપલબ્ધ સમય પસંદ કરો.'
+                            : bookingError}
                         </div>
                       )}
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                          Patient's Full Name *
+                          {language === 'gu' ? 'દર્દીનું સંપૂર્ણ નામ *' : "Patient's Full Name *"}
                         </label>
                         <input
                           type="text"
                           required
                           value={modalForm.name}
                           onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
-                          placeholder="Enter patient's full name"
+                          placeholder={language === 'gu' ? 'દર્દીનું સંપૂર્ણ નામ દાખલ કરો' : "Enter patient's full name"}
                           className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         />
                       </div>
 
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                          WhatsApp Mobile Number *
+                          {language === 'gu' ? 'WhatsApp મોબાઇલ નંબર *' : 'WhatsApp Mobile Number *'}
                         </label>
                         <input
                           type="tel"
                           required
                           value={modalForm.phone}
                           onChange={(e) => setModalForm({ ...modalForm, phone: e.target.value })}
-                          placeholder="Enter WhatsApp mobile number"
+                          placeholder={language === 'gu' ? 'WhatsApp મોબાઇલ નંબર દાખલ કરો' : 'Enter WhatsApp mobile number'}
                           className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan focus:outline-none"
                         />
                       </div>
@@ -1175,7 +1221,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                            Preferred Date *
+                            {language === 'gu' ? 'પસંદગીની તારીખ *' : 'Preferred Date *'}
                           </label>
                           <input
                             type="date"
@@ -1189,13 +1235,17 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
 
                         <div>
                           <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                            Timing Quadrant *
+                            {language === 'gu' ? 'પસંદગીનો સમય *' : 'Timing Quadrant *'}
                           </label>
                           <select
                             value={modalForm.timeSlot}
                             onChange={(e) => {
                               if (modalBookedSlots.includes(e.target.value)) {
-                                setBookingError('This time slot is already booked. Please choose another available slot.');
+                                setBookingError(
+                                  language === 'gu'
+                                    ? 'આ સમય પહેલેથી જ બુક થઈ ગયો છે. કૃપા કરીને બીજો ઉપલબ્ધ સમય પસંદ કરો.'
+                                    : 'This time slot is already booked. Please choose another available slot.'
+                                );
                                 return;
                               }
                               setModalForm({ ...modalForm, timeSlot: e.target.value });
@@ -1206,7 +1256,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
                               const isBooked = modalBookedSlots.includes(slot);
                               return (
                                 <option key={slot} value={slot} disabled={isBooked} className={isBooked ? 'text-gray-400 bg-gray-100' : ''}>
-                                  {slot}{isBooked ? ' (Already Booked)' : ''}
+                                  {slot}{isBooked ? (language === 'gu' ? ' (પહેલેથી જ બુક થયેલ છે)' : ' (Already Booked)') : ''}
                                 </option>
                               );
                             })}
@@ -1216,7 +1266,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
 
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                          Preferred Clinic Branch *
+                          {language === 'gu' ? 'પસંદગીની ક્લિનિક બ્રાન્ચ *' : 'Preferred Clinic Branch *'}
                         </label>
                         <select
                           value={modalForm.branch}
@@ -1230,13 +1280,13 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
 
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                          Symptoms (Optional)
+                          {language === 'gu' ? 'લક્ષણો (વૈકલ્પિક)' : 'Symptoms (Optional)'}
                         </label>
                         <textarea
                           rows={2}
                           value={modalForm.message}
                           onChange={(e) => setModalForm({ ...modalForm, message: e.target.value })}
-                          placeholder="Describe symptoms or additional notes..."
+                          placeholder={language === 'gu' ? 'લક્ષણો અથવા અન્ય નોંધો જણાવો...' : 'Describe symptoms or additional notes...'}
                           className="w-full px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan"
                         />
                       </div>
@@ -1246,7 +1296,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
                           type="submit"
                           className="w-full py-3.5 bg-brand-cyan hover:bg-brand-navy text-white text-xs font-bold rounded-xl shadow-lg transition"
                         >
-                          Free Consultation
+                          {language === 'gu' ? 'ફ્રી પુછપરછ' : 'Free Consultation'}
                         </button>
                       </div>
                     </motion.form>
@@ -1262,22 +1312,30 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
                       </div>
                       <div className="space-y-1">
                         <h4 className="font-display font-extrabold text-lg text-brand-navy">
-                          Slot Confirmed on System!
+                          {language === 'gu' ? 'સિસ્ટમ પર સમય બુક થઈ ગયો છે!' : 'Slot Confirmed on System!'}
                         </h4>
                         <p className="text-gray-500 text-xs font-sans max-w-sm mx-auto leading-relaxed">
-                          We have reserved your consultation for <span className="font-semibold text-brand-navy">{modalForm.name}</span>. A dental coordinator will coordinate with you to confirm the exact consultation slot entry.
+                          {language === 'gu' ? (
+                            <>
+                              અમે <span className="font-semibold text-brand-navy">{modalForm.name}</span> માટે તમારી તપાસનો સમય બુક કરી લીધો છે. ચોક્કસ સમયની પુષ્ટિ કરવા માટે અમારા ડેન્ટલ કોઓર્ડિનેટર ટૂંક સમયમાં તમારો સંપર્ક કરશે.
+                            </>
+                          ) : (
+                            <>
+                              We have reserved your consultation for <span className="font-semibold text-brand-navy">{modalForm.name}</span>. A dental coordinator will coordinate with you to confirm the exact consultation slot entry.
+                            </>
+                          )}
                         </p>
                       </div>
 
                       <div className="pt-4 border-t border-gray-150 text-left text-xs font-sans text-gray-500 space-y-1 max-w-xs mx-auto">
                         <div>
-                          <strong>Service Assigned:</strong> {appointmentTreatment}
+                          <strong>{language === 'gu' ? 'જરૂરી સારવાર:' : 'Service Assigned:'}</strong> {language === 'gu' ? (TREATMENT_TRANSLATIONS[appointmentTreatment] || appointmentTreatment) : appointmentTreatment}
                         </div>
                         <div>
-                          <strong>Branch Desk:</strong> {modalForm.branch}
+                          <strong>{language === 'gu' ? 'ક્લિનિક બ્રાન્ચ:' : 'Branch Desk:'}</strong> {modalForm.branch}
                         </div>
                         <div>
-                          <strong>Selected Date:</strong> {modalForm.date}
+                          <strong>{language === 'gu' ? 'પસંદ કરેલી તારીખ:' : 'Selected Date:'}</strong> {modalForm.date}
                         </div>
                       </div>
 
@@ -1298,7 +1356,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
                           }}
                           className="px-6 py-2 bg-brand-navy hover:bg-brand-cyan text-white text-xs font-semibold rounded-lg"
                         >
-                          Return to Hospital Page
+                          {language === 'gu' ? 'હોસ્પિટલ પેજ પર પાછા જાઓ' : 'Return to Hospital Page'}
                         </button>
                       </div>
                     </motion.div>

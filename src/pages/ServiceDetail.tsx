@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_SERVICES } from '../utils/serviceData';
 import { TREATMENTS } from '../data/treatments';
-import { dentalImplantsFaqs, fullMouthFaqs, invisibleAlignersFaqs, rootCanalFaqs, smileMakeoverFaqs, crownsBridgesFaqs, pediatricDentistryFaqs } from '../data/serviceFaqs';
+import { dentalImplantsFaqs, DENTAL_IMPLANTS_FAQS_GU, fullMouthFaqs, FULL_MOUTH_FAQS_GU, INVISIBLE_ALIGNERS_FAQS_GU, invisibleAlignersFaqs, rootCanalFaqs, ROOT_CANAL_FAQS_GU, smileMakeoverFaqs, SMILE_MAKEOVER_FAQS_GU, crownsBridgesFaqs, CROWNS_BRIDGES_FAQS_GU, pediatricDentistryFaqs, PEDIATRIC_DENTISTRY_FAQS_GU } from '../data/serviceFaqs';
 import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
 import { doctorService } from '../utils/doctorData';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
@@ -345,6 +345,7 @@ interface ServiceDetailProps {
   previewGallery?: ServiceGalleryItem[];
   previewFaqs?: ServiceFaq[];
   previewRelatedServices?: Service[];
+  language?: 'en' | 'gu';
 }
 
 export default function ServiceDetail({ 
@@ -354,7 +355,8 @@ export default function ServiceDetail({
   previewService,
   previewGallery,
   previewFaqs,
-  previewRelatedServices
+  previewRelatedServices,
+  language = 'gu'
 }: ServiceDetailProps) {
   const [service, setService] = useState<Service | null>(null);
   const [gallery, setGallery] = useState<ServiceGalleryItem[]>([]);
@@ -923,7 +925,7 @@ export default function ServiceDetail({
       };
     }
 
-    const dynamicSEO = getServiceSEO(service.slug, service.title, service.short_description || '');
+    const dynamicSEO = getServiceSEO(service.slug, service.title, service.short_description || '', language);
 
     return {
       title: service.seo_title || dynamicSEO.title,
@@ -1495,158 +1497,290 @@ export default function ServiceDetail({
                   {/* LEFT SIDE: Content */}
                   <div className="lg:col-span-7 space-y-4 sm:space-y-6 md:space-y-8 order-2 lg:order-1 text-left">
                     {isDentalImplants ? (
-                      <>
-                        <div className="space-y-3">
-                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            FIXED TEETH IN JUST ONE WEEK
-                          </span>
-                          
-                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Missing Teeth? Get Fixed Teeth with Dental Implants.
-                          </h1>
-                        </div>
-
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Replace missing or loose teeth with strong, natural-looking fixed teeth designed to restore comfortable chewing, confidence, and your smile.
-                        </p>
-
-                        {/* PROOF BAR */}
-                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">16000+ Implant Placements</span>
+                      language === 'gu' ? (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              માત્ર એક અઠવાડિયામાં ફિક્સ દાંત
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              દાંત ખૂટે છે? ડેન્ટલ ઇમ્પ્લાન્ટ દ્વારા મેળવો ફિક્સ દાંત.
+                            </h1>
                           </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">800+ Full Mouth Cases</span>
-                          </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Fixed Teeth in 1 Week</span>
-                          </div>
-                        </div>
 
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
-                          <button
-                            type="button"
-                            onClick={() => openAppointmentModal("Dental Implants - Hero CTA")}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
-                          >
-                            <Calendar className="h-4 w-4" />
-                            <span>BOOK FREE IMPLANT CONSULTATION</span>
-                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                          </button>
+                          <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                            ખૂટેલા અથવા હલતા દાંતને મજબૂત અને કુદરતી દેખાતા ફિક્સ દાંતથી બદલો, જે આરામદાયક રીતે ચાવવામાં, આત્મવિશ્વાસ અને તમારી સ્માઇલને પુનઃસ્થાપિત કરવામાં મદદ કરે છે.
+                          </p>
 
-                          <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
-                          >
-                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP YOUR X-RAY</span>
-                          </a>
-                        </div>
-                      </>
+                          {/* PROOF BAR */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">16000+ ઇમ્પ્લાન્ટ પ્લેસમેન્ટ</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">800+ ફુલ માઉથ કેસ</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">1 અઠવાડિયામાં ફિક્સ દાંત</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => openAppointmentModal("Dental Implants - Hero CTA")}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>ફ્રી ઇમ્પ્લાન્ટ કન્સલ્ટેશન બુક કરો</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>તમારો X-ray WhatsApp કરો</span>
+                            </a>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              FIXED TEETH IN JUST ONE WEEK
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              Missing Teeth? Get Fixed Teeth with Dental Implants.
+                            </h1>
+                          </div>
+
+                          <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                            Replace missing or loose teeth with strong, natural-looking fixed teeth designed to restore comfortable chewing, confidence, and your smile.
+                          </p>
+
+                          {/* PROOF BAR */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">16000+ Implant Placements</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">800+ Full Mouth Cases</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">Fixed Teeth in 1 Week</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => openAppointmentModal("Dental Implants - Hero CTA")}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>BOOK FREE IMPLANT CONSULTATION</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have missing teeth and want to know about dental implants. Here is my X-ray:")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>WHATSAPP YOUR X-RAY</span>
+                            </a>
+                          </div>
+                        </>
+                      )
                     ) : isFullMouth ? (
-                      <>
-                        <div className="space-y-3">
-                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            FULL MOUTH RECONSTRUCTION
-                          </span>
-                          
-                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            FMR: Struggle to Chew, Speak or Smile?
-                          </h1>
-                        </div>
-
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Full mouth rehabilitation combining implants, crowns, root canals and gum treatment in one coordinated plan, led by Dr. Vipul Patel with a full specialist team in-house.
-                        </p>
-
-                        {/* PROOF BAR */}
-                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Complete plan before you start</span>
+                      language === 'gu' ? (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              ફુલ માઉથ રિકન્સ્ટ્રક્શન
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              FMR: ચાવવામાં, બોલવામાં કે સ્માઇલ કરવામાં તકલીફ પડે છે?
+                            </h1>
                           </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Written, fixed cost</span>
-                          </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">2 specialists, one clinic</span>
-                          </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI available</span>
-                          </div>
-                        </div>
 
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
-                          <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
-                          >
-                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>Send your X-ray on WhatsApp</span>
-                          </a>
+                          <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                            ઇમ્પ્લાન્ટ, ક્રાઉન્સ, રૂટ કેનાલ અને પેઢાંની સારવારને એક સંકલિત યોજનામાં જોડતી ફુલ માઉથ રિહેબિલિટેશન સારવાર, જેનું નેતૃત્વ ડૉ. વિપુલ પટેલ કરે છે.
+                          </p>
 
-                          <button
-                            type="button"
-                            onClick={() => openAppointmentModal("Full Mouth Rehabilitation - Hero CTA")}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
-                          >
-                            <Calendar className="h-4 w-4" />
-                            <span>FREE CONSULTATION</span>
-                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                          </button>
-                        </div>
-                      </>
+                          {/* PROOF BAR */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">શરૂ કરતા પહેલાં સંપૂર્ણ સારવાર યોજના</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">લેખિત અને નિશ્ચિત ખર્ચ</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">2 નિષ્ણાતો, એક ક્લિનિક</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI ઉપલબ્ધ</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>તમારો X-ray WhatsApp પર મોકલો</span>
+                            </a>
+
+                            <button
+                              type="button"
+                              onClick={() => openAppointmentModal("Full Mouth Rehabilitation - Hero CTA")}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>ફ્રી પુછપરછ</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              FULL MOUTH RECONSTRUCTION
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              FMR: Struggle to Chew, Speak or Smile?
+                            </h1>
+                          </div>
+
+                          <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                            Full mouth rehabilitation combining implants, crowns, root canals and gum treatment in one coordinated plan, led by Dr. Vipul Patel with a full specialist team in-house.
+                          </p>
+
+                          {/* PROOF BAR */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">Complete plan before you start</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">Written, fixed cost</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">2 specialists, one clinic</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI available</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, most of my teeth are damaged or missing. I want to know about full mouth treatment.")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>Send your X-ray on WhatsApp</span>
+                            </a>
+
+                            <button
+                              type="button"
+                              onClick={() => openAppointmentModal("Full Mouth Rehabilitation - Hero CTA")}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>FREE CONSULTATION</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+                          </div>
+                        </>
+                      )
                     ) : isInvisibleAligners ? (
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            Straighten teeth invisibly
+                            {language === 'gu' ? "દાંતને કોઈને ખબર ન પડે તેમ સીધા કરો" : "Straighten teeth invisibly"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Straight Teeth Without Anyone Noticing
+                            {language === 'gu' ? "કોઈને ખબર ન પડે તેમ સીધા દાંત મેળવો" : "Straight Teeth Without Anyone Noticing"}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Custom clear aligners planned on CBCT and intraoral scanning. See your predicted final result before you start. Removable for eating, meetings and photographs.
+                        <p className={`text-sm sm:text-base md:text-lg leading-relaxed ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-medium'}`}>
+                          {language === 'gu'
+                            ? "CBCT અને ઇન્ટ્રાઓરલ સ્કેનિંગના આધારે તૈયાર કરાયેલા કસ્ટમ ક્લિયર એલાઇનર્સ. સારવાર શરૂ કરતા પહેલાં તમારું અનુમાનિત અંતિમ પરિણામ જુઓ. ખાવા, મીટિંગ અને ફોટોગ્રાફ્સ માટે સરળતાથી કાઢી શકાય તેવા એલાઇનર્સ."
+                            : "Custom clear aligners planned on CBCT and intraoral scanning. See your predicted final result before you start. Removable for eating, meetings and photographs."
+                          }
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">See your result before starting</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "શરૂ કરતા પહેલાં તમારું પરિણામ જુઓ" : "See your result before starting"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Removable</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "કાઢી શકાય તેવા" : "Removable"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Contact Us for Treatment Timeline</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "સારવારની સમયરેખા માટે અમારો સંપર્ક કરો" : "Contact Us for Treatment Timeline"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI available</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "EMI ઉપલબ્ધ" : "EMI available"}
+                            </span>
                           </div>
                         </div>
 
@@ -1657,7 +1791,7 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
                           >
                             <Calendar className="h-4 w-4" />
-                            <span>BOOK FREE ALIGNER CONSULTATION</span>
+                            <span>{language === 'gu' ? "ફ્રી એલાઇનર પુછપરછ બુક કરો" : "BOOK FREE ALIGNER CONSULTATION"}</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
 
@@ -1668,99 +1802,165 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>Send a photo of your teeth</span>
+                            <span>{language === 'gu' ? "તમારા દાંતનો ફોટો મોકલો" : "Send a photo of your teeth"}</span>
                           </a>
                         </div>
                       </>
                     ) : isRootCanal ? (
-                      <>
-                        <div className="space-y-3">
-                          <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            Painless Single Sitting Root Canal Specialist
-                          </span>
-                          
-                          <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Stop Severe Tooth Pain in a Single Visit
-                          </h1>
-                        </div>
-
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Save your natural tooth and resolve throbbing toothaches comfortably in just one visit. Using advanced Japanese rotary endo motors, digital apex locators, and biocompatible MTA sealers, our specialist endodontists provide precise, gentle, and painless root canal treatments.
-                        </p>
-
-                        {/* PROOF BAR */}
-                        <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Completed in 1 Visit</span>
+                      language === 'gu' ? (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              પીડારહિત સિંગલ સિટિંગ રૂટ કેનલ નિષ્ણાત
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              માત્ર એક જ મુલાકાતમાં દાંતનો તીવ્ર દુખાવો દૂર કરો
+                            </h1>
                           </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Microscopic Precision</span>
-                          </div>
-                          <span className="hidden sm:inline text-slate-300 font-light">|</span>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Painless RCT Specialist</span>
-                          </div>
-                        </div>
 
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              window.location.href = `tel:${mConfig.phone_number || "+919510397046"}`;
-                            }}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
-                          >
-                            <Calendar className="h-4 w-4" />
-                            <span>CALL NOW  -  SAME-DAY APPOINTMENT</span>
-                            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                          </button>
+                          <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                            તમારા કુદરતી દાંતને બચાવો અને માત્ર એક જ મુલાકાતમાં ધબકારા સાથે થતા દાંતના દુખાવાથી આરામ મેળવો. અદ્યતન જાપાનીઝ રોટરી એન્ડો મોટર્સ, ડિજિટલ એપેક્સ લોકેટર્સ અને બાયોકોમ્પેટિબલ MTA સીલર્સની મદદથી અમારા નિષ્ણાત એન્ડોડોન્ટિસ્ટ ચોક્કસ, હળવી અને પીડારહિત રૂટ કેનલ સારવાર આપે છે.
+                          </p>
 
-                          <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
-                          >
-                            <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP US</span>
-                          </a>
-                        </div>
-                      </>
+                          {/* PROOF BAR */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">1 મુલાકાતમાં પૂર્ણ</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">માઇક્રોસ્કોપિક ચોકસાઈ</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">પીડારહિત RCT નિષ્ણાત</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                window.location.href = `tel:${mConfig.phone_number || "+919510397046"}`;
+                              }}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>હમણાં કૉલ કરો - આજની જ અપોઇન્ટમેન્ટ</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>WhatsApp કરો</span>
+                            </a>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              Painless Single Sitting Root Canal Specialist
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              Stop Severe Tooth Pain in a Single Visit
+                            </h1>
+                          </div>
+
+                          <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
+                            Save your natural tooth and resolve throbbing toothaches comfortably in just one visit. Using advanced Japanese rotary endo motors, digital apex locators, and biocompatible MTA sealers, our specialist endodontists provide precise, gentle, and painless root canal treatments.
+                          </p>
+
+                          {/* PROOF BAR */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">Completed in 1 Visit</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">Microscopic Precision</span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight">Painless RCT Specialist</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                window.location.href = `tel:${mConfig.phone_number || "+919510397046"}`;
+                              }}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>CALL NOW  -  SAME-DAY APPOINTMENT</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing severe tooth pain and want to know about Single Sitting Root Canal Treatment. Here is a photo of my tooth or X-ray:")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>WHATSAPP US</span>
+                            </a>
+                          </div>
+                        </>
+                      )
                     ) : isSmileMakeover ? (
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            DIGITAL SMILE DESIGN
+                            {language === 'gu' ? "ડિજિટલ સ્માઇલ ડિઝાઇન" : "DIGITAL SMILE DESIGN"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            See Your New Smile Before You Commit to It
+                            {language === 'gu' ? "કોઈ નિર્ણય લેતા પહેલાં તમારી નવી સ્માઇલ જુઓ" : "See Your New Smile Before You Commit to It"}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Digital Smile Design shows you exactly what we're planning before we touch your teeth. Try the shape and length in a physical mock-up. Approve it, adjust it, or walk away  -  no pressure.
+                        <p className={`text-sm sm:text-base md:text-lg leading-relaxed ${language === 'gu' ? 'text-slate-700 font-semibold' : 'text-slate-600 font-medium'}`}>
+                          {language === 'gu' ? "ડિજિટલ સ્માઇલ ડિઝાઇનથી સારવાર શરૂ કરતાં પહેલાં અમે શું પ્લાન કરી રહ્યા છીએ તે તમે ચોક્કસ જોઈ શકો છો. તમારા દાંતના આકાર અને લંબાઈને ફિઝિકલ મોક-અપમાં અજમાવો. તેને મંજૂર કરો, તેમાં ફેરફાર કરાવો અથવા કોઈ દબાણ વિના આગળ ન વધો." : "Digital Smile Design shows you exactly what we're planning before we touch your teeth. Try the shape and length in a physical mock-up. Approve it, adjust it, or walk away  -  no pressure."}
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">See it before you start</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "શરૂઆત પહેલાં જ પરિણામ જુઓ" : "See it before you start"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Physical mock-up included</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "ફિઝિકલ મોક-અપ સામેલ" : "Physical mock-up included"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Digital Smile Design</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "ડિજિટલ સ્માઇલ ડિઝાઇન" : "Digital Smile Design"}
+                            </span>
                           </div>
                         </div>
 
@@ -1772,7 +1972,7 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>Send a smile photo on WhatsApp  -  get a digital preview</span>
+                            <span>{language === 'gu' ? "WhatsApp પર સ્માઇલનો ફોટો મોકલો - ડિજિટલ પ્રિવ્યૂ મેળવો" : "Send a smile photo on WhatsApp  -  get a digital preview"}</span>
                           </a>
                         </div>
                       </>
@@ -1780,38 +1980,48 @@ export default function ServiceDetail({
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            CROWNS & BRIDGES
+                            {language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસ" : "CROWNS & BRIDGES"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Crowns & Bridges in Rajkot
+                            {language === 'gu' ? "રાજકોટમાં ક્રાઉન્સ અને બ્રિજિસ" : "Crowns & Bridges in Rajkot"}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Custom-shaded, precision-fitted restorations that chew like your own tooth. We'll explain the honest difference between materials  -  including when the cheaper option is the right one.
+                        <p className={`text-sm sm:text-base md:text-lg leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                          {language === 'gu'
+                            ? "તમારા પોતાના દાંતની જેમ ચાવવામાં સરળતા આપે તેવી કસ્ટમ-શેડ અને ચોકસાઈથી ફિટ કરવામાં આવેલી ડેન્ટલ રિસ્ટોરેશન્સ. અમે વિવિધ મટિરિયલ્સ વચ્ચેનો સાચો તફાવત સમજાવીશું — જેમાં ક્યારે ઓછા ખર્ચનો વિકલ્પ યોગ્ય છે તે પણ સામેલ છે."
+                            : "Custom-shaded, precision-fitted restorations that chew like your own tooth. We'll explain the honest difference between materials  -  including when the cheaper option is the right one."}
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Digital shade matching</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "ડિજિટલ શેડ મેચિંગ" : "Digital shade matching"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Metal-free zirconia available</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "મેટલ-ફ્રી ઝિર્કોનિયા ઉપલબ્ધ" : "Metal-free zirconia available"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Warranty</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "વોરંટી" : "Warranty"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">2 visits</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "2 મુલાકાતો" : "2 visits"}
+                            </span>
                           </div>
                         </div>
 
@@ -1822,7 +2032,7 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                           >
                             <Calendar className="h-4 w-4" />
-                            <span>Get your crown options & cost</span>
+                            <span>{language === 'gu' ? "તમારા ક્રાઉનના વિકલ્પો અને ખર્ચ જાણો" : "Get your crown options & cost"}</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
 
@@ -1833,7 +2043,7 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP US</span>
+                            <span>{language === 'gu' ? "WhatsApp કરો" : "WHATSAPP US"}</span>
                           </a>
                         </div>
                       </>
@@ -1841,38 +2051,48 @@ export default function ServiceDetail({
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            PEDIATRIC DENTISTRY
+                            {language === 'gu' ? "પીડિયાટ્રિક ડેન્ટિસ્ટ્રી" : "PEDIATRIC DENTISTRY"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Your Child’s First Dental Visit Should Be a Happy One
+                            {language === 'gu' ? "તમારા બાળકની પ્રથમ ડેન્ટલ મુલાકાત ખુશનુમા હોવી જોઈએ" : "Your Child’s First Dental Visit Should Be a Happy One"}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          A dedicated children’s chair, dental toys, and a team that never rushes a frightened child. Treated by Dr. Kinjal Patel, whose particular focus is children and anxious patients.
+                        <p className={`text-sm sm:text-base md:text-lg leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                          {language === 'gu' 
+                            ? "બાળકો માટે ખાસ ચેર, ડેન્ટલ રમકડાં અને ડરેલા બાળકને ક્યારેય ઉતાવળમાં ન મૂકતી અમારી ટીમ. સારવાર ડૉ. કિંજલ પટેલ દ્વારા કરવામાં આવે છે, જેમનું ખાસ ધ્યાન બાળકો અને ડેન્ટલ સારવારથી ગભરાતા દર્દીઓ પર છે."
+                            : "A dedicated children’s chair, dental toys, and a team that never rushes a frightened child. Treated by Dr. Kinjal Patel, whose particular focus is children and anxious patients."}
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Fear-free approach</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "ડરમુક્ત અભિગમ" : "Fear-free approach"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">First visit free</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "પ્રથમ મુલાકાત મફત" : "First visit free"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Children's play environment</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "બાળકો માટે રમકડાં અને આનંદદાયક વાતાવરણ" : "Children's play environment"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Special-needs care available</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "ખાસ જરૂરિયાત ધરાવતા બાળકો માટે સારવાર ઉપલબ્ધ" : "Special-needs care available"}
+                            </span>
                           </div>
                         </div>
 
@@ -1883,18 +2103,24 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                           >
                             <Calendar className="h-4 w-4" />
-                            <span>Book your child's first visit — free</span>
+                            <span>
+                              {language === 'gu' ? "તમારા બાળકની પ્રથમ મુલાકાત બુક કરો — મફત" : "Book your child's first visit — free"}
+                            </span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
 
                           <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I want to book a dental check-up for my child. My child's age is:")}`}
+                            href={`https://wa.me/919510397046?text=${encodeURIComponent(
+                              language === 'gu'
+                                ? "નમસ્તે, હું મારા બાળક માટે ડેન્ટલ ચેક-અપ બુક કરવા માંગુ છું. મારા બાળકની ઉંમર છે:"
+                                : "Hello, I want to book a dental check-up for my child. My child's age is:"
+                            )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP US</span>
+                            <span>{language === 'gu' ? "WhatsApp કરો" : "WHATSAPP US"}</span>
                           </a>
                         </div>
                       </>
@@ -1905,7 +2131,63 @@ export default function ServiceDetail({
                           const text = "Hello Patel Dental Hospital, I would like to know more about Teeth Whitening and would like to book a consultation.";
                           return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
                         })();
-                        return (
+                        return language === 'gu' ? (
+                          <>
+                            <div className="space-y-3">
+                              <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                                લેસર દાંત સફેદ કરવાની સારવાર
+                              </span>
+                              
+                              <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                                માત્ર 30 મિનિટમાં દેખીતી રીતે વધુ સફેદ દાંત
+                              </h1>
+                            </div>
+
+                            <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                              માત્ર એક જ એપોઇન્ટમેન્ટમાં અદ્યતન CE અને FDA-મંજૂર સિસ્ટમ દ્વારા ક્લિનિકમાં પ્રોફેશનલ લેસર દાંત સફેદ કરવાની સારવાર મેળવો. મોટાભાગના દર્દીઓમાં સંવેદનશીલતા વિના તરત જ પરિણામનો અનુભવ કરો. પ્રોફેશનલ હોમ વ્હાઇટનિંગ કિટ્સ પણ ઉપલબ્ધ છે.
+                            </p>
+
+                            {/* PROOF BAR */}
+                            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                                <span className="text-xs font-black text-[#081C3A] tracking-tight">30 મિનિટની સારવાર</span>
+                              </div>
+                              <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                                <span className="text-xs font-black text-[#081C3A] tracking-tight">CE અને FDA-મંજૂર સિસ્ટમ</span>
+                              </div>
+                              <span className="hidden sm:inline text-slate-300 font-light">|</span>
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
+                                <span className="text-xs font-black text-[#081C3A] tracking-tight">દાંતના એનામેલ માટે સુરક્ષિત અને સૌમ્ય</span>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                              <button
+                                type="button"
+                                onClick={() => openAppointmentModal("Teeth Whitening - Hero CTA")}
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                              >
+                                <Calendar className="h-4 w-4" />
+                                <span>વ્હાઇટનિંગ બુક કરો</span>
+                                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+
+                              <a
+                                href={teethWhiteningWhatsAppUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                              >
+                                <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                                <span>WhatsApp કરો</span>
+                              </a>
+                            </div>
+                          </>
+                        ) : (
                           <>
                             <div className="space-y-3">
                               <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
@@ -1967,60 +2249,72 @@ export default function ServiceDetail({
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            Orthodontic Specialist
+                            {language === 'gu' ? "ઓર્થોડોન્ટિક નિષ્ણાત" : "Orthodontic Specialist"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Braces in Rajkot — Transparent Pricing for Every System
+                            {language === 'gu' ? "રાજકોટમાં Braces — દરેક સિસ્ટમ માટે પારદર્શક કિંમત" : "Braces in Rajkot — Transparent Pricing for Every System"}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Metal, ceramic, self-ligating and lingual braces. We publish the cost of each system so you can compare honestly, and plan your case on CBCT before bonding.
+                        <p className={language === 'gu' ? "text-[#081C3A] text-sm sm:text-base md:text-lg font-semibold leading-relaxed" : "text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed"}>
+                          {language === 'gu'
+                            ? "Metal, Ceramic, Self-Ligating અને Lingual Braces. અમે દરેક સિસ્ટમની કિંમત સ્પષ્ટપણે જણાવીએ છીએ, જેથી તમે પ્રામાણિક રીતે સરખામણી કરી શકો અને Braces લગાવતા પહેલાં CBCT દ્વારા તમારા કેસનું આયોજન કરી શકો."
+                            : "Metal, ceramic, self-ligating and lingual braces. We publish the cost of each system so you can compare honestly, and plan your case on CBCT before bonding."}
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">All systems priced</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "તમામ સિસ્ટમની કિંમત ઉપલબ્ધ" : "All systems priced"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Free first assessment</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "પ્રથમ Assessment મફત" : "Free first assessment"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Any age</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "કોઈપણ ઉંમર" : "Any age"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">EMI available</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "EMI ઉપલબ્ધ" : "EMI available"}
+                            </span>
                           </div>
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
                           <button
                             type="button"
-                            onClick={() => openAppointmentModal("Braces Treatment - Hero CTA")}
+                            onClick={() => openAppointmentModal(language === 'gu' ? "Braces સારવાર - હીરો CTA" : "Braces Treatment - Hero CTA")}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                           >
                             <Calendar className="h-4 w-4" />
-                            <span>Book Assessment</span>
+                            <span>{language === 'gu' ? "Assessment બુક કરો" : "Book Assessment"}</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
 
                           <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello Patel Dental Hospital, I would like to know more about Braces Treatment and would like to book a consultation.")}`}
+                            href={language === 'gu'
+                              ? `https://wa.me/919510397046?text=${encodeURIComponent("નમસ્તે પટેલ ડેન્ટલ હોસ્પિટલ, હું Braces સારવાર વિશે વધુ જાણવા માંગુ છું અને કન્સલ્ટેશન બુક કરવા માંગુ છું.")}`
+                              : `https://wa.me/919510397046?text=${encodeURIComponent("Hello Patel Dental Hospital, I would like to know more about Braces Treatment and would like to book a consultation.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP US</span>
+                            <span>{language === 'gu' ? "WhatsApp કરો" : "WHATSAPP US"}</span>
                           </a>
                         </div>
                       </>
@@ -2028,38 +2322,46 @@ export default function ServiceDetail({
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            Comfort-focused Oral Surgery
+                            {language === 'gu' ? "આરામદાયક ઓરલ સર્જરી" : "Comfort-focused Oral Surgery"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Wisdom Tooth Pain? Removed Today, Back to Work Tomorrow.
+                            {language === 'gu' ? "અકલ દાઢમાં દુખાવો? આજે દૂર કરાવો, કાલથી કામ પર પાછા ફરો." : "Wisdom Tooth Pain? Removed Today, Back to Work Tomorrow."}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Wisdom tooth removal by a maxillofacial surgeon, using piezoelectric surgery when the tooth sits close to a nerve. Most patients return to desk work the next day.
+                        <p className={language === 'gu' ? "text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed" : "text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed"}>
+                          {language === 'gu' ? "મેક્સિલોફેશિયલ સર્જન દ્વારા અકલ દાઢ દૂર કરવાની સારવાર કરવામાં આવે છે. જ્યારે દાંત નસની નજીક હોય ત્યારે પીઝોઇલેક્ટ્રિક સર્જરીનો ઉપયોગ કરવામાં આવે છે. મોટાભાગના દર્દીઓ બીજા દિવસે ફરીથી ડેસ્ક પરનું કામ શરૂ કરી શકે છે." : "Wisdom tooth removal by a maxillofacial surgeon, using piezoelectric surgery when the tooth sits close to a nerve. Most patients return to desk work the next day."}
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Same-day appointments</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "એ જ દિવસે અપોઇન્ટમેન્ટ" : "Same-day appointments"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Maxillofacial surgeon</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "મેક્સિલોફેશિયલ સર્જન" : "Maxillofacial surgeon"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Piezo nerve-safe technique</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "નસ માટે સુરક્ષિત પીઝો ટેકનિક" : "Piezo nerve-safe technique"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">OPG assessment before surgery</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "સર્જરી પહેલાં OPG તપાસ" : "OPG assessment before surgery"}
+                            </span>
                           </div>
                         </div>
 
@@ -2069,18 +2371,20 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50 whitespace-nowrap"
                           >
                             <Phone className="h-4 w-4" />
-                            <span>Call now — same-day appointment</span>
+                            <span>{language === 'gu' ? "હમણાં કૉલ કરો — એ જ દિવસની અપોઇન્ટમેન્ટ" : "Call now — same-day appointment"}</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </a>
 
                           <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing wisdom tooth pain and want to consult with a maxillofacial surgeon. Here is my OPG X-ray:")}`}
+                            href={language === 'gu'
+                              ? `https://wa.me/919510397046?text=${encodeURIComponent("નમસ્તે પટેલ ડેન્ટલ હોસ્પિટલ, હું અકલ દાઢના દુખાવા માટે કન્સલ્ટેશન લેવા માંગુ છું. મારી પાસે OPG X-ray છે:")}`
+                              : `https://wa.me/919510397046?text=${encodeURIComponent("Hello, I am experiencing wisdom tooth pain and want to consult with a maxillofacial surgeon. Here is my OPG X-ray:")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP US</span>
+                            <span>{language === 'gu' ? "WhatsApp કરો" : "WHATSAPP US"}</span>
                           </a>
                         </div>
                       </>
@@ -2088,38 +2392,46 @@ export default function ServiceDetail({
                       <>
                         <div className="space-y-3">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
-                            COMPOSITE SHADE MATCHED RESTORATION
+                            {language === 'gu' ? "રંગ સાથે મેળ ખાતી કોમ્પોઝિટ રેસ્ટોરેશન" : "COMPOSITE SHADE MATCHED RESTORATION"}
                           </span>
                           
                           <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                            Fix a Cavity Now — Or a Root Canal Later
+                            {language === 'gu' ? "આજે કેવિટી ઠીક કરાવો — નહીં તો પછી Root Canal કરાવવો પડી શકે" : "Fix a Cavity Now — Or a Root Canal Later"}
                           </h1>
                         </div>
 
-                        <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
-                          Tooth-coloured composite fillings, completed in a single visit, in materials that bond chemically to your tooth.
+                        <p className={language === 'gu' ? "text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed" : "text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed"}>
+                          {language === 'gu' ? "દાંતના રંગની Composite Filling, એક જ મુલાકાતમાં પૂર્ણ કરવામાં આવે છે, જેમાં દાંત સાથે રાસાયણિક રીતે જોડાઈ જતી સામગ્રીનો ઉપયોગ થાય છે." : "Tooth-coloured composite fillings, completed in a single visit, in materials that bond chemically to your tooth."}
                         </p>
 
                         {/* PROOF BAR */}
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Single visit</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "એક જ મુલાકાત" : "Single visit"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">Matched to your tooth shade</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "તમારા દાંતના રંગ સાથે મેળ ખાતી" : "Matched to your tooth shade"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">No metal, no black line</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "મેટલ નહીં, કાળી લાઇન નહીં" : "No metal, no black line"}
+                            </span>
                           </div>
                           <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
                           <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0" />
-                            <span className="text-xs font-black text-[#081C3A] tracking-tight">US-made composite materials</span>
+                            <span className="text-xs font-black text-[#081C3A] tracking-tight">
+                              {language === 'gu' ? "USમાં બનેલી કોમ્પોઝિટ સામગ્રી" : "US-made composite materials"}
+                            </span>
                           </div>
                         </div>
 
@@ -2130,18 +2442,20 @@ export default function ServiceDetail({
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
                           >
                             <Calendar className="h-4 w-4" />
-                            <span>Contact Us for Pricing</span>
+                            <span>{language === 'gu' ? "કિંમત માટે સંપર્ક કરો" : "Contact Us for Pricing"}</span>
                             <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </button>
 
                           <a
-                            href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have a cavity/broken tooth. I want to know about tooth-coloured filling.")}`}
+                            href={language === 'gu'
+                              ? `https://wa.me/919510397046?text=${encodeURIComponent("નમસ્તે પટેલ ડેન્ટલ હોસ્પિટલ, મને દાંતમાં કેવિટી/તૂટેલા દાંતની સમસ્યા છે. હું દાંતના રંગની Composite Filling વિશે માહિતી મેળવવા માંગુ છું.")}`
+                              : `https://wa.me/919510397046?text=${encodeURIComponent("Hello, I have a cavity/broken tooth. I want to know about tooth-coloured filling.")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
                           >
                             <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                            <span>WHATSAPP US</span>
+                            <span>{language === 'gu' ? "WhatsApp કરો" : "WHATSAPP US"}</span>
                           </a>
                         </div>
                       </>
@@ -2618,11 +2932,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      DENTAL IMPLANT FAQ
+                      {language === 'gu' ? "ડેન્ટલ ઇમ્પ્લાન્ટ FAQ" : "DENTAL IMPLANT FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Dental Implants
+                    {language === 'gu' ? "ડેન્ટલ ઇમ્પ્લાન્ટ વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Dental Implants"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2631,6 +2945,9 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? DENTAL_IMPLANTS_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
@@ -2648,7 +2965,7 @@ export default function ServiceDetail({
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -2672,7 +2989,7 @@ export default function ServiceDetail({
                             >
                               <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -2689,11 +3006,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      PEDIATRIC DENTISTRY FAQ
+                      {language === 'gu' ? "પીડિયાટ્રિક ડેન્ટિસ્ટ્રી FAQ" : "PEDIATRIC DENTISTRY FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Pediatric Dentistry
+                    {language === 'gu' ? "પીડિયાટ્રિક ડેન્ટિસ્ટ્રી વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Pediatric Dentistry"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2702,6 +3019,9 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? PEDIATRIC_DENTISTRY_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
@@ -2719,7 +3039,7 @@ export default function ServiceDetail({
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -2741,9 +3061,9 @@ export default function ServiceDetail({
                               transition={{ duration: 0.25, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-normal'}`}>
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -2759,12 +3079,12 @@ export default function ServiceDetail({
                 {/* Header */}
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
-                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      ROOT CANAL FAQ
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60 font-sans">
+                      {language === 'gu' ? "રૂટ કેનલ FAQ" : "ROOT CANAL FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Root Canal Treatment
+                    {language === 'gu' ? "રૂટ કેનલ સારવાર વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Root Canal Treatment"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2773,6 +3093,9 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? ROOT_CANAL_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
@@ -2790,7 +3113,7 @@ export default function ServiceDetail({
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -2812,9 +3135,9 @@ export default function ServiceDetail({
                               transition={{ duration: 0.25, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -2831,11 +3154,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      FULL MOUTH FAQ
+                      {language === 'gu' ? "સંપૂર્ણ મોઢાના પુનઃનિર્માણ FAQ" : "FULL MOUTH FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Full Mouth Rehabilitation
+                    {language === 'gu' ? "સંપૂર્ણ મોઢાના પુનઃનિર્માણ વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Full Mouth Rehabilitation"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2844,6 +3167,9 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? FULL_MOUTH_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
@@ -2861,7 +3187,7 @@ export default function ServiceDetail({
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -2883,9 +3209,9 @@ export default function ServiceDetail({
                               transition={{ duration: 0.25, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -2902,11 +3228,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      CLEAR ALIGNER FAQ
+                      {language === 'gu' ? "ઇનવિઝિબલ એલાઇનર FAQ" : "CLEAR ALIGNER FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Invisible Aligners
+                    {language === 'gu' ? "ઇનવિઝિબલ એલાઇનર્સ વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Invisible Aligners"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2915,6 +3241,9 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? INVISIBLE_ALIGNERS_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
@@ -2925,14 +3254,14 @@ export default function ServiceDetail({
                         }`}
                       >
                         <button
-                          type="button"
+                           type="button"
                           onClick={() => toggleFaq(faq.id)}
                           className="w-full text-left p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
                         >
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -2954,9 +3283,9 @@ export default function ServiceDetail({
                               transition={{ duration: 0.25, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -2973,11 +3302,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      SMILE MAKEOVER FAQ
+                      {language === 'gu' ? "સ્માઇલ મેકઓવર FAQ" : "SMILE MAKEOVER FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Smile Designing
+                    {language === 'gu' ? "સ્માઇલ ડિઝાઇનિંગ વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Smile Designing"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -2986,6 +3315,9 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? SMILE_MAKEOVER_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
@@ -3003,7 +3335,7 @@ export default function ServiceDetail({
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -3025,9 +3357,9 @@ export default function ServiceDetail({
                               transition={{ duration: 0.25, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -3044,11 +3376,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      CROWNS & BRIDGES FAQ
+                      {language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસ FAQ" : "CROWNS & BRIDGES FAQ"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Frequently Asked Questions About Crowns & Bridges
+                    {language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસ વિશે વારંવાર પૂછાતા પ્રશ્નો" : "Frequently Asked Questions About Crowns & Bridges"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -3057,12 +3389,15 @@ export default function ServiceDetail({
                 <div className="space-y-4 max-w-4xl mx-auto">
                   {displayFaqs.map((faq) => {
                     const isExpanded = expandedFaqId === faq.id || (!expandedFaqId && faq.id === displayFaqs[0]?.id);
+                    const translation = language === 'gu' ? CROWNS_BRIDGES_FAQS_GU[faq.question] : null;
+                    const questionText = translation ? translation.question : faq.question;
+                    const answerText = translation ? translation.answer : faq.answer;
                     return (
                       <div 
                         key={faq.id}
                         className={`rounded-[18px] sm:rounded-[20px] transition-all duration-200 border ${
                           isExpanded 
-                            ? 'border-[#0D9488] bg-white shadow-xs' 
+                             ? 'border-[#0D9488] bg-white shadow-xs' 
                             : 'border-slate-200/80 hover:border-slate-300 bg-white'
                         }`}
                       >
@@ -3074,7 +3409,7 @@ export default function ServiceDetail({
                           <span className={`text-base sm:text-lg font-bold tracking-tight leading-snug transition-colors ${
                             isExpanded ? 'text-[#0D9488]' : 'text-[#081C3A]'
                           }`}>
-                            {faq.question}
+                            {questionText}
                           </span>
                           <span className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             isExpanded ? 'bg-teal-50 text-[#0D9488]' : 'bg-slate-50 text-slate-400'
@@ -3096,9 +3431,9 @@ export default function ServiceDetail({
                               transition={{ duration: 0.25, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-normal'}`}>
                                 <div className="pt-4">
-                                  {faq.answer}
+                                  {answerText}
                                 </div>
                               </div>
                             </motion.div>
@@ -3297,20 +3632,26 @@ export default function ServiceDetail({
           const smileMakeoverRelatedCards = [
             {
               slug: 'invisible-aligners',
-              title: 'Invisible Aligners',
-              description: 'Straighten your teeth discretely with advanced clear aligners, planned completely digitally to complement your smile.',
+              title: language === 'gu' ? 'ઇનવિઝિબલ એલાઇનર્સ' : 'Invisible Aligners',
+              description: language === 'gu'
+                ? 'તમારા સ્માઇલને અનુરૂપ સંપૂર્ણ ડિજિટલ રીતે પ્લાન કરાયેલા અદ્યતન ક્લિયર એલાઇનર્સ દ્વારા તમારા દાંતને સરળતાથી અને ધ્યાનમાં ન આવે તે રીતે સીધા કરો.'
+                : 'Straighten your teeth discreetly with advanced clear aligners, planned completely digitally to complement your smile.',
               image: getServiceHeroImage('invisible-aligners')
             },
             {
               slug: 'teeth-whitening',
-              title: 'Laser Teeth Whitening',
-              description: 'Brighten your smile by several shades in a single sitting with safe, clinically supervised laser tooth whitening.',
+              title: language === 'gu' ? 'લેસર દાંતનું વ્હાઇટનિંગ' : 'Laser Teeth Whitening',
+              description: language === 'gu'
+                ? 'સુરક્ષિત અને ક્લિનિકલી સુપરવાઇઝ્ડ લેસર દાંતના વ્હાઇટનિંગ દ્વારા માત્ર એક જ સિટિંગમાં તમારા સ્માઇલને અનેક શેડ્સ સુધી વધુ ઉજળું બનાવો.'
+                : 'Brighten your smile by several shades in a single sitting with safe, clinically supervised laser tooth whitening.',
               image: getServiceHeroImage('teeth-whitening')
             },
             {
               slug: 'crowns-bridges',
-              title: 'Crowns & Bridges',
-              description: 'Restore missing or damaged teeth with custom-milled premium zirconia dental crowns and porcelain fixed bridges.',
+              title: language === 'gu' ? 'ક્રાઉન્સ અને બ્રિજિસ' : 'Crowns & Bridges',
+              description: language === 'gu'
+                ? 'કસ્ટમ-મિલ્ડ પ્રીમિયમ ઝિર્કોનિયા ડેન્ટલ ક્રાઉન્સ અને પોર્સેલિન ફિક્સ્ડ બ્રિજિસ દ્વારા ખૂટેલા અથવા નુકસાન પામેલા દાંતને પુનઃસ્થાપિત કરો.'
+                : 'Restore missing or damaged teeth with custom-milled premium zirconia dental crowns and porcelain fixed bridges.',
               image: getServiceHeroImage('crowns-bridges')
             }
           ];
@@ -3318,20 +3659,26 @@ export default function ServiceDetail({
           const crownsBridgesRelatedCards = [
             {
               slug: 'dental-implants',
-              title: 'Dental Implants',
-              description: 'Permanent tooth replacement utilizing premium titanium root implants for secure, stable, and natural-looking fixed teeth.',
+              title: language === 'gu' ? 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ' : 'Dental Implants',
+              description: language === 'gu'
+                ? 'સુરક્ષિત, સ્થિર અને કુદરતી દેખાતા ફિક્સ્ડ દાંત માટે પ્રીમિયમ ટાઇટેનિયમ રૂટ ઇમ્પ્લાન્ટ્સ દ્વારા કાયમી દાંતનું પુનઃસ્થાપન.'
+                : 'Permanent tooth replacement utilizing premium titanium root implants for secure, stable, and natural-looking fixed teeth.',
               image: getServiceHeroImage('dental-implants')
             },
             {
               slug: 'full-mouth-rehabilitation',
-              title: 'Full Mouth Rehabilitation',
-              description: 'Comprehensive treatment for patients with multiple missing, damaged, or severely worn teeth across both upper and lower jaws.',
+              title: language === 'gu' ? 'ફુલ માઉથ રિહેબિલિટેશન' : 'Full Mouth Rehabilitation',
+              description: language === 'gu'
+                ? 'ઉપરના અને નીચેના બંને જડબામાં અનેક ખૂટતા, ક્ષતિગ્રસ્ત અથવા ગંભીર રીતે ઘસાઈ ગયેલા દાંત ધરાવતા દર્દીઓ માટે વ્યાપક સારવાર.'
+                : 'Comprehensive treatment for patients with multiple missing, damaged, or severely worn teeth across both upper and lower jaws.',
               image: getServiceHeroImage('full-mouth-rehabilitation')
             },
             {
               slug: 'smile-makeover',
-              title: 'Smile Makeover',
-              description: 'Improve the appearance, shade, shape, and overall harmony of your smile with personalized cosmetic dental solutions.',
+              title: language === 'gu' ? 'સ્માઇલ મેકઓવર' : 'Smile Makeover',
+              description: language === 'gu'
+                ? 'વ્યક્તિગત કોસ્મેટિક ડેન્ટલ સોલ્યુશન્સ દ્વારા તમારા સ્માઇલનો દેખાવ, શેડ, આકાર અને એકંદર સૌંદર્ય સુધારો.'
+                : 'Improve the appearance, shade, shape, and overall harmony of your smile with personalized cosmetic dental solutions.',
               image: getServiceHeroImage('smile-makeover')
             }
           ];
@@ -3339,20 +3686,26 @@ export default function ServiceDetail({
           const pediatricRelatedCards = [
             {
               slug: 'braces-treatment',
-              title: 'Orthodontic Braces',
-              description: 'Classic orthodontic corrections using durable ceramic or metal bracket systems to align teeth and correct growing child bite issues.',
+              title: language === 'gu' ? 'ઓર્થોડોન્ટિક બ્રેસીસ' : 'Orthodontic Braces',
+              description: language === 'gu'
+                ? 'દાંતને સીધા કરવા અને વધતા જતા બાળકના બાઈટ (બચકાં) ની સમસ્યાઓને સુધારવા માટે મજબૂત સિરામિક અથવા મેટલ બ્રેકેટ સિસ્ટમનો ઉપયોગ કરીને ક્લાસિક ઓર્થોડોન્ટિક સારવાર.'
+                : 'Classic orthodontic corrections using durable ceramic or metal bracket systems to align teeth and correct growing child bite issues.',
               image: getServiceHeroImage('braces-treatment')
             },
             {
               slug: 'tooth-coloured-filling',
-              title: 'Tooth-Coloured Fillings',
-              description: 'Restore decayed or chipped primary teeth with durable, natural-looking composite fillings that blend seamlessly.',
+              title: language === 'gu' ? 'ટૂથ-કલર ફિલિંગ્સ' : 'Tooth-Coloured Fillings',
+              description: language === 'gu'
+                ? 'સડી ગયેલા અથવા તૂટી ગયેલા દૂધના દાંતને મજબૂત, કુદરતી દેખાતા કમ્પોઝિટ ફિલિંગ્સ સાથે પુનઃસ્થાપિત કરો જે એકદમ કુદરતી લાગે છે.'
+                : 'Restore decayed or chipped primary teeth with durable, natural-looking composite fillings that blend seamlessly.',
               image: getServiceHeroImage('tooth-coloured-filling')
             },
             {
               slug: 'invisible-aligners',
-              title: 'Invisible Aligners',
-              description: 'Straighten teeth discretely with advanced clear aligners, planned completely digitally to complement active lifestyles.',
+              title: language === 'gu' ? 'અદ્રશ્ય અલાઈનર્સ' : 'Invisible Aligners',
+              description: language === 'gu'
+                ? 'બાળકોની સક્રિય જીવનશૈલીને પૂરક બનાવવા માટે સંપૂર્ણ ડિજિટલ પ્લાનિંગ સાથે એડવાન્સ્ડ ક્લિયર અલાઈનર્સ દ્વારા દાંતને કોઈને ખબર ન પડે તે રીતે સીધા કરો.'
+                : 'Straighten teeth discretely with advanced clear aligners, planned completely digitally to complement active lifestyles.',
               image: getServiceHeroImage('invisible-aligners')
             }
           ];
@@ -3364,48 +3717,67 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
 
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
-                  {dentalImplantsRelatedCards.map((card) => (
-                    <div
-                      key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
-                    >
-                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
-                        <img 
-                          src={card.image || null} 
-                          alt={card.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </div>
-                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
-                        <div className="space-y-2.5">
-                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
-                            {card.title}
-                          </h3>
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                            {card.description}
-                          </p>
+                  {dentalImplantsRelatedCards.map((card) => {
+                    const translations: Record<string, { title: string; description: string }> = {
+                      'full-mouth-rehabilitation': {
+                        title: 'ફુલ માઉથ રિહેબિલિટેશન',
+                        description: 'ઉપરના અને નીચેના બંને જડબામાં અનેક ગુમ થયેલા, નુકસાન પામેલા અથવા ગંભીર રીતે ઘસાઈ ગયેલા દાંત ધરાવતા દર્દીઓ માટે વ્યાપક સારવાર.'
+                      },
+                      'crowns-bridges': {
+                        title: 'ક્રાઉન્સ અને બ્રિજિસ',
+                        description: 'હાઈ-સ્ટ્રેન્થ, કસ્ટમ-મિલ્ડ ઝિર્કોનિયા ક્રાઉન્સ અને ફિક્સ્ડ બ્રિજિસ દ્વારા નુકસાન પામેલા અથવા ગુમ થયેલા દાંતને પુનઃસ્થાપિત કરો.'
+                      },
+                      'smile-makeover': {
+                        title: 'સ્માઇલ મેકઓવર',
+                        description: 'વ્યક્તિગત કોસ્મેટિક ડેન્ટલ સોલ્યુશન્સ દ્વારા તમારા સ્માઇલનો દેખાવ, શેડ, આકાર અને એકંદર સૌંદર્ય સુધારો.'
+                      }
+                    };
+                    const translation = language === 'gu' ? translations[card.slug] : null;
+                    const cardTitle = translation ? translation.title : card.title;
+                    const cardDesc = translation ? translation.description : card.description;
+                    return (
+                      <div
+                        key={card.slug}
+                        onClick={() => handleNavigateToService(card.slug)}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      >
+                        <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                          <img 
+                            src={card.image || null} 
+                            alt={cardTitle}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
-                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
-                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                          <div className="space-y-2.5">
+                            <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                              {cardTitle}
+                            </h3>
+                            <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-[#000000] font-semibold' : 'text-slate-600 font-medium'}`}>
+                              {cardDesc}
+                            </p>
+                          </div>
+                          <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                            <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
+                            <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : isRootCanal ? (
@@ -3414,48 +3786,68 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
 
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
-                  {rootCanalRelatedCards.map((card) => (
-                    <div
-                      key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
-                    >
-                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
-                        <img 
-                          src={card.image || null} 
-                          alt={card.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </div>
-                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
-                        <div className="space-y-2.5">
-                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
-                            {card.title}
-                          </h3>
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                            {card.description}
-                          </p>
+                  {rootCanalRelatedCards.map((card) => {
+                    const translations: Record<string, { title: string; description: string }> = {
+                      'crowns-bridges': {
+                        title: 'ક્રાઉન્સ અને બ્રિજિસ',
+                        description: 'ક્ષતિગ્રસ્ત અથવા ખૂટતા દાંતને ઉચ્ચ-મજબૂતીવાળા, કસ્ટમ-મિલ્ડ ઝિર્કોનિયા ક્રાઉન્સ અને ફિક્સ્ડ બ્રિજિસ દ્વારા પુનઃસ્થાપિત કરો.'
+                      },
+                      'dental-implants': {
+                        title: 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ',
+                        description: 'સુરક્ષિત, સ્થિર અને કુદરતી દેખાતા ફિક્સ્ડ દાંત માટે પ્રીમિયમ ટાઇટેનિયમ રૂટ ઇમ્પ્લાન્ટ્સ દ્વારા કાયમી દાંતનું પુનઃસ્થાપન.'
+                      },
+                      'full-mouth-rehabilitation': {
+                        title: 'ફુલ માઉથ રિહેબિલિટેશન',
+                        description: 'ઉપરના અને નીચેના બંને જડબામાં અનેક ખૂટતા, ક્ષતિગ્રસ્ત અથવા ગંભીર રીતે ઘસાઈ ગયેલા દાંત ધરાવતા દર્દીઓ માટે વ્યાપક સારવાર.'
+                      }
+                    };
+                    const translation = language === 'gu' ? translations[card.slug] : null;
+                    const cardTitle = translation ? translation.title : card.title;
+                    const cardDesc = translation ? translation.description : card.description;
+
+                    return (
+                      <div
+                        key={card.slug}
+                        onClick={() => handleNavigateToService(card.slug)}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      >
+                        <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                          <img 
+                            src={card.image || null} 
+                            alt={cardTitle}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
-                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
-                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                          <div className="space-y-2.5">
+                            <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                              {cardTitle}
+                            </h3>
+                            <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-medium'}`}>
+                              {cardDesc}
+                            </p>
+                          </div>
+                          <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                            <span>{language === 'gu' ? "વિગતો જુઓ" : "Learn Details"}</span>
+                            <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : isFullMouth ? (
@@ -3464,48 +3856,67 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
 
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
-                  {fullMouthRelatedCards.map((card) => (
-                    <div
-                      key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
-                    >
-                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
-                        <img 
-                          src={card.image || null} 
-                          alt={card.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </div>
-                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
-                        <div className="space-y-2.5">
-                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
-                            {card.title}
-                          </h3>
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                            {card.description}
-                          </p>
+                  {fullMouthRelatedCards.map((card) => {
+                    const translations: Record<string, { title: string; description: string }> = {
+                      'dental-implants': {
+                        title: 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ',
+                        description: 'મજબૂત, સ્થિર અને કુદરતી દેખાતા ફિક્સ્ડ દાંત માટે પ્રીમિયમ ટાઇટેનિયમ રૂટ ઇમ્પ્લાન્ટ્સ દ્વારા કાયમી દાંત બદલવાની સારવાર।'
+                      },
+                      'crowns-bridges': {
+                        title: 'ક્રાઉન્સ અને બ્રિજિસ',
+                        description: 'હાઈ-સ્ટ્રેન્થ, કસ્ટમ-મિલ્ડ ઝિર્કોનિયા ક્રાઉન્સ અને ફિક્સ્ડ બ્રિજિસ દ્વારા ક્ષતિગ્રસ્ત અથવા ગુમ થયેલા દાંતને પુનઃસ્થાપિત કરો।'
+                      },
+                      'smile-makeover': {
+                        title: 'સ્માઇલ મેકઓવર',
+                        description: 'વ્યક્તિગત કોસ્મેટિક ડેન્ટલ સોલ્યુશન્સ દ્વારા તમારી સ્માઇલનો દેખાવ, શેડ, આકાર અને સમગ્ર હાર્મનીમાં સુધારો કરો।'
+                      }
+                    };
+                    const translation = language === 'gu' ? translations[card.slug] : null;
+                    const cardTitle = translation ? translation.title : card.title;
+                    const cardDesc = translation ? translation.description : card.description;
+                    return (
+                      <div
+                        key={card.slug}
+                        onClick={() => handleNavigateToService(card.slug)}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      >
+                        <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                          <img 
+                            src={card.image || null} 
+                            alt={cardTitle}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
-                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
-                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                          <div className="space-y-2.5">
+                            <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                              {cardTitle}
+                            </h3>
+                            <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-medium'}`}>
+                              {cardDesc}
+                            </p>
+                          </div>
+                          <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                            <span>{language === 'gu' ? "વધુ માહિતી મેળવો" : "Learn Details"}</span>
+                            <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : isInvisibleAligners ? (
@@ -3514,48 +3925,67 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
 
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
-                  {invisibleAlignersRelatedCards.map((card) => (
-                    <div
-                      key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
-                    >
-                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
-                        <img 
-                          src={card.image || null} 
-                          alt={card.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </div>
-                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
-                        <div className="space-y-2.5">
-                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
-                            {card.title}
-                          </h3>
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                            {card.description}
-                          </p>
+                  {invisibleAlignersRelatedCards.map((card) => {
+                    const translations: Record<string, { title: string; description: string }> = {
+                      'braces-treatment': {
+                        title: 'બ્રેસિસ સારવાર',
+                        description: 'દાંતને સીધા કરવા અને બાઇટ સંબંધિત સમસ્યાઓ સુધારવા માટે ટકાઉ સિરામિક, મેટલ અથવા લિંગ્વલ બ્રેકેટ સિસ્ટમ દ્વારા કરવામાં આવતી પરંપરાગત ઓર્થોડોન્ટિક સારવાર.'
+                      },
+                      'smile-makeover': {
+                        title: 'સ્માઇલ મેકઓવર',
+                        description: 'વ્યક્તિગત કોસ્મિતિક ડેન્ટલ સોલ્યુશન્સ અને હેન્ડ-ફિનિશ્ડ વીનિયર્સ દ્વારા તમારા સ્માઇલનો દેખાવ, શેડ, આકાર અને સમગ્ર સૌંદર્યમય સમતુલન સુધારો.'
+                      },
+                      'dental-implants': {
+                        title: 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ',
+                        description: 'મજબૂત, સ્થિર અને કુદરતી દેખાવવાળા કાયમી દાંત માટે પ્રીમિયમ ટાઇટેનિયમ રૂટ ઇમ્પ્લાન્ટ્સ દ્વારા કરવામાં આવતી કાયમી દાંતની સારવાર.'
+                      }
+                    };
+                    const translation = language === 'gu' ? translations[card.slug] : null;
+                    const cardTitle = translation ? translation.title : card.title;
+                    const cardDesc = translation ? translation.description : card.description;
+                    return (
+                      <div
+                        key={card.slug}
+                        onClick={() => handleNavigateToService(card.slug)}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      >
+                        <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                          <img 
+                            src={card.image || null} 
+                            alt={cardTitle}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
-                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
-                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                          <div className="space-y-2.5">
+                            <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                              {cardTitle}
+                            </h3>
+                            <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-medium'}`}>
+                              {cardDesc}
+                            </p>
+                          </div>
+                          <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                            <span>{language === 'gu' ? "વધુ વિગતો" : "Learn Details"}</span>
+                            <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : isSmileMakeover ? (
@@ -3564,11 +3994,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -3600,7 +4030,7 @@ export default function ServiceDetail({
                           </p>
                         </div>
                         <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
+                          <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
@@ -3614,11 +4044,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -3645,12 +4075,12 @@ export default function ServiceDetail({
                           <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
                             {card.title}
                           </h3>
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                          <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
                             {card.description}
                           </p>
                         </div>
                         <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
+                          <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
@@ -3664,11 +4094,11 @@ export default function ServiceDetail({
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <div className="flex justify-center">
                     <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60">
-                      RELATED TREATMENTS
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight">
-                    Related Treatments
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
                   </h2>
                   <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                 </div>
@@ -3695,12 +4125,12 @@ export default function ServiceDetail({
                           <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
                             {card.title}
                           </h3>
-                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                          <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
                             {card.description}
                           </p>
                         </div>
                         <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                          <span>Learn Details</span>
+                          <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
@@ -3815,14 +4245,21 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      DENTAL IMPLANT CONSULTATION
+                      {language === 'gu' ? "ડેન્ટલ ઇમ્પ્લાન્ટ કન્સલ્ટેશન" : "DENTAL IMPLANT CONSULTATION"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    Ready to Explore Your Dental<br />Implant Options?
+                    {language === 'gu' ? (
+                      <>શું તમે તમારા ડેન્ટલ ઇમ્પ્લાન્ટના<br />વિકલ્પો જાણવા માટે તૈયાર છો?</>
+                    ) : (
+                      <>Ready to Explore Your Dental<br />Implant Options?</>
+                    )}
                   </h2>
-                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Book a personalised consultation to discuss your oral condition, suitable treatment options, expected treatment timeline, and estimated treatment plan.
+                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-semibold font-sans">
+                    {language === 'gu'
+                      ? "તમારી મૌખિક સ્થિતિ, યોગ્ય સારવારના વિકલ્પો, સારવાર માટેનો અપેક્ષિત સમય અને અંદાજિત સારવાર યોજના અંગે ચર્ચા કરવા માટે વ્યક્તિગત કન્સલ્ટેશન બુક કરો।"
+                      : "Book a personalised consultation to discuss your oral condition, suitable treatment options, expected treatment timeline, and estimated treatment plan."
+                    }
                   </p>
                 </div>
 
@@ -3843,7 +4280,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <Calendar className="h-4 w-4 shrink-0" />
-                    <span>BOOK YOUR CONSULTATION</span>
+                    <span>{language === 'gu' ? "તમારું કન્સલ્ટેશન બુક કરો" : "BOOK YOUR CONSULTATION"}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                   
@@ -3854,7 +4291,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0" />
-                    <span>CHAT ON WHATSAPP</span>
+                    <span>{language === 'gu' ? "WhatsApp પર ચેટ કરો" : "CHAT ON WHATSAPP"}</span>
                   </a>
                 </div>
               </div>
@@ -3871,14 +4308,14 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      EMERGENCY & SAME-DAY CARE
+                      {language === 'gu' ? "કટોકટી અને એ જ દિવસે સારવાર" : "EMERGENCY & SAME-DAY CARE"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    In Pain? Get Relief Today with Single Sitting RCT
+                    {language === 'gu' ? "દુખાવો છે? આજે જ સિંગલ સિટિંગ RCT સાથે રાહત મેળવો" : "In Pain? Get Relief Today with Single Sitting RCT"}
                   </h2>
-                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Call our emergency desk now for a same-day appointment or message us on WhatsApp for immediate guidance.
+                  <p className={`text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-sans ${language === 'gu' ? 'text-slate-100 font-semibold' : 'text-slate-300/90 font-medium'}`}>
+                    {language === 'gu' ? "એ જ દિવસે એપોઇન્ટમેન્ટ માટે હમણાં જ અમારા ઇમરજન્સી ડેસ્ક પર કૉલ કરો અથવા તાત્કાલિક માર્ગદર્શન માટે અમને WhatsApp પર મેસેજ કરો." : "Call our emergency desk now for a same-day appointment or message us on WhatsApp for immediate guidance."}
                   </p>
                 </div>
 
@@ -3891,7 +4328,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <Phone className="h-4 w-4 shrink-0" />
-                    <span>CALL NOW  -  SAME-DAY APPOINTMENT</span>
+                    <span>{language === 'gu' ? "હમણાં કૉલ કરો - એ જ દિવસની એપોઇન્ટમેન્ટ" : "CALL NOW  -  SAME-DAY APPOINTMENT"}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                   
@@ -3902,7 +4339,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0" />
-                    <span>CHAT ON WHATSAPP</span>
+                    <span>{language === 'gu' ? "WhatsApp પર ચેટ કરો" : "CHAT ON WHATSAPP"}</span>
                   </a>
                 </div>
               </div>
@@ -3919,14 +4356,17 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      INVISIBLE ALIGNER CONSULTATION
+                      {language === 'gu' ? "ઇનવિઝિબલ એલાઇનર પરામર્શ" : "INVISIBLE ALIGNER CONSULTATION"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    Ready to Straighten Your Teeth Without Visible Braces?
+                    {language === 'gu' ? "વિઝિબલ બ્રેસિસ વગર તમારા દાંત સીધા કરવા તૈયાર છો?" : "Ready to Straighten Your Teeth Without Visible Braces?"}
                   </h2>
-                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Book a free aligner consultation or WhatsApp a photo of your teeth to see your predicted final smile simulation and customized treatment options.
+                  <p className={`text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-sans ${language === 'gu' ? 'text-slate-100 font-semibold' : 'text-slate-300/90 font-medium'}`}>
+                    {language === 'gu' 
+                      ? "ફ્રી એલાઇનર પરામર્શ બુક કરો અથવા તમારા દાંતનો ફોટો WhatsApp પર મોકલો અને તમારા અંતિમ સ્માઇલનું અનુમાનિત સિમ્યુલેશન તથા વ્યક્તિગત સારવારના વિકલ્પો જુઓ।"
+                      : "Book a free aligner consultation or WhatsApp a photo of your teeth to see your predicted final smile simulation and customized treatment options."
+                    }
                   </p>
                 </div>
 
@@ -3938,7 +4378,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <Calendar className="h-4 w-4 shrink-0" />
-                    <span>BOOK FREE CONSULTATION</span>
+                    <span>{language === 'gu' ? "ફ્રી પરામર્શ બુક કરો" : "BOOK FREE CONSULTATION"}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                   
@@ -3949,7 +4389,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0 fill-white text-[#25D366]" />
-                    <span>WHATSAPP YOUR PHOTO</span>
+                    <span>{language === 'gu' ? "તમારો ફોટો WhatsApp કરો" : "WHATSAPP YOUR PHOTO"}</span>
                   </a>
                 </div>
               </div>
@@ -3966,14 +4406,17 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      Indicative Cost & Plan in 24 Hours
+                      {language === 'gu' ? "24 કલાકમાં અંદાજિત ખર્ચ અને સારવાર યોજના" : "Indicative Cost & Plan in 24 Hours"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    Get an Indicative Plan and Cost Range Before You Visit
+                    {language === 'gu' ? "તમારી મુલાકાત પહેલાં અંદાજિત સારવાર યોજના અને ખર્ચની રેન્જ મેળવો" : "Get an Indicative Plan and Cost Range Before You Visit"}
                   </h2>
-                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Send us your OPG on WhatsApp and receive an indicative plan and cost range within 24 hours  -  before you visit.
+                  <p className={`text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-sans ${language === 'gu' ? 'text-slate-100 font-semibold' : 'text-slate-300/90 font-medium'}`}>
+                    {language === 'gu'
+                      ? "WhatsApp પર અમને તમારો OPG મોકલો અને તમારી મુલાકાત પહેલાં 24 કલાકની અંદર અંદાજિત સારવાર યોજના અને ખર્ચની રેન્જ મેળવો。"
+                      : "Send us your OPG on WhatsApp and receive an indicative plan and cost range within 24 hours  -  before you visit."
+                    }
                   </p>
                 </div>
 
@@ -3985,7 +4428,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0 fill-white text-[#22C55E]" />
-                    <span>Send OPG on WhatsApp</span>
+                    <span>{language === 'gu' ? "WhatsApp પર OPG મોકલો" : "Send OPG on WhatsApp"}</span>
                   </a>
 
                   <button
@@ -3995,7 +4438,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <Calendar className="h-4 w-4 shrink-0" />
-                    <span>BOOK YOUR APPOINTMENT</span>
+                    <span>{language === 'gu' ? "તમારી એપોઇન્ટમેન્ટ બુક કરો" : "BOOK YOUR APPOINTMENT"}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                 </div>
@@ -4013,14 +4456,16 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      DIGITAL SMILE PREVIEW
+                      {language === 'gu' ? "ડિજિટલ સ્માઇલ પ્રિવ્યૂ" : "DIGITAL SMILE PREVIEW"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    See Your Final Result Before You Pay
+                    {language === 'gu' ? "ચૂકવણી કરતા પહેલાં તમારું અંતિમ પરિણામ જુઓ" : "See Your Final Result Before You Pay"}
                   </h2>
                   <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Send a smile photo on WhatsApp to get your digital smile preview and try a physical mock-up in your mouth before tooth preparation  -  no pressure.
+                    {language === 'gu'
+                      ? "તમારો ડિજિટલ સ્માઇલ પ્રિવ્યૂ મેળવવા માટે WhatsApp પર તમારા સ્માઇલનો ફોટો મોકલો અને દાંતની તૈયારી શરૂ કરતા પહેલાં તમારા મોઢામાં ફિઝિકલ મોક-અપ અજમાવો — કોઈ દબાણ નહીં."
+                      : "Send a smile photo on WhatsApp to get your digital smile preview and try a physical mock-up in your mouth before tooth preparation  -  no pressure."}
                   </p>
                 </div>
 
@@ -4032,7 +4477,11 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0 fill-white text-[#25D366]" />
-                    <span>Send a smile photo on WhatsApp  -  get a digital preview</span>
+                    <span>
+                      {language === 'gu'
+                        ? "WhatsApp પર સ્માઇલનો ફોટો મોકલો - ડિજિટલ પ્રિવ્યૂ મેળવો"
+                        : "Send a smile photo on WhatsApp  -  get a digital preview"}
+                    </span>
                   </a>
                 </div>
               </div>
@@ -4049,14 +4498,16 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      CUSTOM RESTORATION CONSULTATION
+                      {language === 'gu' ? "કસ્ટમ રિસ્ટોરેશન કન્સલ્ટેશન" : "CUSTOM RESTORATION CONSULTATION"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    Get Your Crown Options & Cost
+                    {language === 'gu' ? "તમારા ક્રાઉનના વિકલ્પો અને ખર્ચ જાણો" : "Get Your Crown Options & Cost"}
                   </h2>
-                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Schedule a clinical evaluation with our dental specialists in Rajkot to explore the most suitable crown and bridge materials for your teeth.
+                  <p className={`text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-sans ${language === 'gu' ? 'text-slate-100 font-semibold' : 'text-slate-300/90 font-medium'}`}>
+                    {language === 'gu'
+                      ? "તમારા દાંત માટે સૌથી યોગ્ય ક્રાઉન અને બ્રિજના મટિરિયલ્સ જાણવા માટે રાજકોટમાં અમારા ડેન્ટલ સ્પેશિયાલિસ્ટ્સ સાથે ક્લિનિકલ મૂલ્યાંકન શેડ્યૂલ કરો."
+                      : "Schedule a clinical evaluation with our dental specialists in Rajkot to explore the most suitable crown and bridge materials for your teeth."}
                   </p>
                 </div>
 
@@ -4068,7 +4519,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <Calendar className="h-4 w-4 shrink-0" />
-                    <span>BOOK YOUR APPOINTMENT</span>
+                    <span>{language === 'gu' ? "તમારી એપોઇન્ટમેન્ટ બુક કરો" : "BOOK YOUR APPOINTMENT"}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                   </button>
 
@@ -4079,7 +4530,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0 fill-white text-[#22C55E]" />
-                    <span>Chat on WhatsApp</span>
+                    <span>{language === 'gu' ? "WhatsApp પર ચેટ કરો" : "Chat on WhatsApp"}</span>
                   </a>
                 </div>
               </div>
@@ -4096,14 +4547,16 @@ export default function ServiceDetail({
                   <div className="flex justify-center">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D9488]/20 border border-[#0D9488]/40 text-[#2DD4BF] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                       <Sparkles className="h-3.5 w-3.5 text-[#2DD4BF] shrink-0" />
-                      Free First Visit
+                      {language === 'gu' ? "મફત પ્રથમ મુલાકાત" : "Free First Visit"}
                     </span>
                   </div>
                   <h2 className="font-sans font-black text-2xl sm:text-4xl lg:text-[42px] text-white tracking-tight leading-[1.2] max-w-2xl mx-auto">
-                    Not Sure What Your Child Needs?
+                    {language === 'gu' ? "શું તમે નક્કી નથી કરી શકતા કે તમારા બાળકને કઈ સારવારની જરૂર છે?" : "Not Sure What Your Child Needs?"}
                   </h2>
-                  <p className="text-slate-300/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium font-sans">
-                    Start with a free first visit. We’ll examine your child, explain what’s actually needed, and tell you if anything can safely be watched rather than treated.
+                  <p className={`text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto font-sans ${language === 'gu' ? 'text-white font-semibold' : 'text-slate-300/90 font-medium'}`}>
+                    {language === 'gu'
+                      ? "મફત પ્રથમ મુલાકાતથી શરૂઆત કરો. અમે તમારા બાળકની તપાસ કરીશું, ખરેખર શેની જરૂર છે તે સમજાવીશું અને જો કોઈ સમસ્યા સામાન્ય દેખરેખથી હલ થઈ શકે તેમ હોય તો તેની પણ સ્પષ્ટ માહિતી આપીશું."
+                      : "Start with a free first visit. We’ll examine your child, explain what’s actually needed, and tell you if anything can safely be watched rather than treated."}
                   </p>
                 </div>
 
@@ -4124,7 +4577,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
                   >
                     <Calendar className="h-4 w-4 shrink-0" />
-                    <span>Book Free First Visit</span>
+                    <span>{language === 'gu' ? "મફત પ્રથમ મુલાકાત બુક કરો" : "Book Free First Visit"}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                   
@@ -4135,7 +4588,7 @@ export default function ServiceDetail({
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4 shrink-0" />
-                    <span>WhatsApp Us</span>
+                    <span>{language === 'gu' ? "WhatsApp પર સંપર્ક કરો" : "WhatsApp Us"}</span>
                   </a>
                 </div>
               </div>
@@ -4280,13 +4733,15 @@ export default function ServiceDetail({
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <CheckCircle2 className="h-3.5 w-3.5 text-[#0D9488]" />
-                        Candidate Check
+                        {language === 'gu' ? "ઉમેદવારી તપાસ" : "Candidate Check"}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        Are You a Candidate for a Crown or Bridge?
+                        {language === 'gu' ? "શું તમારા માટે ક્રાઉન અથવા બ્રિજ યોગ્ય છે?" : "Are You a Candidate for a Crown or Bridge?"}
                       </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        Crowns and bridges are designed to solve specific dental structural and functional issues. See if your current tooth condition qualifies:
+                      <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "ક્રાઉન્સ અને બ્રિજ ચોક્કસ દાંતની રચનાત્મક અને કાર્યાત્મક સમસ્યાઓના ઉકેલ માટે બનાવવામાં આવે છે. તમારી હાલની દાંતની સ્થિતિ તેના માટે યોગ્ય છે કે નહીં તે જુઓ:"
+                          : "Crowns and bridges are designed to solve specific dental structural and functional issues. See if your current tooth condition qualifies:"}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -4296,10 +4751,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-8 md:p-10 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[24px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Weak or Broken Tooth
+                          {language === 'gu' ? "નબળો અથવા તૂટેલો દાંત" : "Weak or Broken Tooth"}
                         </h3>
-                        <p className="text-[#475569] text-sm sm:text-base leading-[1.6] font-medium flex-1">
-                          Your tooth is heavily decayed, fractured, or has a large filling that is failing. A crown completely caps the tooth, restoring its strength and protecting it from cracking.
+                        <p className={`text-sm sm:text-base leading-[1.6] flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "તમારા દાંતમાં ગંભીર સડો થયો છે, દાંતમાં ફ્રેક્ચર છે અથવા મોટું ફિલિંગ ખરાબ થઈ રહ્યું છે. ક્રાઉન દાંતને સંપૂર્ણપણે ઢાંકી દે છે, તેની મજબૂતી પુનઃસ્થાપિત કરે છે અને તેને તૂટવાથી બચાવે છે."
+                            : "Your tooth is heavily decayed, fractured, or has a large filling that is failing. A crown completely caps the tooth, restoring its strength and protecting it from cracking."}
                         </p>
                       </div>
 
@@ -4307,10 +4764,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-8 md:p-10 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[24px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          After Root Canal Treatment
+                          {language === 'gu' ? "રૂટ કેનલ સારવાર પછી" : "After Root Canal Treatment"}
                         </h3>
-                        <p className="text-[#475569] text-sm sm:text-base leading-[1.6] font-medium flex-1">
-                          Once a root canal removes the infected nerve, the remaining tooth becomes brittle and prone to fracturing. A crown is essential to seal the tooth and handle chewing forces.
+                        <p className={`text-sm sm:text-base leading-[1.6] flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "રૂટ કેનલ સારવાર દ્વારા ચેપગ્રસ્ત નસ દૂર થયા પછી બાકી રહેલો દાંત નાજુક અને તૂટવાની શક્યતા ધરાવતો બની જાય છે. દાંતને સીલ કરવા અને ચાવવાના દબાણને સહન કરવા માટે ક્રાઉન જરૂરી છે."
+                            : "Once a root canal removes the infected nerve, the remaining tooth becomes brittle and prone to fracturing. A crown is essential to seal the tooth and handle chewing forces."}
                         </p>
                       </div>
 
@@ -4318,10 +4777,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-8 md:p-10 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[24px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Missing One or More Teeth
+                          {language === 'gu' ? "એક અથવા વધુ દાંત ખૂટતા હોય" : "Missing One or More Teeth"}
                         </h3>
-                        <p className="text-[#475569] text-sm sm:text-base leading-[1.6] font-medium flex-1">
-                          You have a gap from a missing tooth, causing adjacent teeth to drift and altering your bite. A dental bridge uses adjacent teeth as anchors to securely fill the empty space.
+                        <p className={`text-sm sm:text-base leading-[1.6] flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "દાંત ખૂટવાથી તમારા મોઢામાં ખાલી જગ્યા બની છે, જેના કારણે આસપાસના દાંત પોતાની જગ્યાથી ખસી શકે છે અને તમારા બાઇટમાં ફેરફાર થઈ શકે છે. ડેન્ટલ બ્રિજ આસપાસના દાંતને આધાર બનાવીને ખાલી જગ્યા સુરક્ષિત રીતે ભરે છે."
+                            : "You have a gap from a missing tooth, causing adjacent teeth to drift and altering your bite. A dental bridge uses adjacent teeth as anchors to securely fill the empty space."}
                         </p>
                       </div>
 
@@ -4329,30 +4790,45 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-5 sm:p-8 md:p-10 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-[20px] sm:text-[24px] tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Cosmetic Tooth Wear
+                          {language === 'gu' ? "દાંતનું કોસ્મેટિક ઘસારો" : "Cosmetic Tooth Wear"}
                         </h3>
-                        <p className="text-[#475569] text-sm sm:text-base leading-[1.6] font-medium flex-1">
-                          Severely worn, discolored, or misshapen teeth that affect your smile. Custom ceramic or zirconia crowns can restore a natural, beautifully aligned appearance.
+                        <p className={`text-sm sm:text-base leading-[1.6] flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "વધુ પડતા ઘસાયેલા, રંગ બદલાયેલા અથવા આકારમાં અસમાન દાંત જે તમારી સ્માઇલને અસર કરે છે. કસ્ટમ સિરામિક અથવા ઝિર્કોનિયા ક્રાઉન કુદરતી અને સુંદર રીતે ગોઠવાયેલ દેખાવ પુનઃસ્થાપિત કરી શકે છે."
+                            : "Severely worn, discolored, or misshapen teeth that affect your smile. Custom ceramic or zirconia crowns can restore a natural, beautifully aligned appearance."}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   {/* Surgical Team Section */}
-                  <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+                  <SurgicalTeamSection
+                    setCurrentPage={setCurrentPage}
+                    language={language}
+                    badge={language === 'gu' ? "સર્જિકલ ટીમ" : undefined}
+                    heading={language === 'gu' ? "ડૉ. વિપુલ પટેલ અને ડૉ. કિંજલ પટેલના નેતૃત્વ હેઠળ" : undefined}
+                    description={language === 'gu' ? "અમારા સિનિયર ઇમ્પ્લાન્ટોલોજિસ્ટ્સ USA-આધારિત અદ્યતન તાલીમ અને ફેલોશિપ-માન્ય નિષ્ણાત અનુભવને જોડીને તમારી ચોક્કસ અને પીડારહિત ડેન્ટલ ઇમ્પ્લાન્ટ સર્જરીનું આયોજન અને અમલીકરણ કરે છે." : undefined}
+                    drVipulName={language === 'gu' ? "Dr. Vipul Patel" : undefined}
+                    drKinjalName={language === 'gu' ? "Dr. Kinjal Patel" : undefined}
+                    drVipulExp={language === 'gu' ? "14+ વર્ષનો અનુભવ, 16,000 સફળ ઇમ્પ્લાન્ટ્સ અને 800 ફિક્સ્ડ ડેન્ચર્સ સાથે" : undefined}
+                    drKinjalExp={language === 'gu' ? "14+ વર્ષનો અનુભવ, 18,000 સ્માઇલ ટ્રાન્સફોર્મેશન અને 30,000 RCT સાથે" : undefined}
+                    drKinjalRole={language === 'gu' ? "રૂટ કેનલ એક્સપર્ટ અને ઇમ્પ્લાન્ટોલોજિસ્ટ" : undefined}
+                  />
 
                   {/* Section 3: Material Comparison */}
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="material-comparison-section">
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <Layers className="h-3.5 w-3.5 text-[#0D9488]" />
-                        Material Options
+                        {language === 'gu' ? "મટિરિયલના વિકલ્પો" : "Material Options"}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        Compare Crown & Bridge Materials
+                        {language === 'gu' ? "ક્રાઉન અને બ્રિજના મટિરિયલ્સની તુલના કરો" : "Compare Crown & Bridge Materials"}
                       </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        Different materials serve different clinical purposes. We help you choose based on durability, aesthetics, and location in your mouth:
+                      <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "અલગ-અલગ મટિરિયલ્સ અલગ ક્લિનિકલ હેતુઓ માટે ઉપયોગી છે. અમે તેની ટકાઉપણું, સૌંદર્ય અને તમારા મોઢામાં તેના સ્થાનના આધારે યોગ્ય વિકલ્પ પસંદ કરવામાં તમારી મદદ કરીએ છીએ:"
+                          : "Different materials serve different clinical purposes. We help you choose based on durability, aesthetics, and location in your mouth:"}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -4363,21 +4839,21 @@ export default function ServiceDetail({
                           <thead>
                             <tr className="border-b border-slate-200">
                               <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                Feature / Factor
+                                {language === 'gu' ? "વિશેષતા / પરિબળ" : "Feature / Factor"}
                               </th>
                               <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                Metal-Ceramic (PFM)
+                                {language === 'gu' ? "મેટલ-સિરામિક (PFM)" : "Metal-Ceramic (PFM)"}
                               </th>
                               <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4 relative">
                                 <div className="flex items-center justify-between gap-2">
-                                  <span>Zirconia</span>
+                                  <span>{language === 'gu' ? "ઝિર્કોનિયા" : "Zirconia"}</span>
                                   <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-widest whitespace-nowrap">
-                                    Popular Choice
+                                    {language === 'gu' ? "લોકપ્રિય પસંદગી" : "Popular Choice"}
                                   </span>
                                 </div>
                               </th>
                               <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                E-max
+                                {language === 'gu' ? "E-MAX" : "E-max"}
                               </th>
                             </tr>
                           </thead>
@@ -4385,43 +4861,63 @@ export default function ServiceDetail({
                             {/* Row 1: Best For */}
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Best For
+                                {language === 'gu' ? "આ માટે શ્રેષ્ઠ" : "Best For"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
-                                Back teeth (molars) where chewing force is high and aesthetic demand is moderate.
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "પાછળના દાંત (મોલર્સ), જ્યાં ચાવવાનું દબાણ વધારે હોય અને સૌંદર્યની જરૂરિયાત મધ્યમ હોય."
+                                  : "Back teeth (molars) where chewing force is high and aesthetic demand is moderate."}
                               </td>
                               <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
                                 <div className="flex items-start gap-2">
                                   <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
-                                  <span>Both front (highly visible) and back teeth (high load molars).</span>
+                                  <span>
+                                    {language === 'gu'
+                                      ? "આગળના (ખૂબ દેખાતા) અને પાછળના બંને દાંત (વધુ દબાણવાળા મોલર્સ) માટે."
+                                      : "Both front (highly visible) and back teeth (high load molars)."}
+                                  </span>
                                 </div>
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
-                                Front teeth (incisors and canines) requiring the absolute highest level of cosmetic match.
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "આગળના દાંત (ઇન્સાઇઝર્સ અને કેનાઇન્સ), જ્યાં સૌથી ઉચ્ચ સ્તરની કોસ્મેટિક મેચિંગ જરૂરી હોય."
+                                  : "Front teeth (incisors and canines) requiring the absolute highest level of cosmetic match."}
                               </td>
                             </tr>
 
                             {/* Row 2: Appearance */}
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Appearance
+                                {language === 'gu' ? "દેખાવ" : "Appearance"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
                                 <div className="flex items-start gap-2">
                                   <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                                  <span>Moderate aesthetics; a thin dark metal line may become visible near the gumline over time as gums naturally recede.</span>
+                                  <span>
+                                    {language === 'gu'
+                                      ? "મધ્યમ સૌંદર્ય; સમય જતાં પેઢા કુદરતી રીતે પાછળ ખસે ત્યારે ગમલાઇન પાસે પાતળી કાળી મેટલ લાઇન દેખાઈ શકે છે."
+                                      : "Moderate aesthetics; a thin dark metal line may become visible near the gumline over time as gums naturally recede."}
+                                  </span>
                                 </div>
                               </td>
                               <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
                                 <div className="flex items-start gap-2">
                                   <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
-                                  <span>High aesthetics; natural light-reflection, biocompatible, and completely metal-free.</span>
+                                  <span>
+                                    {language === 'gu'
+                                      ? "ઉચ્ચ સૌંદર્ય; કુદરતી પ્રકાશનું પ્રતિબિંબ, બાયોકમ્પેટિબલ અને સંપૂર્ણપણે મેટલ-ફ્રી."
+                                      : "High aesthetics; natural light-reflection, biocompatible, and completely metal-free."}
+                                  </span>
                                 </div>
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
                                 <div className="flex items-start gap-2">
                                   <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
-                                  <span>Elite aesthetics; mimics natural enamel translucency perfectly, completely metal-free for premium aesthetics.</span>
+                                  <span>
+                                    {language === 'gu'
+                                      ? "ઉત્તમ સૌંદર્ય; કુદરતી ઇનેમલની ટ્રાન્સલ્યુસન્સીને ખૂબ જ સારી રીતે અનુસરે છે અને પ્રીમિયમ સૌંદર્ય માટે સંપૂર્ણપણે મેટલ-ફ્રી છે."
+                                      : "Elite aesthetics; mimics natural enamel translucency perfectly, completely metal-free for premium aesthetics."}
+                                  </span>
                                 </div>
                               </td>
                             </tr>
@@ -4429,70 +4925,86 @@ export default function ServiceDetail({
                             {/* Row 3: Strength */}
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Strength
+                                {language === 'gu' ? "મજબૂતી" : "Strength"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
-                                Highly durable, cost-effective, proven long-term track record.
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "ખૂબ જ ટકાઉ, ખર્ચ-અસરકારક અને લાંબા સમયથી સાબિત થયેલું પ્રદર્શન."
+                                  : "Highly durable, cost-effective, proven long-term track record."}
                               </td>
                               <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
                                 <div className="flex items-start gap-2">
                                   <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
-                                  <span>Virtually indestructible, solid monolithic strength.</span>
+                                  <span>
+                                    {language === 'gu'
+                                      ? "લગભગ અવિનાશી, મજબૂત મોનોલિથિક શક્તિ."
+                                      : "Virtually indestructible, solid monolithic strength."}
+                                  </span>
                                 </div>
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
-                                Strong, but slightly less chip-resistant than solid monolithic zirconia under heavy grinding.
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "મજબૂત છે, પરંતુ વધુ પડતા ગ્રાઇન્ડિંગ દરમિયાન સોલિડ મોનોલિથિક ઝિર્કોનિયાની તુલનામાં ચિપિંગ સામે થોડું ઓછું પ્રતિરોધક છે."
+                                  : "Strong, but slightly less chip-resistant than solid monolithic zirconia under heavy grinding."}
                               </td>
                             </tr>
 
                             {/* Row 4: MRI-safe */}
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                MRI-safe
+                                {language === 'gu' ? "MRI માટે સુરક્ષિત" : "MRI-safe"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
-                                No (contains metal core)
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "ના (મેટલ કોર ધરાવે છે)"
+                                  : "No (contains metal core)"}
                               </td>
                               <td className="p-4 sm:p-5 font-semibold text-slate-900 bg-teal-50/30 border-x border-teal-100">
                                 <div className="flex items-start gap-2">
                                   <CheckCircle2 className="h-4 w-4 text-[#0D9488] shrink-0 mt-0.5" />
-                                  <span>Yes (completely metal-free)</span>
+                                  <span>
+                                    {language === 'gu'
+                                      ? "હા (સંપૂર્ણપણે મેટલ-ફ્રી)"
+                                      : "Yes (completely metal-free)"}
+                                  </span>
                                 </div>
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-600 font-medium">
-                                Yes (completely metal-free)
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "હા (સંપૂર્ણપણે મેટલ-ફ્રી)"
+                                  : "Yes (completely metal-free)"}
                               </td>
                             </tr>
 
                             {/* Row 5: Tooth removal required */}
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Tooth removal required
+                                {language === 'gu' ? "દાંત કાઢવો જરૂરી" : "Tooth removal required"}
                               </td>
                               <td className="p-4 sm:p-5 text-[#0D9488] font-bold">
-                                Contact Us for Details
+                                {language === 'gu' ? "વધુ માહિતી માટે અમારો સંપર્ક કરો" : "Contact Us for Details"}
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
-                                Contact Us for Details
+                                {language === 'gu' ? "વધુ માહિતી માટે અમારો સંપર્ક કરો" : "Contact Us for Details"}
                               </td>
                               <td className="p-4 sm:p-5 text-[#0D9488] font-bold">
-                                Contact Us for Details
+                                {language === 'gu' ? "વધુ માહિતી માટે અમારો સંપર્ક કરો" : "Contact Us for Details"}
                               </td>
                             </tr>
 
                             {/* Row 6: Lifespan */}
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Lifespan
+                                {language === 'gu' ? "આયુષ્ય" : "Lifespan"}
                               </td>
                               <td className="p-4 sm:p-5 text-[#0D9488] font-bold">
-                                Contact Us for Details
+                                {language === 'gu' ? "વધુ માહિતી માટે અમારો સંપર્ક કરો" : "Contact Us for Details"}
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
-                                Contact Us for Details
+                                {language === 'gu' ? "વધુ માહિતી માટે અમારો સંપર્ક કરો" : "Contact Us for Details"}
                               </td>
                               <td className="p-4 sm:p-5 text-[#0D9488] font-bold">
-                                Contact Us for Details
+                                {language === 'gu' ? "વધુ માહિતી માટે અમારો સંપર્ક કરો" : "Contact Us for Details"}
                               </td>
                             </tr>
                           </tbody>
@@ -4506,13 +5018,15 @@ export default function ServiceDetail({
                       <div className="space-y-3 max-w-3xl mx-auto text-center">
                         <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                           <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                          BEFORE & AFTER TRANSFORMATIONS
+                          {language === 'gu' ? "સારવાર પહેલાં અને પછીના પરિવર્તનો" : "BEFORE & AFTER TRANSFORMATIONS"}
                         </span>
                         <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight text-center">
-                          {seoHeadings.transformations}
+                          {language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસના સારવાર પહેલાં અને પછીના પરિવર્તનો" : seoHeadings.transformations}
                         </h2>
-                        <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium font-sans">
-                          {mConfig.before_after_description || "See real smile transformations of our patients."}
+                        <p className={`text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                          {language === 'gu'
+                            ? "ક્રાઉન્સ અને બ્રિજ દ્વારા દાંતની વાસ્તવિક રિસ્ટોરેશન પછી થયેલા પરિવર્તનો જુઓ."
+                            : (mConfig.before_after_description || "See real crown & bridge tooth restoration transformations.")}
                         </p>
                         <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                       </div>
@@ -4536,10 +5050,11 @@ export default function ServiceDetail({
 
                   {mConfig.show_gallery !== false && (
                     <ClinicalCaseGallery
-                      heading={seoHeadings.caseGallery}
-                      description={mConfig.gallery_description}
+                      heading={language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસ ક્લિનિકલ કેસ ગેલેરી" : seoHeadings.caseGallery}
+                      description={language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસ સારવારના ક્લિનિકલ કેસ સ્ટડીના પરિવર્તનો." : (mConfig.gallery_description || "Clinical case study transformations of Crown & Bridges treatments.")}
                       items={Array.isArray(mConfig.gallery_items) ? mConfig.gallery_items : displayGallery}
                       singleGallery={true}
+                      language={language}
                     />
                   )}
 
@@ -4547,8 +5062,10 @@ export default function ServiceDetail({
 
                   {mConfig.show_google_reviews !== false && (
                     <GooglePatientReviews
-                      heading={seoHeadings.reviews}
+                      heading={language === 'gu' ? "ક્રાઉન્સ અને બ્રિજિસ માટે Google પેશન્ટ રિવ્યૂઝ" : seoHeadings.reviews}
                       reviews={Array.isArray(mConfig.google_reviews) ? mConfig.google_reviews : []}
+                      label={language === 'gu' ? "Google રિવ્યૂઝ" : undefined}
+                      language={language}
                     />
                   )}
 
@@ -4557,13 +5074,15 @@ export default function ServiceDetail({
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        Transparent Pricing
+                        {language === 'gu' ? "પારદર્શક કિંમતો" : "Transparent Pricing"}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        Transparent, Honest Pricing
+                        {language === 'gu' ? "પારદર્શક, પ્રમાણિક કિંમતો" : "Transparent, Honest Pricing"}
                       </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        No hidden charges. We believe in providing clear upfront costs so you can make an informed decision for your oral health.
+                      <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "કોઈ છુપા ચાર્જીસ નથી. અમે સ્પષ્ટ અપફ્રન્ટ ખર્ચ જણાવવામાં માનીએ છીએ જેથી તમે તમારા ઓરલ હેલ્થ માટે યોગ્ય નિર્ણય લઈ શકો."
+                          : "No hidden charges. We believe in providing clear upfront costs so you can make an informed decision for your oral health."}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -4574,75 +5093,83 @@ export default function ServiceDetail({
                           <thead>
                             <tr className="border-b border-slate-200">
                               <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                Material Type
+                                {language === 'gu' ? "મટિરિયલ પ્રકાર" : "Material Type"}
                               </th>
                               <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                Pricing
+                                {language === 'gu' ? "કિંમત" : "Pricing"}
                               </th>
                               <th className="p-4 sm:p-5 bg-[#081C3A] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                Warranty
+                                {language === 'gu' ? "વોરંટી" : "Warranty"}
                               </th>
                               <th className="p-4 sm:p-5 bg-[#0D9488] text-white font-sans font-black text-xs sm:text-sm uppercase tracking-wider w-1/4">
-                                Best For
+                                {language === 'gu' ? "આ માટે શ્રેષ્ઠ" : "Best For"}
                               </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 font-sans text-xs sm:text-sm">
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Metal Fused Ceramic Crown
+                                {language === 'gu' ? "મેટલ ફ્યુઝ્ડ સિરામિક ક્રાઉન" : "Metal Fused Ceramic Crown"}
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
-                                Contact Us for Pricing
+                                {language === 'gu' ? "કિંમત માટે અમારો સંપર્ક કરો" : "Contact Us for Pricing"}
                               </td>
                               <td className="p-4 sm:p-5 text-slate-700 font-semibold">
-                                Warranty
+                                {language === 'gu' ? "વોરંટી" : "Warranty"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
-                                Classic durable option for chewing strength & back teeth
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-700 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "ચાવવાની મજબૂતી અને પાછળના દાંત માટે ક્લાસિક ટકાઉ વિકલ્પ"
+                                  : "Classic durable option for chewing strength & back teeth"}
                               </td>
                             </tr>
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Solid Monolithic Zirconia Crown
+                                {language === 'gu' ? "સોલિડ મોનોલિથિક ઝિર્કોનિયા ક્રાઉન" : "Solid Monolithic Zirconia Crown"}
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
-                                Contact Us for Pricing
+                                {language === 'gu' ? "કિંમત માટે અમારો સંપર્ક કરો" : "Contact Us for Pricing"}
                               </td>
                               <td className="p-4 sm:p-5 text-slate-700 font-semibold">
-                                Warranty
+                                {language === 'gu' ? "વોરંટી" : "Warranty"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
-                                Premium chip-resistant strength for high load molars & longevity
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-700 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "વધુ ભારવાળા મોલર્સ અને લાંબા આયુષ્ય માટે પ્રીમિયમ ચિપ-રેઝિસ્ટન્ટ મજબૂતી"
+                                  : "Premium chip-resistant strength for high load molars & longevity"}
                               </td>
                             </tr>
                             <tr className="hover:bg-slate-50/50 transition-colors">
                               <td className="p-4 sm:p-5 font-bold text-[#081C3A] bg-slate-50/60">
-                                Ultra-Aesthetic Layered Zirconia
+                                {language === 'gu' ? "અલ્ટ્રા-એસ્થેટિક લેયર્ડ ઝિર્કોનિયા" : "Ultra-Aesthetic Layered Zirconia"}
                               </td>
                               <td className="p-4 sm:p-5 font-bold text-[#0D9488] bg-teal-50/30 border-x border-teal-100">
-                                Contact Us for Pricing
+                                {language === 'gu' ? "કિંમત માટે અમારો સંપર્ક કરો" : "Contact Us for Pricing"}
                               </td>
                               <td className="p-4 sm:p-5 text-slate-700 font-semibold">
-                                Warranty
+                                {language === 'gu' ? "વોરંટી" : "Warranty"}
                               </td>
-                              <td className="p-4 sm:p-5 text-slate-700 font-medium">
-                                Elite natural look for highly visible front teeth
+                              <td className={`p-4 sm:p-5 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-700 font-medium'}`}>
+                                {language === 'gu'
+                                  ? "સામે દેખાતા આગળના દાંત માટે ઉત્કૃષ્ટ કુદરતી દેખાવ"
+                                  : "Elite natural look for highly visible front teeth"}
                               </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                       <div className="p-5 sm:p-6 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-                        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-xl">
-                          All plans include consultation, clinical fitting, and custom bite-matching adjustments by our specialists.
+                        <p className={`text-xs sm:text-sm max-w-xl ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                          {language === 'gu'
+                            ? "તમામ યોજનાઓમાં અમારા નિષ્ણાતો દ્વારા કન્સલ્ટેશન, ક્લિનિકલ ફિટિંગ અને કસ્ટમ બાઇટ-મેચિંગ એડજસ્ટમેન્ટનો સમાવેશ થાય છે."
+                            : "All plans include consultation, clinical fitting, and custom bite-matching adjustments by our specialists."}
                         </p>
                         <button
                           type="button"
                           onClick={() => openAppointmentModal("Crowns & Bridges Pricing - Consultation")}
                           className="w-full sm:w-auto px-5 py-2.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300"
                         >
-                          Book Free Consultation
+                          {language === 'gu' ? "ફ્રી કન્સલ્ટેશન બુક કરો" : "Book Free Consultation"}
                         </button>
                       </div>
                     </div>
@@ -4654,13 +5181,15 @@ export default function ServiceDetail({
                       <div className="space-y-3 max-w-2xl mx-auto text-center mb-10 sm:mb-14">
                         <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                           <Clock className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                          TREATMENT TIMELINE
+                          {language === 'gu' ? "સારવારની સમયરેખા" : "TREATMENT TIMELINE"}
                         </span>
                         <h2 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                          Your Treatment Timeline
+                          {language === 'gu' ? "તમારી સારવારની સમયરેખા" : "Your Treatment Timeline"}
                         </h2>
-                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed text-center font-normal">
-                          Two comfortable appointments spaced over a few days are all it takes to fully restore your smile. Here is what to expect:
+                        <p className={`text-sm sm:text-base leading-relaxed text-center ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-normal'}`}>
+                          {language === 'gu'
+                            ? "તમારા સ્માઇલને સંપૂર્ણ રીતે પુનઃસ્થાપિત કરવા માટે થોડા દિવસોના અંતરે માત્ર બે આરામદાયક મુલાકાતોની જરૂર છે. અહીં શું અપેક્ષા રાખવી તે જુઓ:"
+                            : "Two comfortable appointments spaced over a few days are all it takes to fully restore your smile. Here is what to expect:"}
                         </p>
                         <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-4" />
                       </div>
@@ -4675,10 +5204,12 @@ export default function ServiceDetail({
                               1
                             </div>
                             <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
-                              Preparation & Scan (Visit 1)
+                              {language === 'gu' ? "તૈયારી અને સ્કેન (મુલાકાત 1)" : "Preparation & Scan (Visit 1)"}
                             </h3>
-                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
-                              We gently prepare the tooth, capture a precise digital impression using our high-definition 3D scanner, select your custom tooth shade, and place a temporary crown.
+                            <p className={`text-xs sm:text-sm leading-relaxed max-w-[220px] ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600'}`}>
+                              {language === 'gu'
+                                ? "અમે દાંતને હળવાશથી તૈયાર કરીએ છીએ, હાઇ-ડેફિનેશન 3D સ્કેનરથી સચોટ ડિજિટલ ઇમ્પ્રેશન લઈએ છીએ, તમારા દાંતનો કસ્ટમ શેડ પસંદ કરીએ છીએ અને કામચલાઉ ક્રાઉન લગાવીએ છીએ."
+                                : "We gently prepare the tooth, capture a precise digital impression using our high-definition 3D scanner, select your custom tooth shade, and place a temporary crown."}
                             </p>
                           </div>
 
@@ -4688,10 +5219,12 @@ export default function ServiceDetail({
                               2
                             </div>
                             <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
-                              Lab Fabrication (In-Between)
+                              {language === 'gu' ? "લેબ ફેબ્રિકેશન (દરમિયાન)" : "Lab Fabrication (In-Between)"}
                             </h3>
-                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
-                              Our state-of-the-art dental laboratory uses computer-aided design and milling (CAD/CAM) to sculpt your custom restoration from high-grade zirconia or ceramic.
+                            <p className={`text-xs sm:text-sm leading-relaxed max-w-[220px] ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600'}`}>
+                              {language === 'gu'
+                                ? "અમારી અદ્યતન ડેન્ટલ લેબોરેટરી હાઇ-ગ્રેડ ઝિર્કોનિયા અથવા સિરામિકમાંથી તમારું કસ્ટમ રિસ્ટોરેશન બનાવવા માટે કમ્પ્યુટર-સહાયિત ડિઝાઇન અને મિલિંગ (CAD/CAM) નો ઉપયોગ કરે છે."
+                                : "Our state-of-the-art dental laboratory uses computer-aided design and milling (CAD/CAM) to sculpt your custom restoration from high-grade zirconia or ceramic."}
                             </p>
                           </div>
 
@@ -4701,10 +5234,12 @@ export default function ServiceDetail({
                               3
                             </div>
                             <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
-                              Bonding & Fitting (Visit 2)
+                              {language === 'gu' ? "બોન્ડિંગ અને ફિટિંગ (મુલાકાત 2)" : "Bonding & Fitting (Visit 2)"}
                             </h3>
-                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
-                              We remove the temporary crown, verify the fit, bite alignment, and color match of your permanent restoration, and securely bond it in place.
+                            <p className={`text-xs sm:text-sm leading-relaxed max-w-[220px] ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600'}`}>
+                              {language === 'gu'
+                                ? "અમે કામચલાઉ ક્રાઉન દૂર કરીએ છીએ, તમારા કાયમી રિસ્ટોરેશનનું ફિટિંગ, બાઇટ અલાઇનમેન્ટ અને કલર મેચિંગ ચકાસીએ છીએ અને તેને સુરક્ષિત રીતે ફિક્સ કરીએ છીએ."
+                                : "We remove the temporary crown, verify the fit, bite alignment, and color match of your permanent restoration, and securely bond it in place."}
                             </p>
                           </div>
 
@@ -4714,10 +5249,12 @@ export default function ServiceDetail({
                               4
                             </div>
                             <h3 className="font-sans font-bold text-[#081C3A] text-base sm:text-lg mb-2">
-                              Follow-Up & Care (Aftercare)
+                              {language === 'gu' ? "ફોલો-અપ અને કાળજી (સારવાર પછીની સંભાળ)" : "Follow-Up & Care (Aftercare)"}
                             </h3>
-                            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-[220px]">
-                              A routine check-up to ensure your bite feels natural and your gums are adapting comfortably, accompanied by simple care instructions for maximum longevity.
+                            <p className={`text-xs sm:text-sm leading-relaxed max-w-[220px] ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600'}`}>
+                              {language === 'gu'
+                                ? "તમારો બાઇટ કુદરતી લાગે છે અને પેઢા આરામદાયક રીતે અનુકૂલન સાધે છે તેની ખાતરી કરવા માટે નિયમિત તપાસ, સાથે મહત્તમ આયુષ્ય માટે સરળ સંભાળ સૂચનાઓ."
+                                : "A routine check-up to ensure your bite feels natural and your gums are adapting comfortably, accompanied by simple care instructions for maximum longevity."}
                             </p>
                           </div>
                         </div>
@@ -4730,13 +5267,15 @@ export default function ServiceDetail({
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <Shield className="h-3.5 w-3.5 text-[#0D9488]" />
-                        Commitment to Quality
+                        {language === 'gu' ? "ગુણવત્તા પ્રત્યે પ્રતિબદ્ધતા" : "Commitment to Quality"}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        Our Quality & Durability Commitments
+                        {language === 'gu' ? "અમારી ગુણવત્તા અને ટકાઉપણાની પ્રતિબદ્ધતાઓ" : "Our Quality & Durability Commitments"}
                       </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        We stand behind our crowns and bridges. Every restoration is crafted using biocompatible, certified materials from leading global manufacturers to ensure maximum durability, safety, and comfort.
+                      <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "અમે અમારા ક્રાઉન્સ અને બ્રિજિસની સંપૂર્ણ ખાતરી આપીએ છીએ. દરેક રિસ્ટોરેશન મહત્તમ ટકાઉપણું, સલામતી અને આરામ સુનિશ્ચિત કરવા માટે વૈશ્વિક અગ્રણી ઉત્પાદકોના બાયોકમ્પેટિબલ, પ્રમાણિત મટિરિયલ્સનો ઉપયોગ કરીને બનાવવામાં આવે છે."
+                          : "We stand behind our crowns and bridges. Every restoration is crafted using biocompatible, certified materials from leading global manufacturers to ensure maximum durability, safety, and comfort."}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -4746,10 +5285,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Genuine Certified Materials
+                          {language === 'gu' ? "અસલી પ્રમાણિત મટિરિયલ્સ" : "Genuine Certified Materials"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          We only use original, FDA-approved materials from internationally recognized manufacturers (such as Ivoclar, 3M, and Vita). Every premium crown comes with an official authenticity card.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "અમે ફક્ત આંતરરાષ્ટ્રીય સ્તરે માન્યતા પ્રાપ્ત ઉત્પાદકો (જેવા કે Ivoclar, 3M, અને Vita) ના અસલ, FDA-મંજૂર મટિરિયલ્સનો ઉપયોગ કરીએ છીએ. દરેક પ્રીમિયમ ક્રાઉન સાથે અધિકૃત ઓથેન્ટિસિટી કાર્ડ મળે છે."
+                            : "We only use original, FDA-approved materials from internationally recognized manufacturers (such as Ivoclar, 3M, and Vita). Every premium crown comes with an official authenticity card."}
                         </p>
                       </div>
 
@@ -4757,10 +5298,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Specialist Precision Fit
+                          {language === 'gu' ? "સ્પેશિયાલિસ્ટ પ્રિસિઝન ફિટ" : "Specialist Precision Fit"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Your crowns and bridges are designed and fitted under the care of specialized prosthodontists. We use digital scanning and computer-aided design (CAD/CAM) to ensure micron-level margin accuracy.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "તમારા ક્રાઉન્સ અને બ્રિજિસ નિષ્ણાત પ્રોસ્થોડોન્ટિસ્ટ્સની દેખરેખ હેઠળ ડિઝાઇન અને ફિટ કરવામાં આવે છે. માઇક્રોન-લેવલ માર્જિન ચોકસાઈ સુનિશ્ચિત કરવા માટે અમે ડિજિટલ સ્કેનિંગ અને કમ્પ્યુટર-સહાયિત ડિઝાઇન (CAD/CAM) નો ઉપયોગ કરીએ છીએ."
+                            : "Your crowns and bridges are designed and fitted under the care of specialized prosthodontists. We use digital scanning and computer-aided design (CAD/CAM) to ensure micron-level margin accuracy."}
                         </p>
                       </div>
 
@@ -4768,10 +5311,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-2 hover:scale-[1.015] cursor-pointer overflow-hidden flex flex-col h-full text-left">
                         <div className="absolute left-0 top-5 bottom-5 sm:top-8 sm:bottom-8 w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-4 leading-tight">
-                          Bite & Comfort Guarantee
+                          {language === 'gu' ? "બાઇટ અને આરામની ગેરંટી" : "Bite & Comfort Guarantee"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Your chewing comfort is our priority. If you feel any minor bite discomfort or high points after placement, we provide complimentary, precise bite adjustments until it feels completely natural.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "તમારી ચાવવાની સુવિધા અમારી પ્રાથમિકતા છે. જો ક્રાઉન બેસાડ્યા પછી કોઈ સામાન્ય અગવડતા કે ઊંચાઈ લાગે, તો જ્યાં સુધી તે સંપૂર્ણપણે કુદરતી ન લાગે ત્યાં સુધી અમે મફત, ચોક્કસ બાઇટ એડજસ્ટમેન્ટ પ્રદાન કરીએ છીએ."
+                            : "Your chewing comfort is our priority. If you feel any minor bite discomfort or high points after placement, we provide complimentary, precise bite adjustments until it feels completely natural."}
                         </p>
                       </div>
                     </div>
@@ -4785,13 +5330,17 @@ export default function ServiceDetail({
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        PROSTHODONTIC & RESTORATIVE CARE
+                        {language === 'gu' ? "પ્રોસ્થોડોન્ટિક અને રિસ્ટોરેટિવ કેર" : "PROSTHODONTIC & RESTORATIVE CARE"}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        Why Choose Patel Dental Hospital for Your Crowns & Bridges
+                        {language === 'gu'
+                          ? "તમારા ક્રાઉન્સ અને બ્રિજિસ માટે પટેલ ડેન્ટલ હોસ્પિટલ શા માટે પસંદ કરવી"
+                          : "Why Choose Patel Dental Hospital for Your Crowns & Bridges"}
                       </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        We combine honest material recommendations, digital scanning accuracy, and custom CAD/CAM craftsmanship to deliver long-lasting, natural-looking restorations tailored to your specific tooth and chewing needs.
+                      <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "અમે તમારા ચોક્કસ દાંત અને ચાવવાની જરૂરિયાતોને અનુરૂપ લાંબા સમય સુધી ચાલતા, કુદરતી દેખાતા રિસ્ટોરેશન્સ આપવા માટે પ્રમાણિક મટિરિયલ સલાહ, ડિજિટલ સ્કેનિંગ ચોકસાઈ અને કસ્ટમ CAD/CAM કારીગરીનો સમન્વય કરીએ છીએ."
+                          : "We combine honest material recommendations, digital scanning accuracy, and custom CAD/CAM craftsmanship to deliver long-lasting, natural-looking restorations tailored to your specific tooth and chewing needs."}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -4801,10 +5350,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          Honest Material Guidance
+                          {language === 'gu' ? "પ્રમાણિક મટિરિયલ માર્ગદર્શન" : "Honest Material Guidance"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          We clearly explain the pros and cons of each material (PFM, Monolithic Zirconia, Layered Zirconia, and E-max), helping you choose the right balance of strength, aesthetics, and budget without upselling.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "અમે દરેક મટિરિયલ (PFM, Monolithic Zirconia, Layered Zirconia, અને E-MAX) ના ફાયદા અને મર્યાદાઓ સ્પષ્ટપણે સમજાવીએ છીએ, જેથી કોઈપણ વધારાના ખર્ચના દબાણ વિના તમે મજબૂતી, સૌંદર્ય અને બજેટનું યોગ્ય સંતુલન પસંદ કરી શકો."
+                            : "We clearly explain the pros and cons of each material (PFM, Monolithic Zirconia, Layered Zirconia, and E-max), helping you choose the right balance of strength, aesthetics, and budget without upselling."}
                         </p>
                       </div>
 
@@ -4812,10 +5363,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          Digital Shade Matching
+                          {language === 'gu' ? "ડિજિટલ શેડ મેચિંગ" : "Digital Shade Matching"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Advanced shade-matching protocols analyze your adjacent teeth, enamel translucency, and natural contours so your crown or bridge blends seamlessly with your smile.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "અદ્યતન શેડ-મેચિંગ પ્રોટોકોલ્સ તમારા આસપાસના દાંત, ઇનેમલ ટ્રાન્સલ્યુસન્સી અને કુદરતી આકારનું વિશ્લેષણ કરે છે જેથી તમારો ક્રાઉન અથવા બ્રિજ તમારા સ્માઇલ સાથે એકરૂપ થઈ જાય."
+                            : "Advanced shade-matching protocols analyze your adjacent teeth, enamel translucency, and natural contours so your crown or bridge blends seamlessly with your smile."}
                         </p>
                       </div>
 
@@ -4823,10 +5376,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          Precision CAD/CAM Fit
+                          {language === 'gu' ? "ચોક્કસ CAD/CAM ફિટ" : "Precision CAD/CAM Fit"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Computer-aided design and milling ensure micron-level margin fit, eliminating gaps, preventing food lodgement, and protecting the underlying tooth against secondary decay.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "કમ્પ્યુટર-સહાયિત ડિઝાઇન અને મિલિંગ માઇક્રોન-લેવલ માર્જિન ફિટ સુનિશ્ચિત કરે છે, જે ગેપ દૂર કરે છે, ખોરાક ભરાતો અટકાવે છે અને નીચેના દાંતને ગૌણ સડોથી સુરક્ષિત રાખે છે."
+                            : "Computer-aided design and milling ensure micron-level margin fit, eliminating gaps, preventing food lodgement, and protecting the underlying tooth against secondary decay."}
                         </p>
                       </div>
 
@@ -4834,18 +5389,22 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          Balanced Bite & Function
+                          {language === 'gu' ? "સંતુલિત બાઇટ અને કાર્યક્ષમતા" : "Balanced Bite & Function"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Every crown and bridge is customized to harmonize with your natural bite dynamics, ensuring optimal chewing comfort, joint alignment, and long-term durability.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "દરેક ક્રાઉન અને બ્રિજ તમારા કુદરતી બાઇટ સાથે સુમેળ સાધવા માટે કસ્ટમાઇઝ કરવામાં આવે છે, જે શ્રેષ્ઠ ચાવવાની સુવિધા, જડબાના જોડાણનું સંરેખણ અને લાંબા ગાળાની ટકાઉપણું સુનિશ્ચિત કરે છે."
+                            : "Every crown and bridge is customized to harmonize with your natural bite dynamics, ensuring optimal chewing comfort, joint alignment, and long-term durability."}
                         </p>
                       </div>
                     </div>
 
                     {/* Bottom Reassurance */}
                     <div className="max-w-3xl mx-auto text-center pt-2">
-                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                        We guide you toward the most conservative, durable option for your tooth — explaining when a lower-cost material is completely appropriate.
+                      <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "અમે તમારા દાંત માટે સૌથી સંરક્ષણાત્મક અને ટકાઉ વિકલ્પ તરફ તમારું માર્ગદર્શન કરીએ છીએ — જેમાં ઓછી કિંમતનું મટિરિયલ ક્યારે સંપૂર્ણપણે યોગ્ય છે તે પણ સમજાવીએ છીએ."
+                          : "We guide you toward the most conservative, durable option for your tooth — explaining when a lower-cost material is completely appropriate."}
                       </p>
                     </div>
                   </div>
@@ -4855,13 +5414,17 @@ export default function ServiceDetail({
                     <div className="space-y-3 max-w-3xl mx-auto text-center">
                       <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
                         <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-                        PRECISION RESTORATIVE TECHNOLOGY
+                        {language === 'gu' ? "ચોક્કસ રિસ્ટોરેટિવ ટેકનોલોજી" : "PRECISION RESTORATIVE TECHNOLOGY"}
                       </span>
                       <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
-                        Advanced Technology Designed for Precision Crowns & Bridges
+                        {language === 'gu'
+                          ? "ચોક્કસ ક્રાઉન્સ અને બ્રિજિસ માટે ડિઝાઇન કરાયેલી અદ્યતન ટેકનોલોજી"
+                          : "Advanced Technology Designed for Precision Crowns & Bridges"}
                       </h2>
-                      <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-medium font-sans">
-                        Modern digital dentistry streamlines every stage of crown and bridge fabrication, ensuring exceptional comfort, pinpoint accuracy, and durable aesthetics.
+                      <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed text-center font-sans ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "આધુનિક ડિજિટલ ડેન્ટિસ્ટ્રી ક્રાઉન અને બ્રિજ નિર્માણના દરેક તબક્કાને સુવ્યવસ્થિત કરે છે, જે અસાધારણ આરામ, ચોકસાઈ અને ટકાઉ સૌંદર્ય સુનિશ્ચિત કરે છે."
+                          : "Modern digital dentistry streamlines every stage of crown and bridge fabrication, ensuring exceptional comfort, pinpoint accuracy, and durable aesthetics."}
                       </p>
                       <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
                     </div>
@@ -4871,10 +5434,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          3D Digital Impressions & Scanning
+                          {language === 'gu' ? "3D ડિજિટલ ઇમ્પ્રેશન્સ અને સ્કેનિંગ" : "3D Digital Impressions & Scanning"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          High-definition intraoral scanners capture distortion-free digital 3D models of your teeth in seconds, eliminating messy, uncomfortable traditional impression trays.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "હાઇ-ડેફિનેશન ઇન્ટ્રાઓરલ સ્કેનર્સ સેકન્ડોમાં તમારા દાંતના ડિસ્ટોર્શન-ફ્રી ડિજિટલ 3D મોડલ્સ કેપ્ચર કરે છે, જેથી પરંપરાગત અગવડભરી ટ્રેની જરૂર રહેતી નથી."
+                            : "High-definition intraoral scanners capture distortion-free digital 3D models of your teeth in seconds, eliminating messy, uncomfortable traditional impression trays."}
                         </p>
                       </div>
 
@@ -4882,10 +5447,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          CAD/CAM Design & Milling
+                          {language === 'gu' ? "CAD/CAM ડિઝાઇન અને મિલિંગ" : "CAD/CAM Design & Milling"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Automated computer-aided design and precision multi-axis milling carve solid zirconia and glass-ceramic restorations with structural integrity and exact margins.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "ઓટોમેટેડ કમ્પ્યુટર-સહાયિત ડિઝાઇન અને ચોક્કસ મલ્ટિ-એક્સિસ મિલિંગ સોલિડ ઝિર્કોનિયા અને ગ્લાસ-સિરામિક રિસ્ટોરેશન્સને મજબૂત રચના અને ચોક્કસ માર્જિન સાથે તૈયાર કરે છે."
+                            : "Automated computer-aided design and precision multi-axis milling carve solid zirconia and glass-ceramic restorations with structural integrity and exact margins."}
                         </p>
                       </div>
 
@@ -4893,10 +5460,12 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          Biocompatible Monolithic Zirconia
+                          {language === 'gu' ? "બાયોકમ્પેટિબલ મોનોલિથિક ઝિર્કોનિયા" : "Biocompatible Monolithic Zirconia"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Full-contour medical-grade zirconia provides superior fracture resistance for heavy chewing molars without the risk of porcelain chipping or metal exposure.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "ફુલ-કોન્ટૂર મેડિકલ-ગ્રેડ ઝિર્કોનિયા પોર્સેલેઇન ચિપિંગ અથવા મેટલ દેખાવાના જોખમ વિના ભારે ચાવવાના મોલર્સ માટે શ્રેષ્ઠ ફ્રેક્ચર પ્રતિકાર પૂરો પાડે છે."
+                            : "Full-contour medical-grade zirconia provides superior fracture resistance for heavy chewing molars without the risk of porcelain chipping or metal exposure."}
                         </p>
                       </div>
 
@@ -4904,18 +5473,22 @@ export default function ServiceDetail({
                       <div className="relative bg-white border border-[#E8EEF5] rounded-[22px] p-6 sm:p-7 shadow-[0_12px_35px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] hover:border-[#14B8A6] transition-all duration-300 group hover:-translate-y-1.5 flex flex-col h-full text-left overflow-hidden">
                         <div className="absolute left-0 top-6 bottom-6 sm:top-[28px] sm:bottom-[28px] w-[4px] rounded-r-[4px] bg-gradient-to-b from-[#14B8A6] to-[#06B6D4]" />
                         <h3 className="font-sans font-bold text-[#081C3A] text-lg sm:text-xl tracking-tight mb-2 sm:mb-3 leading-tight">
-                          High-Translucency E-max Ceramics
+                          {language === 'gu' ? "હાઇ-ટ્રાન્સલ્યુસન્સી E-MAX સિરામિક્સ" : "High-Translucency E-max Ceramics"}
                         </h3>
-                        <p className="text-[#475569] text-xs sm:text-sm leading-relaxed font-medium flex-1">
-                          Lithium disilicate glass-ceramics deliver lifelike light transmission and natural enamel luminescence for front teeth restorations and aesthetic bridge pontics.
+                        <p className={`text-xs sm:text-sm leading-relaxed flex-1 ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-[#475569] font-medium'}`}>
+                          {language === 'gu'
+                            ? "લિથિયમ ડાયસિલિકેટ ગ્લાસ-સિરામિક્સ આગળના દાંતના રિસ્ટોરેશન્સ અને એસ્થેટિક બ્રિજ પોન્ટિક્સ માટે જીવંત પ્રકાશ ટ્રાન્સમિશન અને કુદરતી ઇનેમલ ચમક આપે છે."
+                            : "Lithium disilicate glass-ceramics deliver lifelike light transmission and natural enamel luminescence for front teeth restorations and aesthetic bridge pontics."}
                         </p>
                       </div>
                     </div>
 
                     {/* Bottom Reassurance */}
                     <div className="max-w-3xl mx-auto text-center pt-2">
-                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                        Digital workflow ensures consistent precision, excellent marginal seal, and lasting durability for every restoration.
+                      <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                        {language === 'gu'
+                          ? "ડિજિટલ વર્કફ્લો દરેક રિસ્ટોરેશન માટે સતત ચોકસાઈ, ઉત્તમ માર્જિનલ સીલ અને ટકાઉ આયુષ્ય સુનિશ્ચિત કરે છે."
+                          : "Digital workflow ensures consistent precision, excellent marginal seal, and lasting durability for every restoration."}
                       </p>
                     </div>
                   </div>
@@ -4943,6 +5516,7 @@ export default function ServiceDetail({
                   openAppointmentModal={openAppointmentModal}
                   smileMakeoverWhatsAppUrl={smileMakeoverWhatsAppUrl}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -4962,6 +5536,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -4982,6 +5557,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5003,6 +5579,7 @@ export default function ServiceDetail({
                   openAppointmentModal={openAppointmentModal}
                   drVipulImg={drVipulImg}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5023,6 +5600,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5044,6 +5622,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5063,6 +5642,7 @@ export default function ServiceDetail({
                   invisibleAlignersHeroImage={getServiceHeroImage('invisible-aligners')}
                   toothColouredFillingHeroImage={getServiceHeroImage('tooth-coloured-filling')}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5082,6 +5662,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   openAppointmentModal={openAppointmentModal}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5102,6 +5683,7 @@ export default function ServiceDetail({
                   openAppointmentModal={openAppointmentModal}
                   getServiceHeroImage={getServiceHeroImage}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }
@@ -5119,6 +5701,7 @@ export default function ServiceDetail({
                   seoHeadings={seoHeadings}
                   getServiceHeroImage={getServiceHeroImage}
                   setCurrentPage={setCurrentPage}
+                  language={language}
                 />
               );
             }

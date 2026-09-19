@@ -27,6 +27,23 @@ interface ClinicalCaseGalleryProps {
   description?: string;
   items: GalleryItem[];
   singleGallery?: boolean;
+  language?: string;
+}
+
+function getCategoryDisplayTitle(cat: string, lang?: string): string {
+  if (lang !== 'gu') return cat;
+  const trimmed = cat.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower === 'single implant' || lower === 'single case' || lower.includes('single')) {
+    return 'સિંગલ ઇમ્પ્લાન્ટ';
+  }
+  if (lower === 'double implant' || lower === 'multiple case' || lower.includes('double') || lower.includes('multiple') || lower.includes('quadrant')) {
+    return 'ડબલ ઇમ્પ્લાન્ટ';
+  }
+  if (lower === 'full mouth rehabilitation (fmr)' || lower === 'fmr case' || lower.includes('fmr') || lower.includes('full mouth')) {
+    return 'ફુલ માઉથ રિહેબિલિટેશન (FMR)';
+  }
+  return cat;
 }
 
 const PREFERRED_CATEGORY_ORDER = [
@@ -484,6 +501,7 @@ interface CategorySliderProps {
   categoryItems: GalleryItem[];
   isMobile: boolean;
   onImageClick: (item: GalleryItem, index: number, list: GalleryItem[]) => void;
+  language?: string;
 }
 
 const CategorySlider: React.FC<CategorySliderProps> = ({
@@ -491,6 +509,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
   categoryItems,
   isMobile,
   onImageClick,
+  language,
 }) => {
   const totalItems = categoryItems.length;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -594,11 +613,17 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
       onTouchEnd={handleTouchEnd}
     >
       {/* Case count info flag tag */}
-      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 bg-white/95 backdrop-blur-md text-[#081C3A] text-xs font-extrabold px-3 py-1.5 rounded-full border border-slate-200/90 flex items-center gap-2 shadow-xs select-none">
+      <div className={`absolute top-3 left-3 sm:top-4 sm:left-4 z-10 bg-white/95 backdrop-blur-md text-xs px-3 py-1.5 rounded-full border border-slate-200/90 flex items-center gap-2 shadow-xs select-none ${language === 'gu' ? 'text-[#000000] font-bold' : 'text-[#081C3A] font-extrabold'}`}>
         <span className="h-2 w-2 rounded-full bg-[#0D9488] animate-pulse" />
-        {!isMobile && totalItems > 1
-          ? `Cases ${currentIndex + 1} & ${((currentIndex + 1) % totalItems) + 1} of ${totalItems}`
-          : `Case ${currentIndex + 1} of ${totalItems}`}
+        {language === 'gu' ? (
+          !isMobile && totalItems > 1
+            ? `${totalItems}માંથી કેસ ${currentIndex + 1} અને ${((currentIndex + 1) % totalItems) + 1}`
+            : `${totalItems}માંથી કેસ ${currentIndex + 1}`
+        ) : (
+          !isMobile && totalItems > 1
+            ? `Cases ${currentIndex + 1} & ${((currentIndex + 1) % totalItems) + 1} of ${totalItems}`
+            : `Case ${currentIndex + 1} of ${totalItems}`
+        )}
       </div>
 
       {/* Slide frame with stable vertical min height */}
@@ -729,6 +754,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
   description,
   items,
   singleGallery = false,
+  language = 'en',
 }) => {
   const isMobile = useIsMobile();
 
@@ -830,13 +856,13 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
       <div className="space-y-3 max-w-3xl mx-auto text-center">
         <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50/80 rounded-full border border-teal-100/60">
           <Sparkles className="h-3.5 w-3.5 text-[#0D9488] shrink-0" />
-          Clinical Cases
+          {language === 'gu' ? "ક્લિનિકલ કેસ" : "Clinical Cases"}
         </span>
         <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-4xl text-[#081C3A] tracking-tight leading-tight text-center">
           {heading}
         </h2>
         {description && (
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center font-medium">
+          <p className={`text-sm sm:text-base max-w-xl mx-auto leading-relaxed text-center ${language === 'gu' ? 'text-[#000000] font-semibold' : 'text-slate-600 font-medium'}`}>
             {description}
           </p>
         )}
@@ -883,17 +909,23 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
                     </div>
                     <div>
                       <h3 className="font-sans font-extrabold text-base sm:text-lg text-[#081C3A] tracking-tight">
-                        {cat}
+                        {getCategoryDisplayTitle(cat, language)}
                       </h3>
-                      <p className="text-xs text-slate-500 font-medium">
-                        {categoryItems.length} {categoryItems.length === 1 ? 'Clinical Case' : 'Clinical Cases'}
+                      <p className={`text-xs ${language === 'gu' ? 'text-[#000000] font-semibold' : 'text-slate-500 font-medium'}`}>
+                        {language === 'gu'
+                          ? `${categoryItems.length} ક્લિનિકલ કેસ`
+                          : `${categoryItems.length} ${categoryItems.length === 1 ? 'Clinical Case' : 'Clinical Cases'}`
+                        }
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] font-bold text-[#0D9488] bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
-                      {categoryItems.length} {categoryItems.length === 1 ? 'Photo' : 'Photos'}
+                      {language === 'gu'
+                        ? `${categoryItems.length} ફોટા`
+                        : `${categoryItems.length} ${categoryItems.length === 1 ? 'Photo' : 'Photos'}`
+                      }
                     </span>
                     <div className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600">
                       {isOpen ? (
@@ -913,6 +945,7 @@ export const ClinicalCaseGallery: React.FC<ClinicalCaseGalleryProps> = ({
                       categoryItems={categoryItems}
                       isMobile={isMobile}
                       onImageClick={(item, actualIndex, list) => handleOpenLightbox(list, actualIndex)}
+                      language={language}
                     />
                   </div>
                 )}

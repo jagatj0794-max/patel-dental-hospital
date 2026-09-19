@@ -19,6 +19,40 @@ interface NavbarProps {
   setLanguage: (lang: 'en' | 'gu') => void;
 }
 
+const NAV_TRANSLATIONS: Record<string, string> = {
+  // Top Level
+  'Home': 'હોમ',
+  'About Us': 'અમારા વિશે',
+  'Why Choose Us?': 'અમને શા માટે પસંદ કરો?',
+  'Dental Tourism': 'ડેન્ટલ ટૂરિઝમ',
+  'Services': 'સારવાર',
+  'Dental Blog': 'ડેન્ટલ બ્લોગ',
+  'Contact Us': 'સંપર્ક કરો',
+  'Free Consultation': 'ફ્રી પુછપરછ',
+
+  // ABOUT US DROPDOWN
+  'Meet Doctors': 'ડૉક્ટરોને મળો',
+  'Technology': 'ટેક્નોલોજી',
+  'Social Service': 'સામાજિક સેવા',
+  'Gallery': 'ગેલેરી',
+
+  // SERVICES DROPDOWN
+  'Dental Implants': 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ',
+  'Full Mouth Rehabilitation': 'ફુલ માઉથ રિહેબિલિટેશન',
+  'Invisible Aligners': 'ઇનવિઝિબલ એલાઇનર્સ',
+  'Single Sitting Root Canal Treatment': 'સિંગલ સિટિંગ રૂટ કેનલ ટ્રીટમેન્ટ',
+  'Smile Makeover': 'સ્માઇલ મેકઓવર',
+  'Crowns & Bridges': 'ક્રાઉન્સ અને બ્રિજિસ',
+  'Pediatric Dentistry': 'બાળકોની ડેન્ટિસ્ટ્રી',
+  'Teeth Whitening': 'દાંત સફેદ કરવાની સારવાર',
+  'Braces Treatment': 'બ્રેસિસ ટ્રીટમેન્ટ',
+  'Wisdom Tooth Surgery': 'વિઝડમ ટૂથ સર્જરી',
+  'Tooth Coloured Filling': 'ટૂથ કલર્ડ ફિલિંગ (કોમ્પોઝિટ ફિલિંગ)',
+  'Tooth Coloured Filling (Composite Filling)': 'ટૂથ કલર્ડ ફિલિંગ (કોમ્પોઝિટ ફિલિંગ)',
+  'Tooth Coloured Filling\n(Composite Filling)': 'ટૂથ કલર્ડ ફિલિંગ (કોમ્પોઝિટ ફિલિંગ)',
+  'Same Day Fix Teeth': 'સેમ ડે ફિક્સ ટીથ',
+};
+
 const navHierarchy = [
   { label: 'Home', id: 'home' },
   { 
@@ -157,8 +191,12 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
           <div className="flex items-center space-x-4 lg:space-x-6">
             <div className="flex items-center space-x-2">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden sm:inline">Rajkot, Gujarat, India</span>
-              <span className="sm:hidden">Rajkot, India</span>
+              <span className="hidden sm:inline">
+                {language === 'gu' ? 'રાજકોટ, ગુજરાત, ભારત' : 'Rajkot, Gujarat, India'}
+              </span>
+              <span className="sm:hidden">
+                {language === 'gu' ? 'રાજકોટ, ભારત' : 'Rajkot, India'}
+              </span>
             </div>
             
             {/* Desktop Language Switch (Top Bar Placement) */}
@@ -219,7 +257,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                       isItemActive(item) || activeDropdown === item.id ? 'text-[#0D9488]' : 'text-[#12355B] hover:text-[#0D9488]'
                     }`}
                   >
-                    {item.label}
+                    {language === 'gu' ? (NAV_TRANSLATIONS[item.label] || item.label) : item.label}
                     {item.dropdown && <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform duration-200 ${activeDropdown === item.id ? 'rotate-180' : ''}`} />}
                   </button>
 
@@ -228,20 +266,24 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                     <AnimatePresence>
                       {activeDropdown === item.id && (
                         <motion.div
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 15 }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                          className="absolute top-full left-0 mt-0 pt-4 w-60 z-50 pointer-events-auto"
+                           initial={{ opacity: 0, y: 15 }}
+                           animate={{ opacity: 1, y: 0 }}
+                           exit={{ opacity: 0, y: 15 }}
+                           transition={{ duration: 0.2, ease: "easeOut" }}
+                           className="absolute top-full left-0 mt-0 pt-4 w-60 z-50 pointer-events-auto"
                         >
                           <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden flex flex-col py-2">
                             {item.dropdown.map((dropItem) => (
                               <button
                                 key={dropItem.id}
                                 onClick={() => handleNavigate(dropItem.id)}
-                                className="block w-full text-left px-5 py-2.5 text-[14px] font-medium text-[#12355B] hover:bg-slate-50 hover:text-[#0D9488] transition-colors"
+                                className={`block w-full text-left px-5 py-2.5 text-[14px] transition-colors ${
+                                  language === 'gu'
+                                    ? 'font-semibold text-[#0B1E36] hover:bg-slate-50 hover:text-[#0D9488]'
+                                    : 'font-medium text-[#12355B] hover:bg-slate-50 hover:text-[#0D9488]'
+                                }`}
                               >
-                                {dropItem.label}
+                                {language === 'gu' ? (NAV_TRANSLATIONS[dropItem.label] || dropItem.label) : dropItem.label}
                               </button>
                             ))}
                           </div>
@@ -264,7 +306,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                 className="flex items-center text-[13px] xl:text-[14px] font-bold text-white bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] hover:from-[#0F766E] hover:to-[#0284c7] px-5 py-2.5 rounded-xl shadow-[0_4px_14px_0_rgba(13,148,136,0.25)] cursor-pointer hover:shadow-lg transition-all duration-300 transform active:scale-95"
               >
                 <Calendar className="h-4 w-4 mr-2" />
-                Free Consultation
+                {language === 'gu' ? 'ફ્રી પુછપરછ' : 'Free Consultation'}
               </button>
             </div>
 
@@ -320,7 +362,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                         isItemActive(item) ? 'text-[#0D9488]' : 'text-[#12355B]'
                       }`}
                     >
-                      {item.label}
+                      {language === 'gu' ? (NAV_TRANSLATIONS[item.label] || item.label) : item.label}
                     </button>
                     {item.dropdown && (
                       <button 
@@ -347,9 +389,13 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                               <button
                                 key={dropItem.id}
                                 onClick={() => handleNavigate(dropItem.id)}
-                                className="block w-full text-left px-6 py-2.5 text-[14px] font-semibold text-slate-600 hover:text-[#0D9488]"
+                                className={`block w-full text-left px-6 py-2.5 text-[14px] transition-all ${
+                                  language === 'gu'
+                                    ? 'font-semibold text-[#0B1E36] hover:text-[#0D9488]'
+                                    : 'font-semibold text-slate-600 hover:text-[#0D9488]'
+                                }`}
                               >
-                                {dropItem.label}
+                                {language === 'gu' ? (NAV_TRANSLATIONS[dropItem.label] || dropItem.label) : dropItem.label}
                               </button>
                             ))}
                           </div>
@@ -388,7 +434,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                   className="flex items-center justify-center w-full bg-gradient-to-r from-[#0D9488] to-[#0ea5e9] py-3.5 rounded-xl font-bold text-white transition shadow-md"
                 >
                   <Calendar className="h-5 w-5 mr-2" />
-                  Free Consultation
+                  {language === 'gu' ? 'ફ્રી પુછપરછ' : 'Free Consultation'}
                 </button>
               </div>
             </div>
