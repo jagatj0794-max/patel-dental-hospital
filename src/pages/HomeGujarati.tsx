@@ -430,19 +430,19 @@ const clinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c3
 const heroBannerBg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
 const doctorsImg = 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800';
 import AnimatedCounter from '../components/AnimatedCounter';
-const sameDayTeethImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
-const dentalImplantsImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
-const fullMouthRehabImg = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
-const clearAlignersImg = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
-const rootCanalImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
-const smileMakeoverImg = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800';
-const crownsBridgesImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
-const teethCleaningImg = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
-const kidsDentistryImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
-const bracesImg = 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800';
-const wisdomToothImg = 'https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800';
-const compositeFillingImg = 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800';
-const fdaApprovedImplantImg = 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800';
+const sameDayTeethImg = '/Dental%20Implants.webp';
+const dentalImplantsImg = '/Dental%20Implants.webp';
+const fullMouthRehabImg = '/Full%20Mouth.webp';
+const clearAlignersImg = '/Aligners.webp';
+const rootCanalImg = '/Root%20Canal.webp';
+const smileMakeoverImg = '/Smile%20Designing.webp';
+const crownsBridgesImg = '/Digital%20Dental%20Experts.webp';
+const teethCleaningImg = '/white%20teeth%20in%20rajkot.jpg';
+const kidsDentistryImg = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp';
+const bracesImg = '/IMG_3610.webp';
+const wisdomToothImg = '/Oral%20&%20Maxillofacial%20Surgery.png';
+const compositeFillingImg = '/MG_3249.webp';
+const fdaApprovedImplantImg = '/Dental%20Implants.webp';
 
 const patelDentistPatient1 = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
 const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
@@ -802,9 +802,22 @@ export default function HomeGujarati({
       greenHighlightLineVal = "સુંદર સ્મિત માટે કુદરતી દાંતના રંગની ફિલિંગ";
     }
 
+    const isValidImage = (url: any): boolean => {
+      if (!url) return false;
+      if (typeof url !== 'string') return false;
+      const trimmed = url.trim();
+      return trimmed !== '' && trimmed !== 'null' && trimmed !== 'undefined' && !trimmed.toLowerCase().includes('placeholder');
+    };
+
+    const resolvedImage = [
+      dbSvc?.homepage_card_image,
+      dbSvc?.hero_image,
+      defaultImage
+    ].find(isValidImage) || defaultImage;
+
     return {
       title: titleVal,
-      image: dbSvc?.homepage_card_image || dbSvc?.hero_image || defaultImage,
+      image: resolvedImage,
       shortDesc: shortDescVal,
       slug: dbSvc?.slug || defaultSlug,
       isActive: dbSvc ? dbSvc.is_active : true,
@@ -2306,7 +2319,7 @@ export default function HomeGujarati({
                     {/* Image Container */}
                     <div className="relative aspect-[3/2] w-full overflow-hidden bg-slate-50">
                       <img
-                        src={cardData.image || null}
+                        src={cardData.image}
                         alt={cardData.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
                         referrerPolicy="no-referrer"

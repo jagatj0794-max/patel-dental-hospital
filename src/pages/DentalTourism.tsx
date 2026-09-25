@@ -161,7 +161,7 @@ const internationalTreatments = [
     slug: "dental-implants",
     title: "Dental Implants",
     description: "Replace missing teeth with natural-looking, functional teeth.",
-    image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+    image: "/Dental%20Implants.webp",
     route: "services/dental-implants"
   },
   {
@@ -169,7 +169,7 @@ const internationalTreatments = [
     slug: "smile-makeover",
     title: "Smile Makeover",
     description: "Transform the appearance of your smile with personalised cosmetic dentistry.",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
+    image: "/Smile%20Designing.webp",
     route: "services/smile-makeover"
   },
   {
@@ -177,7 +177,7 @@ const internationalTreatments = [
     slug: "full-mouth-rehabilitation",
     title: "Full-Mouth Rehabilitation",
     description: "Comprehensive reconstruction for severely damaged, worn or missing teeth.",
-    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+    image: "/Full%20Mouth.webp",
     route: "services/full-mouth-rehabilitation"
   },
   {
@@ -185,7 +185,7 @@ const internationalTreatments = [
     slug: "crowns-and-bridges",
     title: "Zirconia Crowns & Bridges",
     description: "Restore damaged or missing teeth with metal-free, premium Zirconia restorations.",
-    image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+    image: "/Digital%20Dental%20Experts.webp",
     route: "services/crowns-and-bridges"
   },
   {
@@ -193,7 +193,7 @@ const internationalTreatments = [
     slug: "root-canal-treatment",
     title: "Single Sitting Root Canal Treatment",
     description: "Save infected teeth and eliminate pain with comfortable, single-visit root canal therapy.",
-    image: "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
+    image: "/Root%20Canal.webp",
     route: "services/root-canal-treatment"
   },
   {
@@ -201,7 +201,7 @@ const internationalTreatments = [
     slug: "invisible-aligners",
     title: "Invisible Aligners",
     description: "Straighten your teeth comfortably and discreetly with custom, virtually invisible aligners.",
-    image: "https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800",
+    image: "/Aligners.webp",
     route: "services/invisible-aligners"
   },
   {
@@ -209,7 +209,7 @@ const internationalTreatments = [
     slug: "pediatric-dentistry",
     title: "Pediatric Dentistry",
     description: "Gentle, warm, and highly protective pediatric dental care to nurture lifelong healthy smiles.",
-    image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+    image: "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp",
     route: "services/pediatric-dentistry"
   },
   {
@@ -217,7 +217,7 @@ const internationalTreatments = [
     slug: "teeth-whitening",
     title: "Teeth Whitening",
     description: "Brighten your smile dramatically with our safe, fast, and highly effective teeth whitening procedures.",
-    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+    image: "/white%20teeth%20in%20rajkot.jpg",
     route: "services/teeth-whitening"
   },
   {
@@ -225,7 +225,7 @@ const internationalTreatments = [
     slug: "braces-treatment",
     title: "Braces Treatment",
     description: "Classic orthodontic corrections using durable ceramic, metal, or self-ligating bracket systems.",
-    image: "https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800",
+    image: "/IMG_3610.webp",
     route: "services/braces-treatment"
   },
   {
@@ -233,7 +233,7 @@ const internationalTreatments = [
     slug: "wisdom-tooth-surgery",
     title: "Wisdom Tooth Surgery",
     description: "Safe, pain-free, surgical extraction of impacted or painful wisdom teeth.",
-    image: "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
+    image: "/Oral%20&%20Maxillofacial%20Surgery.png",
     route: "services/wisdom-tooth-surgery"
   },
   {
@@ -241,7 +241,7 @@ const internationalTreatments = [
     slug: "tooth-coloured-filling",
     title: "Tooth Coloured Filling (Composite Filling)",
     description: "Seamlessly restore decayed or damaged teeth with natural-looking, metal-free composite fillings.",
-    image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+    image: "/MG_3249.webp",
     route: "services/tooth-coloured-filling"
   }
 ];
@@ -357,9 +357,22 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
       s.title.toLowerCase() === defaultTitle.toLowerCase()
     );
 
+    const isValidImage = (url: any): boolean => {
+      if (!url) return false;
+      if (typeof url !== 'string') return false;
+      const trimmed = url.trim();
+      return trimmed !== '' && trimmed !== 'null' && trimmed !== 'undefined' && !trimmed.toLowerCase().includes('placeholder');
+    };
+
+    const resolvedImage = [
+      dbSvc?.homepage_card_image,
+      dbSvc?.hero_image,
+      defaultImage
+    ].find(isValidImage) || defaultImage;
+
     return {
       title: dbSvc?.title || defaultTitle,
-      image: dbSvc?.homepage_card_image || dbSvc?.hero_image || defaultImage,
+      image: resolvedImage,
     };
   };
 

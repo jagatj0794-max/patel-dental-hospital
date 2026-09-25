@@ -14,7 +14,7 @@ export interface ServiceSEOData {
 }
 
 export const getServiceSEO = (slug: string, title: string, fallbackDesc: string, language?: 'en' | 'gu') => {
-  const canonicalUrl = `https://www.pateldentalhospital.com/#services/${slug}`;
+  const canonicalUrl = `https://pdhrajkot.com/services/${slug}/`;
 
   const createSchema = (srvTitle: string, srvDesc: string) => {
     return [
@@ -26,13 +26,13 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://www.pateldentalhospital.com/"
+            "item": "https://pdhrajkot.com/"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Services",
-            "item": "https://www.pateldentalhospital.com/#treatments"
+            "item": "https://pdhrajkot.com/#treatments"
           },
           {
             "@type": "ListItem",
@@ -47,8 +47,8 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
         "@type": "Dentist",
         "name": "Patel Dental Hospital",
         "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200",
-        "@id": "https://www.pateldentalhospital.com/#dentist",
-        "url": "https://www.pateldentalhospital.com/",
+        "@id": "https://pdhrajkot.com/#dentist",
+        "url": "https://pdhrajkot.com/",
         "telephone": "+919510397046",
         "priceRange": "$$",
         "address": {

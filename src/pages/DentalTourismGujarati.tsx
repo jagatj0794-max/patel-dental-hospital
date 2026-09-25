@@ -161,7 +161,7 @@ const internationalTreatments = [
     slug: "dental-implants",
     title: "ડેન્ટલ ઇમ્પ્લાન્ટ",
     description: "ખોવાયેલા દાંતને કુદરતી દેખાવ અને કાર્યક્ષમતા ધરાવતા દાંતથી બદલો.",
-    image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+    image: "/Dental%20Implants.webp",
     route: "services/dental-implants"
   },
   {
@@ -169,7 +169,7 @@ const internationalTreatments = [
     slug: "smile-makeover",
     title: "સ્માઇલ મેકઓવર",
     description: "વ્યક્તિગત કોસ્મેટિક ડેન્ટિસ્ટ્રી દ્વારા તમારા સ્માઇલના દેખાવમાં પરિવર્તન લાવો.",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
+    image: "/Smile%20Designing.webp",
     route: "services/smile-makeover"
   },
   {
@@ -177,7 +177,7 @@ const internationalTreatments = [
     slug: "full-mouth-rehabilitation",
     title: "ફુલ માઉથ રિહેબિલિટેશન",
     description: "ગંભીર રીતે નુકસાન પામેલા, ઘસાઈ ગયેલા અથવા ખોવાયેલા દાંત માટે સંપૂર્ણ પુનઃનિર્માણ સારવાર.",
-    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+    image: "/Full%20Mouth.webp",
     route: "services/full-mouth-rehabilitation"
   },
   {
@@ -185,7 +185,7 @@ const internationalTreatments = [
     slug: "crowns-and-bridges",
     title: "ક્રાઉન્સ અને બ્રિજિસ",
     description: "મેટલ-ફ્રી, પ્રીમિયમ ઝિર્કોનિયા રિસ્ટોરેશન દ્વારા નુકસાન પામેલા અથવા ખોવાયેલા દાંતને પુનઃસ્થાપિત કરો.",
-    image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+    image: "/Digital%20Dental%20Experts.webp",
     route: "services/crowns-and-bridges"
   },
   {
@@ -193,7 +193,7 @@ const internationalTreatments = [
     slug: "root-canal-treatment",
     title: "સિંગલ સિટિંગ રૂટ કેનાલ સારવાર",
     description: "આરામદાયક અને એક જ મુલાકાતમાં થતી રૂટ કેનાલ સારવાર દ્વારા ચેપગ્રસ્ત દાંતને બચાવો અને દુખાવો દૂર કરો.",
-    image: "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
+    image: "/Root%20Canal.webp",
     route: "services/root-canal-treatment"
   },
   {
@@ -201,7 +201,7 @@ const internationalTreatments = [
     slug: "invisible-aligners",
     title: "ઇનવિઝિબલ એલાઇનર્સ",
     description: "કસ્ટમ, લગભગ અદૃશ્ય એલાઇનર્સ દ્વારા આરામદાયક અને સરળતાથી દૃશ્યમાન ન થાય તે રીતે તમારા દાંતને સીધા કરો.",
-    image: "https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800",
+    image: "/Aligners.webp",
     route: "services/invisible-aligners"
   },
   {
@@ -209,7 +209,7 @@ const internationalTreatments = [
     slug: "pediatric-dentistry",
     title: "બાળકો માટેની ડેન્ટિસ્ટ્રી",
     description: "આજીવન સ્વસ્થ સ્માઇલ માટે પ્રેમાળ, હૂંફાળું અને અત્યંત કાળજીભર્યું બાળકોનું ડેન્ટલ કેર.",
-    image: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+    image: "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp",
     route: "services/pediatric-dentistry"
   },
   {
@@ -217,7 +217,7 @@ const internationalTreatments = [
     slug: "teeth-whitening",
     title: "દાંત સફેદ કરવાની સારવાર",
     description: "અમારી સલામત, ઝડપી અને અત્યંત અસરકારક દાંત સફેદ કરવાની પ્રક્રિયાઓ દ્વારા તમારા સ્માઇલને વધુ ચમકદાર બનાવો.",
-    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+    image: "/white%20teeth%20in%20rajkot.jpg",
     route: "services/teeth-whitening"
   },
   {
@@ -225,7 +225,7 @@ const internationalTreatments = [
     slug: "braces-treatment",
     title: "બ્રેસિસ સારવાર",
     description: "ટકાઉ સિરામિક, મેટલ અથવા સેલ્ફ-લિગેટિંગ બ્રેકેટ સિસ્ટમનો ઉપયોગ કરીને પરંપરાગત ઓર્થોડોન્ટિક સારવાર.",
-    image: "https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=800",
+    image: "/IMG_3610.webp",
     route: "services/braces-treatment"
   },
   {
@@ -233,15 +233,15 @@ const internationalTreatments = [
     slug: "wisdom-tooth-surgery",
     title: "અક્કલ દાંતની સર્જરી",
     description: "અટવાયેલા અથવા દુખાવાવાળા અક્કલ દાંતને સુરક્ષિત અને દુખાવા વગર સર્જરી દ્વારા દૂર કરવાની સારવાર.",
-    image: "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
+    image: "/Oral%20&%20Maxillofacial%20Surgery.png",
     route: "services/wisdom-tooth-surgery"
   },
   {
     id: "filling-srv",
     slug: "tooth-coloured-filling",
     title: "દાંતના રંગનું ફિલિંગ (કમ્પોઝિટ ફિલિંગ)",
-    description: "કુદરતી દેખાવ ધરાવતા, મેટલ-ફ્રી કમ્પોઝિટ ફિલિંગ દ્વારા સડી ગયેલા અથવા નુકસાન પામેલા દાંતને સુંદર રીતે પુનઃસ્થાપિત કરો.",
-    image: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+    description: "Seamlessly restore decayed or damaged teeth with natural-looking, metal-free composite fillings.",
+    image: "/MG_3249.webp",
     route: "services/tooth-coloured-filling"
   }
 ];
@@ -359,9 +359,22 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
       s.title.toLowerCase() === defaultTitle.toLowerCase()
     );
 
+    const isValidImage = (url: any): boolean => {
+      if (!url) return false;
+      if (typeof url !== 'string') return false;
+      const trimmed = url.trim();
+      return trimmed !== '' && trimmed !== 'null' && trimmed !== 'undefined' && !trimmed.toLowerCase().includes('placeholder');
+    };
+
+    const resolvedImage = [
+      dbSvc?.homepage_card_image,
+      dbSvc?.hero_image,
+      defaultImage
+    ].find(isValidImage) || defaultImage;
+
     return {
       title: defaultTitle,
-      image: dbSvc?.homepage_card_image || dbSvc?.hero_image || defaultImage,
+      image: resolvedImage,
     };
   };
 

@@ -78,8 +78,8 @@ export default function TeethWhitening({ setCurrentPage, openAppointmentModal }:
   };
 
   const socialLinks = [
-    { name: 'Facebook', url: 'https://facebook.com', color: 'hover:bg-blue-600' },
-    { name: 'Instagram', url: 'https://instagram.com', color: 'hover:bg-pink-600' },
+    { name: 'Facebook', url: 'https://www.facebook.com/vipul.gothi.73', color: 'hover:bg-blue-600' },
+    { name: 'Instagram', url: 'https://www.instagram.com/pateldentalhospital_rj?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==', color: 'hover:bg-pink-600' },
     { name: 'Twitter', url: 'https://twitter.com', color: 'hover:bg-sky-500' },
     { name: 'WhatsApp', url: getWhatsAppUrl(), color: 'hover:bg-green-500' },
     { name: 'LinkedIn', url: 'https://linkedin.com', color: 'hover:bg-blue-700' }

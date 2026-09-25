@@ -198,14 +198,14 @@ const routes = [
 ];
 
 function generateSchemasForRoute(route: typeof routes[number]) {
-  const canonicalUrl = `https://www.pateldentalhospital.com${route.path === '/' ? '/' : route.path + '/'}`;
+  const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path + '/'}`;
   const dentistSchema = {
     "@context": "https://schema.org",
     "@type": "Dentist",
     "name": "Patel Dental Hospital",
-    "image": "https://www.pateldentalhospital.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
-    "@id": "https://www.pateldentalhospital.com/#dentist",
-    "url": "https://www.pateldentalhospital.com/",
+    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "@id": "https://pdhrajkot.com/#dentist",
+    "url": "https://pdhrajkot.com/",
     "telephone": "+919510397046",
     "priceRange": "$$",
     "address": {
@@ -245,7 +245,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Patel Dental Hospital",
-      "url": "https://www.pateldentalhospital.com/"
+      "url": "https://pdhrajkot.com/"
     });
     schemas.push(dentistSchema);
   } else {
@@ -256,7 +256,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://www.pateldentalhospital.com/"
+        "item": "https://pdhrajkot.com/"
       }
     ];
 
@@ -269,7 +269,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
       });
     } else if (pathParts.length === 2) {
       const parentName = pathParts[0] === 'services' ? 'Services' : pathParts[0] === 'blog' ? 'Blog' : pathParts[0];
-      const parentUrl = `https://www.pateldentalhospital.com/${pathParts[0]}/`;
+      const parentUrl = `https://pdhrajkot.com/${pathParts[0]}/`;
       breadcrumbListElement.push({
         "@type": "ListItem",
         "position": 2,
@@ -296,7 +296,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
       schemas.push({
         "@context": "https://schema.org",
         "@type": "Dentist",
-        "@id": "https://www.pateldentalhospital.com/#dentist",
+        "@id": "https://pdhrajkot.com/#dentist",
         "hasOfferCatalog": {
           "@type": "OfferCatalog",
           "name": "Dental Services",
@@ -352,7 +352,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         "@type": "BlogPosting",
         "headline": route.title,
         "description": route.description,
-        "image": "https://www.pateldentalhospital.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+        "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
         "author": {
           "@type": "Person",
           "name": "Dr. Vipul Patel",
@@ -367,7 +367,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
           "name": "Patel Dental Hospital",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://www.pateldentalhospital.com/Best%20Dntal%20Hospital%20Rajkot.PNG"
+            "url": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG"
           }
         },
         "mainEntityOfPage": {
@@ -488,7 +488,7 @@ async function prerender() {
       );
 
       // 3.5 Inject Canonical Tag and Schema JSON-LD blocks
-      const canonicalUrl = `https://www.pateldentalhospital.com${route.path === '/' ? '/' : route.path + '/'}`;
+      const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path + '/'}`;
       let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n`;
 
       const schemas = generateSchemasForRoute(route);

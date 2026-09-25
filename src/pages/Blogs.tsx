@@ -121,7 +121,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const selectedPost = BLOG_POSTS.find(p => p.id === selectedPostId);
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.pateldentalhospital.com';
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://pdhrajkot.com';
 
   useSEO({
     title: selectedPost 
@@ -155,7 +155,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
       "author": {
         "@type": "Organization",
         "name": "Patel Dental Hospital",
-        "url": "https://www.pateldentalhospital.com/"
+        "url": "https://pdhrajkot.com/"
       },
       "publisher": {
         "@type": "Organization",

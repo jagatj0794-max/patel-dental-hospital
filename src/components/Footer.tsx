@@ -38,8 +38,8 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
 
   // Social handles
   const socials = [
-    { name: 'Facebook', icon: Facebook, url: 'https://facebook.com', hoverColor: 'hover:bg-blue-600' },
-    { name: 'Instagram', icon: Instagram, url: 'https://instagram.com', hoverColor: 'hover:bg-pink-600' }
+    { name: 'Facebook', icon: Facebook, url: 'https://www.facebook.com/vipul.gothi.73', hoverColor: 'hover:bg-blue-600' },
+    { name: 'Instagram', icon: Instagram, url: 'https://www.instagram.com/pateldentalhospital_rj?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==', hoverColor: 'hover:bg-pink-600' }
   ];
 
   return (
