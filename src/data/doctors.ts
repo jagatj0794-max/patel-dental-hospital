@@ -94,7 +94,8 @@ AWARDS & RECOGNITION
       }
     ],
     branch: 'Gayatrinagar Branch',
-    experience: '12+'
+    experience: '12+',
+    alt_text: 'Dr. Kinjal Patel, cosmetic and aesthetic dentist, posing at Patel Dental Hospital, Rajkot.'
   },
   {
     id: 'vipul',
@@ -196,6 +197,7 @@ CLINICAL EXPERIENCE
       }
     ],
     branch: 'Amin Marg Branch',
-    experience: '18+'
+    experience: '18+',
+    alt_text: 'Dr. Vipul Patel, senior maxillofacial surgeon and implantologist, at Patel Dental Hospital, Rajkot.'
   }
 ];

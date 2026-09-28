@@ -19,55 +19,68 @@ const patelDentistPatient12 = 'https://images.unsplash.com/photo-1629909613654-2
 export interface PatientMoment {
   id: string;
   image: string;
+  altText?: string;
 }
 
 export const PATIENT_MOMENTS: PatientMoment[] = [
   {
     id: 'moment-1',
-    image: patelDentistPatient1
+    image: patelDentistPatient1,
+    altText: 'Patient smiling happily with a bright, healthy smile after successful dental treatment at Patel Dental Hospital, Rajkot.'
   },
   {
     id: 'moment-2',
-    image: patelDentistPatient2
+    image: patelDentistPatient2,
+    altText: 'Happy dental patient showing a restored smile after receiving professional care at Patel Dental Hospital, Rajkot.'
   },
   {
     id: 'moment-3',
-    image: patelDentistPatient3
+    image: patelDentistPatient3,
+    altText: 'A smiling patient posing with the dentist at Patel Dental Hospital in Rajkot following treatment.'
   },
   {
     id: 'moment-4',
-    image: patelDentistPatient4
+    image: patelDentistPatient4,
+    altText: 'Dental patient showing a confident, healthy smile after expert cosmetic dental care at Patel Dental Hospital.'
   },
   {
     id: 'moment-5',
-    image: patelDentistPatient5
+    image: patelDentistPatient5,
+    altText: 'Pleased patient sharing a bright smile following a comfortable dental visit and successful rehabilitation.'
   },
   {
     id: 'moment-6',
-    image: patelDentistPatient6
+    image: patelDentistPatient6,
+    altText: 'Patient smiling happily with a bright, healthy smile after successful dental treatment at Patel Dental Hospital, Rajkot.'
   },
   {
     id: 'moment-7',
-    image: patelDentistPatient7
+    image: patelDentistPatient7,
+    altText: 'Happy dental patient showing a restored smile after receiving professional care at Patel Dental Hospital, Rajkot.'
   },
   {
     id: 'moment-8',
-    image: patelDentistPatient8
+    image: patelDentistPatient8,
+    altText: 'A smiling patient posing with the dentist at Patel Dental Hospital in Rajkot following treatment.'
   },
   {
     id: 'moment-9',
-    image: patelDentistPatient9
+    image: patelDentistPatient9,
+    altText: 'Dental patient showing a confident, healthy smile after expert cosmetic dental care at Patel Dental Hospital.'
   },
   {
     id: 'moment-10',
-    image: patelDentistPatient10
+    image: patelDentistPatient10,
+    altText: 'Pleased patient sharing a bright smile following a comfortable dental visit and successful rehabilitation.'
   },
   {
     id: 'moment-11',
-    image: patelDentistPatient11
+    image: patelDentistPatient11,
+    altText: 'Patient smiling happily with a bright, healthy smile after successful dental treatment at Patel Dental Hospital, Rajkot.'
   },
   {
     id: 'moment-12',
-    image: patelDentistPatient12
+    image: patelDentistPatient12,
+    altText: 'Happy dental patient showing a restored smile after receiving professional care at Patel Dental Hospital, Rajkot.'
   }
 ];

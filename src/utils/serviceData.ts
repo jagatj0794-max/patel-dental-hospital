@@ -1233,6 +1233,8 @@ export const DEFAULT_SERVICES: Service[] = [
           before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
           after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
           caption: 'Pediatric Smile Restoration',
+          before_alt_text: 'Before pediatric dental treatment showing decayed and damaged milk teeth in a young patient.',
+          after_alt_text: 'After pediatric dental treatment showing fully restored healthy deciduous teeth and a happy smile.',
           display_order: 10
         }
       ],
@@ -1342,6 +1344,8 @@ export const DEFAULT_SERVICES: Service[] = [
           before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
           after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
           caption: 'Braces Alignment Smile Transformation',
+          before_alt_text: 'Before braces treatment showing severe dental crowding and misaligned anterior teeth.',
+          after_alt_text: 'After braces treatment showing perfectly aligned teeth and an improved dental arch.',
           display_order: 10
         }
       ],
@@ -1454,6 +1458,8 @@ export const DEFAULT_SERVICES: Service[] = [
           before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
           after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
           caption: 'Wisdom Tooth Surgery Extraction',
+          before_alt_text: 'Before wisdom tooth surgery showing the impacted or misaligned wisdom tooth in the molar region.',
+          after_alt_text: 'After wisdom tooth surgery showing the clean extraction site after successful tooth removal.',
           display_order: 10
         }
       ],
@@ -1579,6 +1585,8 @@ export const DEFAULT_SERVICES: Service[] = [
           before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
           after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
           caption: 'Tooth Coloured Filling Restoration',
+          before_alt_text: 'Before tooth coloured filling treatment showing dark carious decay on the molar tooth surface.',
+          after_alt_text: 'After composite filling treatment showing the fully restored tooth structure with tooth-coloured material.',
           display_order: 10
         }
       ],
@@ -1713,6 +1721,9 @@ export async function saveServiceDirectly(service: Service): Promise<void> {
           patient_testimonials: service.patient_testimonials || null,
           hospital_team_photos: service.hospital_team_photos || null,
           marketing_config: service.marketing_config || null,
+          alt_text: service.alt_text || null,
+          hero_image_alt_text: service.hero_image_alt_text || null,
+          homepage_card_image_alt_text: service.homepage_card_image_alt_text || null,
           updated_at: new Date().toISOString()
         });
 

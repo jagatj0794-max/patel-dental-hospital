@@ -23,9 +23,9 @@ const routes = [
   {
     path: '/',
     pageId: 'home',
-    title: 'Best Dental Hospital in Rajkot | Patel Dental Hospital',
-    description: 'Patel Dental Hospital is the best dental hospital in Rajkot, Gujarat & India. Offering advanced dental care in Rajkot, including dental implants, root canal treatment, braces, invisible aligners, and cosmetic dentistry.',
-    keywords: 'Best Dental Hospital in Rajkot, Best Dental Clinic in Rajkot, Best Dental Hospital in India, Best Dental Hospital in Gujarat, Dental Hospital in Rajkot, Dental Clinic in Rajkot'
+    title: 'Patel Dental Hospital | Dental Care in Rajkot',
+    description: 'Patel Dental Hospital in Rajkot provides comprehensive dental care, including dental implants, root canal treatment, smile makeovers, orthodontics, and other dental treatments.',
+    keywords: ''
   },
   {
     path: '/about',
@@ -465,16 +465,25 @@ async function prerender() {
       }
 
       // Replace or inject Keywords meta tag
-      if (html.includes('name="keywords"')) {
-        html = html.replace(
-          /<meta name="keywords" content="[\s\S]*?"\s*\/?>/,
-          `<meta name="keywords" content="${route.keywords}" />`
-        );
+      if (route.keywords) {
+        if (html.includes('name="keywords"')) {
+          html = html.replace(
+            /<meta name="keywords" content="[\s\S]*?"\s*\/?>/,
+            `<meta name="keywords" content="${route.keywords}" />`
+          );
+        } else {
+          html = html.replace(
+            '</head>',
+            `  <meta name="keywords" content="${route.keywords}" />\n</head>`
+          );
+        }
       } else {
-        html = html.replace(
-          '</head>',
-          `  <meta name="keywords" content="${route.keywords}" />\n</head>`
-        );
+        if (html.includes('name="keywords"')) {
+          html = html.replace(
+            /<meta name="keywords" content="[\s\S]*?"\s*\/?>\n?/,
+            ''
+          );
+        }
       }
 
       // Inject open graph title & description tags

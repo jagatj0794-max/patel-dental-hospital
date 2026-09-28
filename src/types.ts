@@ -54,6 +54,7 @@ export interface Doctor {
   expertises: { title: string; desc: string }[];
   branch: 'Amin Marg Branch' | 'Gayatrinagar Branch';
   experience?: string; // Experience in years
+  alt_text?: string;
 }
 
 export interface Appointment {
@@ -73,6 +74,7 @@ export interface Appointment {
 export interface PatientMoment {
   id: string;
   image: string;
+  altText?: string;
 }
 
 export interface AwardItem {
@@ -81,8 +83,13 @@ export interface AwardItem {
   display_order: number;
   orientation?: 'horizontal' | 'vertical';
   is_active: boolean;
+  title?: string;
+  subtitle?: string;
+  person_name?: string;
+  date?: string;
   created_at?: string;
   updated_at?: string;
+  alt_text?: string;
 }
 
 export interface ContactInfo {
@@ -295,6 +302,9 @@ export interface Service {
   patient_testimonials?: any[] | string | null;
   hospital_team_photos?: any[] | string | null;
   marketing_config?: MarketingConfig | string | null;
+  alt_text?: string | null;
+  hero_image_alt_text?: string | null;
+  homepage_card_image_alt_text?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -326,6 +336,7 @@ export interface SocialServiceItem {
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
+  alt_text?: string;
 }
 
 export interface TechnologyItem {
@@ -339,6 +350,7 @@ export interface TechnologyItem {
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
+  alt_text?: string;
 }
 
 export interface InternationalPatientImage {
@@ -357,8 +369,10 @@ export interface BeforeAfterEntry {
   treatment_name: string;
   before_image_url: string;
   before_storage_path?: string;
+  before_alt_text?: string;
   after_image_url: string;
   after_storage_path?: string;
+  after_alt_text?: string;
   display_order: number;
   is_active: boolean;
   created_at?: string;

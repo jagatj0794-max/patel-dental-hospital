@@ -62,7 +62,7 @@ import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
 import { contactService } from '../utils/contactData';
 import { socialServiceService, generateUUID } from '../utils/socialServiceData';
 import { technologyService } from '../utils/technologyData';
-import { awardsService } from '../utils/awardsData';
+import { awardsService, cleanAwardImageUrl } from '../utils/awardsData';
 import { internationalPatientsService } from '../utils/internationalPatientsData';
 import { beforeAfterService } from '../utils/beforeAfterData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
@@ -278,7 +278,7 @@ export default function Admin({
           [item.id]: item.orientation || 'horizontal'
         }));
       };
-      img.src = item.image_url;
+      img.src = cleanAwardImageUrl(item.image_url);
     });
   }, [draftAwards]);
 
@@ -288,8 +288,148 @@ export default function Admin({
 
   const [awardsOrientationTab, setAwardsOrientationTab] = useState<'horizontal' | 'vertical'>('horizontal');
   const [awardToDelete, setAwardToDelete] = useState<string | null>(null);
+  const [awardTextToClear, setAwardTextToClear] = useState<string | null>(null);
+  const [isAddAwardModalOpen, setIsAddAwardModalOpen] = useState(false);
+  const [isSavingAwardId, setIsSavingAwardId] = useState<string | null>(null);
+  const [newAwardForm, setNewAwardForm] = useState({
+    title: '',
+    subtitle: '',
+    person_name: '',
+    date: '',
+    orientation: 'horizontal' as 'horizontal' | 'vertical',
+    imageFile: null as File | null,
+    imagePreview: '',
+    imageUrl: ''
+  });
   const [previewAwardUrl, setPreviewAwardUrl] = useState<string | null>(null);
   const [isLoadingAwards, setIsLoadingAwards] = useState(false);
+
+  const handleAwardFieldChange = (id: string, field: 'title' | 'subtitle' | 'person_name' | 'date' | 'alt_text', value: string) => {
+    setDraftAwards(prev => (prev || []).map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const handleSaveSingleAward = async (id: string) => {
+    const item = (draftAwards || []).find(a => a.id === id);
+    if (!item) return;
+    setIsSavingAwardId(id);
+    setSaveMessage(`Saving "${item.title || 'Award'}"...`);
+    try {
+      const success = await awardsService.saveAwardsList(draftAwards || []);
+      if (success) {
+        setSaveMessage('Award details saved successfully!');
+      } else {
+        setSaveMessage('Failed to save award details.');
+      }
+    } catch (err: any) {
+      setSaveMessage('Error saving award: ' + (err.message || err));
+    } finally {
+      setIsSavingAwardId(null);
+      setTimeout(() => setSaveMessage(null), 3000);
+    }
+  };
+
+  const handleSaveAllAwards = async () => {
+    setSaveMessage('Saving all awards & certificates text...');
+    try {
+      const success = await awardsService.saveAwardsList(draftAwards || []);
+      if (success) {
+        setSaveMessage('All awards & certificate text saved successfully!');
+      } else {
+        setSaveMessage('Failed to save awards.');
+      }
+    } catch (err: any) {
+      setSaveMessage('Error saving awards: ' + (err.message || err));
+    } finally {
+      setTimeout(() => setSaveMessage(null), 3500);
+    }
+  };
+
+  const handleConfirmClearAwardText = async () => {
+    if (!awardTextToClear) return;
+    const targetId = awardTextToClear;
+    setAwardTextToClear(null);
+    const updated = (draftAwards || []).map(award => {
+      if (award.id === targetId) {
+        return { ...award, title: '', subtitle: '', person_name: '', date: '' };
+      }
+      return award;
+    });
+    setDraftAwards(updated);
+    setSaveMessage('Clearing certificate text...');
+    try {
+      const success = await awardsService.saveAwardsList(updated);
+      if (success) {
+        setSaveMessage('Certificate text cleared successfully!');
+      } else {
+        setSaveMessage('Failed to clear certificate text.');
+      }
+    } catch (err: any) {
+      setSaveMessage('Error: ' + (err.message || err));
+    } finally {
+      setTimeout(() => setSaveMessage(null), 3000);
+    }
+  };
+
+  const handleCreateNewAward = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAwardForm.imageFile && !newAwardForm.imageUrl.trim()) {
+      alert('Please upload an award image file or enter an image URL.');
+      return;
+    }
+
+    setSaveMessage('Adding new award & certificate text...');
+    try {
+      let finalUrl = newAwardForm.imageUrl.trim();
+      if (newAwardForm.imageFile) {
+        try {
+          finalUrl = await uploadImage(newAwardForm.imageFile);
+        } catch (uploadErr) {
+          console.warn('Storage upload failed, using preview URL:', uploadErr);
+          finalUrl = newAwardForm.imagePreview || '';
+        }
+      }
+
+      const newId = generateUUID();
+      const newAward: AwardItem = {
+        id: newId,
+        image_url: finalUrl,
+        display_order: (draftAwards || []).length,
+        orientation: newAwardForm.orientation,
+        is_active: true,
+        title: newAwardForm.title.trim(),
+        subtitle: newAwardForm.subtitle.trim(),
+        person_name: newAwardForm.person_name.trim(),
+        date: newAwardForm.date.trim()
+      };
+
+      const updated = [newAward, ...(draftAwards || [])];
+      setDraftAwards(updated);
+      setIsAddAwardModalOpen(false);
+      setNewAwardForm({
+        title: '',
+        subtitle: '',
+        person_name: '',
+        date: '',
+        orientation: 'horizontal',
+        imageFile: null,
+        imagePreview: '',
+        imageUrl: ''
+      });
+
+      const success = await awardsService.saveAwardsList(updated);
+      if (success) {
+        setSaveMessage('New award created and saved successfully!');
+        setAwardsOrientationTab(newAward.orientation || 'horizontal');
+      } else {
+        setSaveMessage('Failed to save new award to database.');
+      }
+    } catch (err: any) {
+      console.error('Error creating award:', err);
+      setSaveMessage('Error: ' + (err.message || err));
+    } finally {
+      setTimeout(() => setSaveMessage(null), 3500);
+    }
+  };
 
   const handleMoveAward = async (id: string, direction: 'up' | 'down') => {
     // Find the current filtered items (by orientation tab)
@@ -4223,6 +4363,18 @@ export default function Admin({
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium leading-relaxed bg-white"
                         />
                       </div>
+
+                      {/* Doctor Image Alt Text */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Doctor Photo Alt Text</label>
+                        <input
+                          type="text"
+                          value={editingDoctor.alt_text || ''}
+                          onChange={(e) => setEditingDoctor({ ...editingDoctor, alt_text: e.target.value })}
+                          placeholder="e.g. Portrait of Dr. Vipul Patel, Specialist Implantologist"
+                          className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-semibold bg-white text-slate-800"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -4816,6 +4968,34 @@ export default function Admin({
                           </div>
                         </div>
 
+                        {/* Alt Text Input */}
+                        <div className="p-3 border-t border-slate-100 flex flex-col gap-1 shrink-0 bg-white">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Alt Text</label>
+                          <input
+                            type="text"
+                            placeholder="Describe this gallery image..."
+                            value={item.altText || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const updated = (mediaImages || []).map(img => 
+                                img.id === item.id ? { ...img, altText: val } : img
+                              );
+                              setMediaImages(updated);
+                            }}
+                            onBlur={async () => {
+                              setSaveMessage('Saving updated alt text...');
+                              const success = await galleryService.saveGalleryData(mediaImages, patientMoments);
+                              if (success) {
+                                setSaveMessage('Alt text saved successfully!');
+                              } else {
+                                setSaveMessage('Failed to save alt text.');
+                              }
+                              setTimeout(() => setSaveMessage(null), 2500);
+                            }}
+                            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none w-full bg-white text-slate-800"
+                          />
+                        </div>
+
                         {/* Replace & Delete Footer Panel */}
                         <div className="p-3 border-t border-slate-100 flex items-center justify-between gap-2 bg-slate-50/50 mt-auto">
                           <button
@@ -4944,6 +5124,34 @@ export default function Admin({
                             alt="Patient Smile Moment" 
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Alt Text Input */}
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Alt Text</label>
+                          <input
+                            type="text"
+                            placeholder="Describe this smile moment..."
+                            value={item.altText || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const updated = (patientMoments || []).map(moment => 
+                                moment.id === item.id ? { ...moment, altText: val } : moment
+                              );
+                              setPatientMoments(updated);
+                            }}
+                            onBlur={async () => {
+                              setSaveMessage('Saving updated alt text...');
+                              const success = await galleryService.saveGalleryData(mediaImages, patientMoments);
+                              if (success) {
+                                setSaveMessage('Alt text saved successfully!');
+                              } else {
+                                setSaveMessage('Failed to save alt text.');
+                              }
+                              setTimeout(() => setSaveMessage(null), 2500);
+                            }}
+                            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none w-full bg-white text-slate-800"
                           />
                         </div>
 
@@ -5290,6 +5498,34 @@ export default function Admin({
                             alt="Social Service Moment" 
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Alt Text Input */}
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Alt Text</label>
+                          <input
+                            type="text"
+                            placeholder="Describe this social service image..."
+                            value={item.alt_text || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const updated = (draftSocialServices || []).map(moment => 
+                                moment.id === item.id ? { ...moment, alt_text: val } : moment
+                              );
+                              setDraftSocialServices(updated);
+                            }}
+                            onBlur={async () => {
+                              setSaveMessage('Saving updated alt text...');
+                              const success = await socialServiceService.saveSocialServices(draftSocialServices);
+                              if (success) {
+                                setSaveMessage('Alt text saved successfully!');
+                              } else {
+                                setSaveMessage('Failed to save alt text.');
+                              }
+                              setTimeout(() => setSaveMessage(null), 2500);
+                            }}
+                            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none w-full bg-white text-slate-800"
                           />
                         </div>
 
@@ -5760,6 +5996,20 @@ export default function Admin({
                           />
                         </div>
 
+                        {/* Alt Text Input */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Alt Text
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Dentists using advanced high-resolution microscope in dental operatory"
+                            value={editingTechnology.alt_text || ''}
+                            onChange={(e) => setEditingTechnology({ ...editingTechnology, alt_text: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-800 font-medium"
+                          />
+                        </div>
+
                         {/* Active Checkbox */}
                         <div className="flex items-center gap-2 pt-1">
                           <input
@@ -5882,29 +6132,42 @@ export default function Admin({
             {activeMediaTab === 'awards' && (
               <div className="space-y-6" id="awards-tab-content">
                 {/* Actions row */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
-                  <div className="text-xs text-slate-500 font-medium">
-                    Showing <span className="font-bold text-slate-800">
-                      {(draftAwards || []).filter(item => {
-                        const orientation = getItemOrientation(item);
-                        if (awardsOrientationTab === 'horizontal') {
-                          return orientation === 'horizontal';
-                        } else {
-                          return orientation === 'vertical';
-                        }
-                      }).length}
-                    </span> {awardsOrientationTab === 'horizontal' ? 'horizontal (landscape)' : 'vertical (portrait)'} awards
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-3xs">
+                  <div>
+                    <h3 className="text-sm font-extrabold text-[#081C3A]">Awards & Certificates Text Management</h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      Showing <span className="font-bold text-slate-800">
+                        {(draftAwards || []).filter(item => {
+                          const orientation = getItemOrientation(item);
+                          if (awardsOrientationTab === 'horizontal') {
+                            return orientation === 'horizontal';
+                          } else {
+                            return orientation === 'vertical';
+                          }
+                        }).length}
+                      </span> {awardsOrientationTab === 'horizontal' ? 'horizontal (landscape)' : 'vertical (portrait)'} awards. Edit title, award type, person name, and date for each certificate.
+                    </p>
                   </div>
                   
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    {/* Add New Award Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsAddAwardModalOpen(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Add New Award</span>
+                    </button>
+
                     {/* Vertical (Portrait) Upload Option */}
                     <div>
                       <label
                         htmlFor="awards-upload-file-trigger-vertical"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                        className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
                       >
                         <Plus className="h-4 w-4" />
-                        <span>Upload Vertical Image</span>
+                        <span>Upload Vertical</span>
                       </label>
                       <input
                         type="file"
@@ -5918,15 +6181,6 @@ export default function Admin({
                             setSaveMessage('Detecting orientation and uploading...');
                             try {
                               const orientation = await detectImageOrientation(file);
-                              console.log('[Awards] Auto-classified orientation:', orientation);
-
-                              let feedbackMsg = `Award uploaded successfully!`;
-                              if (orientation !== 'vertical') {
-                                feedbackMsg = `Image was detected as landscape. Saved as Horizontal Award.`;
-                              } else {
-                                feedbackMsg = `Award uploaded & classified as VERTICAL!`;
-                              }
-
                               const imageUrl = await uploadImage(file);
                               const updated = [
                                 {
@@ -5934,14 +6188,18 @@ export default function Admin({
                                   image_url: imageUrl,
                                   display_order: draftAwards.length,
                                   orientation: orientation,
-                                  is_active: true
+                                  is_active: true,
+                                  title: '',
+                                  subtitle: '',
+                                  person_name: '',
+                                  date: ''
                                 },
                                 ...(draftAwards || [])
                               ];
                               setDraftAwards(updated);
                               const success = await awardsService.saveAwardsList(updated);
                               if (success) {
-                                setSaveMessage(feedbackMsg);
+                                setSaveMessage('Award uploaded! Fill in certificate details below.');
                                 setAwardsOrientationTab(orientation);
                               } else {
                                 setSaveMessage('Failed to save award image to database.');
@@ -5956,23 +6214,23 @@ export default function Admin({
                                   reader.onerror = reject;
                                   reader.readAsDataURL(file);
                                 });
-                                let feedbackMsg = `Award loaded locally!`;
-                                if (orientation !== 'vertical') {
-                                  feedbackMsg = `Image detected as landscape. Loaded as Horizontal Award.`;
-                                }
                                 const updated = [
                                   {
                                     id: generateUUID(),
                                     image_url: dataUrl,
                                     display_order: draftAwards.length,
                                     orientation: orientation,
-                                    is_active: true
+                                    is_active: true,
+                                    title: '',
+                                    subtitle: '',
+                                    person_name: '',
+                                    date: ''
                                   },
                                   ...(draftAwards || [])
                                 ];
                                 setDraftAwards(updated);
                                 await awardsService.saveAwardsList(updated);
-                                setSaveMessage(feedbackMsg);
+                                setSaveMessage('Award loaded! Fill in certificate details below.');
                                 setAwardsOrientationTab(orientation);
                               } catch (fallbackErr) {
                                 console.error(fallbackErr);
@@ -5989,10 +6247,10 @@ export default function Admin({
                     <div>
                       <label
                         htmlFor="awards-upload-file-trigger-horizontal"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                        className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
                       >
                         <Plus className="h-4 w-4" />
-                        <span>Upload Horizontal Image</span>
+                        <span>Upload Horizontal</span>
                       </label>
                       <input
                         type="file"
@@ -6006,15 +6264,6 @@ export default function Admin({
                             setSaveMessage('Detecting orientation and uploading...');
                             try {
                               const orientation = await detectImageOrientation(file);
-                              console.log('[Awards] Auto-classified orientation:', orientation);
-
-                              let feedbackMsg = `Award uploaded successfully!`;
-                              if (orientation !== 'horizontal') {
-                                feedbackMsg = `Image was detected as portrait. Saved as Vertical Award.`;
-                              } else {
-                                feedbackMsg = `Award uploaded & classified as HORIZONTAL!`;
-                              }
-
                               const imageUrl = await uploadImage(file);
                               const updated = [
                                 {
@@ -6022,14 +6271,18 @@ export default function Admin({
                                   image_url: imageUrl,
                                   display_order: draftAwards.length,
                                   orientation: orientation,
-                                  is_active: true
+                                  is_active: true,
+                                  title: '',
+                                  subtitle: '',
+                                  person_name: '',
+                                  date: ''
                                 },
                                 ...(draftAwards || [])
                               ];
                               setDraftAwards(updated);
                               const success = await awardsService.saveAwardsList(updated);
                               if (success) {
-                                setSaveMessage(feedbackMsg);
+                                setSaveMessage('Award uploaded! Fill in certificate details below.');
                                 setAwardsOrientationTab(orientation);
                               } else {
                                 setSaveMessage('Failed to save award image to database.');
@@ -6044,23 +6297,23 @@ export default function Admin({
                                   reader.onerror = reject;
                                   reader.readAsDataURL(file);
                                 });
-                                let feedbackMsg = `Award loaded locally!`;
-                                if (orientation !== 'horizontal') {
-                                  feedbackMsg = `Image detected as portrait. Loaded as Vertical Award.`;
-                                }
                                 const updated = [
                                   {
                                     id: generateUUID(),
                                     image_url: dataUrl,
                                     display_order: draftAwards.length,
                                     orientation: orientation,
-                                    is_active: true
+                                    is_active: true,
+                                    title: '',
+                                    subtitle: '',
+                                    person_name: '',
+                                    date: ''
                                   },
                                   ...(draftAwards || [])
                                 ];
                                 setDraftAwards(updated);
                                 await awardsService.saveAwardsList(updated);
-                                setSaveMessage(feedbackMsg);
+                                setSaveMessage('Award loaded! Fill in certificate details below.');
                                 setAwardsOrientationTab(orientation);
                               } catch (fallbackErr) {
                                 console.error(fallbackErr);
@@ -6072,6 +6325,16 @@ export default function Admin({
                         }}
                       />
                     </div>
+
+                    {/* Save All Changes Button */}
+                    <button
+                      type="button"
+                      onClick={handleSaveAllAwards}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#081C3A] hover:bg-slate-900 text-white text-xs font-bold shadow-xs hover:shadow-md transition duration-150 cursor-pointer select-none"
+                    >
+                      <Save className="h-4 w-4 text-amber-400" />
+                      <span>Save All Changes</span>
+                    </button>
                   </div>
                 </div>
 
@@ -6086,7 +6349,7 @@ export default function Admin({
                         : 'border-transparent text-slate-500 hover:text-slate-800'
                     }`}
                   >
-                    Horizontal Images ({(draftAwards || []).filter(a => getItemOrientation(a) === 'horizontal').length})
+                    Horizontal / Landscape ({(draftAwards || []).filter(a => getItemOrientation(a) === 'horizontal').length})
                   </button>
                   <button
                     type="button"
@@ -6097,7 +6360,7 @@ export default function Admin({
                         : 'border-transparent text-slate-500 hover:text-slate-800'
                     }`}
                   >
-                    Vertical Images ({(draftAwards || []).filter(a => getItemOrientation(a) === 'vertical').length})
+                    Vertical / Portrait ({(draftAwards || []).filter(a => getItemOrientation(a) === 'vertical').length})
                   </button>
                 </div>
 
@@ -6111,10 +6374,10 @@ export default function Admin({
                   }
                 }).length === 0) ? (
                   <div className="bg-white rounded-2xl p-16 border border-slate-100 text-center text-slate-400 text-sm">
-                    No {awardsOrientationTab === 'horizontal' ? 'horizontal' : 'vertical'} award photos uploaded yet.
+                    No {awardsOrientationTab === 'horizontal' ? 'horizontal' : 'vertical'} award photos uploaded yet. Click "Add New Award" or upload an image to begin.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {draftAwards
                       .filter(item => {
                         const orientation = getItemOrientation(item);
@@ -6128,24 +6391,25 @@ export default function Admin({
                         <div 
                           key={item.id}
                           id={`admin-award-card-${item.id}`}
-                          className="bg-white border border-slate-150 rounded-2xl p-4 flex flex-col justify-between gap-3 group relative hover:border-amber-100 transition-all duration-200 shadow-3xs"
+                          className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col gap-4 group relative hover:border-amber-200 transition-all duration-200 shadow-3xs"
                         >
                           {/* Order & Preview Controls */}
-                          <div className="flex items-center justify-between gap-2 border-b border-slate-50 pb-2">
+                          <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                             <div className="flex items-center gap-1.5">
+                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Order:</span>
                               <button
                                 type="button"
                                 onClick={() => handleMoveAward(item.id, 'up')}
-                                className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
-                                title="Move Left / Backwards"
+                                className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition cursor-pointer"
+                                title="Move Left / Earlier"
                               >
                                 <ChevronUp className="h-3.5 w-3.5 -rotate-90" />
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleMoveAward(item.id, 'down')}
-                                className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
-                                title="Move Right / Forwards"
+                                className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition cursor-pointer"
+                                title="Move Right / Later"
                               >
                                 <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
                               </button>
@@ -6153,8 +6417,8 @@ export default function Admin({
                             
                             <button
                               type="button"
-                              onClick={() => setPreviewAwardUrl(item.image_url)}
-                              className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition flex items-center gap-1 text-[11px] font-bold"
+                              onClick={() => setPreviewAwardUrl(cleanAwardImageUrl(item.image_url))}
+                              className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition flex items-center gap-1 text-[11px] font-bold cursor-pointer"
                               title="Preview Full Image"
                             >
                               <Eye className="h-3.5 w-3.5 text-slate-400 group-hover:text-amber-600" />
@@ -6162,25 +6426,128 @@ export default function Admin({
                             </button>
                           </div>
 
-                          <div className={`relative w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100 shrink-0 ${
-                            awardsOrientationTab === 'horizontal' ? 'aspect-[16/10]' : 'aspect-[3/4]'
+                          {/* Image Thumbnail */}
+                          <div className={`relative w-full rounded-xl overflow-hidden bg-slate-50 border border-slate-100 shrink-0 ${
+                            awardsOrientationTab === 'horizontal' ? 'h-36 sm:h-40' : 'h-48 sm:h-56'
                           }`}>
                             <img 
-                              src={item.image_url} 
+                              src={cleanAwardImageUrl(item.image_url)} 
                               alt="Award Recognition" 
-                              className="w-full h-full object-contain bg-slate-50/50 cursor-zoom-in"
-                              onClick={() => setPreviewAwardUrl(item.image_url)}
+                              className="w-full h-full object-contain bg-slate-50 cursor-zoom-in"
+                              onClick={() => setPreviewAwardUrl(cleanAwardImageUrl(item.image_url))}
                               referrerPolicy="no-referrer"
                             />
                           </div>
 
-                          {/* Replace & Delete Actions */}
-                          <div className="flex items-center justify-between gap-2 mt-auto">
+                          {/* Text Management Section */}
+                          <div className="space-y-3 pt-1 border-t border-slate-100">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-wider bg-amber-50 px-2 py-0.5 rounded">
+                                Certificate Text Fields
+                              </span>
+                              {(item.title || item.subtitle || item.person_name || item.date) && (
+                                <button
+                                  type="button"
+                                  onClick={() => setAwardTextToClear(item.id)}
+                                  className="text-[10px] font-bold text-slate-400 hover:text-rose-600 transition cursor-pointer"
+                                  title="Clear text data for this award"
+                                >
+                                  Clear Text
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Field 1: Title */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                1. Title / Organization
+                              </label>
+                              <input
+                                type="text"
+                                value={item.title || ''}
+                                placeholder="e.g. Indian Society of Oral Implantologists (ISOI)"
+                                onChange={(e) => handleAwardFieldChange(item.id, 'title', e.target.value)}
+                                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition bg-slate-50/50 focus:bg-white text-slate-800"
+                              />
+                            </div>
+
+                            {/* Field 2: Subtitle / Award Type */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                2. Subtitle / Award Type
+                              </label>
+                              <input
+                                type="text"
+                                value={item.subtitle || ''}
+                                placeholder="e.g. Fellowship or Diplomate"
+                                onChange={(e) => handleAwardFieldChange(item.id, 'subtitle', e.target.value)}
+                                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition bg-slate-50/50 focus:bg-white text-slate-800"
+                              />
+                            </div>
+
+                            {/* Field 3: Person Name */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                3. Person Name
+                              </label>
+                              <input
+                                type="text"
+                                value={item.person_name || ''}
+                                placeholder="e.g. Dr. Vipul Gothi or Dr. Kinjal Bhanderi"
+                                onChange={(e) => handleAwardFieldChange(item.id, 'person_name', e.target.value)}
+                                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition bg-slate-50/50 focus:bg-white text-slate-800 font-medium"
+                              />
+                            </div>
+
+                            {/* Field 4: Date */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                4. Date
+                              </label>
+                              <input
+                                type="text"
+                                value={item.date || ''}
+                                placeholder="e.g. 1 August 2022"
+                                onChange={(e) => handleAwardFieldChange(item.id, 'date', e.target.value)}
+                                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition bg-slate-50/50 focus:bg-white text-slate-800"
+                              />
+                            </div>
+
+                            {/* Field 5: Alt Text */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                5. Alt Text
+                              </label>
+                              <input
+                                type="text"
+                                value={item.alt_text || ''}
+                                placeholder="e.g. Dr. Vipul Gothi receiving ICOI Fellowship certificate"
+                                onChange={(e) => handleAwardFieldChange(item.id, 'alt_text', e.target.value)}
+                                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition bg-slate-50/50 focus:bg-white text-slate-800"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-auto">
+                            {/* Save Award */}
+                            <button
+                              type="button"
+                              onClick={() => handleSaveSingleAward(item.id)}
+                              disabled={isSavingAwardId === item.id}
+                              className="flex-1 font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer disabled:opacity-50"
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                              <span>{isSavingAwardId === item.id ? 'Saving...' : 'Save Award'}</span>
+                            </button>
+
+                            {/* Replace Image */}
                             <label
                               htmlFor={`awards-replace-trigger-${item.id}`}
-                              className="font-bold text-xs text-amber-600 hover:text-amber-700 bg-amber-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-amber-100 transition select-none flex-1 text-center cursor-pointer"
+                              className="font-bold text-xs text-amber-700 hover:text-amber-800 bg-amber-50 px-3 py-2 rounded-xl flex items-center justify-center gap-1 hover:bg-amber-100 transition select-none text-center cursor-pointer border border-amber-200/60"
+                              title="Replace Certificate Image"
                             >
-                              <Upload className="h-3 w-3 shrink-0" />
+                              <Upload className="h-3.5 w-3.5 shrink-0" />
                               <span>Replace</span>
                             </label>
                             <input
@@ -6191,26 +6558,22 @@ export default function Admin({
                               onChange={async (e) => {
                                 if (e.target.files && e.target.files[0]) {
                                   const file = e.target.files[0];
-                                  console.log('[Awards] Upload Started:', file.name);
-                                  setSaveMessage('Detecting orientation and replacing on Supabase...');
+                                  setSaveMessage('Detecting orientation and replacing image...');
                                   try {
                                     const orientation = await detectImageOrientation(file);
-                                    console.log('[Awards] Auto-classified replacement orientation:', orientation);
-
                                     const imageUrl = await uploadImage(file);
-                                    console.log('[Awards] Upload Success:', imageUrl);
-                                    const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: imageUrl, orientation: orientation } : award);
+                                    const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: imageUrl, orientation } : award);
                                     setDraftAwards(updated);
-                                    setSaveMessage('Saving updated award photo to Supabase...');
+                                    setSaveMessage('Saving updated image...');
                                     const success = await awardsService.saveAwardsList(updated);
                                     if (success) {
-                                      setSaveMessage(`Award photo replaced and classified as ${orientation.toUpperCase()}!`);
+                                      setSaveMessage(`Award image replaced!`);
                                       setAwardsOrientationTab(orientation);
                                     } else {
-                                      setSaveMessage('Failed to save replacement to database.');
+                                      setSaveMessage('Failed to save replacement.');
                                     }
                                   } catch (err: any) {
-                                    console.warn('Upload failed, falling back to local Base64:', err);
+                                    console.warn('Upload fallback to Base64:', err);
                                     try {
                                       const orientation = await detectImageOrientation(file);
                                       const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -6219,10 +6582,10 @@ export default function Admin({
                                         reader.onerror = reject;
                                         reader.readAsDataURL(file);
                                       });
-                                      const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: dataUrl, orientation: orientation } : award);
+                                      const updated = (draftAwards || []).map(award => award.id === item.id ? { ...award, image_url: dataUrl, orientation } : award);
                                       setDraftAwards(updated);
                                       await awardsService.saveAwardsList(updated);
-                                      setSaveMessage(`Award photo replaced locally and classified as ${orientation.toUpperCase()}.`);
+                                      setSaveMessage(`Award image replaced locally.`);
                                       setAwardsOrientationTab(orientation);
                                     } catch (fallbackErr) {
                                       console.error(fallbackErr);
@@ -6234,12 +6597,12 @@ export default function Admin({
                               }}
                             />
 
+                            {/* Delete Award */}
                             <button
                               type="button"
-                              onClick={() => {
-                                setAwardToDelete(item.id);
-                              }}
+                              onClick={() => setAwardToDelete(item.id)}
                               className="text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100 hover:border-rose-200 transition cursor-pointer shrink-0"
+                              title="Delete Award"
                               aria-label="Delete Award Photo"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -6247,6 +6610,187 @@ export default function Admin({
                           </div>
                         </div>
                       ))}
+                  </div>
+                )}
+
+                {/* Add New Award Modal */}
+                {isAddAwardModalOpen && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+                    <div className="absolute inset-0" onClick={() => setIsAddAwardModalOpen(false)} />
+                    
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full p-6 text-slate-800 z-10 animate-fade-in max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="h-5 w-5 text-amber-600" />
+                          <h3 className="text-base font-extrabold text-[#081C3A]">Add New Award / Certificate</h3>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsAddAwardModalOpen(false)}
+                          className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleCreateNewAward} className="space-y-4">
+                        {/* Orientation Selection */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                            Certificate Layout / Orientation
+                          </label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setNewAwardForm(prev => ({ ...prev, orientation: 'horizontal' }))}
+                              className={`p-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer flex flex-col items-center gap-1 ${
+                                newAwardForm.orientation === 'horizontal'
+                                  ? 'border-amber-600 bg-amber-50/50 text-amber-800'
+                                  : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                              }`}
+                            >
+                              <span className="w-12 h-7 bg-amber-200/60 rounded border border-amber-300 block mb-1"></span>
+                              Horizontal (Landscape)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setNewAwardForm(prev => ({ ...prev, orientation: 'vertical' }))}
+                              className={`p-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer flex flex-col items-center gap-1 ${
+                                newAwardForm.orientation === 'vertical'
+                                  ? 'border-amber-600 bg-amber-50/50 text-amber-800'
+                                  : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                              }`}
+                            >
+                              <span className="w-7 h-10 bg-amber-200/60 rounded border border-amber-300 block mb-1"></span>
+                              Vertical (Portrait)
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Image Upload */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                            Certificate Image <span className="text-rose-500">*</span>
+                          </label>
+                          <div className="flex flex-col gap-2">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              id="new-award-file-input"
+                              className="hidden"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const file = e.target.files[0];
+                                  const preview = URL.createObjectURL(file);
+                                  setNewAwardForm(prev => ({ ...prev, imageFile: file, imagePreview: preview }));
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor="new-award-file-input"
+                              className="border-2 border-dashed border-slate-300 hover:border-amber-500 p-4 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition bg-slate-50/50 hover:bg-amber-50/30"
+                            >
+                              {newAwardForm.imagePreview ? (
+                                <img
+                                  src={newAwardForm.imagePreview}
+                                  alt="Preview"
+                                  className="max-h-32 object-contain rounded-lg"
+                                />
+                              ) : (
+                                <>
+                                  <Upload className="h-6 w-6 text-slate-400" />
+                                  <span className="text-xs font-bold text-slate-600">Click to choose image file</span>
+                                  <span className="text-[10px] text-slate-400">PNG, JPG, or WEBP</span>
+                                </>
+                              )}
+                            </label>
+                            
+                            <div className="flex items-center gap-2 my-1">
+                              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">or provide image URL:</span>
+                            </div>
+                            <input
+                              type="text"
+                              value={newAwardForm.imageUrl}
+                              placeholder="https://example.com/award.jpg"
+                              onChange={(e) => setNewAwardForm(prev => ({ ...prev, imageUrl: e.target.value }))}
+                              className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Field 1: Title */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            1. Title / Organization
+                          </label>
+                          <input
+                            type="text"
+                            value={newAwardForm.title}
+                            placeholder="e.g. International Congress of Oral Implantologists (ICOI)"
+                            onChange={(e) => setNewAwardForm(prev => ({ ...prev, title: e.target.value }))}
+                            className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                          />
+                        </div>
+
+                        {/* Field 2: Subtitle / Award Type */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            2. Subtitle / Award Type
+                          </label>
+                          <input
+                            type="text"
+                            value={newAwardForm.subtitle}
+                            placeholder="e.g. Fellowship or Diplomate"
+                            onChange={(e) => setNewAwardForm(prev => ({ ...prev, subtitle: e.target.value }))}
+                            className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                          />
+                        </div>
+
+                        {/* Field 3: Person Name */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            3. Person Name
+                          </label>
+                          <input
+                            type="text"
+                            value={newAwardForm.person_name}
+                            placeholder="e.g. Dr. Vipul Gothi or Dr. Kinjal Bhanderi"
+                            onChange={(e) => setNewAwardForm(prev => ({ ...prev, person_name: e.target.value }))}
+                            className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                          />
+                        </div>
+
+                        {/* Field 4: Date */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            4. Date
+                          </label>
+                          <input
+                            type="text"
+                            value={newAwardForm.date}
+                            placeholder="e.g. 1 August 2022"
+                            onChange={(e) => setNewAwardForm(prev => ({ ...prev, date: e.target.value }))}
+                            className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                          <button
+                            type="button"
+                            onClick={() => setIsAddAwardModalOpen(false)}
+                            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-5 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition cursor-pointer shadow-sm shadow-amber-600/20"
+                          >
+                            Save & Add Award
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 )}
 
@@ -6258,9 +6802,9 @@ export default function Admin({
                     
                     {/* Card container */}
                     <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
-                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Image</h3>
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Delete Award & Certificate</h3>
                       <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-                        Are you sure you want to delete this image?
+                        Are you sure you want to permanently delete this award item and all its certificate text data? This action cannot be undone.
                       </p>
                       <div className="flex items-center justify-end gap-2.5">
                         <button
@@ -6276,13 +6820,13 @@ export default function Admin({
                             const updated = (draftAwards || []).filter(award => award.id !== awardToDelete);
                             setDraftAwards(updated);
                             setAwardToDelete(null);
-                            setSaveMessage('Deleting award photo and syncing with Supabase...');
+                            setSaveMessage('Deleting award and certificate text...');
                             try {
                               const success = await awardsService.saveAwardsList(updated);
                               if (success) {
-                                setSaveMessage('Award photo deleted successfully!');
+                                setSaveMessage('Award deleted successfully!');
                               } else {
-                                setSaveMessage('Failed to delete award photo on Supabase database.');
+                                setSaveMessage('Failed to delete award on Supabase database.');
                               }
                             } catch (err: any) {
                               console.error('Error deleting award photo:', err);
@@ -6293,7 +6837,36 @@ export default function Admin({
                           }}
                           className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer shadow-sm shadow-rose-600/10"
                         >
-                          Delete
+                          Delete Award
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Clear Text Confirmation Dialog Modal */}
+                {awardTextToClear && (
+                  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+                    <div className="absolute inset-0" onClick={() => setAwardTextToClear(null)} />
+                    <div className="relative bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full p-6 text-slate-800 z-10 animate-fade-in">
+                      <h3 className="text-base font-extrabold text-[#081C3A] mb-2">Clear Certificate Text</h3>
+                      <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                        Are you sure you want to delete and clear the text data (Title, Subtitle, Person Name, Date) for this certificate?
+                      </p>
+                      <div className="flex items-center justify-end gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setAwardTextToClear(null)}
+                          className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleConfirmClearAwardText}
+                          className="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition cursor-pointer shadow-sm"
+                        >
+                          Clear Text
                         </button>
                       </div>
                     </div>
@@ -6432,6 +7005,34 @@ export default function Admin({
                             alt="International Patient Moment" 
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Alt Text Input */}
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Alt Text</label>
+                          <input
+                            type="text"
+                            placeholder="Describe this patient photo..."
+                            value={item.alt_text || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const updated = (draftInternationalPatients || []).map(moment => 
+                                moment.id === item.id ? { ...moment, alt_text: val } : moment
+                              );
+                              setDraftInternationalPatients(updated);
+                            }}
+                            onBlur={async () => {
+                              setSaveMessage('Saving updated alt text...');
+                              const success = await internationalPatientsService.saveInternationalPatientsList(draftInternationalPatients);
+                              if (success) {
+                                setSaveMessage('Alt text saved successfully!');
+                              } else {
+                                setSaveMessage('Failed to save alt text.');
+                              }
+                              setTimeout(() => setSaveMessage(null), 2500);
+                            }}
+                            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none w-full bg-white text-slate-800"
                           />
                         </div>
 
@@ -8023,6 +8624,34 @@ export default function Admin({
                             alt="Dental Tourism Moment" 
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
+                          />
+                        </div>
+
+                        {/* Alt Text Input */}
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Alt Text</label>
+                          <input
+                            type="text"
+                            placeholder="Describe this tourism image..."
+                            value={item.alt_text || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const updated = (draftInternationalPatients || []).map(moment => 
+                                moment.id === item.id ? { ...moment, alt_text: val } : moment
+                              );
+                              setDraftInternationalPatients(updated);
+                            }}
+                            onBlur={async () => {
+                              setSaveMessage('Saving updated alt text...');
+                              const success = await internationalPatientsService.saveInternationalPatientsList(draftInternationalPatients);
+                              if (success) {
+                                setSaveMessage('Alt text saved successfully!');
+                              } else {
+                                setSaveMessage('Failed to save alt text.');
+                              }
+                              setTimeout(() => setSaveMessage(null), 2500);
+                            }}
+                            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none w-full bg-white text-slate-800"
                           />
                         </div>
 

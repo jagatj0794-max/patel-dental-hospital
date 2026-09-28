@@ -100,7 +100,7 @@ const GalleryCardItem: React.FC<GalleryCardItemProps> = ({ moment, index, onClic
       <div className="overflow-hidden relative bg-slate-50 w-full">
         <img
           src={moment.image || null}
-          alt="Patel Dental Hospital Patient Moment"
+          alt={moment.altText || "Patel Dental Hospital Patient Smile Moment"}
           className="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-105"
           referrerPolicy="no-referrer"
           loading="lazy"
@@ -324,7 +324,7 @@ export default function PatientMomentsGallery({
               >
                 <img
                   src={currentItem.image || null}
-                  alt="Patient Moment Zoomed"
+                  alt={currentItem.altText || "Patient Smile Moment Zoomed"}
                   style={{
                     maxHeight: `calc(100vh - ${navbarHeight}px - 100px)`,
                   }}

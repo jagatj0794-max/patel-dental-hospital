@@ -6,6 +6,10 @@
 import { supabase } from './supabase';
 import { uploadImage } from './supabaseStorage';
 import { AwardItem } from '../types';
+import { safeStorage } from './storage';
+import { getAwardCaption, cleanAwardImageUrl, parseAwardMetaFromUrl, getAwardSavedText } from './awardCaptions';
+
+export { cleanAwardImageUrl, parseAwardMetaFromUrl, getAwardSavedText };
 
 export function generateUUID(): string {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
@@ -69,20 +73,35 @@ export const awardsService = {
       }
 
       console.log('[Awards] Fetch Result: ' + data.length + ' records returned.');
-      console.log('[Fetch Success] Successfully fetched awards from public.awards');
-      console.log('[Records Returned] Records returned from Supabase public.awards:', data);
 
       const hasCol = await awardsService.checkOrientationColumn();
 
-      const mapped = data.map((row: any) => ({
-        id: row.id,
-        image_url: row.image_url || '',
-        display_order: Number(row.display_order) || 0,
-        orientation: hasCol ? (row.orientation || 'horizontal') : 'horizontal',
-        is_active: row.is_active !== false,
-        created_at: row.created_at,
-        updated_at: row.updated_at
-      }));
+      const mapped: AwardItem[] = data.map((row: any) => {
+        const rawUrl = row.image_url || '';
+        const savedMeta = getAwardSavedText(row.id, rawUrl);
+        const defaultCaption = getAwardCaption(row.id, rawUrl, 'en');
+
+        const title = row.title ?? savedMeta?.title ?? defaultCaption?.organization ?? '';
+        const subtitle = row.subtitle ?? savedMeta?.subtitle ?? defaultCaption?.recognition ?? '';
+        const person_name = row.person_name ?? savedMeta?.person_name ?? defaultCaption?.recipient ?? '';
+        const date = row.date ?? savedMeta?.date ?? defaultCaption?.date ?? '';
+        const alt_text = row.alt_text ?? ((savedMeta as any)?.alt_text || '');
+
+        return {
+          id: row.id,
+          image_url: rawUrl,
+          display_order: Number(row.display_order) || 0,
+          orientation: hasCol ? (row.orientation || 'horizontal') : 'horizontal',
+          is_active: row.is_active !== false,
+          title,
+          subtitle,
+          person_name,
+          date,
+          alt_text,
+          created_at: row.created_at,
+          updated_at: row.updated_at
+        };
+      });
 
       return mapped;
     } catch (e: any) {
@@ -110,12 +129,26 @@ export const awardsService = {
       const itemId = isValidUUID ? item.id : generateUUID();
       const hasCol = await awardsService.checkOrientationColumn();
 
+      // Encode text metadata into image_url and safeStorage (excluding alt_text)
+      const textMeta = {
+        title: item.title || '',
+        subtitle: item.subtitle || '',
+        person_name: item.person_name || '',
+        date: item.date || ''
+      };
+      safeStorage.setItem('award_text_' + itemId, JSON.stringify({ ...textMeta, alt_text: item.alt_text || '' }));
+
+      const cleanUrl = cleanAwardImageUrl(item.image_url || '');
+      const encodedUrl = `${cleanUrl}#award_meta=${encodeURIComponent(JSON.stringify(textMeta))}`;
+
       const row: any = {
         id: itemId,
-        image_url: item.image_url || '',
+        image_url: encodedUrl,
+        alt_text: item.alt_text || '',
         display_order: item.display_order || 0,
         is_active: item.is_active !== false,
-        created_at: item.created_at || new Date().toISOString()
+        created_at: item.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
       if (hasCol) {
         row.orientation = item.orientation || 'horizontal';
@@ -178,8 +211,31 @@ export const awardsService = {
     try {
       awardsService.lastError = null;
       const hasCol = await awardsService.checkOrientationColumn();
+
+      if (updates.title !== undefined || updates.subtitle !== undefined || updates.person_name !== undefined || updates.date !== undefined || updates.alt_text !== undefined) {
+        const existingStored = getAwardSavedText(id, updates.image_url) || {};
+        const mergedMeta = {
+          title: updates.title !== undefined ? updates.title : (existingStored.title || ''),
+          subtitle: updates.subtitle !== undefined ? updates.subtitle : (existingStored.subtitle || ''),
+          person_name: updates.person_name !== undefined ? updates.person_name : (existingStored.person_name || ''),
+          date: updates.date !== undefined ? updates.date : (existingStored.date || '')
+        };
+        const fullMetaWithAlt = {
+          ...mergedMeta,
+          alt_text: updates.alt_text !== undefined ? updates.alt_text : ((existingStored as any).alt_text || '')
+        };
+        safeStorage.setItem('award_text_' + id, JSON.stringify(fullMetaWithAlt));
+
+        if (updates.image_url || updates.alt_text !== undefined) {
+          const targetUrl = updates.image_url || (existingStored as any).image_url || '';
+          const cleanUrl = cleanAwardImageUrl(targetUrl);
+          updates.image_url = `${cleanUrl}#award_meta=${encodeURIComponent(JSON.stringify(mergedMeta))}`;
+        }
+      }
+
       const row: any = { updated_at: new Date().toISOString() };
       if (updates.image_url !== undefined) row.image_url = updates.image_url;
+      if (updates.alt_text !== undefined) row.alt_text = updates.alt_text;
       if (updates.display_order !== undefined) row.display_order = updates.display_order;
       if (updates.is_active !== undefined) row.is_active = updates.is_active;
       if (hasCol && updates.orientation !== undefined) row.orientation = updates.orientation;
@@ -210,6 +266,8 @@ export const awardsService = {
   deleteAwardItem: async (id: string): Promise<boolean> => {
     try {
       awardsService.lastError = null;
+      safeStorage.removeItem('award_text_' + id);
+
       const { error } = await supabase.client
         .from('awards')
         .delete()
@@ -270,6 +328,8 @@ export const awardsService = {
         console.log("awards idsToDelete:", idsToDelete);
 
         if (idsToDelete.length > 0) {
+          idsToDelete.forEach(id => safeStorage.removeItem('award_text_' + id));
+
           const { error: deleteErr } = await supabase.client
             .from('awards')
             .delete()
@@ -290,12 +350,26 @@ export const awardsService = {
       const rowsToUpsert = items.map((item, index) => {
         const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
         const itemId = isValidUUID ? item.id : generateUUID();
+
+        const textMeta = {
+          title: item.title || '',
+          subtitle: item.subtitle || '',
+          person_name: item.person_name || '',
+          date: item.date || ''
+        };
+        safeStorage.setItem('award_text_' + itemId, JSON.stringify({ ...textMeta, alt_text: item.alt_text || '' }));
+
+        const cleanUrl = cleanAwardImageUrl(item.image_url || '');
+        const encodedUrl = `${cleanUrl}#award_meta=${encodeURIComponent(JSON.stringify(textMeta))}`;
+
         const row: any = {
           id: itemId,
-          image_url: item.image_url || '',
+          image_url: encodedUrl,
+          alt_text: item.alt_text || '',
           display_order: index,
           is_active: item.is_active !== false,
-          created_at: item.created_at || new Date().toISOString()
+          created_at: item.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString()
         };
         if (hasCol) {
           row.orientation = item.orientation || 'horizontal';

@@ -1,0 +1,2022 @@
+[
+  {
+    "num": 1,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785241452779_awgdq7e5.webp",
+    "table": "hero_content",
+    "id": "main (desktop)",
+    "category": "Hero Section",
+    "asset_id": "HERO-DESK-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Desktop Hero Background Banner",
+      "HomeGujarati (Gujarati) \u2192 Desktop Hero Background Banner"
+    ]
+  },
+  {
+    "num": 2,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787578103805_e0b9bvq5.webp",
+    "table": "hero_content",
+    "id": "main (mobile)",
+    "category": "Hero Section",
+    "asset_id": "HERO-MOB-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Mobile Hero Background Banner",
+      "HomeGujarati (Gujarati) \u2192 Mobile Hero Background Banner"
+    ]
+  },
+  {
+    "num": 3,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786731857259_tot757iy.webp",
+    "table": "gallery",
+    "id": "img-1786731863664-jum99",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-01",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 4,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786731873991_t1gsk0v2.webp",
+    "table": "gallery",
+    "id": "img-1786731878828-lyoqh",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-02",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 5,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786731918831_qpqn3mdx.webp",
+    "table": "gallery",
+    "id": "img-1786731924312-cc1dv",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-03",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 6,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786731938696_6jj43a6e.webp",
+    "table": "gallery",
+    "id": "img-1786731943973-udo82",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-04",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 7,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786731956262_qq8dl7t6.webp",
+    "table": "gallery",
+    "id": "img-1786731962735-y73ea",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-05",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 8,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786731980273_mtizzwdr.webp",
+    "table": "gallery",
+    "id": "img-1786731985419-nt7wi",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-06",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 9,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732002097_qa0ivjx3.webp",
+    "table": "gallery",
+    "id": "img-1786732006698-kv3d7",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-07",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 10,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732023963_ma94iz2y.webp",
+    "table": "gallery",
+    "id": "img-1786732029370-fnb75",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-08",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 11,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732036610_kah1fdny.webp",
+    "table": "gallery",
+    "id": "img-1786732042332-u7n75",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-09",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 12,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732048760_ndpzvyt0.webp",
+    "table": "gallery",
+    "id": "img-1786732054810-9j6vs",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-10",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 13,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732063531_2yxe9p2m.webp",
+    "table": "gallery",
+    "id": "img-1786732070606-179vk",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-11",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 14,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732080873_1sb8sjmz.webp",
+    "table": "gallery",
+    "id": "img-1786732084862-blnwz",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-12",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 15,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732097478_6r54ycag.webp",
+    "table": "gallery",
+    "id": "img-1786732101749-60ggf",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-13",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 16,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732110455_peq2i9u9.webp",
+    "table": "gallery",
+    "id": "img-1786732115505-rewgk",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-14",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 17,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732124129_e6jejq0q.webp",
+    "table": "gallery",
+    "id": "img-1786732128203-ow8un",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-15",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 18,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732134494_5kz19u4e.webp",
+    "table": "gallery",
+    "id": "img-1786732139123-wzmyl",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-16",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 19,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732159340_8mc1enb2.webp",
+    "table": "gallery",
+    "id": "img-1786732163397-d64lt",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-17",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 20,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732169579_84hflvq3.webp",
+    "table": "gallery",
+    "id": "img-1786732174791-obwta",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-18",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 21,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732215614_tnx401nw.webp",
+    "table": "gallery",
+    "id": "img-1786732222111-g52ma",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-19",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 22,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732228967_njjt63hm.webp",
+    "table": "gallery",
+    "id": "img-1786732232429-n3x0o",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-20",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 23,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786732238330_wfnqbj15.webp",
+    "table": "gallery",
+    "id": "img-1786732244289-jpp9w",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-21",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 24,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733328766_i9tvevmm.webp",
+    "table": "gallery",
+    "id": "img-1786733334189-usyau",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-22",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 25,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733346508_g8nwbxxc.webp",
+    "table": "gallery",
+    "id": "img-1786733351596-c1271",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-23",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 26,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733363973_gjm2cwil.webp",
+    "table": "gallery",
+    "id": "img-1786733369828-uhxg2",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-24",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 27,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733382036_la5i6m8j.webp",
+    "table": "gallery",
+    "id": "img-1786733387755-sxj0b",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-25",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 28,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733403754_ce6wb3e6.webp",
+    "table": "gallery",
+    "id": "img-1786733407326-p76m7",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-26",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 29,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733443895_u6c8uowa.webp",
+    "table": "gallery",
+    "id": "img-1786733452812-xze79",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-27",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 30,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733492693_r2ggn5tq.webp",
+    "table": "gallery",
+    "id": "img-1786733497260-vj68q",
+    "category": "General Gallery",
+    "asset_id": "GEN-GAL-28",
+    "prev_usage": 4,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Hospital Gallery Grid",
+      "HomeGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Why Choose Us (English) \u2192 Hospital Gallery Grid",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Hospital Gallery Grid",
+      "Smile Gallery (English) \u2192 Hospital Gallery Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Hospital Gallery Grid"
+    ]
+  },
+  {
+    "num": 31,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786213074921_9h53zl6t.webp",
+    "table": "gallery",
+    "id": "smile-1786213079259-gb1m2",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-01",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 32,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786213157978_nmlsmsjr.webp",
+    "table": "gallery",
+    "id": "smile-1786213064373-6kjvi",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-02",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 33,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786213014831_13w2lz3h.webp",
+    "table": "gallery",
+    "id": "smile-1786213022476-039lu",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-03",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 34,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212967722_sx3nlq8l.jpg",
+    "table": "gallery",
+    "id": "smile-1786212974531-t2wrx",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-04",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 35,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212948836_n90x3lyx.jpg",
+    "table": "gallery",
+    "id": "smile-1786212955366-jda2r",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-05",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 36,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212927952_n1y4i7gf.webp",
+    "table": "gallery",
+    "id": "smile-1786212932884-l3bh0",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-06",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 37,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212906290_slpijppt.webp",
+    "table": "gallery",
+    "id": "smile-1786212915982-gnvcb",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-07",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 38,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212895483_bn8ue2a3.webp",
+    "table": "gallery",
+    "id": "smile-1786212899490-bv6s8",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-08",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 39,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212877875_r5tkheyr.webp",
+    "table": "gallery",
+    "id": "smile-1786212882451-yd9ab",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-09",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 40,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212858423_f2h59m4f.webp",
+    "table": "gallery",
+    "id": "smile-1786212862690-q74nm",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-10",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 41,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212838034_xev52l4g.webp",
+    "table": "gallery",
+    "id": "smile-1786212843642-dzkkk",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-11",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 42,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212818173_82bnu8oh.webp",
+    "table": "gallery",
+    "id": "smile-1786212825472-tl87j",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-12",
+    "prev_usage": 6,
+    "verified_usage": 6,
+    "usages": [
+      "Home (English) \u2192 Patient Moments / Happy Smiles",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments / Happy Smiles",
+      "Why Choose Us (English) \u2192 Patient Moments",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments",
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid"
+    ]
+  },
+  {
+    "num": 43,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212796462_8w5m62i6.webp",
+    "table": "gallery",
+    "id": "smile-1786212801902-j7l0v",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-13",
+    "prev_usage": 6,
+    "verified_usage": 2,
+    "usages": [
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid",
+      "Home (English) \u2192 Patient Moments (Expandable)",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments (Expandable)",
+      "Why Choose Us (English) \u2192 Patient Moments (Expandable)",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments (Expandable)"
+    ]
+  },
+  {
+    "num": 44,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212756901_h93b7uw0.webp",
+    "table": "gallery",
+    "id": "smile-1786212761199-y36io",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-14",
+    "prev_usage": 6,
+    "verified_usage": 2,
+    "usages": [
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid",
+      "Home (English) \u2192 Patient Moments (Expandable)",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments (Expandable)",
+      "Why Choose Us (English) \u2192 Patient Moments (Expandable)",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments (Expandable)"
+    ]
+  },
+  {
+    "num": 45,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212735362_cliex0f8.webp",
+    "table": "gallery",
+    "id": "smile-1786212742623-3yctr",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-15",
+    "prev_usage": 6,
+    "verified_usage": 2,
+    "usages": [
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid",
+      "Home (English) \u2192 Patient Moments (Expandable)",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments (Expandable)",
+      "Why Choose Us (English) \u2192 Patient Moments (Expandable)",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments (Expandable)"
+    ]
+  },
+  {
+    "num": 46,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212694004_8jmsbmnu.jpg",
+    "table": "gallery",
+    "id": "smile-1786212702245-bn5v9",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-16",
+    "prev_usage": 6,
+    "verified_usage": 2,
+    "usages": [
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid",
+      "Home (English) \u2192 Patient Moments (Expandable)",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments (Expandable)",
+      "Why Choose Us (English) \u2192 Patient Moments (Expandable)",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments (Expandable)"
+    ]
+  },
+  {
+    "num": 47,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786212651860_tv8oprw6.webp",
+    "table": "gallery",
+    "id": "smile-1786212659320-wl0if",
+    "category": "Smile Gallery",
+    "asset_id": "SMILE-GAL-17",
+    "prev_usage": 6,
+    "verified_usage": 2,
+    "usages": [
+      "Smile Gallery (English) \u2192 Smile Gallery Masonry Grid",
+      "SmileGalleryGujarati (Gujarati) \u2192 Smile Gallery Masonry Grid",
+      "Home (English) \u2192 Patient Moments (Expandable)",
+      "HomeGujarati (Gujarati) \u2192 Patient Moments (Expandable)",
+      "Why Choose Us (English) \u2192 Patient Moments (Expandable)",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Patient Moments (Expandable)"
+    ]
+  },
+  {
+    "num": 48,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786765484242_aik8gm1j.jpg",
+    "table": "social_service",
+    "id": "03945ed0-b92a-49b4-afe8-b36ca9570fe4",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 49,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786765474527_tshx6fnl.jpg",
+    "table": "social_service",
+    "id": "2f2f8b15-39bb-43ee-9dc4-d4fc54a6794c",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 50,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786765463293_9gyz94mi.jpg",
+    "table": "social_service",
+    "id": "971437bf-a267-44aa-8221-3b6a94456afa",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-03",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 51,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786765441508_4pzy13u8.jpg",
+    "table": "social_service",
+    "id": "721c01d9-ad98-4606-ad85-3af951493d91",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-04",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 52,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435174694_1n54cdw0.jpeg",
+    "table": "social_service",
+    "id": "9a69ab80-cb7d-44d0-bf46-09ae93820ab9",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-05",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 53,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435170306_v1kvzea7.jpg",
+    "table": "social_service",
+    "id": "3a347c0c-b374-4d6a-98cb-c337ed0abe05",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-06",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 54,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435158309_rt4gkp6l.jpg",
+    "table": "social_service",
+    "id": "9264c7e5-e377-4065-8b0c-e580c02cd5f2",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-07",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 55,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435147202_cwezji2p.jpg",
+    "table": "social_service",
+    "id": "4956b6dc-bb1a-4ac5-aebd-3015cd6b0fcc",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-08",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 56,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435139283_lk8ofzwt.jpg",
+    "table": "social_service",
+    "id": "9de0af5a-251a-43ae-a367-a592baa6f72d",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-09",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 57,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435133165_k2nv9x03.jpg",
+    "table": "social_service",
+    "id": "36d4a1a5-4fcd-44dc-84a5-81a33a616a3d",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-10",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 58,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435127688_pza568oo.jpg",
+    "table": "social_service",
+    "id": "332ed567-4869-408f-b628-dbe8789f5f06",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-11",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 59,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435122711_tzy9xovg.jpg",
+    "table": "social_service",
+    "id": "8e4f214f-4d45-4989-a6b6-753be9870157",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-12",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 60,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435117317_zn3qdhp9.jpg",
+    "table": "social_service",
+    "id": "f3097a75-51c8-44f2-a2a5-5ea4c01e53d1",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-13",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 61,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435109808_fkru8oyh.jpg",
+    "table": "social_service",
+    "id": "d94c7f16-4fa5-4c14-bc05-0181849db9a0",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-14",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 62,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1785435014340_kfd8jyg7.jpg",
+    "table": "social_service",
+    "id": "f0d82eb2-2519-40ee-a7b1-999930e20366",
+    "category": "Social Service",
+    "asset_id": "SOC-SRV-15",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Social Service (English) \u2192 Community & Social Service Gallery",
+      "SocialServiceGujarati (Gujarati) \u2192 Community & Social Service Gallery"
+    ]
+  },
+  {
+    "num": 63,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786468977021_l9siudlb.webp",
+    "table": "technology",
+    "id": "7f8edb1a-3a19-4283-9f8c-d7dbb0356541",
+    "category": "Technology",
+    "asset_id": "TECH-01",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 64,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787662200878_a75mciue.webp",
+    "table": "technology",
+    "id": "1670e875-07f3-488a-b7f1-37421867a0cf",
+    "category": "Technology",
+    "asset_id": "TECH-02",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 65,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786469110730_pr7myrf3.webp",
+    "table": "technology",
+    "id": "bb81a4a8-804d-41d8-bff7-dcb19a08b124",
+    "category": "Technology",
+    "asset_id": "TECH-03",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 66,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786469192842_noo0os6h.webp",
+    "table": "technology",
+    "id": "22db6afa-ab5c-4ecb-b4d3-679dd0a57a14",
+    "category": "Technology",
+    "asset_id": "TECH-04",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 67,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786469249434_3bf572bp.webp",
+    "table": "technology",
+    "id": "aa2f95f6-d445-4d80-9b66-f28756059bf9",
+    "category": "Technology",
+    "asset_id": "TECH-05",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 68,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787317375351_er0vjw95.webp",
+    "table": "technology",
+    "id": "0ea9ddc6-e5d7-425f-ba5e-c8a5227dbcb4",
+    "category": "Technology",
+    "asset_id": "TECH-06",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 69,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787317477249_z48mjk1y.webp",
+    "table": "technology",
+    "id": "35895d74-cdd4-4cbf-bec3-f590858d9077",
+    "category": "Technology",
+    "asset_id": "TECH-07",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 70,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787317527232_1jqvyl8h.webp",
+    "table": "technology",
+    "id": "9bfff327-e051-4773-8b7f-1cac9d986d20",
+    "category": "Technology",
+    "asset_id": "TECH-08",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 71,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787317644248_anusuikm.webp",
+    "table": "technology",
+    "id": "89755b67-1327-49af-96c4-8daec1900494",
+    "category": "Technology",
+    "asset_id": "TECH-09",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 72,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787317735144_dpun17ky.webp",
+    "table": "technology",
+    "id": "74cb3a9e-f3e7-43cc-92a2-88f10c0d7bfa",
+    "category": "Technology",
+    "asset_id": "TECH-10",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 73,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787317781507_jfe9s0dr.webp",
+    "table": "technology",
+    "id": "957ce6b9-b048-4a36-a39a-77c4ffa033bd",
+    "category": "Technology",
+    "asset_id": "TECH-11",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "Technology (English) \u2192 Advanced Dental Equipment Grid",
+      "TechnologyGujarati (Gujarati) \u2192 Advanced Dental Equipment Grid",
+      "Why Choose Us (English) \u2192 Advanced Technology & Diagnostics",
+      "WhyChooseUsGujarati (Gujarati) \u2192 Advanced Technology & Diagnostics"
+    ]
+  },
+  {
+    "num": 74,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786735083257_9rtjtuq6.webp",
+    "table": "awards",
+    "id": "c7a3758a-24d3-4805-b019-1d739b1a1cfc",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 75,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191360880_eabeig2y.png",
+    "table": "awards",
+    "id": "4392637d-0d40-44f5-a651-5dac06faa458",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 76,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191346578_mgh8lg8j.png",
+    "table": "awards",
+    "id": "69dcf784-5006-4f3e-944a-0ca39904e634",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-03",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 77,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191333898_gzt71uzg.png",
+    "table": "awards",
+    "id": "c56700a3-75d7-479d-b674-bf9469b29a3b",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-04",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 78,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1787284435951_nexo0d5y.webp",
+    "table": "awards",
+    "id": "3a7cc3e0-bfe6-4300-99fb-b5a153c5fc69",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-05",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 79,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786735124967_llfd2a3e.webp",
+    "table": "awards",
+    "id": "08f697e9-c20b-43fe-91a2-9dd7fb746eb8",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-06",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 80,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786735106596_k1yufqjo.webp",
+    "table": "awards",
+    "id": "36c520c2-de49-4af3-b162-5ca9acfa295c",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-07",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 81,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191290272_4cf7qx7m.png",
+    "table": "awards",
+    "id": "7ffc15f5-9d71-4472-94d1-4b741b96ab0c",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-08",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 82,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191229945_5eu2jh67.png",
+    "table": "awards",
+    "id": "472f0848-85d5-4d86-b167-5d0d722f9494",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-09",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 83,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191237012_ryyth4qo.png",
+    "table": "awards",
+    "id": "ba137ef1-c883-4b39-8333-f54518070ac4",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-10",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 84,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191243705_h1mdqaft.png",
+    "table": "awards",
+    "id": "1422a2d5-7feb-4b7e-8107-5607398d6032",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-11",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 85,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191257508_i5rn0fpx.png",
+    "table": "awards",
+    "id": "2232f4c8-26dd-4ef9-8f6f-9e1c019608e6",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-12",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 86,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191323689_39h0d07k.png",
+    "table": "awards",
+    "id": "9eb730e0-e745-44cd-9394-469db3029213",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-13",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 87,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786191302992_pjwy314p.png",
+    "table": "awards",
+    "id": "3e02c4f3-8784-4621-861b-54e56d1693a3",
+    "category": "Awards & Recognition",
+    "asset_id": "AWARD-14",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Awards & Recognition Showcase",
+      "HomeGujarati (Gujarati) \u2192 Awards & Recognition Showcase"
+    ]
+  },
+  {
+    "num": 88,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733679825_fwbxzdd3.webp",
+    "table": "international_patients_gallery",
+    "id": "06870ab3-f1ba-4665-8474-c0eef6ca227a",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 89,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733667699_rwl1jtvh.jpg",
+    "table": "international_patients_gallery",
+    "id": "e44d5d8e-3a89-4f42-8338-7833b0baf44a",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 90,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733656947_lbjz06g9.jpg",
+    "table": "international_patients_gallery",
+    "id": "3eda7a5e-00d3-4f75-9cd3-e0cc64d11063",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-03",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 91,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733637965_dw3i47r7.webp",
+    "table": "international_patients_gallery",
+    "id": "5d50a7bb-f9f4-4ad6-9354-7aa82f4322c8",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-04",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 92,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733631177_xj94ai70.jpg",
+    "table": "international_patients_gallery",
+    "id": "88643df4-00e4-44a1-ad67-6d46c2746ef4",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-05",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 93,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733616799_2c94gbok.webp",
+    "table": "international_patients_gallery",
+    "id": "eed7e8cb-d166-471e-9cce-bc359b19b594",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-06",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 94,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733597181_mgia4cj0.webp",
+    "table": "international_patients_gallery",
+    "id": "2f71ffba-0e4c-45ac-b677-46e88c9d9f16",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-07",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 95,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786733566786_v4wv3wx5.webp",
+    "table": "international_patients_gallery",
+    "id": "1ba5a5ab-ecad-4e97-90b6-90cd45322256",
+    "category": "International Patients",
+    "asset_id": "INT-PAT-08",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 International Patients Moments Gallery",
+      "DentalTourismGujarati (Gujarati) \u2192 International Patients Moments Gallery"
+    ]
+  },
+  {
+    "num": 96,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp",
+    "table": "services",
+    "id": "wisdom-srv (hero_image)",
+    "category": "Service Hero (wisdom-tooth-surgery)",
+    "asset_id": "SRV-HERO-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 wisdom-tooth-surgery Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 wisdom-tooth-surgery Hero Banner"
+    ]
+  },
+  {
+    "num": 97,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407924645_khouwxx2.webp",
+    "table": "services",
+    "id": "filling-srv (hero_image)",
+    "category": "Service Hero (tooth-coloured-filling)",
+    "asset_id": "SRV-HERO-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 tooth-coloured-filling Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 tooth-coloured-filling Hero Banner"
+    ]
+  },
+  {
+    "num": 98,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp",
+    "table": "services",
+    "id": "aligners-srv (hero_image)",
+    "category": "Service Hero (invisible-aligners)",
+    "asset_id": "SRV-HERO-03",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "ServiceDetail (English) \u2192 invisible-aligners Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 invisible-aligners Hero Banner",
+      "BracesTreatmentView (English) \u2192 Related Service Card",
+      "BracesTreatmentView (Gujarati) \u2192 Related Service Card"
+    ]
+  },
+  {
+    "num": 99,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407866067_1a700nk9.webp",
+    "table": "services",
+    "id": "braces-srv (hero_image)",
+    "category": "Service Hero (braces-treatment)",
+    "asset_id": "SRV-HERO-04",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 braces-treatment Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 braces-treatment Hero Banner"
+    ]
+  },
+  {
+    "num": 100,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450851786_qnipnf0s.webp",
+    "table": "services",
+    "id": "implants-srv (hero_image)",
+    "category": "Service Hero (dental-implants)",
+    "asset_id": "SRV-HERO-05",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 dental-implants Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 dental-implants Hero Banner"
+    ]
+  },
+  {
+    "num": 101,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786565722583_t57uxnk1.webp",
+    "table": "services",
+    "id": "crowns (hero_image)",
+    "category": "Service Hero (crowns-bridges)",
+    "asset_id": "SRV-HERO-06",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 crowns-bridges Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 crowns-bridges Hero Banner"
+    ]
+  },
+  {
+    "num": 102,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450901463_tvoinbyq.jpg",
+    "table": "services",
+    "id": "rct (hero_image)",
+    "category": "Service Hero (root-canal-treatment)",
+    "asset_id": "SRV-HERO-07",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 root-canal-treatment Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 root-canal-treatment Hero Banner"
+    ]
+  },
+  {
+    "num": 103,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407738608_3vac10yu.webp",
+    "table": "services",
+    "id": "smile-srv (hero_image)",
+    "category": "Service Hero (smile-makeover)",
+    "asset_id": "SRV-HERO-08",
+    "prev_usage": 2,
+    "verified_usage": 4,
+    "usages": [
+      "ServiceDetail (English) \u2192 smile-makeover Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 smile-makeover Hero Banner",
+      "BracesTreatmentView (English) \u2192 Related Service Card",
+      "BracesTreatmentView (Gujarati) \u2192 Related Service Card"
+    ]
+  },
+  {
+    "num": 104,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp",
+    "table": "services",
+    "id": "fmr-srv (hero_image)",
+    "category": "Service Hero (full-mouth-rehabilitation)",
+    "asset_id": "SRV-HERO-09",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 full-mouth-rehabilitation Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 full-mouth-rehabilitation Hero Banner"
+    ]
+  },
+  {
+    "num": 105,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp",
+    "table": "services",
+    "id": "kids (hero_image)",
+    "category": "Service Hero (pediatric-dentistry)",
+    "asset_id": "SRV-HERO-10",
+    "prev_usage": 2,
+    "verified_usage": 8,
+    "usages": [
+      "ServiceDetail (English) \u2192 pediatric-dentistry Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 pediatric-dentistry Hero Banner",
+      "BracesTreatmentView (English) \u2192 Related Service Card",
+      "BracesTreatmentView (Gujarati) \u2192 Related Service Card",
+      "Home (English) \u2192 Treatment Card (Kids Dentistry)",
+      "HomeGujarati (Gujarati) \u2192 Treatment Card (Kids Dentistry)",
+      "Dental Tourism (English) \u2192 Treatment Card (Kids Dentistry)",
+      "DentalTourismGujarati (Gujarati) \u2192 Treatment Card (Kids Dentistry)"
+    ]
+  },
+  {
+    "num": 106,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407832495_qm0f2hs8.webp",
+    "table": "services",
+    "id": "whitening-srv (hero_image)",
+    "category": "Service Hero (teeth-whitening)",
+    "asset_id": "SRV-HERO-11",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "ServiceDetail (English) \u2192 teeth-whitening Hero Banner",
+      "ServiceDetail (Gujarati) \u2192 teeth-whitening Hero Banner"
+    ]
+  },
+  {
+    "num": 107,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450834356_6yydbnwe.webp",
+    "table": "services",
+    "id": "implants-srv (homepage_card_image)",
+    "category": "Service Card (dental-implants)",
+    "asset_id": "SRV-CARD-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Treatment Card (dental-implants)",
+      "HomeGujarati (Gujarati) \u2192 Treatment Card (dental-implants)"
+    ]
+  },
+  {
+    "num": 108,
+    "url": "https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450886815_3rmvag0f.jpg",
+    "table": "services",
+    "id": "rct (homepage_card_image)",
+    "category": "Service Card (root-canal-treatment)",
+    "asset_id": "SRV-CARD-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Home (English) \u2192 Treatment Card (root-canal-treatment)",
+      "HomeGujarati (Gujarati) \u2192 Treatment Card (root-canal-treatment)"
+    ]
+  },
+  {
+    "num": 109,
+    "url": "/Dr kinjal patel 2.png",
+    "table": "doctors / static",
+    "id": "kinjal",
+    "category": "Doctor Portrait (Dr. Kinjal Patel)",
+    "asset_id": "DOC-PORT-01",
+    "prev_usage": 9,
+    "verified_usage": 5,
+    "usages": [
+      "Doctors (English) \u2192 Dr. Kinjal Patel Card",
+      "Doctors (English) \u2192 Dr. Kinjal Patel Detail Bio Banner",
+      "DoctorsGujarati (Gujarati) \u2192 Dr. Kinjal Patel Card",
+      "DoctorsGujarati (Gujarati) \u2192 Dr. Kinjal Patel Detail Bio Banner",
+      "About \u2192 Clinical Medical Team Member 2"
+    ]
+  },
+  {
+    "num": 110,
+    "url": "/dr. patel.png",
+    "table": "doctors / static",
+    "id": "vipul",
+    "category": "Doctor Portrait (Dr. Vipul Patel)",
+    "asset_id": "DOC-PORT-02",
+    "prev_usage": 9,
+    "verified_usage": 9,
+    "usages": [
+      "Doctors (English) \u2192 Dr. Vipul Patel Card",
+      "Doctors (English) \u2192 Dr. Vipul Patel Detail Bio Banner",
+      "DoctorsGujarati (Gujarati) \u2192 Dr. Vipul Patel Card",
+      "DoctorsGujarati (Gujarati) \u2192 Dr. Vipul Patel Detail Bio Banner",
+      "About \u2192 Hero Senior Director Portrait",
+      "About \u2192 Doctor Highlight Section",
+      "About \u2192 Clinical Medical Team Member 1",
+      "ServiceDetail (English) \u2192 Full Mouth Rehabilitation Quote",
+      "ServiceDetail (Gujarati) \u2192 Full Mouth Rehabilitation Quote"
+    ]
+  },
+  {
+    "num": 111,
+    "url": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800",
+    "table": "About.tsx (static)",
+    "id": "about-facility-1",
+    "category": "About Page Facility Highlight",
+    "asset_id": "ABOUT-FAC-01",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Facility Highlight (Modern Infrastructure (Operatory Rooms))"
+    ]
+  },
+  {
+    "num": 112,
+    "url": "https://images.unsplash.com/photo-1579684389782-64d84b5e901d?auto=format&fit=crop&q=80&w=800",
+    "table": "About.tsx (static)",
+    "id": "about-facility-2",
+    "category": "About Page Facility Highlight",
+    "asset_id": "ABOUT-FAC-02",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Facility Highlight (In-House CBCT Scan)"
+    ]
+  },
+  {
+    "num": 113,
+    "url": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800",
+    "table": "About.tsx (static)",
+    "id": "about-facility-3",
+    "category": "About Page Facility Highlight",
+    "asset_id": "ABOUT-FAC-03",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Facility Highlight (Advanced Implant Technology (Reception Lounge))"
+    ]
+  },
+  {
+    "num": 114,
+    "url": "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&q=80&w=800",
+    "table": "About.tsx (static)",
+    "id": "about-facility-4",
+    "category": "About Page Facility Highlight",
+    "asset_id": "ABOUT-FAC-04",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Facility Highlight (USA Standard Sterilization Protocol)"
+    ]
+  },
+  {
+    "num": 115,
+    "url": "/patel dental hospital doctors.png",
+    "table": "About.tsx (static)",
+    "id": "about-team-1",
+    "category": "About Page Team Photograph",
+    "asset_id": "ABOUT-TEAM-01",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Our Team Section (Clinical Faculty Team Photo 1)"
+    ]
+  },
+  {
+    "num": 116,
+    "url": "/patel dental doctors.jpeg",
+    "table": "About.tsx (static)",
+    "id": "about-team-2",
+    "category": "About Page Team Photograph",
+    "asset_id": "ABOUT-TEAM-02",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Our Team Section (Clinical Doctors Team Photo 2)"
+    ]
+  },
+  {
+    "num": 117,
+    "url": "/photo_2026-07-13_09-49-40.jpg",
+    "table": "About.tsx (static)",
+    "id": "about-team-3",
+    "category": "About Page Team Photograph",
+    "asset_id": "ABOUT-TEAM-03",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "About \u2192 Our Team Section (Hospital Staff & Support Group Photo)"
+    ]
+  },
+  {
+    "num": 118,
+    "url": "/1730717115_Statue_of_Unity.jpg",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-dest-1",
+    "category": "Dental Tourism Attraction",
+    "asset_id": "DT-DEST-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Gujarat Tourism Attraction (Statue of Unity)",
+      "DentalTourismGujarati (Gujarati) \u2192 Gujarat Tourism Attraction (Statue of Unity)"
+    ]
+  },
+  {
+    "num": 119,
+    "url": "/Great Rann Of Kutch (14).jpg",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-dest-2",
+    "category": "Dental Tourism Attraction",
+    "asset_id": "DT-DEST-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Gujarat Tourism Attraction (Great Rann Of Kutch)",
+      "DentalTourismGujarati (Gujarati) \u2192 Gujarat Tourism Attraction (Great Rann Of Kutch)"
+    ]
+  },
+  {
+    "num": 120,
+    "url": "/Gir-National-Park-and-Santuary.jpg",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-dest-3",
+    "category": "Dental Tourism Attraction",
+    "asset_id": "DT-DEST-03",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Gujarat Tourism Attraction (Gir National Park and Sanctuary)",
+      "DentalTourismGujarati (Gujarati) \u2192 Gujarat Tourism Attraction (Gir National Park and Sanctuary)"
+    ]
+  },
+  {
+    "num": 121,
+    "url": "/1888537-somnath-temple-jyotirlinga-sardar-patel-narendra-modi-ghazni-invasion-temple-reconstruction.jpg",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-dest-4",
+    "category": "Dental Tourism Attraction",
+    "asset_id": "DT-DEST-04",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Gujarat Tourism Attraction (Somnath Jyotirlinga Temple)",
+      "DentalTourismGujarati (Gujarati) \u2192 Gujarat Tourism Attraction (Somnath Jyotirlinga Temple)"
+    ]
+  },
+  {
+    "num": 122,
+    "url": "/Gujarat-Dwarkadhish-Temple.jpg",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-dest-5",
+    "category": "Dental Tourism Attraction",
+    "asset_id": "DT-DEST-05",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Gujarat Tourism Attraction (Dwarkadhish Temple)",
+      "DentalTourismGujarati (Gujarati) \u2192 Gujarat Tourism Attraction (Dwarkadhish Temple)"
+    ]
+  },
+  {
+    "num": 123,
+    "url": "/mandvi1.jpg",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-dest-6",
+    "category": "Dental Tourism Attraction",
+    "asset_id": "DT-DEST-06",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Gujarat Tourism Attraction (Mandvi Beach & Vijay Vilas Palace)",
+      "DentalTourismGujarati (Gujarati) \u2192 Gujarat Tourism Attraction (Mandvi Beach & Vijay Vilas Palace)"
+    ]
+  },
+  {
+    "num": 124,
+    "url": "/NRI.webp",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-banner-nri",
+    "category": "Dental Tourism Static Asset",
+    "asset_id": "DT-STATIC-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 NRI & International Patient Hero Banner",
+      "DentalTourismGujarati (Gujarati) \u2192 NRI & International Patient Hero Banner"
+    ]
+  },
+  {
+    "num": 125,
+    "url": "/dr. vipul patel.webp",
+    "table": "DentalTourism.tsx (static)",
+    "id": "dt-doctor-vipul",
+    "category": "Dental Tourism Static Asset",
+    "asset_id": "DT-STATIC-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Dental Tourism (English) \u2192 Senior Dental Implant Specialist Profile (Dr. Vipul Patel)",
+      "DentalTourismGujarati (Gujarati) \u2192 Senior Dental Implant Specialist Profile (Dr. Vipul Patel)"
+    ]
+  },
+  {
+    "num": 126,
+    "url": "/dental implant in rajkot.jpg",
+    "table": "Blogs.tsx (static)",
+    "id": "blog-dental-implants",
+    "category": "Blog Featured Image",
+    "asset_id": "BLOG-IMG-01",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Blogs (English) \u2192 Featured Post Thumbnail (Dental Implants in Rajkot Blog Cover)",
+      "BlogsGujarati (Gujarati) \u2192 Featured Post Thumbnail (Dental Implants in Rajkot Blog Cover)"
+    ]
+  },
+  {
+    "num": 127,
+    "url": "/cline aliner in rajkot.jpg",
+    "table": "Blogs.tsx (static)",
+    "id": "blog-clear-aligners",
+    "category": "Blog Featured Image",
+    "asset_id": "BLOG-IMG-02",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Blogs (English) \u2192 Featured Post Thumbnail (Clear Aligners in Rajkot Blog Cover)",
+      "BlogsGujarati (Gujarati) \u2192 Featured Post Thumbnail (Clear Aligners in Rajkot Blog Cover)"
+    ]
+  },
+  {
+    "num": 128,
+    "url": "/white teeth in rajkot.jpg",
+    "table": "Blogs.tsx (static)",
+    "id": "blog-teeth-whitening",
+    "category": "Blog Featured Image",
+    "asset_id": "BLOG-IMG-03",
+    "prev_usage": 2,
+    "verified_usage": 2,
+    "usages": [
+      "Blogs (English) \u2192 Featured Post Thumbnail (Teeth Whitening in Rajkot Blog Cover)",
+      "BlogsGujarati (Gujarati) \u2192 Featured Post Thumbnail (Teeth Whitening in Rajkot Blog Cover)"
+    ]
+  },
+  {
+    "num": 129,
+    "url": "/src/assets/images/sameday_fix_1780608011497.png",
+    "table": "SameDayFix.tsx (static asset import)",
+    "id": "sameday-fix-hero",
+    "category": "Same Day Fix Hero",
+    "asset_id": "SDF-HERO-01",
+    "prev_usage": 1,
+    "verified_usage": 1,
+    "usages": [
+      "Same Day Fix (English) \u2192 Full-Arch Fixed Teeth Procedure Illustration"
+    ]
+  }
+]

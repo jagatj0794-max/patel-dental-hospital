@@ -7,6 +7,28 @@ import { Doctor } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { DEFAULT_DOCTORS } from '../data/doctors';
 
+export function getAltTextFromUrl(url: string): string {
+  if (!url) return '';
+  const hashIdx = url.indexOf('#alt_text=');
+  if (hashIdx !== -1) {
+    try {
+      return decodeURIComponent(url.slice(hashIdx + '#alt_text='.length));
+    } catch (e) {
+      return '';
+    }
+  }
+  return '';
+}
+
+export function cleanUrlOfAltText(url: string): string {
+  if (!url) return '';
+  const hashIdx = url.indexOf('#alt_text=');
+  if (hashIdx !== -1) {
+    return url.slice(0, hashIdx);
+  }
+  return url;
+}
+
 export function mapDbToDoctor(row: any): Doctor {
   let statsArr: { value: string; label: string }[] = [];
   if (Array.isArray(row.stats)) {
@@ -51,7 +73,7 @@ export function mapDbToDoctor(row: any): Doctor {
     name: row.name,
     titles: row.titles || '',
     designation: row.designation || '',
-    img: row.img || '',
+    img: cleanUrlOfAltText(row.img || ''),
     briefIntro: row.brief_intro || row.briefIntro || '',
     quote: row.quote || '',
     bdsYear: row.bds_year || row.bdsYear || '',
@@ -60,16 +82,19 @@ export function mapDbToDoctor(row: any): Doctor {
     expertises: expertisesArr,
     branch: row.branch || 'Gayatrinagar Branch',
     experience: row.experience || '',
+    alt_text: row.alt_text || getAltTextFromUrl(row.img || ''),
   };
 }
 
 export function mapDoctorToDb(doc: Doctor): any {
+  const cleanImg = cleanUrlOfAltText(doc.img || '');
   return {
     id: doc.id,
     name: doc.name,
     titles: doc.titles || '',
     designation: doc.designation || '',
-    img: doc.img || '',
+    img: cleanImg,
+    alt_text: doc.alt_text || '',
     brief_intro: doc.briefIntro || '',
     quote: doc.quote || '',
     bds_year: doc.bdsYear || '',

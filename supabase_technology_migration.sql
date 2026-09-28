@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.technology (
   image_url text NOT NULL,
   title text,
   description text,
+  alt_text text,
   display_order integer DEFAULT 0,
   is_active boolean DEFAULT true,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,

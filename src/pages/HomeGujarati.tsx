@@ -16,6 +16,7 @@ import { DEFAULT_VIDEOS } from '../utils/videoData';
 import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_RCT_GREEN_HIGHLIGHT_LINE } from '../utils/serviceData';
 import { getWhatsAppUrl } from '../utils/contactData';
 import { awardsService } from '../utils/awardsData';
+import { getAwardCaption, cleanAwardImageUrl } from '../utils/awardCaptions';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
@@ -1910,30 +1911,52 @@ export default function HomeGujarati({
           </div>
 
           {awardsList && awardsList.length > 0 ? (
-            <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto" id="awards-rows-container">
+            <div className="flex flex-col gap-8 sm:gap-12 max-w-7xl mx-auto" id="awards-rows-container">
               {/* Row 1: Portrait/Vertical Awards */}
               <div className="w-full" id="awards-row-vertical">
-                <div className="flex gap-6 sm:gap-8 overflow-x-auto pb-4 pt-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-                  {verticalAwards.map((item, idx) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: idx * 0.05 }}
-                      onClick={() => setSelectedAward(item)}
-                      className="flex-shrink-0 cursor-pointer h-44 sm:h-56 md:h-64 lg:h-72 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
-                      id={`home-award-vertical-${item.id}`}
-                    >
-                      <img
-                        src={item.image_url || null}
-                        alt="Award & Recognition Vertical"
-                        className="h-full w-auto object-contain object-center rounded-lg"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
-                    </motion.div>
-                  ))}
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.06)] p-4 sm:p-6 lg:p-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 items-start">
+                    {verticalAwards.map((item, idx) => {
+                      const caption = getAwardCaption(item.id, item.image_url || '', 'gu', item);
+                      return (
+                        <div 
+                          key={item.id} 
+                          className={`flex flex-col items-center gap-3 w-full ${
+                            idx === 4 ? 'col-span-2 sm:col-span-1 lg:col-span-1 max-w-[240px] sm:max-w-none mx-auto' : ''
+                          }`}
+                        >
+                          <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.4, delay: idx * 0.05 }}
+                            onClick={() => setSelectedAward(item)}
+                            className="w-full cursor-pointer h-48 sm:h-56 md:h-64 lg:h-72 bg-slate-50/60 rounded-xl border border-slate-200/70 p-2 sm:p-2.5 flex items-center justify-center transition-all duration-300 hover:border-teal-400 hover:shadow-md hover:scale-[1.02]"
+                            id={`home-award-vertical-${item.id}`}
+                          >
+                            <img
+                              src={cleanAwardImageUrl(item.image_url) || null}
+                              alt={item.alt_text || "Award & Recognition Vertical"}
+                              className="h-full w-auto object-contain object-center rounded-lg shadow-sm"
+                              loading="lazy"
+                              referrerPolicy="no-referrer"
+                            />
+                          </motion.div>
+                          {caption && (
+                            <div className="text-center px-1 max-w-full">
+                              <p className="text-[11px] sm:text-xs font-bold text-slate-800 leading-tight line-clamp-2">{caption.organization}</p>
+                              <p className="text-[10px] sm:text-[11px] font-semibold text-teal-600 leading-tight mt-0.5">
+                                {caption.recognition}{caption.category ? ` – ${caption.category}` : ''}
+                              </p>
+                              <p className="text-[9px] sm:text-[10px] text-slate-500 leading-normal mt-0.5">
+                                {caption.recipient && caption.date ? `${caption.recipient} • ${caption.date}` : (caption.recipient || caption.date || '')}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                   {verticalAwards.length === 0 && (
                     <div className="text-center py-6 text-slate-400 text-xs w-full">
                       No portrait awards available.
@@ -1991,22 +2014,39 @@ export default function HomeGujarati({
                               }
                               baseItems = temp;
                             }
-                            return baseItems.map((item, idx) => (
-                              <div
-                                key={`track1-${item.id}-${idx}`}
-                                onClick={() => setSelectedAward(item)}
-                                className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
-                                id={`home-award-horizontal-t1-${item.id}-${idx}`}
-                              >
-                                <img
-                                  src={item.image_url || null}
-                                  alt="Award & Recognition Horizontal"
-                                  className="h-full w-auto object-contain object-center rounded-lg"
-                                  loading="eager"
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
-                            ));
+                            return baseItems.map((item, idx) => {
+                              const caption = getAwardCaption(item.id, item.image_url || '', 'gu', item);
+                              return (
+                                <div key={`track1-${item.id}-${idx}`} className="flex flex-col items-center gap-3 flex-shrink-0 w-44 sm:w-56 md:w-60">
+                                  <div
+                                    onClick={() => setSelectedAward(item)}
+                                    className="w-full cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                                    id={`home-award-horizontal-t1-${item.id}-${idx}`}
+                                  >
+                                    <img
+                                      src={cleanAwardImageUrl(item.image_url) || null}
+                                      alt={item.alt_text || "Award & Recognition Horizontal"}
+                                      className="h-full w-auto object-contain object-center rounded-lg"
+                                      loading="eager"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  </div>
+                                  {caption && (
+                                    <div className="text-center px-1 max-w-full">
+                                      <p className="text-[10px] sm:text-[11px] font-bold text-slate-800 leading-tight line-clamp-2">{caption.organization}</p>
+                                      <p className="text-[9px] sm:text-[10px] font-semibold text-teal-600 leading-tight mt-0.5">
+                                        {caption.recognition}
+                                        {caption.specialization ? ` – ${caption.specialization}` : ''}
+                                        {caption.category ? ` – ${caption.category}` : ''}
+                                      </p>
+                                      <p className="text-[8px] sm:text-[9px] text-slate-500 leading-normal mt-0.5">
+                                        {caption.recipient && caption.date ? `${caption.recipient} • ${caption.date}` : (caption.recipient || caption.date || '')}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            });
                           })()}
                         </div>
                         {/* Track 2 - Identical clone for seamless loop */}
@@ -2021,22 +2061,39 @@ export default function HomeGujarati({
                               }
                               baseItems = temp;
                             }
-                            return baseItems.map((item, idx) => (
-                              <div
-                                key={`track2-${item.id}-${idx}`}
-                                onClick={() => setSelectedAward(item)}
-                                className="flex-shrink-0 cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 w-auto bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
-                                id={`home-award-horizontal-t2-${item.id}-${idx}`}
-                              >
-                                <img
-                                  src={item.image_url || null}
-                                  alt="Award & Recognition Horizontal"
-                                  className="h-full w-auto object-contain object-center rounded-lg"
-                                  loading="eager"
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
-                            ));
+                            return baseItems.map((item, idx) => {
+                              const caption = getAwardCaption(item.id, item.image_url || '', 'gu', item);
+                              return (
+                                <div key={`track2-${item.id}-${idx}`} className="flex flex-col items-center gap-3 flex-shrink-0 w-44 sm:w-56 md:w-60">
+                                  <div
+                                    onClick={() => setSelectedAward(item)}
+                                    className="w-full cursor-pointer h-28 sm:h-36 md:h-40 lg:h-48 bg-white rounded-xl border border-slate-100 shadow-[0_4px_14px_rgba(0,0,0,0.12)] p-2 sm:p-2.5 flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]"
+                                    id={`home-award-horizontal-t2-${item.id}-${idx}`}
+                                  >
+                                    <img
+                                      src={cleanAwardImageUrl(item.image_url) || null}
+                                      alt={item.alt_text || "Award & Recognition Horizontal"}
+                                      className="h-full w-auto object-contain object-center rounded-lg"
+                                      loading="eager"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  </div>
+                                  {caption && (
+                                    <div className="text-center px-1 max-w-full">
+                                      <p className="text-[10px] sm:text-[11px] font-bold text-slate-800 leading-tight line-clamp-2">{caption.organization}</p>
+                                      <p className="text-[9px] sm:text-[10px] font-semibold text-teal-600 leading-tight mt-0.5">
+                                        {caption.recognition}
+                                        {caption.specialization ? ` – ${caption.specialization}` : ''}
+                                        {caption.category ? ` – ${caption.category}` : ''}
+                                      </p>
+                                      <p className="text-[8px] sm:text-[9px] text-slate-500 leading-normal mt-0.5">
+                                        {caption.recipient && caption.date ? `${caption.recipient} • ${caption.date}` : (caption.recipient || caption.date || '')}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            });
                           })()}
                         </div>
                       </div>
@@ -2049,16 +2106,7 @@ export default function HomeGujarati({
                 )}
               </div>
             </div>
-          ) : (
-            <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-3xs max-w-2xl mx-auto">
-              <div className="w-12 h-12 rounded-full bg-teal-50 text-[#0D9488] flex items-center justify-center mx-auto mb-3 text-xl font-bold">
-                🏆
-              </div>
-              <p className="text-slate-500 text-sm font-medium">
-                Awards & Recognitions will be displayed here.
-              </p>
-            </div>
-          )}
+          ) : null}
         </div>
       </section>
 
@@ -2092,14 +2140,36 @@ export default function HomeGujarati({
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center rounded-2xl overflow-hidden cursor-default"
+              className="relative max-w-5xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center rounded-2xl overflow-hidden cursor-default gap-4"
             >
-              <img
-                src={selectedAward.image_url || null}
-                alt="Award Full View"
-                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-                referrerPolicy="no-referrer"
-              />
+              <div className="flex-1 min-h-0 w-full flex items-center justify-center">
+                <img
+                  src={cleanAwardImageUrl(selectedAward.image_url) || null}
+                  alt={selectedAward.alt_text || "Award Full View"}
+                  className="max-w-full max-h-[65vh] sm:max-h-[70vh] object-contain rounded-lg shadow-2xl"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              {(() => {
+                const caption = getAwardCaption(selectedAward.id, selectedAward.image_url || '', 'gu', selectedAward);
+                if (!caption) return null;
+                return (
+                  <div className="bg-slate-900/90 border border-white/10 rounded-2xl p-4 text-center max-w-xl w-full mx-auto shadow-2xl backdrop-blur-md">
+                    <p className="text-xs sm:text-sm font-bold text-teal-400">{caption.organization}</p>
+                    <p className="text-[11px] sm:text-xs font-semibold text-white mt-1">
+                      {caption.recognition}
+                      {caption.specialization ? ` – ${caption.specialization}` : ''}
+                      {caption.category ? ` – ${caption.category}` : ''}
+                      {caption.programme ? ` – ${caption.programme}` : ''}
+                    </p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-300 mt-1">
+                      <span className="text-teal-200 font-medium">
+                        {caption.recipient && caption.date ? `${caption.recipient} • ${caption.date}` : (caption.recipient || caption.date || '')}
+                      </span>
+                    </p>
+                  </div>
+                );
+              })()}
             </motion.div>
           </motion.div>
         )}

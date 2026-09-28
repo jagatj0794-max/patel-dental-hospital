@@ -113,7 +113,7 @@ export default function SocialServiceGujarati() {
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center p-2">
                     <img
                       src={item.image_url || null}
-                      alt={item.title || 'સામાજિક સેવા પ્રવૃત્તિ'}
+                      alt={item.alt_text || item.title || 'સામાજિક સેવા પ્રવૃત્તિ'}
                       className="max-w-full max-h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105 mx-auto block"
                       referrerPolicy="no-referrer"
                       loading="lazy"
@@ -192,7 +192,7 @@ export default function SocialServiceGujarati() {
                 <div className="relative overflow-hidden flex items-center justify-center max-h-[70vh] bg-black p-4">
                   <img
                     src={currentLightboxImg.image_url || null}
-                    alt={currentLightboxImg.title || 'સામાજિક સેવા પ્રવૃત્તિ વિગતો'}
+                    alt={currentLightboxImg.alt_text || currentLightboxImg.title || 'સામાજિક સેવા પ્રવૃત્તિ વિગતો'}
                     className="max-h-[60vh] w-auto max-w-full object-contain mx-auto"
                     referrerPolicy="no-referrer"
                   />

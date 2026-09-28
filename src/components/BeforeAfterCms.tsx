@@ -26,11 +26,16 @@ import { uploadImage } from '../utils/supabaseStorage';
 
 const TREATMENT_OPTIONS = [
   "Dental Implants",
+  "Full Mouth Rehabilitation",
+  "Invisible Aligners",
+  "Single Sitting Root Canal Treatment",
   "Smile Makeover",
-  "Full-Mouth Rehabilitation",
-  "Zirconia Crowns & Bridges",
-  "Root Canal Treatment",
-  "Aligners & Orthodontics"
+  "Crowns & Bridges",
+  "Pediatric Dentistry",
+  "Teeth Whitening",
+  "Braces Treatment",
+  "Wisdom Tooth Surgery",
+  "Tooth Coloured Filling (Composite Filling)"
 ];
 
 export default function BeforeAfterCms() {
@@ -43,7 +48,9 @@ export default function BeforeAfterCms() {
   const [editingItem, setEditingItem] = useState<BeforeAfterEntry | null>(null);
   const [treatmentName, setTreatmentName] = useState(TREATMENT_OPTIONS[0]);
   const [beforeUrl, setBeforeUrl] = useState('');
+  const [beforeAltText, setBeforeAltText] = useState('');
   const [afterUrl, setAfterUrl] = useState('');
+  const [afterAltText, setAfterAltText] = useState('');
   const [displayOrder, setDisplayOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
   
@@ -55,7 +62,64 @@ export default function BeforeAfterCms() {
     setIsLoading(true);
     try {
       const data = await beforeAfterService.getBeforeAfterEntries();
-      setItems(data);
+      
+      // Controlled Dental Tourism Alt-Texts
+      const tourismAltTexts: Record<string, { before: string, after: string }> = {
+        "Dental Implants": {
+          before: "Before dental implant treatment showing the existing tooth condition and missing tooth area at Patel Dental Hospital, Rajkot.",
+          after: "After dental implant treatment showing the restored tooth and improved dental appearance at Patel Dental Hospital, Rajkot."
+        },
+        "Full-Mouth Rehabilitation": {
+          before: "Before full mouth rehabilitation showing the existing condition of multiple teeth at Patel Dental Hospital, Rajkot.",
+          after: "After full mouth rehabilitation showing restored teeth and an improved overall dental appearance at Patel Dental Hospital, Rajkot."
+        },
+        "Smile Makeover": {
+          before: "Before smile makeover showing the existing appearance of the teeth and smile at Patel Dental Hospital, Rajkot.",
+          after: "After smile makeover showing an improved appearance of the teeth and smile at Patel Dental Hospital, Rajkot."
+        },
+        "Crowns & Bridges": {
+          before: "Before crowns and bridges treatment showing the existing condition of the teeth at Patel Dental Hospital, Rajkot.",
+          after: "After crowns and bridges treatment showing restored teeth and improved dental appearance at Patel Dental Hospital, Rajkot."
+        },
+        "Root Canal Treatment": {
+          before: "Before root canal treatment showing the affected tooth and existing dental condition at Patel Dental Hospital, Rajkot.",
+          after: "After root canal treatment showing the restored tooth following dental treatment at Patel Dental Hospital, Rajkot."
+        },
+        "Aligners & Orthodontics": {
+          before: "Before aligners and orthodontic treatment showing misaligned teeth and the existing alignment condition at Patel Dental Hospital, Rajkot.",
+          after: "After aligners and orthodontic treatment showing improved teeth alignment at Patel Dental Hospital, Rajkot."
+        }
+      };
+
+      let needsSync = false;
+      const syncedData = data.map((item: BeforeAfterEntry) => {
+        const key = Object.keys(tourismAltTexts).find(k => k === item.treatment_name);
+        if (key) {
+          const expected = tourismAltTexts[key];
+          if (item.before_alt_text !== expected.before || item.after_alt_text !== expected.after) {
+            needsSync = true;
+            return {
+              ...item,
+              before_alt_text: expected.before,
+              after_alt_text: expected.after
+            };
+          }
+        }
+        return item;
+      });
+
+      if (needsSync) {
+        console.log('[BeforeAfterCms] Auto-Syncing Dental Tourism Alt-Texts in Supabase via Admin Session...');
+        const success = await beforeAfterService.saveBeforeAfterList(syncedData);
+        if (success) {
+          const freshData = await beforeAfterService.getBeforeAfterEntries();
+          setItems(freshData);
+        } else {
+          setItems(data);
+        }
+      } else {
+        setItems(data);
+      }
     } catch (err) {
       console.error('Error loading before/after entries:', err);
     } finally {
@@ -71,7 +135,9 @@ export default function BeforeAfterCms() {
     setEditingItem(null);
     setTreatmentName(TREATMENT_OPTIONS[0]);
     setBeforeUrl('');
+    setBeforeAltText('');
     setAfterUrl('');
+    setAfterAltText('');
     setDisplayOrder(items.length > 0 ? Math.max(...items.map(i => i.display_order)) + 1 : 0);
     setIsActive(true);
     setIsFormOpen(false);
@@ -81,7 +147,9 @@ export default function BeforeAfterCms() {
     setEditingItem(item);
     setTreatmentName(item.treatment_name);
     setBeforeUrl(item.before_image_url);
+    setBeforeAltText(item.before_alt_text || '');
     setAfterUrl(item.after_image_url);
+    setAfterAltText(item.after_alt_text || '');
     setDisplayOrder(item.display_order);
     setIsActive(item.is_active);
     setIsFormOpen(true);
@@ -137,7 +205,9 @@ export default function BeforeAfterCms() {
       id: itemId,
       treatment_name: treatmentName,
       before_image_url: beforeUrl,
+      before_alt_text: beforeAltText,
       after_image_url: afterUrl,
+      after_alt_text: afterAltText,
       display_order: Number(displayOrder) || 0,
       is_active: isActive
     };
@@ -458,6 +528,17 @@ export default function BeforeAfterCms() {
                   </span>
                 </div>
               )}
+
+              <div className="space-y-1.5 mt-3">
+                <label className="text-xs font-bold text-slate-700 block">Before Image Description / Alt Text</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Patient before treatment showing the original condition..."
+                  value={beforeAltText}
+                  onChange={(e) => setBeforeAltText(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:border-teal-500 bg-white"
+                />
+              </div>
             </div>
 
             {/* After Image upload */}
@@ -499,6 +580,17 @@ export default function BeforeAfterCms() {
                   </span>
                 </div>
               )}
+
+              <div className="space-y-1.5 mt-3">
+                <label className="text-xs font-bold text-slate-700 block">After Image Description / Alt Text</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Patient after treatment showing the restored result..."
+                  value={afterAltText}
+                  onChange={(e) => setAfterAltText(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:border-teal-500 bg-white"
+                />
+              </div>
             </div>
 
             {/* Display Order & Active status side-by-side */}

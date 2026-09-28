@@ -283,6 +283,8 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
       before_image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=600',
       after_image: 'https://images.unsplash.com/photo-1579781403298-d3460f4c8942?auto=format&fit=crop&q=80&w=600',
       caption: '',
+      before_alt_text: '',
+      after_alt_text: '',
       display_order: nextOrder
     };
     updateMConfigField('before_after_pairs', [...beforeAfterPairs, newItem]);
@@ -488,6 +490,17 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
                   )}
                 </div>
 
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Card Preview Image Alt Text</label>
+                  <input
+                    type="text"
+                    value={mConfig.homepage_card_image_alt || ''}
+                    onChange={(e) => updateMConfigField('homepage_card_image_alt', e.target.value)}
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-teal-500 bg-white text-slate-800"
+                    placeholder="Enter card image alt text..."
+                  />
+                </div>
+
                 {/* Homepage Short Intro */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Homepage Grid Short Summary description</label>
@@ -579,6 +592,16 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
                         <img src={service.hero_image} alt="Desktop Hero Bg" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                     )}
+                    <div className="space-y-1.5 mt-2">
+                      <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Desktop Hero Background Image Alt Text</label>
+                      <input
+                        type="text"
+                        value={mConfig.hero_image_alt || ''}
+                        onChange={(e) => updateMConfigField('hero_image_alt', e.target.value)}
+                        className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                        placeholder="Describe the desktop hero image..."
+                      />
+                    </div>
                   </div>
 
                   {/* Mobile Background */}
@@ -617,6 +640,16 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
                         <img src={service.hero_bg_image_mobile || mConfig.hero_bg_image_mobile} alt="Mobile Hero Bg" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                     )}
+                    <div className="space-y-1.5 mt-2">
+                      <label className="text-[10px] font-black text-[#081C3A] uppercase tracking-wider block">Mobile Hero Background Image Alt Text</label>
+                      <input
+                        type="text"
+                        value={mConfig.hero_image_mobile_alt || ''}
+                        onChange={(e) => updateMConfigField('hero_image_mobile_alt', e.target.value)}
+                        className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                        placeholder="Describe the mobile hero image..."
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -788,6 +821,17 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
                                 }}
                               />
                             </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold text-slate-500 uppercase">Alt Text</label>
+                            <input
+                              type="text"
+                              value={item.alt_text || ''}
+                              onChange={(e) => updateGalleryItemField(idx, 'alt_text', e.target.value)}
+                              className="w-full px-2 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                              placeholder="Image alt text"
+                            />
                           </div>
 
                           {item.image_url && (
@@ -1114,6 +1158,29 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
                                   }}
                                 />
                               </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-bold text-slate-500 uppercase block">Before Image Alt Text</label>
+                              <input
+                                type="text"
+                                value={pair.before_alt_text || ''}
+                                onChange={(e) => updateBeforeAfterPairField(idx, 'before_alt_text', e.target.value)}
+                                className="w-full px-2 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                                placeholder="Before image alt text"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-bold text-slate-500 uppercase block">After Image Alt Text</label>
+                              <input
+                                type="text"
+                                value={pair.after_alt_text || ''}
+                                onChange={(e) => updateBeforeAfterPairField(idx, 'after_alt_text', e.target.value)}
+                                className="w-full px-2 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none bg-white text-slate-800"
+                                placeholder="After image alt text"
+                              />
                             </div>
                           </div>
 

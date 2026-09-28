@@ -54,7 +54,13 @@ async function startServer() {
           typeof value === 'string' &&
           !['host', 'connection', 'content-length', 'accept-encoding', 'origin', 'referer'].includes(key.toLowerCase())
         ) {
-          headers[key] = value;
+          // Explicitly restore standard uppercase capitalization for key headers (like Authorization)
+          // to prevent issues with strict case-sensitive API gateways or backends
+          if (key.toLowerCase() === 'authorization') {
+            headers['Authorization'] = value;
+          } else {
+            headers[key] = value;
+          }
         }
       }
 

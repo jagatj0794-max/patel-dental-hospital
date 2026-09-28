@@ -279,7 +279,49 @@ const beforeAfterCases = [
   }
 ];
 
-function BeforeAfterSlider({ beforeImage, afterImage, title, idx }: { beforeImage: string; afterImage: string; title: string; idx: number; key?: any }) {
+function BeforeAfterSlider({ beforeImage, afterImage, title, idx, beforeAltText, afterAltText }: { beforeImage: string; afterImage: string; title: string; idx: number; beforeAltText?: string; afterAltText?: string; key?: any }) {
+  const normTitle = (title || "").trim().toLowerCase();
+  let fallbackBefore = `Patient before treatment showing the affected area at Patel Dental Hospital Rajkot.`;
+  let fallbackAfter = `Patient after treatment showing the restored result at Patel Dental Hospital Rajkot.`;
+
+  if (normTitle.includes("implant")) {
+    fallbackBefore = "Patient before dental implant treatment showing missing teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after dental implant treatment with restored teeth at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("full") || normTitle.includes("rehab")) {
+    fallbackBefore = "Patient before full mouth rehabilitation showing damaged or missing teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after full mouth rehabilitation with restored teeth at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("aligner") || normTitle.includes("ortho")) {
+    fallbackBefore = "Patient before invisible aligner treatment showing misaligned teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after invisible aligner treatment showing improved dental alignment at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("root") || normTitle.includes("canal")) {
+    fallbackBefore = "Patient before root canal treatment showing the affected tooth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after root canal treatment with the restored tooth at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("smile") || normTitle.includes("makeover")) {
+    fallbackBefore = "Patient before smile makeover showing the original appearance of the teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after smile makeover showing the improved appearance of the smile at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("crown") || normTitle.includes("bridge")) {
+    fallbackBefore = "Patient before crowns and bridges treatment showing damaged or missing teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after crowns and bridges treatment with restored teeth at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("pediatric") || normTitle.includes("child") || normTitle.includes("kid")) {
+    fallbackBefore = "Child patient before pediatric dental treatment showing the affected teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Child patient after pediatric dental treatment showing the treated teeth at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("whiten")) {
+    fallbackBefore = "Patient before teeth whitening treatment showing the original tooth shade at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after teeth whitening treatment showing the improved tooth shade at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("brace")) {
+    fallbackBefore = "Patient before braces treatment showing misaligned teeth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after braces treatment showing improved dental alignment at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("wisdom") || normTitle.includes("surgery")) {
+    fallbackBefore = "Patient before wisdom tooth surgery showing the affected wisdom tooth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after wisdom tooth surgery showing the treated area at Patel Dental Hospital Rajkot.";
+  } else if (normTitle.includes("fill") || normTitle.includes("composite")) {
+    fallbackBefore = "Patient before tooth coloured composite filling showing the affected tooth at Patel Dental Hospital Rajkot.";
+    fallbackAfter = "Patient after tooth coloured composite filling showing the restored tooth at Patel Dental Hospital Rajkot.";
+  }
+
+  const resolvedBeforeAlt = beforeAltText || fallbackBefore;
+  const resolvedAfterAlt = afterAltText || fallbackAfter;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -298,6 +340,8 @@ function BeforeAfterSlider({ beforeImage, afterImage, title, idx }: { beforeImag
         <ServiceBeforeAfterSlider
           beforeImage={beforeImage}
           afterImage={afterImage}
+          beforeAltText={resolvedBeforeAlt}
+          afterAltText={resolvedAfterAlt}
           aspectRatio="aspect-[16/9]"
           beforeLabel="પહેલાં"
           afterLabel="પછી"
@@ -1520,6 +1564,8 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
                   title={translateTitle(caseItem.treatment_name)}
                   beforeImage={caseItem.before_image_url}
                   afterImage={caseItem.after_image_url}
+                  beforeAltText={caseItem.before_alt_text}
+                  afterAltText={caseItem.after_alt_text}
                   idx={idx}
                 />
               );
@@ -1620,7 +1666,7 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
                 >
                   <img
                     src={patient.image_url || null}
-                    alt="Happy Patient"
+                    alt={patient.alt_text || "Happy Patient"}
                     className="w-full h-auto object-contain rounded-[inherit] block bg-slate-50/50"
                     referrerPolicy="no-referrer"
                     loading="lazy"
@@ -2334,7 +2380,7 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
           >
             <img
               src={selectedPatient?.image_url || null}
-              alt="Patient Gallery Full"
+              alt={selectedPatient?.alt_text || "Patient Gallery Full"}
               className="max-h-[80vh] w-auto max-w-full object-contain rounded-2xl block"
               referrerPolicy="no-referrer"
             />

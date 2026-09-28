@@ -8,6 +8,8 @@ interface BeforeAfterSliderProps {
   aspectRatio?: string;
   beforeLabel?: string;
   afterLabel?: string;
+  beforeAltText?: string;
+  afterAltText?: string;
 }
 
 export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
@@ -16,7 +18,9 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   caption,
   aspectRatio = 'aspect-[4/3]',
   beforeLabel = 'Before',
-  afterLabel = 'After'
+  afterLabel = 'After',
+  beforeAltText = 'Before Treatment Condition',
+  afterAltText = 'After Treatment Result'
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(600);
@@ -111,7 +115,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         {/* After Image (Background) */}
         <img
           src={afterImage || null}
-          alt="After Treatment Result"
+          alt={afterAltText || 'After Treatment Result'}
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
           loading="lazy"
           referrerPolicy="no-referrer"
@@ -124,7 +128,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         >
           <img
             src={beforeImage || null}
-            alt="Before Treatment Condition"
+            alt={beforeAltText || 'Before Treatment Condition'}
             style={{
               width: containerWidth,
               height: '100%',

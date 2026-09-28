@@ -141,7 +141,7 @@ export default function Technology() {
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F8FAFC] rounded-2xl flex items-center justify-center p-5 border border-slate-100">
                       <img
                         src={item.image_url}
-                        alt={item.title || 'Advanced Dental Technology'}
+                        alt={item.alt_text || item.title || 'Advanced Dental Technology'}
                         className="max-w-full max-h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105 mx-auto block"
                         referrerPolicy="no-referrer"
                         loading="lazy"
@@ -217,7 +217,7 @@ export default function Technology() {
                 <div className="relative overflow-hidden flex items-center justify-center bg-black/80 p-6 min-h-[260px] max-h-[55vh]">
                   <img
                     src={currentLightboxImg.image_url}
-                    alt={currentLightboxImg.title || 'Technology Detail'}
+                    alt={currentLightboxImg.alt_text || currentLightboxImg.title || 'Technology Detail'}
                     className="max-h-[50vh] w-auto max-w-full object-contain mx-auto"
                     referrerPolicy="no-referrer"
                   />

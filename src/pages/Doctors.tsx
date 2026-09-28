@@ -113,7 +113,7 @@ export default function Doctors({ openAppointmentModal, doctorsList }: DoctorsPr
                 <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-100 w-full border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow">
                   <img
                     src={doctor.img || null}
-                    alt={doctor.name}
+                    alt={doctor.alt_text || doctor.name}
                     className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />

@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS public.awards CASCADE;
 CREATE TABLE public.awards (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   image_url text NOT NULL,
+  alt_text text,
   display_order integer DEFAULT 0,
   orientation text NOT NULL DEFAULT 'horizontal',
   is_active boolean DEFAULT true,

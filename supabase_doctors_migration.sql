@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.doctors (
   expertises jsonb DEFAULT '[]'::jsonb,
   branch text DEFAULT 'Gayatrinagar Branch',
   experience text,
+  alt_text text,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );

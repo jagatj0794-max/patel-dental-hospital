@@ -6,6 +6,28 @@
 import { supabase } from './supabase';
 import { TechnologyItem } from '../types';
 
+export function getAltTextFromUrl(url: string): string {
+  if (!url) return '';
+  const hashIdx = url.indexOf('#alt_text=');
+  if (hashIdx !== -1) {
+    try {
+      return decodeURIComponent(url.slice(hashIdx + '#alt_text='.length));
+    } catch (e) {
+      return '';
+    }
+  }
+  return '';
+}
+
+export function cleanUrlOfAltText(url: string): string {
+  if (!url) return '';
+  const hashIdx = url.indexOf('#alt_text=');
+  if (hashIdx !== -1) {
+    return url.slice(0, hashIdx);
+  }
+  return url;
+}
+
 export function generateUUID(): string {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
     return window.crypto.randomUUID();
@@ -54,7 +76,8 @@ export const technologyService = {
         title: row.title || '',
         short_description: row.short_description || row.shortDesc || '',
         description: row.description || '',
-        image_url: row.image_url || '',
+        image_url: cleanUrlOfAltText(row.image_url || ''),
+        alt_text: row.alt_text || getAltTextFromUrl(row.image_url || ''),
         display_order: Number(row.display_order) || 0,
         is_active: row.is_active !== false,
         created_at: row.created_at,
@@ -81,12 +104,14 @@ export const technologyService = {
       const shortDesc = item.short_description || item.shortDesc || '';
       const fullDesc = item.description || '';
       
+      const cleanUrl = cleanUrlOfAltText(item.image_url || '');
       const row: any = {
         id: itemId,
         title: item.title || '',
         short_description: shortDesc,
         description: fullDesc,
-        image_url: item.image_url || '',
+        image_url: cleanUrl,
+        alt_text: item.alt_text || '',
         display_order: item.display_order || 0,
         is_active: item.is_active !== false,
         created_at: item.created_at || new Date().toISOString()
@@ -242,12 +267,14 @@ export const technologyService = {
         const itemId = isValidUUID ? item.id : generateUUID();
         const shortDesc = item.short_description || item.shortDesc || '';
         const fullDesc = item.description || '';
+        const cleanUrl = cleanUrlOfAltText(item.image_url || '');
         return {
           id: itemId,
           title: item.title || '',
           short_description: shortDesc,
           description: fullDesc,
-          image_url: item.image_url || '',
+          image_url: cleanUrl,
+          alt_text: item.alt_text || '',
           display_order: index,
           is_active: item.is_active !== false,
           created_at: item.created_at || new Date().toISOString()

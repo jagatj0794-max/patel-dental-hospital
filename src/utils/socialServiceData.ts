@@ -6,6 +6,28 @@
 import { supabase } from './supabase';
 import { SocialServiceItem } from '../types';
 
+export function getAltTextFromUrl(url: string): string {
+  if (!url) return '';
+  const hashIdx = url.indexOf('#alt_text=');
+  if (hashIdx !== -1) {
+    try {
+      return decodeURIComponent(url.slice(hashIdx + '#alt_text='.length));
+    } catch (e) {
+      return '';
+    }
+  }
+  return '';
+}
+
+export function cleanUrlOfAltText(url: string): string {
+  if (!url) return '';
+  const hashIdx = url.indexOf('#alt_text=');
+  if (hashIdx !== -1) {
+    return url.slice(0, hashIdx);
+  }
+  return url;
+}
+
 export function generateUUID(): string {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
     return window.crypto.randomUUID();
@@ -23,14 +45,16 @@ const DEFAULT_FALLBACK_SOCIAL_SERVICES: SocialServiceItem[] = [
     title: 'Free Dental Awareness & Diagnostics Camp',
     image_url: '/IMG_20190521_190345.jpg',
     display_order: 1,
-    is_active: true
+    is_active: true,
+    alt_text: 'Free dental awareness and diagnostics camp conducted by Patel Dental Hospital for the community in Rajkot.'
   },
   {
     id: 'f2c83d10-31e2-45e5-9d33-41bb3396aa77',
     title: 'Community Oral Health Campaign',
     image_url: '/IMG_20200313_130221.jpg',
     display_order: 2,
-    is_active: true
+    is_active: true,
+    alt_text: 'Community oral health screening and hygiene promotion campaign conducted by dentists.'
   }
 ];
 
@@ -89,7 +113,8 @@ export const socialServiceService = {
       const mapped = data.map((row: any) => ({
         id: row.id,
         title: row.title || '',
-        image_url: row.image_url || '',
+        image_url: cleanUrlOfAltText(row.image_url || ''),
+        alt_text: row.alt_text || getAltTextFromUrl(row.image_url || ''),
         display_order: Number(row.display_order) || 0,
         is_active: row.is_active !== false,
         created_at: row.created_at,
@@ -123,10 +148,12 @@ export const socialServiceService = {
       socialServiceService.lastError = null;
       const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
       const itemId = isValidUUID ? item.id : generateUUID();
+      const cleanUrl = cleanUrlOfAltText(item.image_url || '');
       const row = {
         id: itemId,
         title: item.title || '',
-        image_url: item.image_url || '',
+        image_url: cleanUrl,
+        alt_text: item.alt_text || '',
         display_order: item.display_order || 0,
         is_active: item.is_active !== false,
         created_at: item.created_at || new Date().toISOString()
@@ -262,10 +289,12 @@ export const socialServiceService = {
       const rowsToUpsert = items.map((item, index) => {
         const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
         const itemId = isValidUUID ? item.id : generateUUID();
+        const cleanUrl = cleanUrlOfAltText(item.image_url || '');
         return {
           id: itemId,
           title: item.title || '',
-          image_url: item.image_url || '',
+          image_url: cleanUrl,
+          alt_text: item.alt_text || '',
           display_order: index, // automatic ordering based on the passed list order
           is_active: item.is_active !== false,
           created_at: item.created_at || new Date().toISOString()
@@ -300,7 +329,8 @@ export const socialServiceService = {
         const mapped = finalRows.map((row: any) => ({
           id: row.id,
           title: row.title || '',
-          image_url: row.image_url || '',
+          image_url: cleanUrlOfAltText(row.image_url || ''),
+          alt_text: row.alt_text || getAltTextFromUrl(row.image_url || ''),
           display_order: Number(row.display_order) || 0,
           is_active: row.is_active !== false,
           created_at: row.created_at

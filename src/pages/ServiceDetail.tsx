@@ -5075,6 +5075,8 @@ export default function ServiceDetail({
                               beforeImage={pair.before_image}
                               afterImage={pair.after_image}
                               caption={pair.caption}
+                              beforeAltText={pair.before_alt_text}
+                              afterAltText={pair.after_alt_text}
                             />
                           </div>
                         ))}
@@ -5772,6 +5774,8 @@ export default function ServiceDetail({
                             beforeImage={pair.before_image}
                             afterImage={pair.after_image}
                             caption={pair.caption}
+                            beforeAltText={pair.before_alt_text}
+                            afterAltText={pair.after_alt_text}
                           />
                         </div>
                       ))}
@@ -5847,6 +5851,8 @@ export default function ServiceDetail({
                           beforeImage={pair.before_image}
                           afterImage={pair.after_image}
                           caption={pair.caption}
+                          beforeAltText={pair.before_alt_text}
+                          afterAltText={pair.after_alt_text}
                         />
                       </div>
                     ))}
