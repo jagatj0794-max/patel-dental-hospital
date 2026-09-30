@@ -149,13 +149,14 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             <ul className="space-y-3 text-xs">
               {[
                 { label: 'Dental Implants', target: 'services/dental-implants', gu: 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ' },
-                { label: 'Single Sitting Root Canal Treatment', target: 'services/root-canal-treatment', gu: 'સિંગલ-સિટિંગ રૂટ કેનાલ ટ્રીટમેન્ટ' },
                 { label: 'Full Mouth Rehabilitation', target: 'services/full-mouth-rehabilitation', gu: 'ફુલ માઉથ રિહેબિલિટેશન' },
+                { label: 'OSMF Treatment & Surgery', target: 'services/oral-submucous-fibrosis-osmf-treatment-rajkot', gu: 'ઓરલ સબમ્યુકસ ફાઇબ્રોસિસ (OSMF) ટ્રીટમેન્ટ અને સર્જરી' },
                 { label: 'Invisible Aligners', target: 'services/invisible-aligners', gu: 'ઇનવિઝિબલ એલાઇનર્સ' },
+                { label: 'Single Sitting Root Canal Treatment', target: 'services/root-canal-treatment', gu: 'સિંગલ-સિટિંગ રૂટ કેનાલ ટ્રીટમેન્ટ' },
                 { label: 'Smile Makeover', target: 'services/smile-makeover', gu: 'સ્માઇલ મેકઓવર' },
                 { label: 'Crowns & Bridges', target: 'services/crowns-bridges', gu: 'ક્રાઉન્સ અને બ્રિજિસ' },
-                { label: 'Teeth Whitening', target: 'services/teeth-whitening', gu: 'ટીથ વ્હાઇટનિંગ' },
                 { label: 'Pediatric Dentistry', target: 'services/pediatric-dentistry', gu: 'પીડિયાટ્રિક ડેન્ટિસ્ટ્રી' },
+                { label: 'Teeth Whitening', target: 'services/teeth-whitening', gu: 'ટીથ વ્હાઇટનિંગ' },
                 { label: 'Braces Treatment', target: 'services/braces-treatment', gu: 'બ્રેસિસ ટ્રીટમેન્ટ' },
                 { label: 'Wisdom Tooth Surgery', target: 'services/wisdom-tooth-surgery', gu: 'વિઝડમ ટૂથ સર્જરી' },
                 { label: 'Tooth Coloured Filling', target: 'services/tooth-coloured-filling', gu: 'ટૂથ કલર્ડ ફિલિંગ' },

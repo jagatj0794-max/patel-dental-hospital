@@ -36,6 +36,7 @@ import { PediatricDentistryView } from '../components/service/PediatricDentistry
 import { TeethWhiteningView } from '../components/service/TeethWhiteningView';
 import { BracesTreatmentView } from '../components/service/BracesTreatmentView';
 import { ToothColouredFillingView } from '../components/service/ToothColouredFillingView';
+import { OSMFTreatmentView } from '../components/service/OSMFTreatmentView';
 import { SurgicalTeamSection } from '../components/service/SurgicalTeamSection';
 import { useSEO } from '../utils/seo';
 import { getServiceSEO } from '../utils/serviceSeoData';
@@ -439,9 +440,13 @@ export default function ServiceDetail({
     return service?.id === 'filling-srv' || service?.id === 'filling' || service?.slug === 'tooth-coloured-filling' || service?.slug === 'composite-filling' || slug === 'tooth-coloured-filling' || slug === 'composite-filling' || (service?.title ? service.title.toLowerCase().includes('filling') || service.title.toLowerCase().includes('tooth coloured') : false);
   }, [service, slug]);
 
+  const isOSMF = React.useMemo(() => {
+    return service?.id === 'osmf-srv' || service?.id === 'osmf' || service?.slug === 'oral-submucous-fibrosis-osmf-treatment-rajkot' || slug === 'oral-submucous-fibrosis-osmf-treatment-rajkot' || (service?.title ? service.title.toLowerCase().includes('osmf') || service.title.toLowerCase().includes('oral submucous') : false);
+  }, [service, slug]);
+
   const isNewArchitecture = React.useMemo(() => {
-    return isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling;
-  }, [isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
+    return isOSMF || isDentalImplants || isRootCanal || isFullMouth || isInvisibleAligners || isSmileMakeover || isCrownsAndBridges || isTeethWhitening || isPediatricDentistry || isBracesTreatment || isWisdomToothSurgery || isToothColouredFilling;
+  }, [isOSMF, isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners, isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry, isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling]);
 
   const mConfig = React.useMemo(() => {
     if (!service || !service.marketing_config) return {};
@@ -496,6 +501,9 @@ export default function ServiceDetail({
     } else if (isToothColouredFilling) {
       kw = 'Composite Filling';
       kwPlural = 'Composite Filling';
+    } else if (isOSMF) {
+      kw = 'OSMF Treatment';
+      kwPlural = 'OSMF Treatment';
     } else {
       kw = service?.title || 'Dental Care';
       kwPlural = service?.title || 'Dental Care';
@@ -515,6 +523,7 @@ export default function ServiceDetail({
            : isBracesTreatment ? 'What is Braces Treatment?'
            : isWisdomToothSurgery ? 'What is Wisdom Tooth Surgery?'
            : isToothColouredFilling ? 'What is a Composite Filling?'
+           : isOSMF ? 'What is Oral Submucous Fibrosis (OSMF)?'
            : `About ${kw}`,
       process: isDentalImplants ? 'Dental Implant Treatment Procedure'
              : isRootCanal ? 'Root Canal Treatment Process & Timeline'
@@ -527,6 +536,7 @@ export default function ServiceDetail({
              : isBracesTreatment ? 'Braces Treatment Process'
              : isWisdomToothSurgery ? 'Wisdom Tooth Surgery Process'
              : isToothColouredFilling ? 'Composite Filling Treatment Process'
+             : isOSMF ? 'OSMF Therapeutic & Surgical Process'
              : `${kw} Treatment Process`,
       whyChooseUs: `Why Choose Patel Dental Hospital for ${kwPlural} in Rajkot`,
       benefits: `Benefits of ${kwPlural}`,
@@ -541,6 +551,7 @@ export default function ServiceDetail({
                : isBracesTreatment ? 'Who Needs Braces Treatment?'
                : isWisdomToothSurgery ? 'Who Needs Wisdom Tooth Surgery?'
                : isToothColouredFilling ? 'Who Needs a Composite Filling?'
+               : isOSMF ? 'Who Needs Oral Submucous Fibrosis (OSMF) Treatment?'
                : `Candidates for ${kw}`,
       transformations: `Before & After ${kwPlural} Transformations`,
       caseGallery: `${kw} Clinical Case Gallery`,
@@ -551,7 +562,7 @@ export default function ServiceDetail({
       faq: isDentalImplants ? 'Dental Implant FAQs' : `Frequently Asked Questions about ${kwPlural}`
     };
   }, [
-    isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners,
+    isOSMF, isDentalImplants, isRootCanal, isFullMouth, isInvisibleAligners,
     isSmileMakeover, isCrownsAndBridges, isTeethWhitening, isPediatricDentistry,
     isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling, service
   ]);
@@ -2473,6 +2484,133 @@ export default function ServiceDetail({
                           </a>
                         </div>
                       </>
+                    ) : isOSMF ? (
+                      language === 'gu' ? (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              ઓરલ સબમ્યુકસ ફાઇબ્રોસિસ (OSMF)
+                            </span>
+                            
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              મોઢું ખોલવામાં તકલીફ થાય છે?
+                            </h1>
+                          </div>
+
+                          <div className="space-y-4">
+                            <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                              OSMFને કારણે ખાવા, બોલવા, બ્રશ કરવા અને સામાન્ય દાંતની સારવાર કરાવવામાં પણ તકલીફ પડી શકે છે.
+                            </p>
+                            <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                              જો તમારું મોઢું ધીમે ધીમે ઓછું ખુલતું જાય, મસાલેદાર ખોરાક ખાતી વખતે બળતરા થાય અથવા ગાલની અંદરનો ભાગ ખેંચાયેલો અને કઠણ લાગે, તો તમને Oral Submucous Fibrosis (OSMF) હોઈ શકે છે.
+                            </p>
+                            <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                              Patel Dental Hospital, Rajkot ખાતે OSMFના દર્દીઓનું યોગ્ય મૂલ્યાંકન કરવામાં આવે છે, જેમાં fibrosisની ગંભીરતા, હાલનું mouth opening અને non-surgical treatment અથવા surgical managementમાંથી કઈ સારવાર યોગ્ય છે તે નક્કી કરવામાં આવે છે.
+                            </p>
+                          </div>
+
+                          {/* PROOF BAR for Doctor profile convention */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-500">Doctor:</span>
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight font-sans">
+                                Dr. Vipul Patel
+                              </span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-500 font-sans">Qualification:</span>
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight font-sans">
+                                MDS – Oral & Maxillofacial Surgery
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => openAppointmentModal("OSMF Treatment - Hero CTA")}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>ફ્રી કન્સલ્ટેશન</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("નમસ્તે પટેલ ડેન્ટલ હોસ્પિટલ, મને મોં ખોલવામાં તકલીફ છે (OSMF) અને મારા મોં ખોલવાની મર્યાદા વિશે ચર્ચા કરવા માંગુ છું.")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>વોટ્સએપ કરો</span>
+                            </a>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-3">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#0D9488] uppercase tracking-widest px-3 py-1 bg-teal-50 rounded-full border border-teal-100/50">
+                              ORAL SUBMUCOUS FIBROSIS (OSMF)
+                            </span>
+                            <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
+                              Difficulty Opening Your Mouth?
+                            </h1>
+                          </div>
+
+                          <div className="space-y-4">
+                            <p className="text-black text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
+                              OSMF can cause difficulty in eating, speaking, brushing, and even receiving routine dental treatment.
+                            </p>
+                            <p className="text-slate-600 text-xs sm:text-sm md:text-base font-medium leading-relaxed">
+                              If your mouth is gradually opening less, you experience burning while eating spicy food, or the inside of your cheeks feels tight and stiff, you may have Oral Submucous Fibrosis (OSMF).
+                            </p>
+                            <p className="text-slate-600 text-xs sm:text-sm md:text-base font-medium leading-relaxed">
+                              At Patel Dental Hospital, Rajkot, OSMF patients are properly evaluated to determine the severity of fibrosis, current mouth opening, and whether non-surgical treatment or surgical management is appropriate.
+                            </p>
+                          </div>
+
+                          {/* PROOF BAR for Doctor profile convention */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-500">Doctor:</span>
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight font-sans">
+                                Dr. Vipul Patel
+                              </span>
+                            </div>
+                            <span className="hidden sm:inline text-slate-300 font-light font-sans">|</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-500 font-sans">Qualification:</span>
+                              <span className="text-xs font-black text-[#081C3A] tracking-tight font-sans">
+                                MDS – Oral & Maxillofacial Surgery
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => openAppointmentModal("OSMF Treatment - Hero CTA")}
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
+                            >
+                              <Calendar className="h-4 w-4" />
+                              <span>{mConfig.cta_appointment_text || "Free Consultation"}</span>
+                              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+
+                            <a
+                              href={`https://wa.me/919510397046?text=${encodeURIComponent("Hello Patel Dental Hospital, I would like to discuss OSMF treatment and my reduced mouth opening.")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg hover:-translate-y-[1px] active:translate-y-0 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#25D366]/50 whitespace-nowrap"
+                            >
+                              <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
+                              <span>{mConfig.cta_whatsapp_text || "WHATSAPP US"}</span>
+                            </a>
+                          </div>
+                        </>
+                      )
                     ) : (
                       <>
                         <div className="space-y-3">
@@ -3551,12 +3689,30 @@ export default function ServiceDetail({
             )
           ) : null;
 
+          const SERVICE_HERO_IMAGES: Record<string, string> = {
+            'dental-implants': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450851786_qnipnf0s.webp',
+            'full-mouth-rehabilitation': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp',
+            'wisdom-tooth-surgery': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp',
+            'oral-submucous-fibrosis-osmf-treatment-rajkot': '/Oral%20&%20Maxillofacial%20Surgery.png',
+            'root-canal-treatment': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450901463_tvoinbyq.jpg',
+            'invisible-aligners': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp',
+            'smile-makeover': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407738608_3vac10yu.webp',
+            'crowns-bridges': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786565722583_t57uxnk1.webp',
+            'pediatric-dentistry': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp',
+            'teeth-whitening': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407832495_qm0f2hs8.webp',
+            'braces-treatment': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407866067_1a700nk9.webp',
+            'tooth-coloured-filling': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407924645_khouwxx2.webp'
+          };
+
           const getServiceHeroImage = (targetSlug: string) => {
-            const fromLoaded = allServicesList.find(s => s.slug === targetSlug);
+            const fromLoaded = allServicesList.find(s => s.slug === targetSlug || s.id === targetSlug);
             if (fromLoaded?.hero_image && fromLoaded.hero_image.trim() !== '') {
               return fromLoaded.hero_image;
             }
-            const fromDefault = DEFAULT_SERVICES.find(s => s.slug === targetSlug);
+            if (SERVICE_HERO_IMAGES[targetSlug]) {
+              return SERVICE_HERO_IMAGES[targetSlug];
+            }
+            const fromDefault = DEFAULT_SERVICES.find(s => s.slug === targetSlug || s.id === targetSlug);
             if (fromDefault?.hero_image && fromDefault.hero_image.trim() !== '') {
               return fromDefault.hero_image;
             }
@@ -3571,6 +3727,7 @@ export default function ServiceDetail({
               targetSlug === 'wisdom-tooth-surgery' ? 'wisdom' : 
               targetSlug === 'tooth-coloured-filling' ? 'filling' : 
               targetSlug === 'root-canal-treatment' ? 'rct' : 
+              targetSlug === 'oral-submucous-fibrosis-osmf-treatment-rajkot' ? 'osmf' :
               targetSlug;
             const fromTreatment = TREATMENTS.find(t => t.id === treatmentId);
             if (fromTreatment?.image && fromTreatment.image.trim() !== '') {
@@ -3578,6 +3735,33 @@ export default function ServiceDetail({
             }
             return '';
           };
+
+          const osmfRelatedCards = [
+            {
+              slug: 'dental-implants',
+              title: language === 'gu' ? 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ' : 'Dental Implants',
+              description: language === 'gu'
+                ? 'સુરક્ષિત, સ્થિર અને કુદરતી દેખાતા ફિક્સ્ડ દાંત માટે પ્રીમિયમ ટાઇટેનિયમ રૂટ ઇમ્પ્લાન્ટ્સ દ્વારા કાયમી દાંતનું પુનઃસ્થાપન.'
+                : 'Permanent tooth replacement utilizing premium titanium root implants for secure, stable, and natural-looking fixed teeth in one week.',
+              image: getServiceHeroImage('dental-implants')
+            },
+            {
+              slug: 'full-mouth-rehabilitation',
+              title: language === 'gu' ? 'ફુલ માઉથ રિહેબિલિટેશન' : 'Full Mouth Rehabilitation',
+              description: language === 'gu'
+                ? 'ઉપરના અને નીચેના બંને જડબામાં અનેક ખૂટતા, ક્ષતિગ્રસ્ત અથવા ગંભીર રીતે ઘસાઈ ગયેલા દાંત ધરાવતા દર્દીઓ માટે વ્યાપક સારવાર.'
+                : 'Comprehensive treatment for patients with multiple missing, damaged, or severely worn teeth across both upper and lower jaws.',
+              image: getServiceHeroImage('full-mouth-rehabilitation')
+            },
+            {
+              slug: 'wisdom-tooth-surgery',
+              title: language === 'gu' ? 'વિઝડમ ટૂથ સર્જરી' : 'Wisdom Tooth Surgery',
+              description: language === 'gu'
+                ? 'મેક્સિલોફેશિયલ સર્જન દ્વારા દર્દ વગર ઝડપી અને સુરક્ષિત રીતે ડહાપણની દાઢ કાઢવાની આધુનિક સારવાર.'
+                : 'Comfortable, painless, and precise wisdom tooth removal surgery performed by specialized maxillofacial surgeons.',
+              image: getServiceHeroImage('wisdom-tooth-surgery')
+            }
+          ];
 
           const dentalImplantsRelatedCards = [
             {
@@ -4160,6 +4344,56 @@ export default function ServiceDetail({
                             {card.title}
                           </h3>
                           <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-medium'}`}>
+                            {card.description}
+                          </p>
+                        </div>
+                        <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
+                          <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
+                          <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : isOSMF ? (
+              <div className="space-y-8 sm:space-y-10 pt-6 sm:pt-10" id="cms-section-related-services">
+                {/* Centered Badge, Heading & Teal Underline */}
+                <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center px-4 py-1 rounded-full bg-teal-50/90 text-[#0D9488] text-[11px] sm:text-xs font-bold uppercase tracking-wider border border-teal-100/60 font-sans">
+                      {language === 'gu' ? "સંબંધિત સારવાર" : "RELATED TREATMENTS"}
+                    </span>
+                  </div>
+                  <h2 className="font-sans font-black text-2xl sm:text-3xl lg:text-[38px] text-[#081C3A] tracking-tight leading-tight text-center">
+                    {language === 'gu' ? "સંબંધિત સારવાર" : "Related Treatments"}
+                  </h2>
+                  <div className="h-1 w-12 bg-[#0D9488] rounded-full mx-auto mt-3.5" />
+                </div>
+
+                {/* 3 Equal Treatment Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
+                  {osmfRelatedCards.map((card) => (
+                    <div
+                      key={card.slug}
+                      onClick={() => handleNavigateToService(card.slug)}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                    >
+                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                        <img 
+                          src={card.image || getServiceHeroImage(card.slug)} 
+                          alt={card.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                      <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between space-y-4">
+                        <div className="space-y-2.5">
+                          <h3 className="font-sans font-bold text-lg sm:text-xl text-[#081C3A] group-hover:text-[#0D9488] transition-colors leading-snug tracking-tight">
+                            {card.title}
+                          </h3>
+                          <p className={`text-xs sm:text-sm leading-relaxed ${language === 'gu' ? 'text-slate-700 font-semibold' : 'text-slate-600 font-medium'}`}>
                             {card.description}
                           </p>
                         </div>
@@ -5738,6 +5972,25 @@ export default function ServiceDetail({
                   getServiceHeroImage={getServiceHeroImage}
                   setCurrentPage={setCurrentPage}
                   language={language}
+                />
+              );
+            }
+
+            if (isOSMF) {
+              return (
+                <OSMFTreatmentView
+                  heroElement={heroElement}
+                  mConfig={mConfig}
+                  openAppointmentModal={openAppointmentModal}
+                  videoElement={videoElement}
+                  testimonialsElement={testimonialsElement}
+                  beforeAfterPairs={beforeAfterPairs}
+                  displayGallery={displayGallery}
+                  seoHeadings={seoHeadings}
+                  getServiceHeroImage={getServiceHeroImage}
+                  setCurrentPage={setCurrentPage}
+                  language={language}
+                  relatedServicesElement={relatedServicesElement}
                 />
               );
             }

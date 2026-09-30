@@ -5,9 +5,9 @@
 
 import { Treatment } from '../types';
 
-const imgImplants = '/Dental%20Implants.webp';
+const imgImplants = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450851786_qnipnf0s.webp';
 const imgSameday = '/Dental%20Implants.webp';
-const imgFullmouth = '/Full%20Mouth.webp';
+const imgFullmouth = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp';
 const imgRct = '/Root%20Canal.webp';
 const imgBraces = '/IMG_3610.webp';
 const imgAligners = '/Aligners.webp';
@@ -15,7 +15,7 @@ const imgKids = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/publ
 const imgCosmetic = '/Smile%20Designing.webp';
 const imgGum = '/Dental%20Implants.webp';
 const imgCleaning = '/white%20teeth%20in%20rajkot.jpg';
-const imgWisdom = '/Oral%20&%20Maxillofacial%20Surgery.png';
+const imgWisdom = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp';
 const imgDentures = '/Dental%20Implants.webp';
 const imgCrowns = '/Digital%20Dental%20Experts.webp';
 const imgSmilemakeover = '/Smile%20Designing.webp';
@@ -229,6 +229,20 @@ export const TREATMENTS: Treatment[] = [
       'Covers both intra-oral corrective and extra-oral reconstructive surgery'
     ],
     duration: 'Varies with case complexity',
+    image: imgOralsurgery
+  },
+  {
+    id: 'osmf',
+    title: 'Oral Submucous Fibrosis (OSMF) Treatment & Surgery',
+    shortDesc: 'Comprehensive therapeutic and surgical treatment for Oral Submucous Fibrosis (OSMF) to restore normal mouth opening and relieve oral pain.',
+    longDesc: 'Oral Submucous Fibrosis (OSMF) is a chronic, progressive condition mainly affecting the oral cavity, often resulting in restricted mouth opening. At Patel Dental Hospital, we offer complete diagnostic assessment, advanced therapeutic treatments, localized therapies, and specialized surgical procedures to effectively treat OSMF and restore oral function.',
+    benefits: [
+      'Restores comfortable and normal mouth opening',
+      'Relieves oral burning sensation and pain',
+      'Provides custom therapeutic and localized injection therapies',
+      'Advanced surgical solutions for severe, progressive fibrotic bands'
+    ],
+    duration: '1 - 4 Weeks (Depending on severity)',
     image: imgOralsurgery
   }
 ];

@@ -254,7 +254,7 @@ export interface MarketingConfig {
   green_highlight_line?: string;
 
   // Custom Related Services List
-  related_services?: { id: string; enabled: boolean }[];
+  related_services?: (string | { id: string; enabled: boolean })[];
 
   // Written Reviews & Case Transformations
   written_reviews?: {

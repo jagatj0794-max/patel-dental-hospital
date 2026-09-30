@@ -152,7 +152,7 @@ export function getSupabase(): SupabaseClient {
             const targetUrl = new URL(url);
             const configUrl = new URL(supabaseUrl!);
             if (targetUrl.host === configUrl.host) {
-              const proxyUrl = `/api/supabase${targetUrl.pathname}${targetUrl.search}`;
+              const proxyUrl = `${window.location.origin}/api/supabase${targetUrl.pathname}${targetUrl.search}`;
               return fetch(proxyUrl, options);
             }
           } catch (e) {

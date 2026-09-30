@@ -33,6 +33,16 @@ async function startServer() {
 
   // API Proxy for Supabase requests
   app.all('/api/supabase/*', async (req, res) => {
+    // Handle OPTIONS (CORS preflight) requests directly and instantly
+    if (req.method === 'OPTIONS') {
+      const origin = req.headers.origin || '*';
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD');
+      res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || 'authorization, apikey, content-type, x-client-info, x-supabase-auth');
+      return res.status(204).end();
+    }
+
     const rawUrl = process.env.VITE_SUPABASE_URL || 'https://wmgzhqtqmnddfjykaykm.supabase.co';
     const supabaseUrl = sanitizeEnvValue(rawUrl);
 
@@ -91,12 +101,23 @@ async function startServer() {
       console.log(`[Supabase Proxy] Forwarding ${req.method} request to: ${targetUrl}`);
       const response = await fetch(targetUrl, fetchOptions);
 
-      // Copy response headers to the client
+      // Copy response headers to the client, omitting CORS and content encoding headers
       response.headers.forEach((value, name) => {
-        if (!['content-encoding', 'transfer-encoding', 'content-length'].includes(name.toLowerCase())) {
+        const lowerName = name.toLowerCase();
+        if (
+          !['content-encoding', 'transfer-encoding', 'content-length'].includes(lowerName) &&
+          !lowerName.startsWith('access-control-')
+        ) {
           res.setHeader(name, value);
         }
       });
+
+      // Explicitly set correct browser-safe CORS response headers
+      const origin = req.headers.origin || '*';
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD');
+      res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || 'authorization, apikey, content-type, x-client-info, x-supabase-auth');
 
       res.status(response.status);
 

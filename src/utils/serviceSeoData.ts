@@ -293,6 +293,17 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
         schema: createSchema(sTitle, sDesc)
       };
     }
+    case 'oral-submucous-fibrosis-osmf-treatment-rajkot': {
+      const sTitle = 'Oral Submucous Fibrosis (OSMF) Treatment & Surgery in Rajkot';
+      const sDesc = 'Get advanced Oral Submucous Fibrosis (OSMF) treatment & surgery in Rajkot at Patel Dental Hospital. Painless therapeutic procedures and comprehensive diagnosis.';
+      return {
+        title: sTitle,
+        description: sDesc,
+        keywords: 'Oral Submucous Fibrosis Treatment Rajkot, OSMF Surgery Rajkot, OSMF Treatment Clinic Rajkot, Patel Dental Hospital',
+        canonicalUrl,
+        schema: createSchema(sTitle, sDesc)
+      };
+    }
     default: {
       const sTitle = `${title} | Advanced Dental Treatment in Rajkot`;
       const sDesc = fallbackDesc || `Advanced, reliable ${title} at Patel Dental Hospital, Rajkot. Led by expert senior dentists using world-class technologies and safe sterile guidelines.`;

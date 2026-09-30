@@ -140,6 +140,13 @@ const routes = [
     keywords: 'Full Mouth Rehabilitation, Full Mouth Restoration, Complete Dental Rehabilitation, Full Mouth Reconstruction, Restorative Dentistry, Advanced Dental Care in Rajkot, Dentist in Rajkot'
   },
   {
+    path: '/services/oral-submucous-fibrosis-osmf-treatment-rajkot',
+    pageId: 'services/oral-submucous-fibrosis-osmf-treatment-rajkot',
+    title: 'Oral Submucous Fibrosis (OSMF) Treatment & Surgery in Rajkot',
+    description: 'Get advanced Oral Submucous Fibrosis (OSMF) treatment & surgery in Rajkot at Patel Dental Hospital. Painless therapeutic procedures and comprehensive diagnosis.',
+    keywords: 'Oral Submucous Fibrosis Treatment Rajkot, OSMF Surgery Rajkot, OSMF Treatment Clinic Rajkot, Patel Dental Hospital'
+  },
+  {
     path: '/services/crowns-bridges',
     pageId: 'services/crowns-bridges',
     title: 'Premium Dental Crowns & Bridges in Rajkot | Zirconia & Ceramic Caps',

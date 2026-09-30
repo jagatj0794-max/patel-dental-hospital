@@ -39,6 +39,9 @@ const NAV_TRANSLATIONS: Record<string, string> = {
   // SERVICES DROPDOWN
   'Dental Implants': 'ડેન્ટલ ઇમ્પ્લાન્ટ્સ',
   'Full Mouth Rehabilitation': 'ફુલ માઉથ રિહેબિલિટેશન',
+  'Oral Submucous Fibrosis (OSMF) Treatment & Surgery in Rajkot': 'ઓરલ સબમ્યુકસ ફાઇબ્રોસિસ (OSMF) ટ્રીટમેન્ટ અને સર્જરી',
+  'Oral Submucous Fibrosis (OSMF)': 'ઓરલ સબમ્યુકસ ફાઇબ્રોસિસ (OSMF)',
+  'OSMF Treatment & Surgery': 'OSMF ટ્રીટમેન્ટ અને સર્જરી',
   'Invisible Aligners': 'ઇનવિઝિબલ એલાઇનર્સ',
   'Single Sitting Root Canal Treatment': 'સિંગલ સિટિંગ રૂટ કેનલ ટ્રીટમેન્ટ',
   'Smile Makeover': 'સ્માઇલ મેકઓવર',
@@ -106,7 +109,9 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
           const activeServices = services
             .filter(s => s.is_active && isApprovedServiceSlug(s.slug) && !s.title?.toLowerCase().includes('bone graft'))
             .map(s => ({
-              label: s.title,
+              label: (s.slug === 'oral-submucous-fibrosis-osmf-treatment-rajkot' || s.title?.toLowerCase().includes('osmf'))
+                ? 'Oral Submucous Fibrosis (OSMF)'
+                : s.title,
               id: `services/${s.slug}`
             }));
           setDynamicServices(activeServices);

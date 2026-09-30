@@ -330,7 +330,7 @@ export const DEFAULT_SERVICES: Service[] = [
     description: 'When decay reaches the nerve of the tooth, it causes severe pain to the patient. In such conditions the dentist removes all decayed and infected portions of the tooth and cleans the root canal with files and medicine.\n\nAfter cleaning and disinfecting the root canal system, our dentist fills the canal with biocompatible materials like Gutta Percha and MTA.\n\nOur professionals top the tooth with a crown or permanent filling to add protection against decay.',
     hero_image: TREATMENTS.find(t => t.id === 'rct')?.image || '',
     icon: 'Activity',
-    display_order: 2,
+    display_order: 5,
     is_active: true,
     process_steps: [
       {
@@ -525,7 +525,7 @@ export const DEFAULT_SERVICES: Service[] = [
     description: 'The processes of rebuilding or repairing all teeth, gums and temporomandibular joint in both upper and lower jaw are called as Full Mouth Rehabilitation or Reconstruction or Restoration.',
     hero_image: TREATMENTS.find(t => t.id === 'fullmouth')?.image || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200',
     icon: 'Sparkles',
-    display_order: 3,
+    display_order: 2,
     is_active: true,
     process_steps: [
       {
@@ -784,7 +784,7 @@ export const DEFAULT_SERVICES: Service[] = [
     intro_title: 'What is Smile Makeover?',
     hero_image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407738608_3vac10yu.webp',
     icon: 'Sparkles',
-    display_order: 5,
+    display_order: 6,
     is_active: true,
     process_steps: [
       {
@@ -900,7 +900,7 @@ export const DEFAULT_SERVICES: Service[] = [
     intro_title: 'What are Crown and Bridges?',
     hero_image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1200',
     icon: 'Layers',
-    display_order: 6,
+    display_order: 7,
     is_active: true,
     process_steps: [
       {
@@ -998,7 +998,7 @@ export const DEFAULT_SERVICES: Service[] = [
     intro_title: 'What is Teeth Whitening?',
     hero_image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600',
     icon: 'Sparkles',
-    display_order: 7,
+    display_order: 9,
     is_active: true,
     process_steps: [
       {
@@ -1278,7 +1278,7 @@ export const DEFAULT_SERVICES: Service[] = [
     intro_title: 'What is Braces Treatment?',
     hero_image: TREATMENTS.find(t => t.id === 'braces')?.image || 'https://images.unsplash.com/photo-1512223792601-592a9809eed4?auto=format&fit=crop&q=80&w=1200',
     icon: 'Grid',
-    display_order: 9,
+    display_order: 10,
     is_active: true,
     process_steps: [
       {
@@ -1397,9 +1397,9 @@ export const DEFAULT_SERVICES: Service[] = [
     hero_description: 'At Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
     intro_title: 'What is a Wisdom Tooth?',
     intro_description: 'Wisdom teeth are the four permanent adult molar teeth located at the top and bottom back corners of the mouth. We have a total of four wisdom teeth.\n\nIf a wisdom tooth does not have enough room to grow, it can cause pain, infection, and sometimes pus collection in the gums, which may lead to swelling in severe cases.\n\nSometimes, mouth opening is also reduced.\n\nIn such conditions, the wisdom tooth needs to be removed.\n\nAt Patel Dental Hospital, we offer painless and quick wisdom tooth removal surgery in India with internationally trained specialists.',
-    hero_image: TREATMENTS.find(t => t.id === 'wisdom')?.image || 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=1200',
+    hero_image: TREATMENTS.find(t => t.id === 'wisdom')?.image || 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp',
     icon: 'Scissors',
-    display_order: 10,
+    display_order: 11,
     is_active: true,
     process_steps: [
       {
@@ -1514,7 +1514,7 @@ export const DEFAULT_SERVICES: Service[] = [
     intro_description: 'Composite filling, also known as a tooth-coloured filling, is a cavity filling intended to be long-lasting and natural-looking.\n\nComposite fillings are made of ceramic and resin materials that bond chemically to the tooth. They can be used to repair chipped or broken teeth as well as to fill decayed areas of the teeth.\n\nBroken teeth, stained teeth, black gums, hideous gaps, or crooked teeth—our cosmetic dentistry can fix them all in a flash.',
     hero_image: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=600',
     icon: 'Shield',
-    display_order: 11,
+    display_order: 12,
     is_active: true,
     process_steps: [
       {
@@ -1628,6 +1628,104 @@ export const DEFAULT_SERVICES: Service[] = [
       show_faqs: false,
       show_bottom_cta: true
     }
+  },
+  {
+    id: 'osmf-srv',
+    slug: 'oral-submucous-fibrosis-osmf-treatment-rajkot',
+    title: 'Oral Submucous Fibrosis (OSMF) Treatment & Surgery in Rajkot',
+    short_description: 'Comprehensive therapeutic and surgical treatment for Oral Submucous Fibrosis (OSMF) to restore normal mouth opening and relieve oral pain.',
+    description: 'Oral Submucous Fibrosis (OSMF) is a chronic, progressive condition mainly affecting the oral cavity, often resulting in restricted mouth opening. At Patel Dental Hospital, we offer complete diagnostic assessment, advanced therapeutic treatments, localized therapies, and specialized surgical procedures to effectively treat OSMF and restore oral function.',
+    hero_image: '/Oral%20&%20Maxillofacial%20Surgery.png',
+    icon: 'Activity',
+    display_order: 3,
+    is_active: true,
+    process_steps: [
+      {
+        id: 'osmf-step-1',
+        phase: 'Step 1',
+        title: 'Clinical Diagnosis',
+        description: 'Complete examination of the oral cavity to identify fibrotic bands and measure the degree of mouth opening.',
+        display_order: 10
+      },
+      {
+        id: 'osmf-step-2',
+        phase: 'Step 2',
+        title: 'Therapeutic Treatment',
+        description: 'Administration of localized injection therapy, micro-nutrients, and physical exercises to improve tissue elasticity.',
+        display_order: 20
+      },
+      {
+        id: 'osmf-step-3',
+        phase: 'Step 3',
+        title: 'Surgical Management',
+        description: 'Surgical excision of dense fibrotic bands if necessary, to restore normal mandibular movement.',
+        display_order: 30
+      }
+    ],
+    features: [
+      {
+        id: 'osmf-feat-1',
+        title: 'Specialized Expertise',
+        description: 'Comprehensive OSMF diagnosis and staging by senior surgical oral consultants.',
+        display_order: 10
+      },
+      {
+        id: 'osmf-feat-2',
+        title: 'Advanced Therapies',
+        description: 'Combining clinically-proven local injection treatments with targeted physical therapy.',
+        display_order: 20
+      }
+    ],
+    procedure_video_title: 'OSMF Treatment Procedure',
+    procedure_video_url: '',
+    patient_testimonials: [],
+    hospital_team_photos: [],
+    marketing_config: {
+      green_highlight_line: 'Restore normal mouth opening and relieve chronic oral discomfort with specialized therapeutic and surgical treatments.',
+      process_section_title: 'Our OSMF Treatment Protocol',
+      benefits_section_title: 'Why Choose Patel Dental Hospital for OSMF Treatment?',
+      testimonials_section_title: 'Patient Testimonials',
+      hospital_team_title: 'Hospital & Team Gallery',
+      procedure_video_title: 'OSMF Treatment Procedure',
+      procedure_video_url: '',
+      gallery_heading: 'Clinical Case Gallery',
+      gallery_description: 'Case transitions of Oral Submucous Fibrosis (OSMF) treatments.',
+      gallery_items: [],
+      cost_packages: [],
+      cost_included_items: [],
+      cost_starting_price: '',
+      cost_heading: 'OSMF Treatment Options',
+      cost_description: '',
+      cost_cards: [],
+      faqs: [],
+      phone_number: '+91 9510397046',
+      whatsapp_number: '+91 9510397046',
+      sec11_heading: 'Book Your OSMF Consultation',
+      google_reviews_heading: 'Google Patient Reviews',
+      google_reviews: UNIVERSAL_GOOGLE_REVIEWS,
+      before_after_heading: 'Before & After Transformations',
+      before_after_description: 'Real clinical results of our OSMF therapy patients.',
+      before_after_pairs: [],
+      show_hero: true,
+      show_introduction: true,
+      show_process: true,
+      show_benefits: true,
+      show_candidate: false,
+      show_before_after: false,
+      show_gallery: false,
+      show_procedure_video: false,
+      show_testimonials: false,
+      show_hospital_photos: true,
+      show_cost: false,
+      show_google_reviews: true,
+      show_faqs: false,
+      show_bottom_cta: true,
+      related_services: [
+        { id: 'implants-srv', enabled: true },
+        { id: 'fmr-srv', enabled: true },
+        { id: 'wisdom-srv', enabled: true }
+      ]
+    }
   }
 ];
 
@@ -1642,7 +1740,8 @@ export const APPROVED_SERVICE_SLUGS = [
   'pediatric-dentistry',
   'braces-treatment',
   'wisdom-tooth-surgery',
-  'tooth-coloured-filling'
+  'tooth-coloured-filling',
+  'oral-submucous-fibrosis-osmf-treatment-rajkot'
 ];
 
 export const isApprovedServiceSlug = (slug: string): boolean => {
@@ -2540,10 +2639,10 @@ export const serviceService = {
         }
       }
 
-      return sanitizeServiceList(data || []);
+      return sanitizeServiceList(data || []).sort((a, b) => a.display_order - b.display_order);
     } catch (e) {
       console.warn('Exception in getServices:', e);
-      return DEFAULT_SERVICES;
+      return [...DEFAULT_SERVICES].sort((a, b) => a.display_order - b.display_order);
     }
   },
 
