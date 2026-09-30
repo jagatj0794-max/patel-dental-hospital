@@ -21,7 +21,7 @@ export const DEFAULT_MEDIA_IMAGES: MediaImage[] = [
   { id: 'img-2', url: '/Dr kinjal patel 2.png', title: 'Microscopic Dental Diagnostics', category: 'Clinic Interior', branch: 'Amin Marg Branch', altText: 'Microscopic dental diagnostics equipment setup inside the clinic at Patel Dental Hospital, Rajkot.' },
   { id: 'img-3', url: '/patel dental doctors.jpeg', title: 'High-Tech Dental Operatory', category: 'Dental Implants', branch: 'Gayatrinagar Branch', altText: 'High-tech dental operatory surgery room setup with advanced dental chair.' },
   { id: 'img-4', url: '/patel dental hospital doctors.png', title: 'Clinical Medical Faculty', category: 'Doctors', branch: 'All Branches', altText: 'Team of experienced dentists and clinical medical faculty at Patel Dental Hospital, Rajkot.' },
-  { id: 'img-5', url: '/patel mobile hero.jpeg', title: 'Premium Patient Care Ward', category: 'Homepage Slider', branch: 'All Branches', altText: 'Premium recovery ward and patient care room with modern facilities.' },
+  { id: 'img-5', url: '/patel-tablet-bg.webp', title: 'Premium Patient Care Ward', category: 'Homepage Slider', branch: 'All Branches', altText: 'Premium recovery ward and patient care room with modern facilities.' },
   { id: 'img-6', url: '/Dr. kinjal patel.png', title: 'Expert Consultation Panel', category: 'Homepage Gallery', branch: 'Amin Marg Branch', altText: 'Expert dentist consultation meeting and dental care planning area.' },
 ];
 

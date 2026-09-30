@@ -3764,7 +3764,7 @@ export default function Admin({
                       <div className="flex-grow flex flex-col items-center justify-center text-center text-slate-400 py-4">
                         <ImageIcon className="h-8 w-8 text-slate-300 mb-2" />
                         <p className="text-[11px] font-medium">Using hospital standard Desktop template</p>
-                        <p className="text-[9px] text-slate-400 mt-0.5">(/parel doctor.png)</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">(/patel-doctors-transparent.webp)</p>
                       </div>
                     )}
                   </div>
@@ -3854,7 +3854,7 @@ export default function Admin({
                       <div className="flex-grow flex flex-col items-center justify-center text-center text-slate-400 py-4">
                         <ImageIcon className="h-8 w-8 text-slate-300 mb-2" />
                         <p className="text-[11px] font-medium">Using fallback Desktop image</p>
-                        <p className="text-[9px] text-slate-400 mt-0.5">({draftBgImage ? 'Custom Desktop Image' : '/patel mobile hero.jpeg'})</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">({draftBgImage ? 'Custom Desktop Image' : '/patel-tablet-bg.webp'})</p>
                       </div>
                     )}
                   </div>
@@ -9983,7 +9983,7 @@ export default function Admin({
                 <div className="w-full h-[520px] bg-[#FAFAFC] rounded-2xl relative border border-slate-200 overflow-hidden shadow-md flex flex-col justify-center">
                   <div className="absolute inset-0 z-0">
                     <img
-                      src={draftBgImage || "/parel doctor.png"}
+                      src={draftBgImage || "/patel-doctors-transparent.webp"}
                       alt="Desktop Reception View"
                       className="w-full h-full object-cover object-center lg:object-[right_center]"
                       referrerPolicy="no-referrer"
@@ -10035,7 +10035,7 @@ export default function Admin({
                 <div className="w-[340px] h-[520px] bg-white rounded-2xl relative border border-slate-200 overflow-hidden shadow-md flex flex-col justify-start">
                   <div className="absolute inset-0 z-0">
                     <img 
-                      src={draftBgImageMobile || draftBgImage || "/patel mobile hero.jpeg"} 
+                      src={draftBgImageMobile || draftBgImage || "/patel-tablet-bg.webp"} 
                       alt="Mobile Reception View" 
                       className="w-full h-full object-cover object-[center_60%]"
                       referrerPolicy="no-referrer"

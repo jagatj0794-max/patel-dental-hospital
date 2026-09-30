@@ -789,7 +789,7 @@ export default function Home({
               Replace hero collage with doctor's original photo / hospital photo / staff photo once assets are provided.
             */}
             <img
-              src={heroBgImage || "/parel doctor.png"}
+              src={heroBgImage || "/patel-doctors-transparent.webp"}
               alt="Dr. Vipul Patel and Dr. Kinjal Patel at Patel Dental Hospital reception"
               className="w-full h-full object-cover object-top lg:object-[right_top]"
               referrerPolicy="no-referrer"
@@ -910,7 +910,7 @@ export default function Home({
           {/* Mobile Background Image */}
           <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             <img 
-              src={heroBgImageMobile || heroBgImage || "/patel mobile hero.jpeg"} 
+              src={heroBgImageMobile || heroBgImage || "/patel-tablet-bg.webp"} 
               alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
               className="w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
