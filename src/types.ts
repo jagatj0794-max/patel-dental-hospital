@@ -5,7 +5,6 @@
 
 export type PageId =
   | 'home'
-  | 'about'
   | 'sameday'
   | 'implants'
   | 'gallery'

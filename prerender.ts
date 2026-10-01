@@ -28,13 +28,6 @@ const routes = [
     keywords: ''
   },
   {
-    path: '/about',
-    pageId: 'about',
-    title: 'About Patel Dental Hospital | Best Dentist & Dental Clinic in Rajkot',
-    description: 'Discover Patel Dental Hospital in Rajkot, Gujarat. Led by Dr. Vipul Patel with 18+ years experience. Providing advanced, painless dental treatments under one roof with in-house CBCT and USA-standard sterilization.',
-    keywords: 'About Patel Dental Hospital, Best Dentist in Rajkot, Dental Clinic in Rajkot, Best Dental Hospital in Rajkot'
-  },
-  {
     path: '/sameday',
     pageId: 'sameday',
     title: 'Same Day Fixed Teeth & Implants in Rajkot | Patel Dental Hospital',
@@ -405,8 +398,6 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         },
         "description": "Dr. Kinjal Patel specializes in pediatric dentistry, child preventive care, and aesthetic smile correction procedures."
       });
-    } else if (route.path === '/about') {
-      schemas.push(dentistSchema);
     } else if (route.path === '/contact') {
       schemas.push({
         "@context": "https://schema.org",

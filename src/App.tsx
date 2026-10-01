@@ -28,7 +28,6 @@ import Lightbox from './components/Lightbox';
 // Pages
 import Home from './pages/Home';
 import HomeGujarati from './pages/HomeGujarati';
-import About from './pages/About';
 import SameDayFix from './pages/SameDayFix';
 import SmileGallery from './pages/SmileGallery';
 import SmileGalleryGujarati from './pages/SmileGalleryGujarati';
@@ -113,7 +112,7 @@ const getPageFromUrl = (): PageId => {
     return 'admin';
   }
 
-  const validPages: PageId[] = ['home', 'about', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
+  const validPages: PageId[] = ['home', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
   if (page && (validPages.includes(page as PageId) || page.startsWith('services/') || page.startsWith('blog/'))) {
     return page as PageId;
   }
@@ -814,8 +813,6 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             contactInfo={contactInfo}
           />
         );
-      case 'about':
-        return <About openAppointmentModal={openAppointmentModal} />;
       case 'sameday':
         return <SameDayFix openAppointmentModal={openAppointmentModal} contactInfo={contactInfo} />;
       case 'implants':

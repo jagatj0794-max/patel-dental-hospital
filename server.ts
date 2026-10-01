@@ -140,6 +140,11 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
+  // Redirect legacy /about and /about/ routes to /doctors/
+  app.get(['/about', '/about/'], (req, res) => {
+    res.redirect(301, '/doctors/');
+  });
+
   // Vite middleware setup
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
