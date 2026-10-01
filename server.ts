@@ -140,7 +140,7 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
-  // Redirect legacy /about and /about/ routes to /doctors/
+  // LEGACY_ABOUT_REDIRECT_TEST_20261001 - Redirect legacy About routes to Doctors
   app.get(['/about', '/about/'], (req, res) => {
     res.redirect(301, '/doctors/');
   });
