@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import {
   dentalImplantsFaqs,
   fullMouthFaqs,
@@ -430,7 +430,7 @@ async function prerender() {
     process.exit(1);
   }
 
-  const { render } = await import(ssrBundlePath);
+  const { render } = await import(pathToFileURL(ssrBundlePath).href);
 
   for (const route of routes) {
     console.log(`Rendering route: ${route.path} (pageId: ${route.pageId})`);
