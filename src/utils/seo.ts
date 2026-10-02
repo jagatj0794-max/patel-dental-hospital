@@ -103,14 +103,8 @@ export function useSEO({
     canonicalLink.setAttribute('href', currentUrl);
 
     // 7. Schema Markup Injection
-    let schemaScript: HTMLScriptElement | null = null;
-    if (schema) {
-      schemaScript = document.createElement('script');
-      schemaScript.setAttribute('type', 'application/ld+json');
-      schemaScript.setAttribute('id', 'dynamic-seo-schema');
-      schemaScript.textContent = JSON.stringify(schema);
-      document.head.appendChild(schemaScript);
-    }
+    // We explicitly avoid modifying, removing, or adding JSON-LD schemas in client-side runtime
+    // to preserve build-time pre-rendered schemas and prevent duplication or stale states.
 
     // Cleanup function to restore original home/base meta tags when leaving page
     return () => {
@@ -153,10 +147,6 @@ export function useSEO({
         canonicalLink?.setAttribute('href', originalCanonical);
       } else {
         canonicalLink?.remove();
-      }
-
-      if (schemaScript) {
-        schemaScript.remove();
       }
     };
   }, [title, description, keywords, ogTitle, ogDescription, ogImage, ogType, twitterCard, canonicalUrl, schema]);

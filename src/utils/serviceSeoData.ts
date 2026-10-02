@@ -97,8 +97,8 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
 
   switch (slug) {
     case 'dental-implants': {
-      const sTitle = 'Best Dental Implants in Rajkot | Tooth Implant Specialist';
-      const sDesc = 'Get lifetime-warranty dental implants in Rajkot at Patel Dental Hospital. Permanent tooth replacement, painless 3D CBCT guided surgery by Dr. Vipul Patel.';
+      const sTitle = 'Full Mouth Dental Implants Rajkot | Patel Dental Hospital';
+      const sDesc = 'Best dental implant hospital in Rajkot. Get permanent, natural-looking tooth replacements with advanced computer-guided implants by Dr. Vipul Patel.';
       return {
         title: sTitle,
         description: sDesc,
@@ -161,8 +161,8 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
       };
     }
     case 'invisible-aligners': {
-      const sTitle = 'Invisible Aligners & Clear Aligners in Rajkot | Clear Braces Specialist';
-      const sDesc = 'Straighten your teeth discreetly with invisible aligners & clear aligners in Rajkot. Get comfortable orthodontic treatment customized by experts at Patel Dental Hospital.';
+      const sTitle = 'Clear Invisible Aligners Rajkot | Patel Dental Hospital';
+      const sDesc = 'Straighten your teeth invisibly with premium clear aligners at Patel Dental Hospital, Rajkot. USA-certified digital orthodontic templates for a perfect smile.';
       return {
         title: sTitle,
         description: sDesc,
@@ -236,8 +236,8 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
       };
     }
     case 'pediatric-dentistry': {
-      const sTitle = 'Best Pediatric Dentist in Rajkot | Child & Kids Dental Clinic';
-      const sDesc = 'Warm, gentle, and pain-free children\'s dental care in Rajkot. Patel Dental Hospital offers expert pediatric dentistry, cavity prevention, fluoride therapy, and dental sealants.';
+      const sTitle = 'Best Pediatric Dentist in Rajkot | Kids Dental Care';
+      const sDesc = 'Kid-friendly dental treatments in Rajkot at Patel Dental Hospital. Painless pediatric dentistry, preventive fluoride, and gentle cavity treatments.';
       return {
         title: sTitle,
         description: sDesc,
@@ -261,8 +261,8 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
       };
     }
     case 'braces-treatment': {
-      const sTitle = 'Orthodontic Braces Treatment in Rajkot | Metal & Ceramic Braces';
-      const sDesc = 'Align your crooked or crowded teeth perfectly with metal, ceramic, or self-ligating dental braces in Rajkot. Comprehensive orthodontic solutions under senior consultants.';
+      const sTitle = 'Best Braces Treatment in Rajkot | Ceramic & Metal Braces';
+      const sDesc = 'Advanced orthodontic braces treatment in Rajkot at Patel Dental Hospital. Metal, ceramic, and self-ligating braces for kids & adults by specialists.';
       return {
         title: sTitle,
         description: sDesc,
