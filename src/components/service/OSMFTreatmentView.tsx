@@ -1110,9 +1110,13 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
             {/* 3 Equal Treatment Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
               {/* Card 1: Dental Implants */}
-              <div
-                onClick={() => handleNavigateToService('dental-implants')}
-                className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+              <a
+                href="/services/dental-implants/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigateToService('dental-implants');
+                }}
+                className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
               >
                 <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                   <img 
@@ -1139,12 +1143,16 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
                     <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                   </div>
                 </div>
-              </div>
+              </a>
 
               {/* Card 2: Full Mouth Rehabilitation */}
-              <div
-                onClick={() => handleNavigateToService('full-mouth-rehabilitation')}
-                className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+              <a
+                href="/services/full-mouth-rehabilitation/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigateToService('full-mouth-rehabilitation');
+                }}
+                className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
               >
                 <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                   <img 
@@ -1171,12 +1179,16 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
                     <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                   </div>
                 </div>
-              </div>
+              </a>
 
               {/* Card 3: Wisdom Tooth Surgery */}
-              <div
-                onClick={() => handleNavigateToService('wisdom-tooth-surgery')}
-                className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+              <a
+                href="/services/wisdom-tooth-surgery/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigateToService('wisdom-tooth-surgery');
+                }}
+                className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
               >
                 <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                   <img 
@@ -1194,8 +1206,8 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
                     </h3>
                     <p className={`text-xs sm:text-sm leading-relaxed ${isGujarati ? 'text-slate-700 font-semibold' : 'text-slate-600 font-medium'}`}>
                       {isGujarati
-                        ? "મેક્સિલોફેશિયલ સર્જન દ્વારા દર્દ વગર ઝડપી અને સુરક્ષિત રીતે ડહાપણની દાઢ કાઢવાની આધુનિક સારવાર."
-                        : "Comfortable, painless, and precise wisdom tooth removal surgery performed by specialized maxillofacial surgeons."}
+                        ? "દુખાવો કરતી કે અંદર ફસાયેલી ડાઢને આધુનિક માઇક્રોમોટર પદ્ધતિથી કોઈપણ પીડા વગર સુરક્ષિત રીતે દૂર કરવી."
+                        : "Minimally invasive surgical removal of impacted or painful wisdom teeth using specialized micromotor units for rapid post-op healing."}
                     </p>
                   </div>
                   <div className="pt-2 flex items-center text-[#0D9488] text-xs sm:text-sm font-bold tracking-wide group-hover:translate-x-1 transition-transform">
@@ -1203,7 +1215,7 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
                     <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
         </section>

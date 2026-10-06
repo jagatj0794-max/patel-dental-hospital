@@ -26,9 +26,17 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
     window.location.hash = page;
   };
 
+  const getHref = (target: string) => {
+    if (target === 'home') return '/';
+    if (target === 'services' || target === 'treatments') return '/services/';
+    if (target === 'academy' || target === 'blogs') return '/blogs/';
+    if (target.startsWith('services/') || target.startsWith('blog/')) return `/${target}/`;
+    return `/${target}/`;
+  };
+
   const currentYear = new Date().getFullYear();
 
-  const isDev = import.meta.env.DEV || 
+  const isDev = (typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV)) || 
                 (typeof window !== 'undefined' && (
                   window.location.hostname.includes('localhost') || 
                   window.location.hostname.includes('127.0.0.1') || 
@@ -129,13 +137,17 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                 { label: language === 'gu' ? 'અમારો સંપર્ક કરો' : 'Contact Us', target: 'contact' },
               ].map((link, idx) => (
                 <li key={idx}>
-                  <button
-                    onClick={() => handleLinkClick(link.target as PageId)}
+                  <a
+                    href={getHref(link.target)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLinkClick(link.target as PageId);
+                    }}
                     className="text-slate-400 hover:text-brand-cyan transition duration-200 cursor-pointer text-left flex items-center space-x-1.5 focus:outline-hidden gujarati-text"
                   >
                     <ChevronRight className="h-3.5 w-3.5 text-brand-cyan shrink-0 opacity-60" />
                     <span>{link.label}</span>
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -162,13 +174,17 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
                 { label: 'Tooth Coloured Filling', target: 'services/tooth-coloured-filling', gu: 'ટૂથ કલર્ડ ફિલિંગ' },
               ].map((treatment, idx) => (
                 <li key={idx}>
-                  <button
-                    onClick={() => handleLinkClick(treatment.target as PageId)}
+                  <a
+                    href={getHref(treatment.target)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLinkClick(treatment.target as PageId);
+                    }}
                     className="text-slate-400 hover:text-brand-teal transition duration-200 cursor-pointer text-left flex items-center space-x-1.5 focus:outline-hidden gujarati-text"
                   >
                     <span className="h-1 w-1 bg-brand-teal rounded-full shrink-0" />
                     <span>{language === 'gu' ? treatment.gu : treatment.label}</span>
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>

@@ -164,7 +164,7 @@ export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
     }
 
     try {
-      const stored = localStorage.getItem('hospital_services');
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('hospital_services') : null;
       if (stored) {
         const services = JSON.parse(stored);
         if (Array.isArray(services)) {

@@ -407,7 +407,7 @@ export default function WhyChooseUs({
       <PatientMomentsGallery patientMoments={patientMoments} isStandalonePage={false} />
 
       {/* Hospital Gallery */}
-      <HospitalGallery mediaImages={mediaImages} />
+      <HospitalGallery mediaImages={mediaImages} headingTag="h2" />
 
       {/* Trust Seal CTA Footer Panel */}
       <section className="bg-gradient-to-r from-[#0B1B33] to-[#081528] text-white py-16 text-center">

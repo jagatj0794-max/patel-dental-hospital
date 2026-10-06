@@ -68,22 +68,6 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
   const hasVideo = source === 'instagram' ? !!instagramUrl : !!uploadUrl;
   const isEnabled = mConfig.featured_video_enabled !== false;
 
-  if (!isEnabled || !hasVideo) {
-    return null;
-  }
-
-  const heading = mConfig.featured_video_heading || `Featured ${serviceTitle} Video`;
-  const description = mConfig.featured_video_description || `Learn more about the advanced procedures and clinical excellence of ${serviceTitle} treatment at Patel Dental Hospital. Watch our expert walk-through of the process.`;
-  const bullets = mConfig.featured_video_bullets && mConfig.featured_video_bullets.length > 0 
-    ? mConfig.featured_video_bullets 
-    : [
-        'Advanced state-of-the-art procedure methods',
-        'Minimally invasive and pain-free techniques',
-        'Expert clinical execution and diagnostic precision'
-      ];
-  const ctaText = mConfig.featured_video_cta_text || 'Schedule A Consultation';
-  const ctaLink = mConfig.featured_video_cta_link || '';
-
   const getThumbnailUrl = () => {
     if (mConfig.featured_video_thumbnail_source === 'custom' && mConfig.featured_video_custom_thumbnail) {
       return mConfig.featured_video_custom_thumbnail;
@@ -101,6 +85,22 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
     source,
     instagramUrl
   ]);
+
+  if (!isEnabled || !hasVideo) {
+    return null;
+  }
+
+  const heading = mConfig.featured_video_heading || `Featured ${serviceTitle} Video`;
+  const description = mConfig.featured_video_description || `Learn more about the advanced procedures and clinical excellence of ${serviceTitle} treatment at Patel Dental Hospital. Watch our expert walk-through of the process.`;
+  const bullets = mConfig.featured_video_bullets && mConfig.featured_video_bullets.length > 0 
+    ? mConfig.featured_video_bullets 
+    : [
+        'Advanced state-of-the-art procedure methods',
+        'Minimally invasive and pain-free techniques',
+        'Expert clinical execution and diagnostic precision'
+      ];
+  const ctaText = mConfig.featured_video_cta_text || 'Schedule A Consultation';
+  const ctaLink = mConfig.featured_video_cta_link || '';
 
   const handleCtaClick = () => {
     if (!ctaLink || ctaLink === '#appointment' || ctaLink === 'appointment') {
@@ -347,6 +347,7 @@ interface ServiceDetailProps {
   previewFaqs?: ServiceFaq[];
   previewRelatedServices?: Service[];
   language?: 'en' | 'gu';
+  preloadedData?: any;
 }
 
 export default function ServiceDetail({ 
@@ -357,17 +358,19 @@ export default function ServiceDetail({
   previewGallery,
   previewFaqs,
   previewRelatedServices,
-  language = 'gu'
+  language = 'gu',
+  preloadedData
 }: ServiceDetailProps) {
-  const [service, setService] = useState<Service | null>(null);
-  const [gallery, setGallery] = useState<ServiceGalleryItem[]>([]);
-  const [faqs, setFaqs] = useState<ServiceFaq[]>([]);
-  const [relatedServices, setRelatedServices] = useState<Service[]>([]);
-  const [allServicesList, setAllServicesList] = useState<Service[]>([]);
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
+  const fallbackInitialService = previewService || preloadedData?.services?.find((s: Service) => s.slug === slug || s.id === slug) || DEFAULT_SERVICES.find(s => s.slug === slug || s.id === slug) || null;
+  const [service, setService] = useState<Service | null>(fallbackInitialService);
+  const [gallery, setGallery] = useState<ServiceGalleryItem[]>(() => previewGallery || preloadedData?.galleries?.[fallbackInitialService?.id || ''] || []);
+  const [faqs, setFaqs] = useState<ServiceFaq[]>(() => previewFaqs || preloadedData?.faqs?.[fallbackInitialService?.id || ''] || []);
+  const [relatedServices, setRelatedServices] = useState<Service[]>(() => previewRelatedServices || []);
+  const [allServicesList, setAllServicesList] = useState<Service[]>(() => preloadedData?.services || DEFAULT_SERVICES);
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(() => preloadedData?.contactInfo || DEFAULT_CONTACT_INFO);
   const [drVipulImg, setDrVipulImg] = useState('/dr. patel.png');
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!fallbackInitialService);
 
   useEffect(() => {
     doctorService.getDoctors().then(docs => {
@@ -766,7 +769,9 @@ export default function ServiceDetail({
     }
     let active = true;
     const loadServiceData = async () => {
-      setIsLoading(true);
+      if (!service) {
+        setIsLoading(true);
+      }
       setError(null);
       try {
         // 1. Fetch current service
@@ -3150,23 +3155,17 @@ export default function ServiceDetail({
                           </span>
                         </button>
                         
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
-                                <div className="pt-4">
-                                  {answerText}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        <div 
+                          className={`overflow-hidden transition-all duration-200 ${
+                            isExpanded ? 'block' : 'hidden'
+                          }`}
+                        >
+                          <div className="px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] text-slate-600 font-normal leading-relaxed whitespace-pre-wrap">
+                            <div className="pt-4">
+                              {answerText}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -3224,23 +3223,17 @@ export default function ServiceDetail({
                           </span>
                         </button>
                         
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-normal'}`}>
-                                <div className="pt-4">
-                                  {answerText}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        <div 
+                          className={`overflow-hidden transition-all duration-200 ${
+                            isExpanded ? 'block' : 'hidden'
+                          }`}
+                        >
+                          <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-[#1E3A5F] font-semibold' : 'text-slate-600 font-normal'}`}>
+                            <div className="pt-4">
+                              {answerText}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -3298,23 +3291,17 @@ export default function ServiceDetail({
                           </span>
                         </button>
                         
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
-                                <div className="pt-4">
-                                  {answerText}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        <div 
+                          className={`overflow-hidden transition-all duration-200 ${
+                            isExpanded ? 'block' : 'hidden'
+                          }`}
+                        >
+                          <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
+                            <div className="pt-4">
+                              {answerText}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -3372,23 +3359,17 @@ export default function ServiceDetail({
                           </span>
                         </button>
                         
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
-                                <div className="pt-4">
-                                  {answerText}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        <div 
+                          className={`overflow-hidden transition-all duration-200 ${
+                            isExpanded ? 'block' : 'hidden'
+                          }`}
+                        >
+                          <div className={`px-5 sm:px-6 pb-6 pt-0 border-t border-slate-100 text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap ${language === 'gu' ? 'text-black font-semibold' : 'text-slate-600 font-normal'}`}>
+                            <div className="pt-4">
+                              {answerText}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -3666,21 +3647,15 @@ export default function ServiceDetail({
                           </span>
                         </button>
                         
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="px-4 pb-4 pt-1 border-t border-slate-100/50 text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-wrap pl-11">
-                                {faq.answer}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        <div 
+                          className={`overflow-hidden transition-all duration-200 ${
+                            isExpanded ? 'block' : 'hidden'
+                          }`}
+                        >
+                          <div className="px-4 pb-4 pt-1 border-t border-slate-100/50 text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-wrap pl-11">
+                            {faq.answer}
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -3965,10 +3940,14 @@ export default function ServiceDetail({
                     const cardTitle = translation ? translation.title : card.title;
                     const cardDesc = translation ? translation.description : card.description;
                     return (
-                      <div
+                      <a
                         key={card.slug}
-                        onClick={() => handleNavigateToService(card.slug)}
-                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                        href={`/services/${card.slug}/`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavigateToService(card.slug);
+                        }}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                       >
                         <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                           <img 
@@ -3993,7 +3972,7 @@ export default function ServiceDetail({
                             <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                           </div>
                         </div>
-                      </div>
+                      </a>
                     );
                   })}
                 </div>
@@ -4035,10 +4014,14 @@ export default function ServiceDetail({
                     const cardDesc = translation ? translation.description : card.description;
 
                     return (
-                      <div
+                      <a
                         key={card.slug}
-                        onClick={() => handleNavigateToService(card.slug)}
-                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                        href={`/services/${card.slug}/`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavigateToService(card.slug);
+                        }}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                       >
                         <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                           <img 
@@ -4063,7 +4046,7 @@ export default function ServiceDetail({
                             <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                           </div>
                         </div>
-                      </div>
+                      </a>
                     );
                   })}
                 </div>
@@ -4104,10 +4087,14 @@ export default function ServiceDetail({
                     const cardTitle = translation ? translation.title : card.title;
                     const cardDesc = translation ? translation.description : card.description;
                     return (
-                      <div
+                      <a
                         key={card.slug}
-                        onClick={() => handleNavigateToService(card.slug)}
-                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                        href={`/services/${card.slug}/`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavigateToService(card.slug);
+                        }}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                       >
                         <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                           <img 
@@ -4132,7 +4119,7 @@ export default function ServiceDetail({
                             <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                           </div>
                         </div>
-                      </div>
+                      </a>
                     );
                   })}
                 </div>
@@ -4173,10 +4160,14 @@ export default function ServiceDetail({
                     const cardTitle = translation ? translation.title : card.title;
                     const cardDesc = translation ? translation.description : card.description;
                     return (
-                      <div
+                      <a
                         key={card.slug}
-                        onClick={() => handleNavigateToService(card.slug)}
-                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                        href={`/services/${card.slug}/`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavigateToService(card.slug);
+                        }}
+                        className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                       >
                         <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                           <img 
@@ -4201,7 +4192,7 @@ export default function ServiceDetail({
                             <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                           </div>
                         </div>
-                      </div>
+                      </a>
                     );
                   })}
                 </div>
@@ -4224,10 +4215,14 @@ export default function ServiceDetail({
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
                   {smileMakeoverRelatedCards.map((card) => (
-                    <div
+                    <a
                       key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      href={`/services/${card.slug}/`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigateToService(card.slug);
+                      }}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
@@ -4252,7 +4247,7 @@ export default function ServiceDetail({
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -4274,10 +4269,14 @@ export default function ServiceDetail({
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
                   {crownsBridgesRelatedCards.map((card) => (
-                    <div
+                    <a
                       key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      href={`/services/${card.slug}/`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigateToService(card.slug);
+                      }}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
@@ -4302,7 +4301,7 @@ export default function ServiceDetail({
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -4324,10 +4323,14 @@ export default function ServiceDetail({
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
                   {pediatricRelatedCards.map((card) => (
-                    <div
+                    <a
                       key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      href={`/services/${card.slug}/`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigateToService(card.slug);
+                      }}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
@@ -4352,7 +4355,7 @@ export default function ServiceDetail({
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -4374,10 +4377,14 @@ export default function ServiceDetail({
                 {/* 3 Equal Treatment Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
                   {osmfRelatedCards.map((card) => (
-                    <div
+                    <a
                       key={card.slug}
-                      onClick={() => handleNavigateToService(card.slug)}
-                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+                      href={`/services/${card.slug}/`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigateToService(card.slug);
+                      }}
+                      className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
                     >
                       <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                         <img 
@@ -4402,7 +4409,7 @@ export default function ServiceDetail({
                           <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                         </div>
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -4422,10 +4429,8 @@ export default function ServiceDetail({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                   {relatedServices.map((item) => (
-                    <motion.div
+                    <div
                       key={item.id}
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.3 }}
                       className="bg-white border border-[#E5EEF5] rounded-[20px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_12px_24px_rgba(8,28,58,0.08)] hover:border-[#B9D1E6] transition-all duration-300 flex flex-col justify-between group"
                     >
                       <div>
@@ -4448,15 +4453,19 @@ export default function ServiceDetail({
                       </div>
 
                       <div className="p-5 pt-0">
-                        <button
-                          onClick={() => handleNavigateToService(item.slug)}
-                          className="w-full py-2 bg-slate-50 hover:bg-[#0D9488]/5 border border-slate-150 text-[#081C3A] hover:text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
+                        <a
+                          href={`/services/${item.slug}/`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleNavigateToService(item.slug);
+                          }}
+                          className="w-full py-2 bg-slate-50 hover:bg-[#0D9488]/5 border border-slate-150 text-[#081C3A] hover:text-[#0D9488] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 block text-center"
                         >
                           Learn Details
-                          <ArrowRight className="h-3 w-3" />
-                        </button>
+                          <ArrowRight className="h-3 w-3 inline ml-1" />
+                        </a>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>

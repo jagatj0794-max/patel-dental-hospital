@@ -995,9 +995,9 @@ export default function HomeGujarati({
             {/* Headline */}
             <div className="flex flex-col text-center space-y-2 max-w-[450px]">
               {/* Main Heading */}
-              <h1 className="font-display text-[20px] sm:text-[21px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
+              <h2 className="font-display text-[20px] sm:text-[21px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
                 વર્લ્ડ-ક્લાસ <span className="text-[#00897B]">ડેન્ટલ કેર</span>
-              </h1>
+              </h2>
             </div>
 
             {/* CTA Buttons */}
@@ -1102,13 +1102,13 @@ export default function HomeGujarati({
 
               {/* Main Headline */}
               <div className="flex flex-col text-left space-y-2">
-                <h1 className="font-display text-[20px] md:text-[22px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
+                <h2 className="font-display text-[20px] md:text-[22px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
                   વર્લ્ડ-ક્લાસ{" "}
                   <span className="relative inline-block text-[#00897B]">
                     ડેન્ટલ કેર
                     <div className="absolute -bottom-1 left-0 w-full h-[3px] bg-[#C9A96E] rounded-full" />
                   </span>
-                </h1>
+                </h2>
               </div>
 
               {/* Action Buttons */}
@@ -2856,22 +2856,11 @@ export default function HomeGujarati({
                     </div>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key="content"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-6 pb-6 sm:px-8 sm:pb-7 pt-0 border-t border-slate-50 text-slate-500 text-[13.5px] sm:text-[14px] leading-relaxed font-semibold gujarati-text">
-                          {faq.answer}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'block' : 'hidden'}`}>
+                    <div className="px-6 pb-6 sm:px-8 sm:pb-7 pt-0 border-t border-slate-50 text-slate-500 text-[13.5px] sm:text-[14px] leading-relaxed font-semibold gujarati-text pt-4">
+                      {faq.answer}
+                    </div>
+                  </div>
                 </div>
               );
             })}

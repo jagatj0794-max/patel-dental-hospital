@@ -651,14 +651,14 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 </div>
 
                 {/* Hero Main Heading */}
-                <h1 className="font-display tracking-tight text-[#0CC2DA] leading-tight">
+                <h2 className="font-display tracking-tight text-[#0CC2DA] leading-tight">
                   <span 
                     style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.12)' }}
                     className="block text-2xl font-black tracking-tight"
                   >
                     Transform Your Smile in India.
                   </span>
-                </h1>
+                </h2>
 
                 {/* Supporting Description */}
                 <p className="text-slate-600 text-xs font-medium leading-relaxed font-sans max-w-lg">
@@ -752,14 +752,14 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
               <div className="text-[11px] font-black text-[#1E3A5F] tracking-wider font-sans uppercase">
                 Premium Dental Care • Personalised • Exceptional Value
               </div>
-              <h1 className="font-display tracking-tight text-[#0CC2DA] leading-tight">
+              <h2 className="font-display tracking-tight text-[#0CC2DA] leading-tight">
                 <span 
                   style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.12)' }}
                   className="block text-3xl font-black tracking-tight"
                 >
                   Transform Your Smile in India.
                 </span>
-              </h1>
+              </h2>
             </div>
 
             {/* 2. HERO IMAGE */}
@@ -2278,22 +2278,13 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                     </span>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                      >
-                        <div className="px-6 pb-5 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/80 bg-slate-50/40">
-                          <p className="whitespace-pre-line font-medium font-sans">
-                            {faq.answer}
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'block' : 'hidden'}`}>
+                    <div className="px-6 pb-5 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100/80 bg-slate-50/40">
+                      <p className="whitespace-pre-line font-medium font-sans">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               );
             })}

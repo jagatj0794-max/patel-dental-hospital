@@ -6,7 +6,7 @@
  * if environment keys are supplied, with safe guards for SSR/SSG.
  */
 
-const GA_ID = import.meta.env.VITE_GA4_MEASUREMENT_ID || '';
+const GA_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GA4_MEASUREMENT_ID) || (typeof process !== 'undefined' && process.env?.VITE_GA4_MEASUREMENT_ID) || '';
 
 // Safely initialize dataLayer and tracking queues on window object
 if (typeof window !== 'undefined') {
@@ -65,7 +65,7 @@ export function trackEvent(eventName: string, params: Record<string, any> = {}):
   }
 
   // Log to console in development mode
-  if (import.meta.env.DEV) {
+  if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
     console.log(`[PDH Analytics Event] Name: ${eventName}`, params);
   }
 }

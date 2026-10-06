@@ -6,9 +6,10 @@
 import { useState } from 'react';
 import { Calendar, CheckCircle2, ChevronDown, ChevronUp, Clock, ShieldCheck, Star, Users, Video } from 'lucide-react';
 import { motion } from 'motion/react';
-import samedayFix from '../assets/images/sameday_fix_1780608011497.png';
 import { ContactInfo } from '../types';
 import { useSEO } from '../utils/seo';
+
+const samedayFix = '/Full Mouth.webp';
 
 interface SameDayFixProps {
   openAppointmentModal: (preselectedTreatment?: string) => void;

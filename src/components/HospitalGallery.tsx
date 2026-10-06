@@ -14,6 +14,7 @@ interface HospitalGalleryProps {
   customTitle?: string;
   customDescription?: string;
   isGujarati?: boolean;
+  headingTag?: 'h1' | 'h2';
 }
 
 export default function HospitalGallery({ 
@@ -21,7 +22,8 @@ export default function HospitalGallery({
   customBadge,
   customTitle,
   customDescription,
-  isGujarati = false
+  isGujarati = false,
+  headingTag = 'h1'
 }: HospitalGalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -61,9 +63,15 @@ export default function HospitalGallery({
             <span className={`text-[#0D9488] font-bold text-xs tracking-widest uppercase block ${isGujarati ? 'gujarati-text' : ''}`}>
               {customBadge || "Patel Dental Hospital • Hospital Infrastructure & Clinical Excellence"}
             </span>
-            <h1 className={`stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight ${isGujarati ? 'gujarati-text' : ''}`}>
-              {customTitle || "Hospital Gallery"}
-            </h1>
+            {headingTag === 'h2' ? (
+              <h2 className={`stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight ${isGujarati ? 'gujarati-text' : ''}`}>
+                {customTitle || "Hospital Gallery"}
+              </h2>
+            ) : (
+              <h1 className={`stat-heading-premium text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase leading-tight ${isGujarati ? 'gujarati-text' : ''}`}>
+                {customTitle || "Hospital Gallery"}
+              </h1>
+            )}
             <p className={`text-slate-500 text-sm sm:text-base font-sans max-w-2xl mx-auto leading-relaxed ${isGujarati ? 'gujarati-text' : ''}`}>
               {customDescription || "Explore our modern dental operatories, advanced 3D CBCT imaging suites, sterile surgical zones, and clinical treatment highlights."}
             </p>

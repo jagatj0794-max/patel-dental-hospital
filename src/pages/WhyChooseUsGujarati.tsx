@@ -1056,6 +1056,7 @@ export default function WhyChooseUsGujarati({
       <HospitalGallery 
         mediaImages={mediaImages} 
         isGujarati={true}
+        headingTag="h2"
         customBadge="પટેલ ડેન્ટલ હોસ્પિટલ • હોસ્પિટલનું ઇન્ફ્રાસ્ટ્રક્ચર અને ક્લિનિકલ શ્રેષ્ઠતા"
         customTitle="હોસ્પિટલ ગેલેરી"
         customDescription="અમારા આધુનિક ડેન્ટલ ઓપરેટરીઝ, અદ્યતન 3D CBCT ઇમેજિંગ સુવિધાઓ, સ્ટેરાઇલ સર્જિકલ ઝોન અને ક્લિનિકલ સારવારની ઝલક જુઓ."

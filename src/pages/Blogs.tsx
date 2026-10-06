@@ -1113,9 +1113,15 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
             <span className="text-[#0D9488] font-extrabold text-xs tracking-widest uppercase flex items-center justify-center gap-1.5 mb-1">
               <BookOpen className="h-4 w-4 text-[#0D9488]" /> Dental Library & Patient Guides
             </span>
-            <h1 className="text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-sans font-black tracking-tight leading-tight">
-              {selectedPostId ? "Read Article" : "Patel Dental Blog"}
-            </h1>
+            {selectedPostId ? (
+              <h2 className="text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-sans font-black tracking-tight leading-tight text-center">
+                Read Article
+              </h2>
+            ) : (
+              <h1 className="text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-sans font-black tracking-tight leading-tight text-center">
+                Patel Dental Blog
+              </h1>
+            )}
             <p className="text-slate-500 text-xs sm:text-sm md:text-base font-sans font-medium leading-relaxed max-w-2xl mx-auto">
               {selectedPostId 
                 ? "Understand the scientific foundations, clinical procedures, and home care practices." 

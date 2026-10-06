@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// A secure, silent fallback storage mechanism in case localStorage or sessionStorage is blocked in sandboxed iframes.
+// A secure, silent fallback storage mechanism in case localStorage or sessionStorage is blocked in sandboxed iframes or during SSR.
 const memoryStore: Record<string, string> = {};
 const sessionMemoryStore: Record<string, string> = {};
 
 export const safeStorage = {
   getItem(key: string): string | null {
+    if (typeof window === 'undefined') {
+      return memoryStore[key] !== undefined ? memoryStore[key] : null;
+    }
     try {
       const value = window.localStorage.getItem(key);
       if (value !== null) return value;
@@ -19,6 +22,10 @@ export const safeStorage = {
   },
 
   setItem(key: string, value: string): void {
+    if (typeof window === 'undefined') {
+      memoryStore[key] = value;
+      return;
+    }
     try {
       window.localStorage.setItem(key, value);
     } catch {
@@ -28,6 +35,10 @@ export const safeStorage = {
   },
 
   removeItem(key: string): void {
+    if (typeof window === 'undefined') {
+      delete memoryStore[key];
+      return;
+    }
     try {
       window.localStorage.removeItem(key);
     } catch {
@@ -37,6 +48,9 @@ export const safeStorage = {
   },
 
   getSessionItem(key: string): string | null {
+    if (typeof window === 'undefined') {
+      return sessionMemoryStore[key] !== undefined ? sessionMemoryStore[key] : null;
+    }
     try {
       const value = window.sessionStorage.getItem(key);
       if (value !== null) return value;
@@ -47,6 +61,10 @@ export const safeStorage = {
   },
 
   setSessionItem(key: string, value: string): void {
+    if (typeof window === 'undefined') {
+      sessionMemoryStore[key] = value;
+      return;
+    }
     try {
       window.sessionStorage.setItem(key, value);
     } catch {
@@ -56,6 +74,10 @@ export const safeStorage = {
   },
 
   removeSessionItem(key: string): void {
+    if (typeof window === 'undefined') {
+      delete sessionMemoryStore[key];
+      return;
+    }
     try {
       window.sessionStorage.removeItem(key);
     } catch {

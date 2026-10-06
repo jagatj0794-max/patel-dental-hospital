@@ -21,8 +21,8 @@ export function sanitizeEnvValue(val: string | undefined): string | undefined {
 }
 
 export function getSupabaseConfigError(): string | null {
-  const rawUrl = import.meta.env.VITE_SUPABASE_URL;
-  const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const rawUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || process.env.VITE_SUPABASE_URL || 'https://wmgzhqtqmnddfjykaykm.supabase.co';
+  const rawKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_Dp-26wBXw6LjWvRLtdUC3g_aO5tAjJW';
   const url = sanitizeEnvValue(rawUrl);
   const key = sanitizeEnvValue(rawKey);
 
@@ -109,8 +109,8 @@ export function getSupabase(): SupabaseClient {
     return supabaseClientInstance;
   }
 
-  const supabaseUrl = sanitizeEnvValue(import.meta.env.VITE_SUPABASE_URL);
-  const supabaseAnonKey = sanitizeEnvValue(import.meta.env.VITE_SUPABASE_ANON_KEY);
+  const supabaseUrl = sanitizeEnvValue((typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || process.env.VITE_SUPABASE_URL || 'https://wmgzhqtqmnddfjykaykm.supabase.co');
+  const supabaseAnonKey = sanitizeEnvValue((typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_Dp-26wBXw6LjWvRLtdUC3g_aO5tAjJW');
 
   if (!isSupabaseConfigured()) {
     console.warn(
@@ -126,43 +126,56 @@ export function getSupabase(): SupabaseClient {
     });
   }
 
-  console.log("SUPABASE URL RAW =", JSON.stringify(supabaseUrl));
-  console.log("SUPABASE KEY RAW =", JSON.stringify(supabaseAnonKey));
+  // Raw logging removed for security to keep credentials out of build logs
+
+  // Custom fetch wrapper with a safe 30-second timeout to prevent infinite hangs in build runner, while supporting proxy routing in local dev
+  const customFetch = (url: string, options: any = {}) => {
+    let targetUrl = url;
+    if (typeof window !== 'undefined' && window.location && typeof window.location.hostname === 'string') {
+      const hostname = window.location.hostname;
+      const isLocalOrDev = 
+        hostname.includes('localhost') || 
+        hostname.includes('127.0.0.1') || 
+        hostname.includes('run.app') || 
+        hostname.includes('ais-dev');
+
+      if (isLocalOrDev) {
+        try {
+          const u = new URL(url);
+          const configUrl = new URL(supabaseUrl!);
+          if (u.host === configUrl.host) {
+            targetUrl = `${window.location.origin}/api/supabase${u.pathname}${u.search}`;
+          }
+        } catch (e) {
+          console.error('[Supabase Client Proxy Fetch] Error processing URL:', e);
+        }
+      }
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // Safer 30s timeout for cold starts
+
+    return fetch(targetUrl, { ...options, signal: controller.signal })
+      .then(res => {
+        clearTimeout(timeoutId);
+        return res;
+      })
+      .catch(err => {
+        clearTimeout(timeoutId);
+        throw err;
+      });
+  };
 
   const clientOptions: any = {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
+    },
+    global: {
+      fetch: customFetch
     }
   };
-
-  // If in browser, use custom fetch to route requests through our server-side proxy (only in local or dev environments)
-  if (typeof window !== 'undefined') {
-    const isLocalOrDev = 
-      window.location.hostname.includes('localhost') || 
-      window.location.hostname.includes('127.0.0.1') || 
-      window.location.hostname.includes('run.app') || 
-      window.location.hostname.includes('ais-dev');
-
-    if (isLocalOrDev) {
-      clientOptions.global = {
-        fetch: (url: string, options: any) => {
-          try {
-            const targetUrl = new URL(url);
-            const configUrl = new URL(supabaseUrl!);
-            if (targetUrl.host === configUrl.host) {
-              const proxyUrl = `${window.location.origin}/api/supabase${targetUrl.pathname}${targetUrl.search}`;
-              return fetch(proxyUrl, options);
-            }
-          } catch (e) {
-            console.error('[Supabase Client Proxy Fetch] Error processing URL:', e);
-          }
-          return fetch(url, options);
-        }
-      };
-    }
-  }
 
   supabaseClientInstance = createClient(supabaseUrl!, supabaseAnonKey!, clientOptions);
   return supabaseClientInstance;

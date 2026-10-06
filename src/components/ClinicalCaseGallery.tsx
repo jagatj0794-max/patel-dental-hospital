@@ -573,6 +573,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
 
   // Preloading image links in the background asynchronously
   useEffect(() => {
+    if (typeof Image === 'undefined') return;
     if (totalItems > 1) {
       const prevImg = categoryItems[(currentIndex - 1 + totalItems) % totalItems].image_url;
       const nextImg = categoryItems[(currentIndex + 1) % totalItems].image_url;

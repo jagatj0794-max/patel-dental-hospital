@@ -56,6 +56,21 @@ const NAV_TRANSLATIONS: Record<string, string> = {
   'Same Day Fix Teeth': 'સેમ ડે ફિક્સ ટીથ',
 };
 
+const DEFAULT_NAV_SERVICES = [
+  { label: 'Dental Implants', id: 'services/dental-implants' },
+  { label: 'Invisible Aligners', id: 'services/invisible-aligners' },
+  { label: 'Pediatric Dentistry', id: 'services/pediatric-dentistry' },
+  { label: 'Braces Treatment', id: 'services/braces-treatment' },
+  { label: 'Smile Makeover', id: 'services/smile-makeover' },
+  { label: 'Full Mouth Rehabilitation', id: 'services/full-mouth-rehabilitation' },
+  { label: 'Crowns & Bridges', id: 'services/crowns-bridges' },
+  { label: 'Single Sitting Root Canal Treatment', id: 'services/root-canal-treatment' },
+  { label: 'Teeth Whitening', id: 'services/teeth-whitening' },
+  { label: 'Wisdom Tooth Surgery', id: 'services/wisdom-tooth-surgery' },
+  { label: 'Tooth Coloured Filling', id: 'services/tooth-coloured-filling' },
+  { label: 'Oral Submucous Fibrosis (OSMF)', id: 'services/oral-submucous-fibrosis-osmf-treatment-rajkot' }
+];
+
 const navHierarchy = [
   { label: 'Home', id: 'home' },
   { 
@@ -79,8 +94,8 @@ const navHierarchy = [
   },
   {
     label: 'Services',
-    id: 'treatments',
-    dropdown: []
+    id: 'services',
+    dropdown: DEFAULT_NAV_SERVICES
   },
   {
     label: 'Dental Blog',
@@ -97,18 +112,20 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
-  const [dynamicServices, setDynamicServices] = useState<{ label: string; id: string }[]>([]);
+  const [dynamicServices, setDynamicServices] = useState<{ label: string; id: string }[]>(DEFAULT_NAV_SERVICES);
 
   // Map route IDs to canonical URL path destinations for search engines and AI crawlers
   const getHref = (id: string) => {
     if (id === 'home') return '/';
-    if (id === 'academy' || id === 'blogs') return '/blogs';
-    if (id === 'implants') return '/services/dental-implants';
-    if (id === 'aligners' || id === 'clear-aligners' || id === 'invisible-aligners') return '/services/invisible-aligners';
-    if (id === 'kids' || id === 'pediatric' || id === 'pediatric-dentistry') return '/services/pediatric-dentistry';
-    if (id === 'braces' || id === 'braces-treatment') return '/services/braces-treatment';
-    if (id.startsWith('services/') || id.startsWith('blog/')) return `/${id}`;
-    return `/${id}`;
+    if (id === 'about') return '/doctors/';
+    if (id === 'services' || id === 'treatments') return '/services/';
+    if (id === 'academy' || id === 'blogs') return '/blogs/';
+    if (id === 'implants') return '/services/dental-implants/';
+    if (id === 'aligners' || id === 'clear-aligners' || id === 'invisible-aligners') return '/services/invisible-aligners/';
+    if (id === 'kids' || id === 'pediatric' || id === 'pediatric-dentistry') return '/services/pediatric-dentistry/';
+    if (id === 'braces' || id === 'braces-treatment') return '/services/braces-treatment/';
+    if (id.startsWith('services/') || id.startsWith('blog/')) return `/${id}/`;
+    return `/${id}/`;
   };
 
   // Fetch active services dynamically
@@ -117,7 +134,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
     const fetchServices = async () => {
       try {
         const services = await serviceService.getServices();
-        if (active) {
+        if (active && services && services.length > 0) {
           const activeServices = services
             .filter(s => s.is_active && isApprovedServiceSlug(s.slug) && !s.title?.toLowerCase().includes('bone graft'))
             .map(s => ({
@@ -126,7 +143,9 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                 : s.title,
               id: `services/${s.slug}`
             }));
-          setDynamicServices(activeServices);
+          if (activeServices.length > 0) {
+            setDynamicServices(activeServices);
+          }
         }
       } catch (err) {
         console.error('Failed to load active services for navbar dropdown:', err);
@@ -271,14 +290,21 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
                   {item.dropdown ? (
-                    <button
-                      className={`flex items-center text-[13px] xl:text-[14px] 2xl:text-[15px] font-semibold py-2 transition-colors whitespace-nowrap ${
-                        isItemActive(item) || activeDropdown === item.id ? 'text-[#0D9488]' : 'text-[#12355B] hover:text-[#0D9488]'
-                      }`}
-                    >
-                      {language === 'gu' ? (NAV_TRANSLATIONS[item.label] || item.label) : item.label}
-                      <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform duration-200 ${activeDropdown === item.id ? 'rotate-180' : ''}`} />
-                    </button>
+                    <div className="flex items-center">
+                      <a
+                        href={getHref(item.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavigate(item.id);
+                        }}
+                        className={`flex items-center text-[13px] xl:text-[14px] 2xl:text-[15px] font-semibold py-2 transition-colors whitespace-nowrap ${
+                          isItemActive(item) || activeDropdown === item.id ? 'text-[#0D9488]' : 'text-[#12355B] hover:text-[#0D9488]'
+                        }`}
+                      >
+                        {language === 'gu' ? (NAV_TRANSLATIONS[item.label] || item.label) : item.label}
+                        <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform duration-200 ${activeDropdown === item.id ? 'rotate-180' : ''}`} />
+                      </a>
+                    </div>
                   ) : (
                     <a
                       href={getHref(item.id)}
@@ -294,39 +320,35 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                     </a>
                   )}
 
-                  {/* Dropdown Menu */}
+                  {/* Dropdown Menu - Always in the DOM for search engines and AI crawlers, hidden via CSS when closed */}
                   {item.dropdown && (
-                    <AnimatePresence>
-                      {activeDropdown === item.id && (
-                        <motion.div
-                           initial={{ opacity: 0, y: 15 }}
-                           animate={{ opacity: 1, y: 0 }}
-                           exit={{ opacity: 0, y: 15 }}
-                           transition={{ duration: 0.2, ease: "easeOut" }}
-                           className="absolute top-full left-0 mt-0 pt-4 w-60 z-50 pointer-events-auto"
-                        >
-                          <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden flex flex-col py-2">
-                            {item.dropdown.map((dropItem) => (
-                              <a
-                                key={dropItem.id}
-                                href={getHref(dropItem.id)}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handleNavigate(dropItem.id);
-                                }}
-                                className={`block w-full text-left px-5 py-2.5 text-[14px] transition-colors ${
-                                  language === 'gu'
-                                    ? 'font-semibold text-[#0B1E36] hover:bg-slate-50 hover:text-[#0D9488]'
-                                    : 'font-medium text-[#12355B] hover:bg-slate-50 hover:text-[#0D9488]'
-                                }`}
-                              >
-                                {language === 'gu' ? (NAV_TRANSLATIONS[dropItem.label] || dropItem.label) : dropItem.label}
-                              </a>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    <div
+                      className={`absolute top-full left-0 mt-0 pt-2 w-64 z-50 pointer-events-auto transition-all duration-200 ${
+                        activeDropdown === item.id
+                          ? 'block opacity-100 visible'
+                          : 'hidden lg:group-hover:block lg:group-hover:opacity-100'
+                      }`}
+                    >
+                      <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden flex flex-col py-2">
+                        {item.dropdown.map((dropItem) => (
+                          <a
+                            key={dropItem.id}
+                            href={getHref(dropItem.id)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleNavigate(dropItem.id);
+                            }}
+                            className={`block w-full text-left px-5 py-2.5 text-[14px] transition-colors ${
+                              language === 'gu'
+                                ? 'font-semibold text-[#0B1E36] hover:bg-slate-50 hover:text-[#0D9488]'
+                                : 'font-medium text-[#12355B] hover:bg-slate-50 hover:text-[#0D9488]'
+                            }`}
+                          >
+                            {language === 'gu' ? (NAV_TRANSLATIONS[dropItem.label] || dropItem.label) : dropItem.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}
@@ -391,14 +413,20 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                 <div key={item.id} className="border-b border-gray-50 last:border-0">
                   <div className="flex items-center justify-between px-2 py-3 rounded-xl transition-all">
                     {item.dropdown ? (
-                      <button
-                        onClick={() => toggleMobileDropdown(item.id)}
-                        className={`flex-grow text-left text-[15px] font-bold ${
-                          isItemActive(item) ? 'text-[#0D9488]' : 'text-[#12355B]'
-                        }`}
-                      >
-                        {language === 'gu' ? (NAV_TRANSLATIONS[item.label] || item.label) : item.label}
-                      </button>
+                      <div className="flex items-center flex-grow">
+                        <a
+                          href={getHref(item.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleNavigate(item.id);
+                          }}
+                          className={`flex-grow text-left text-[15px] font-bold ${
+                            isItemActive(item) ? 'text-[#0D9488]' : 'text-[#12355B]'
+                          }`}
+                        >
+                          {language === 'gu' ? (NAV_TRANSLATIONS[item.label] || item.label) : item.label}
+                        </a>
+                      </div>
                     ) : (
                       <a
                         href={getHref(item.id)}
@@ -415,46 +443,39 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                     )}
                     {item.dropdown && (
                       <button 
+                        type="button"
+                        aria-label="Toggle submenu"
                         onClick={() => toggleMobileDropdown(item.id)}
-                        className="p-2 text-[#12355B] bg-slate-50 rounded-lg"
+                        className="p-2 text-[#12355B] bg-slate-50 rounded-lg cursor-pointer"
                       >
                         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileExpanded === item.id ? 'rotate-180' : ''}`} />
                       </button>
                     )}
                   </div>
                   
-                  {/* Mobile Dropdown Items */}
+                  {/* Mobile Dropdown Items - in DOM, toggled via CSS */}
                   {item.dropdown && (
-                    <AnimatePresence>
-                      {mobileExpanded === item.id && (
-                        <motion.div
-                           initial={{ height: 0, opacity: 0 }}
-                           animate={{ height: 'auto', opacity: 1 }}
-                           exit={{ height: 0, opacity: 0 }}
-                           className="overflow-hidden bg-slate-50 rounded-xl mb-2"
-                        >
-                          <div className="py-2 flex flex-col">
-                            {item.dropdown.map((dropItem) => (
-                              <a
-                                key={dropItem.id}
-                                href={getHref(dropItem.id)}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handleNavigate(dropItem.id);
-                                }}
-                                className={`block w-full text-left px-6 py-2.5 text-[14px] transition-all ${
-                                  language === 'gu'
-                                    ? 'font-semibold text-[#0B1E36] hover:text-[#0D9488]'
-                                    : 'font-semibold text-slate-600 hover:text-[#0D9488]'
-                                }`}
-                              >
-                                {language === 'gu' ? (NAV_TRANSLATIONS[dropItem.label] || dropItem.label) : dropItem.label}
-                              </a>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    <div className={`overflow-hidden bg-slate-50 rounded-xl mb-2 ${mobileExpanded === item.id ? 'block' : 'hidden'}`}>
+                      <div className="py-2 flex flex-col">
+                        {item.dropdown.map((dropItem) => (
+                          <a
+                            key={dropItem.id}
+                            href={getHref(dropItem.id)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleNavigate(dropItem.id);
+                            }}
+                            className={`block w-full text-left px-6 py-2.5 text-[14px] transition-all ${
+                              language === 'gu'
+                                ? 'font-semibold text-[#0B1E36] hover:text-[#0D9488]'
+                                : 'font-semibold text-slate-600 hover:text-[#0D9488]'
+                            }`}
+                          >
+                            {language === 'gu' ? (NAV_TRANSLATIONS[dropItem.label] || dropItem.label) : dropItem.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}

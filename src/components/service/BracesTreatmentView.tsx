@@ -219,7 +219,7 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
     }
 
     try {
-      const stored = localStorage.getItem('hospital_services');
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('hospital_services') : null;
       if (stored) {
         const services = JSON.parse(stored);
         if (Array.isArray(services)) {
@@ -1057,11 +1057,11 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
                     </span>
                   </button>
                   
-                  {isExpanded && (
+                  <div className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'block' : 'hidden'}`}>
                     <div className={`px-5 pb-5 sm:px-6 sm:pb-6 text-sm sm:text-base leading-relaxed border-t border-slate-100 pt-4 font-sans ${language === 'gu' ? 'text-slate-700 font-semibold' : 'text-slate-600 font-medium'}`}>
                       {faq.answer}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
@@ -1132,9 +1132,13 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
           {/* 1. Invisible Aligners */}
-          <div 
-            onClick={() => handleNavigateToService('invisible-aligners')}
-            className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+          <a 
+            href="/services/invisible-aligners/"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavigateToService('invisible-aligners');
+            }}
+            className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
           >
             <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
               <img 
@@ -1161,12 +1165,16 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </div>
             </div>
-          </div>
+          </a>
 
           {/* 2. Smile Makeover */}
-          <div 
-            onClick={() => handleNavigateToService('smile-makeover')}
-            className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+          <a 
+            href="/services/smile-makeover/"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavigateToService('smile-makeover');
+            }}
+            className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
           >
             <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
               <img 
@@ -1193,12 +1201,16 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </div>
             </div>
-          </div>
+          </a>
 
           {/* 3. Pediatric Dentistry */}
-          <div 
-            onClick={() => handleNavigateToService('pediatric-dentistry')}
-            className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1"
+          <a 
+            href="/services/pediatric-dentistry/"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavigateToService('pediatric-dentistry');
+            }}
+            className="bg-white border border-slate-200/80 rounded-[22px] sm:rounded-[26px] overflow-hidden shadow-[0_4px_20px_rgba(8,28,58,0.05)] hover:shadow-[0_16px_36px_rgba(8,28,58,0.1)] hover:border-[#14B8A6]/50 transition-all duration-300 flex flex-col group cursor-pointer hover:-translate-y-1 block"
           >
             <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
               <img 
@@ -1225,7 +1237,7 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </section>
     </div>

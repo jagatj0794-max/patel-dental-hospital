@@ -46,6 +46,7 @@ import Blogs from './pages/Blogs';
 import BlogsGujarati from './pages/BlogsGujarati';
 import WhyChooseUs from './pages/WhyChooseUs';
 import WhyChooseUsGujarati from './pages/WhyChooseUsGujarati';
+import Services from './pages/Services';
 import { initAnalytics, trackAppointmentFormSubmit } from './utils/analytics';
 
 // Admin / Test pages lazy loaded
@@ -112,7 +113,7 @@ const getPageFromUrl = (): PageId => {
     return 'admin';
   }
 
-  const validPages: PageId[] = ['home', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
+  const validPages: PageId[] = ['home', 'services', 'sameday', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
   if (page && (validPages.includes(page as PageId) || page.startsWith('services/') || page.startsWith('blog/'))) {
     return page as PageId;
   }
@@ -120,7 +121,7 @@ const getPageFromUrl = (): PageId => {
   return 'home';
 };
 
-export default function App({ initialPage }: { initialPage?: PageId } = {}) {
+export default function App({ initialPage, preloadedData }: { initialPage?: PageId; preloadedData?: any } = {}) {
   const [currentPage, setCurrentPage] = useState<PageId>(() => {
     return initialPage || getPageFromUrl();
   });
@@ -132,11 +133,15 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
   // My Saved Appointments state (loaded dynamically from Supabase based on session IDs)
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  // English ↔ Gujarati language switch foundation state (Default is Gujarati)
-  const [language, setLanguage] = useState<'en' | 'gu'>(() => {
+  // English ↔ Gujarati language switch foundation state (Default is Gujarati for SSG)
+  const [language, setLanguage] = useState<'en' | 'gu'>('gu');
+
+  useEffect(() => {
     const saved = safeStorage.getItem('app_language');
-    return (saved as 'en' | 'gu') || 'gu';
-  });
+    if (saved === 'en' || saved === 'gu') {
+      setLanguage(saved);
+    }
+  }, []);
 
   const handleSetLanguage = (lang: 'en' | 'gu') => {
     setLanguage(lang);
@@ -190,10 +195,37 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
   const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
 
   // Hero customisable states
-  const [heroHeading, setHeroHeading] = useState("Dental Implant, Aligner &\nFMR Specialists\nin Rajkot");
-  const [heroDescription, setHeroDescription] = useState("Trusted smiles. Advanced care. Exceptional results.");
-  const [heroBgImage, setHeroBgImage] = useState("");
-  const [heroBgImageMobile, setHeroBgImageMobile] = useState("");
+  const [heroHeading, setHeroHeading] = useState(() => preloadedData?.hero?.heading || "Dental Implant, Aligner &\nFMR Specialists\nin Rajkot");
+  const [heroDescription, setHeroDescription] = useState(() => preloadedData?.hero?.description || "Trusted smiles. Advanced care. Exceptional results.");
+  const [heroBgImage, setHeroBgImage] = useState(() => {
+    if (preloadedData?.hero?.bg_image) {
+      const trimmed = preloadedData.hero.bg_image.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          return parsed.desktop || "";
+        } catch {
+          return preloadedData.hero.bg_image;
+        }
+      }
+      return preloadedData.hero.bg_image;
+    }
+    return "";
+  });
+  const [heroBgImageMobile, setHeroBgImageMobile] = useState(() => {
+    if (preloadedData?.hero?.bg_image) {
+      const trimmed = preloadedData.hero.bg_image.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          return parsed.mobile || "";
+        } catch {
+          return "";
+        }
+      }
+    }
+    return "";
+  });
 
   // Load Hero section from Supabase on mount
   useEffect(() => {
@@ -258,8 +290,8 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
     };
   }, []);
 
-  // Doctors list state initialized with default values; updated from Supabase on mount
-  const [doctorsList, setDoctorsList] = useState<Doctor[]>(DEFAULT_DOCTORS);
+  // Doctors list state initialized with preloaded/default values; updated from Supabase on mount
+  const [doctorsList, setDoctorsList] = useState<Doctor[]>(() => preloadedData?.doctors || DEFAULT_DOCTORS);
 
   // Load Gallery from Supabase on mount
   useEffect(() => {
@@ -281,11 +313,11 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
     };
   }, []);
 
-  // Media / Gallery images state initialized with default values; updated from Supabase on mount
-  const [mediaImages, setMediaImages] = useState<Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>>(DEFAULT_MEDIA_IMAGES);
+  // Media / Gallery images state initialized with preloaded/default values; updated from Supabase on mount
+  const [mediaImages, setMediaImages] = useState<Array<{ id: string; url: string; title: string; category: string; branch: string; altText?: string }>>(() => preloadedData?.mediaImages || DEFAULT_MEDIA_IMAGES);
 
-  // Happy Smiles / Patient Moments state initialized with default values; updated from Supabase on mount
-  const [patientMoments, setPatientMoments] = useState<PatientMoment[]>(PATIENT_MOMENTS);
+  // Happy Smiles / Patient Moments state initialized with preloaded/default values; updated from Supabase on mount
+  const [patientMoments, setPatientMoments] = useState<PatientMoment[]>(() => preloadedData?.patientMoments || PATIENT_MOMENTS);
 
   // Load Videos from Supabase on mount
   useEffect(() => {
@@ -306,8 +338,8 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
     };
   }, []);
 
-  // Video management state initialized with default values; updated from Supabase on mount
-  const [videosList, setVideosList] = useState<DentalVideo[]>(DEFAULT_VIDEOS);
+  // Video management state initialized with preloaded/default values; updated from Supabase on mount
+  const [videosList, setVideosList] = useState<DentalVideo[]>(() => preloadedData?.videos || DEFAULT_VIDEOS);
 
   // Load Contact Info from Supabase on mount
   useEffect(() => {
@@ -328,8 +360,8 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
     };
   }, []);
 
-  // Contact management state initialized with default values; updated from Supabase on mount
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT_INFO);
+  // Contact management state initialized with preloaded/default values; updated from Supabase on mount
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(() => preloadedData?.contactInfo || DEFAULT_CONTACT_INFO);
 
   // Load and listen to Supabase authentication changes
   useEffect(() => {
@@ -764,6 +796,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
           openAppointmentModal={openAppointmentModal}
           setCurrentPage={setCurrentPage}
           language={language}
+          preloadedData={preloadedData}
         />
       );
     }
@@ -813,6 +846,15 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             contactInfo={contactInfo}
           />
         );
+      case 'services':
+        return (
+          <Services
+            setCurrentPage={setCurrentPage}
+            openAppointmentModal={openAppointmentModal}
+            language={language}
+            servicesList={preloadedData?.services}
+          />
+        );
       case 'sameday':
         return <SameDayFix openAppointmentModal={openAppointmentModal} contactInfo={contactInfo} />;
       case 'implants':
@@ -822,6 +864,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
             language={language}
+            preloadedData={preloadedData}
           />
         );
       case 'aligners':
@@ -833,6 +876,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
             language={language}
+            preloadedData={preloadedData}
           />
         );
       case 'kids':
@@ -844,6 +888,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
             language={language}
+            preloadedData={preloadedData}
           />
         );
       case 'braces':
@@ -854,6 +899,7 @@ export default function App({ initialPage }: { initialPage?: PageId } = {}) {
             openAppointmentModal={openAppointmentModal}
             setCurrentPage={setCurrentPage}
             language={language}
+            preloadedData={preloadedData}
           />
         );
       case 'gallery':

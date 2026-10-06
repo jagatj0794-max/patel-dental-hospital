@@ -1107,9 +1107,15 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
             <span className="text-[#0D9488] font-extrabold text-xs tracking-widest uppercase flex items-center justify-center gap-1.5 mb-1 font-sans">
               <BookOpen className="h-4 w-4 text-[#0D9488]" /> ડેન્ટલ લાઇબ્રેરી અને પેશન્ટ ગાઇડ્સ
             </span>
-            <h1 className="text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-sans font-black tracking-tight leading-tight text-center">
-              {selectedPostId ? "લેખ વાંચો" : "પટેલ ડેન્ટલ બ્લોગ"}
-            </h1>
+            {selectedPostId ? (
+              <h2 className="text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-sans font-black tracking-tight leading-tight text-center">
+                લેખ વાંચો
+              </h2>
+            ) : (
+              <h1 className="text-[#081C3A] text-2xl sm:text-3xl lg:text-4xl font-sans font-black tracking-tight leading-tight text-center">
+                પટેલ ડેન્ટલ બ્લોગ
+              </h1>
+            )}
             <p className="text-slate-700 text-xs sm:text-sm md:text-base font-sans font-semibold leading-relaxed max-w-2xl mx-auto text-center">
               {selectedPostId 
                 ? "વૈજ્ઞાનિક પાયા, ક્લિનિકલ પ્રક્રિયાઓ અને ઘરેલું સંભાળની પદ્ધતિઓ સમજો." 

@@ -29,6 +29,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (typeof ResizeObserver === 'undefined') return;
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         setContainerWidth(entry.contentRect.width);
