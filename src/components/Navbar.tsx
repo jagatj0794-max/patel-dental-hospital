@@ -309,6 +309,9 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                     <a
                       href={getHref(item.id)}
                       onClick={(e) => {
+                        if (item.id === 'academy' || item.id === 'blogs') {
+                          return; // Native browser navigation to /blogs/
+                        }
                         e.preventDefault();
                         handleNavigate(item.id);
                       }}
@@ -431,6 +434,9 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
                       <a
                         href={getHref(item.id)}
                         onClick={(e) => {
+                          if (item.id === 'academy' || item.id === 'blogs') {
+                            return; // Native browser navigation to /blogs/
+                          }
                           e.preventDefault();
                           handleNavigate(item.id);
                         }}

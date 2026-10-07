@@ -65,52 +65,16 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     highlightsGu: ['૧૦૦% અદ્રશ્ય અને પારદર્શક', 'સરળતાથી કાઢી શકાય તેવા', 'ડિજિટલ 3D પ્લાનિંગ']
   },
   {
-    slug: 'full-mouth-rehabilitation',
-    enTitle: 'Full Mouth Rehabilitation',
-    guTitle: 'ફુલ માઉથ રિહેબિલિટેશન (સંપૂર્ણ મોંની સારવાર)',
-    enDesc: 'Comprehensive restorative treatment rebuilding damaged, worn-out, or missing teeth in both upper and lower jaws for optimal bite and aesthetics.',
-    guDesc: 'ઘસાઈ ગયેલા કે ગુમ થયેલા દાંત માટે આખા મોંની પુનઃરચના અને બાઇટ સુધારણા. ચાવવાની શક્તિ અને સ્મિતની પુનઃસ્થાપના.',
-    badgeEn: 'Full Mouth Restoration',
-    badgeGu: 'સંપૂર્ણ પુનઃનિર્માણ',
-    image: '/Full%20Mouth.webp',
-    highlightsEn: ['350+ Full Mouth Cases', 'Bite & Jaw Alignment', 'Restores Complete Function'],
-    highlightsGu: ['350+ ફુલ માઉથ કેસ', 'જડબા અને બાઇટ સુધારણા', 'સંપૂર્ણ ચાવવાની ક્ષમતા']
-  },
-  {
-    slug: 'root-canal-treatment',
-    enTitle: 'Single Sitting Root Canal Treatment',
-    guTitle: 'સિંગલ સીટિંગ રૂટ કેનાલ ટ્રીટમેન્ટ (RCT)',
-    enDesc: 'Comfortable, single-visit painless root canal therapy using Japanese rotary endomotors, apex locators, and biocompatible sealers.',
-    guDesc: 'માત્ર ૧ જ મુલાકાતમાં દુખાવા વગરની આધુનિક સિંગલ-સિટિંગ રૂટ કેનાલ સારવાર. તમારા કુદરતી દાંતને બચાવવાનો શ્રેષ્ઠ ઉપાય.',
-    badgeEn: 'Painless RCT',
-    badgeGu: 'પીડારહિત રૂટ કેનાલ',
-    image: '/Root%20Canal.webp',
-    highlightsEn: ['Single Sitting Completion', 'Made in Japan Endo Motor', 'Saves Natural Tooth'],
-    highlightsGu: ['૧ જ મુલાકાતમાં પૂર્ણ', 'જાપાનીઝ એન્ડો મોટર ટેકનોલોજી', 'કુદરતી દાંતનું રક્ષણ']
-  },
-  {
-    slug: 'smile-makeover',
-    enTitle: 'Smile Makeover & Cosmetic Designing',
-    guTitle: 'સ્માઇલ મેકઓવર અને કોસ્મેટિક ડિઝાઇઇનિંગ',
-    enDesc: 'Artistic smile enhancement with porcelain veneers, cosmetic contouring, and aesthetic shade matching for an irresistible smile.',
-    guDesc: 'પોર્સેલેઈન વિનિયર્સ, ડિજિટલ સ્માઇલ ડિઝાઇન અને કસ્ટમ શેડ દ્વારા આકર્ષક અને આત્મવિશ્વાસપૂર્ણ સ્મિત મેળવો.',
-    badgeEn: 'Aesthetic Dentistry',
-    badgeGu: 'એસ્થેટિક ડેન્ટિસ્ટ્રી',
-    image: '/Smile%20Designing.webp',
-    highlightsEn: ['Digital Smile Designing', 'Porcelain Veneers', 'Harmonious Aesthetics'],
-    highlightsGu: ['ડિજિટલ સ્માઇલ ડિઝાઇનિંગ', 'પોર્સેલેઈન વિનિયર્સ', 'પરફેક્ટ સ્માઇલ કરેક્શન']
-  },
-  {
-    slug: 'crowns-bridges',
-    enTitle: 'Dental Crowns & Bridges',
-    guTitle: 'ડેન્ટલ ક્રાઉન્સ અને બ્રિજિસ (દાંતની કેપ)',
-    enDesc: 'High-strength, custom-milled monolithic Zirconia and ceramic crowns designed by CAD/CAM for maximum durability and natural translucency.',
-    guDesc: 'અત્યાધુનિક CAD/CAM ઝિર્કોનિયા અને સિરામિક કેપ દ્વારા ક્ષતિગ્રસ્ત કે તૂટેલા દાંતને કુદરતી મજબૂતી અને સુંદરતા આપો.',
-    badgeEn: 'CAD/CAM Zirconia',
-    badgeGu: 'CAD/CAM ઝિર્કોનિયા',
-    image: '/Digital%20Dental%20Experts.webp',
-    highlightsEn: ['High-Strength Zirconia', 'Custom CAD/CAM Milled', 'Natural Tooth Translucency'],
-    highlightsGu: ['ઉચ્ચ મજબૂતી ઝિર્કોનિયા', 'CAD/CAM કસ્ટમ ફિટિંગ', 'કુદરતી દાંત જેવો દેખાવ']
+    slug: 'pediatric-dentistry',
+    enTitle: 'Pediatric Dentistry (Kids Dental Care)',
+    guTitle: 'પીડિયાટ્રિક ડેન્ટિસ્ટ્રી (બાળકોની સારવાર)',
+    enDesc: 'Gentle, child-friendly preventive and restorative dental care led by pediatric specialists in a comfortable, fear-free atmosphere.',
+    guDesc: 'બાળકો માટે સ્નેહપૂર્ણ, ભયમુક્ત વાતાવરણમાં કેવિટી પ્રિવેન્શન, ફ્લોરાઈડ એપ્લિકેશન અને દાંતની સલામત કાળજી.',
+    badgeEn: 'Gentle Child Care',
+    badgeGu: 'બાળકો માટે વિશેષ કેર',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp',
+    highlightsEn: ['Child-Friendly Setup', 'Preventive Fluoride Care', 'Painless Cavity Repair'],
+    highlightsGu: ['બાળ-મિત્ર વાતાવરણ', 'પ્રિવેન્ટિવ ફ્લોરાઈડ કેર', 'પીડારહિત કેવિટી રિપેર']
   },
   {
     slug: 'braces-treatment',
@@ -125,16 +89,52 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     highlightsGu: ['મેટલ અને સિરામિક બ્રેસીસ', 'બાળકો અને પુખ્ત વયના લોકો માટે', 'ચોક્કસ એલાઇનમેન્ટ']
   },
   {
-    slug: 'pediatric-dentistry',
-    enTitle: 'Pediatric Dentistry (Kids Dental Care)',
-    guTitle: 'પીડિયાટ્રિક ડેન્ટિસ્ટ્રી (બાળકોની સારવાર)',
-    enDesc: 'Gentle, child-friendly preventive and restorative dental care led by pediatric specialists in a comfortable, fear-free atmosphere.',
-    guDesc: 'બાળકો માટે સ્નેહપૂર્ણ, ભયમુક્ત વાતાવરણમાં કેવિટી પ્રિવેન્શન, ફ્લોરાઈડ એપ્લિકેશન અને દાંતની સલામત કાળજી.',
-    badgeEn: 'Gentle Child Care',
-    badgeGu: 'બાળકો માટે વિશેષ કેર',
-    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp',
-    highlightsEn: ['Child-Friendly Setup', 'Preventive Fluoride Care', 'Painless Cavity Repair'],
-    highlightsGu: ['બાળ-મિત્ર વાતાવરણ', 'પ્રિવેન્ટિવ ફ્લોરાઈડ કેર', 'પીડારહિત કેવિટી રિપેર']
+    slug: 'smile-makeover',
+    enTitle: 'Smile Makeover & Cosmetic Designing',
+    guTitle: 'સ્માઇલ મેકઓવર અને કોસ્મેટિક ડિઝાઇઇનિંગ',
+    enDesc: 'Artistic smile enhancement with porcelain veneers, cosmetic contouring, and aesthetic shade matching for an irresistible smile.',
+    guDesc: 'પોર્સેલેઈન વિનિયર્સ, ડિજિટલ સ્માઇલ ડિઝાઇન અને કસ્ટમ શેડ દ્વારા આકર્ષક અને આત્મવિશ્વાસપૂર્ણ સ્મિત મેળવો.',
+    badgeEn: 'Aesthetic Dentistry',
+    badgeGu: 'એસ્થેટિક ડેન્ટિસ્ટ્રી',
+    image: '/Smile%20Designing.webp',
+    highlightsEn: ['Digital Smile Designing', 'Porcelain Veneers', 'Harmonious Aesthetics'],
+    highlightsGu: ['ડિજિટલ સ્માઇલ ડિઝાઇનિંગ', 'પોર્સેલેઈન વિનિયર્સ', 'પરફેક્ટ સ્માઇલ કરેક્શન']
+  },
+  {
+    slug: 'full-mouth-rehabilitation',
+    enTitle: 'Full Mouth Rehabilitation',
+    guTitle: 'ફુલ માઉથ રિહેબિલિટેશન (સંપૂર્ણ મોંની સારવાર)',
+    enDesc: 'Comprehensive restorative treatment rebuilding damaged, worn-out, or missing teeth in both upper and lower jaws for optimal bite and aesthetics.',
+    guDesc: 'ઘસાઈ ગયેલા કે ગુમ થયેલા દાંત માટે આખા મોંની પુનઃરચના અને બાઇટ સુધારણા. ચાવવાની શક્તિ અને સ્મિતની પુનઃસ્થાપના.',
+    badgeEn: 'Full Mouth Restoration',
+    badgeGu: 'સંપૂર્ણ પુનઃનિર્માણ',
+    image: '/Full%20Mouth.webp',
+    highlightsEn: ['350+ Full Mouth Cases', 'Bite & Jaw Alignment', 'Restores Complete Function'],
+    highlightsGu: ['350+ ફુલ માઉથ કેસ', 'જડબા અને બાઇટ સુધારણા', 'સંપૂર્ણ ચાવવાની ક્ષમતા']
+  },
+  {
+    slug: 'crowns-bridges',
+    enTitle: 'Dental Crowns & Bridges',
+    guTitle: 'ડેન્ટલ ક્રાઉન્સ અને બ્રિજિસ (દાંતની કેપ)',
+    enDesc: 'High-strength, custom-milled monolithic Zirconia and ceramic crowns designed by CAD/CAM for maximum durability and natural translucency.',
+    guDesc: 'અત્યાધુનિક CAD/CAM ઝિર્કોનિયા અને સિરામિક કેપ દ્વારા ક્ષતિગ્રસ્ત કે તૂટેલા દાંતને કુદરતી મજબૂતી અને સુંદરતા આપો.',
+    badgeEn: 'CAD/CAM Zirconia',
+    badgeGu: 'CAD/CAM ઝિર્કોનિયા',
+    image: '/Digital%20Dental%20Experts.webp',
+    highlightsEn: ['High-Strength Zirconia', 'Custom CAD/CAM Milled', 'Natural Tooth Translucency'],
+    highlightsGu: ['ઉચ્ચ મજબૂતી ઝિર્કોનિયા', 'CAD/CAM કસ્ટમ ફિટિંગ', 'કુદરતી દાંત જેવો દેખાવ']
+  },
+  {
+    slug: 'root-canal-treatment',
+    enTitle: 'Single Sitting Root Canal Treatment',
+    guTitle: 'સિંગલ સીટિંગ રૂટ કેનાલ ટ્રીટમેન્ટ (RCT)',
+    enDesc: 'Comfortable, single-visit painless root canal therapy using Japanese rotary endomotors, apex locators, and biocompatible sealers.',
+    guDesc: 'માત્ર ૧ જ મુલાકાતમાં દુખાવા વગરની આધુનિક સિંગલ-સિટિંગ રૂટ કેનાલ સારવાર. તમારા કુદરતી દાંતને બચાવવાનો શ્રેષ્ઠ ઉપાય.',
+    badgeEn: 'Painless RCT',
+    badgeGu: 'પીડારહિત રૂટ કેનાલ',
+    image: '/Root%20Canal.webp',
+    highlightsEn: ['Single Sitting Completion', 'Made in Japan Endo Motor', 'Saves Natural Tooth'],
+    highlightsGu: ['૧ જ મુલાકાતમાં પૂર્ણ', 'જાપાનીઝ એન્ડો મોટર ટેકનોલોજી', 'કુદરતી દાંતનું રક્ષણ']
   },
   {
     slug: 'teeth-whitening',
@@ -143,7 +143,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     enDesc: 'Advanced in-clinic laser teeth whitening removing stubborn enamel stains safely in under 60 minutes for a dazzling bright smile.',
     guDesc: 'માત્ર ૬૦ મિનિટમાં સુરક્ષિત લેસર ટીથ વ્હાઇટનિંગ. ચા-કોફી અને ડાઘ દૂર કરી દાંતને ચમકદાર સફેદ બનાવો.',
     badgeEn: 'Instant Brightening',
-    badgeGu: 'ઇન્સ્ટન્ટ બ્રાઇટનિંગ',
+    badgeGu: 'ઇન્સ્ટન્ટ બ્રાઇતનીંગ',
     image: '/white%20teeth%20in%20rajkot.jpg',
     highlightsEn: ['Up to 8 Shades Whiter', 'Enamel-Safe Protocol', '60-Minute Session'],
     highlightsGu: ['૮ શેડ સુધી સફેદ દાંત', 'એનામલ-સુરક્ષિત પદ્ધતિ', 'માત્ર ૬૦ મિનિટમાં પરિણામ']
@@ -182,13 +182,14 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     badgeGu: 'સ્પેશિયલ સારવાર',
     image: '/Oral%20&%20Maxillofacial%20Surgery.png',
     highlightsEn: ['Mouth Opening Restoration', 'Tissue Elasticity Therapy', 'Specialist Surgical Protocols'],
-    highlightsGu: ['મોં ખોલવાની ક્ષમતા સુધારણા', 'બળતરામાં તાત્કાલિક રાહત', 'નિષ્ણાત સર્જિકલ કેર']
+    highlightsGu: ['મોં ખોલવાની ક્ષમતા苏ધારણા', 'બળતરામાં તાત્કાલિક રાહત', 'નિષ્ણાત સર્જિકલ કેર']
   }
 ];
 
 export default function Services({ 
   setCurrentPage, 
   openAppointmentModal, 
+  servicesList = [],
   language = 'gu' 
 }: ServicesPageProps) {
 
@@ -267,10 +268,13 @@ export default function Services({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
           {SERVICES_HUB_DATA.map((item) => {
-            const title = language === 'gu' ? item.guTitle : item.enTitle;
-            const desc = language === 'gu' ? item.guDesc : item.enDesc;
+            const dbRecord = (servicesList || []).find(s => s.slug === item.slug);
+
+            const title = language === 'gu' ? item.guTitle : (dbRecord?.title || item.enTitle);
+            const desc = language === 'gu' ? item.guDesc : (dbRecord?.short_description || dbRecord?.homepage_short_description || item.enDesc);
             const badge = language === 'gu' ? item.badgeGu : item.badgeEn;
             const highlights = language === 'gu' ? item.highlightsGu : item.highlightsEn;
+            const image = dbRecord?.hero_image || dbRecord?.homepage_card_image || item.image;
 
             return (
               <a
@@ -285,7 +289,7 @@ export default function Services({
                 {/* Image Container */}
                 <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
                   <img
-                    src={item.image}
+                    src={image}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
