@@ -5,6 +5,7 @@
   RewriteRule ^services/single-sitting-root-canal-treatment/?$ /services/root-canal-treatment/ [R=301,L]
   RewriteRule ^services/crowns-and-bridges/?$ /services/crowns-bridges/ [R=301,L]
   RewriteRule ^blog/?$ /blogs/ [R=301,L]
+  RewriteRule ^sameday/?$ /services/dental-implants/ [R=301,L]
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

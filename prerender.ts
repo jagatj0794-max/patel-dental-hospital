@@ -74,16 +74,9 @@ const routes = [
   {
     path: '/',
     pageId: 'home',
-    title: 'Patel Dental Hospital | Dental Care in Rajkot',
-    description: 'Patel Dental Hospital in Rajkot provides comprehensive dental care, including dental implants, root canal treatment, smile makeovers, orthodontics, and other dental treatments.',
+    title: 'પટેલ ડેન્ટલ હોસ્પિટલ | રાજકોટમાં દાંતની આધુનિક સારવાર',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલ દ્વારા ડેન્ટલ ઇમ્પ્લાન્ટ, રૂટ કેનાલ, સ્માઇલ મેકઓવર, દાંતના તાર અને પેઢાની તકલીફો સહિતની આધુનિક સારવાર પૂરી પાડવામાં આવે છે.',
     keywords: ''
-  },
-  {
-    path: '/sameday',
-    pageId: 'sameday',
-    title: 'Same Day Fixed Teeth & Implants in Rajkot | Patel Dental Hospital',
-    description: 'Get fixed teeth in a single day at Patel Dental Hospital, Rajkot. Advanced same-day implant technology, guided surgery templates, and quick restoration.',
-    keywords: 'Same Day Fixed Teeth Rajkot, Same Day Implants Rajkot, Teeth in a Day Rajkot, Immediate Load Implants Gujarat'
   },
   {
     path: '/services',
@@ -95,8 +88,8 @@ const routes = [
   {
     path: '/services/dental-implants',
     pageId: 'services/dental-implants',
-    title: 'Full Mouth Dental Implants Rajkot | Patel Dental Hospital',
-    description: 'Best dental implant hospital in Rajkot. Get permanent, natural-looking tooth replacements with advanced computer-guided implants by Dr. Vipul Patel.',
+    title: 'ડેન્ટલ ઇમ્પ્લાન્ટ સારવાર રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલ ખાતે આધુનિક ટેકનોલોજી અને થ્રીડી સ્કેનિંગની મદદથી આખા મોંની તેમજ સિંગલ ટૂથ ડેન્ટલ ઇમ્પ્લાન્ટ સારવાર પૂરી પાડવામાં આવે છે.',
     keywords: 'Dental Implants Rajkot, Best Implant Dentist Rajkot, Full Mouth Implants Rajkot, Teeth Implants Cost Rajkot'
   },
   {
@@ -158,8 +151,8 @@ const routes = [
   {
     path: '/blogs',
     pageId: 'blogs',
-    title: 'Dental Health Blog & Articles | Patel Dental Hospital',
-    description: 'Read the latest dental health tips, expert advice, and advanced treatment articles written by specialists at Patel Dental Hospital, Rajkot.',
+    title: 'ડેન્ટલ આરોગ્ય બ્લોગ અને લેખો | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલના સત્તાવાર બ્લોગમાં દાંતની સંભાળ, ડેન્ટલ ઇમ્પ્લાન્ટ, મોઢાની સ્વચ્છતા અને અદ્રશ્ય તાર સંબંધિત માહિતીપ્રદ લેખો વિગતે વાંચો.',
     keywords: 'Dental Blog Rajkot, Teeth Care Tips, Dentist Articles Gujarat, Oral Health Blog India'
   },
   {
@@ -843,6 +836,15 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
   };
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 async function prerender() {
   console.log('🏁 Starting static pre-rendering...');
 
@@ -927,6 +929,9 @@ async function prerender() {
         `<div id="root">${appHtml}</div>`
       );
 
+      // Replace html lang attribute from en to gu
+      html = html.replace('<html lang="en">', '<html lang="gu">');
+
       // Inject route-specific meta tags and title
       html = html.replace(
         /<title>[\s\S]*?<\/title>/,
@@ -936,12 +941,12 @@ async function prerender() {
       if (html.includes('name="description"')) {
         html = html.replace(
           /<meta name="description" content="[\s\S]*?"\s*\/?>/,
-          `<meta name="description" content="${route.description}" />`
+          `<meta name="description" content="${escapeHtml(route.description)}" />`
         );
       } else {
         html = html.replace(
           '</head>',
-          `  <meta name="description" content="${route.description}" />\n</head>`
+          `  <meta name="description" content="${escapeHtml(route.description)}" />\n</head>`
         );
       }
 
@@ -949,12 +954,12 @@ async function prerender() {
         if (html.includes('name="keywords"')) {
           html = html.replace(
             /<meta name="keywords" content="[\s\S]*?"\s*\/?>/,
-            `<meta name="keywords" content="${route.keywords}" />`
+            `<meta name="keywords" content="${escapeHtml(route.keywords)}" />`
           );
         } else {
           html = html.replace(
             '</head>',
-            `  <meta name="keywords" content="${route.keywords}" />\n</head>`
+            `  <meta name="keywords" content="${escapeHtml(route.keywords)}" />\n</head>`
           );
         }
       } else {
@@ -968,16 +973,16 @@ async function prerender() {
 
       html = html.replace(
         /<meta property="og:title" content="[\s\S]*?"\s*\/?>/,
-        `<meta property="og:title" content="${route.title}" />`
+        `<meta property="og:title" content="${escapeHtml(route.title)}" />`
       );
       html = html.replace(
         /<meta property="og:description" content="[\s\S]*?"\s*\/?>/,
-        `<meta property="og:description" content="${route.description}" />`
+        `<meta property="og:description" content="${escapeHtml(route.description)}" />`
       );
 
-      // Canonical Tag and Schema JSON-LD blocks
+      // Canonical Tag, Locale Tag and Schema JSON-LD blocks
       const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path + '/'}`;
-      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n`;
+      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <meta property="og:locale" content="gu_IN" />\n`;
 
       const schemas = generateSchemasForRoute(route);
       for (const s of schemas) {
