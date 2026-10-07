@@ -81,8 +81,8 @@ const routes = [
   {
     path: '/services',
     pageId: 'services',
-    title: 'Dental Services & Treatments in Rajkot | Patel Dental Hospital',
-    description: 'Explore comprehensive dental services and treatments at Patel Dental Hospital, Rajkot. From dental implants to clear aligners, RCT, and smile design by specialists.',
+    title: 'દાંતની સારવાર રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલમાં ઇમ્પ્લાન્ટ, રૂટ કેનાલ, બ્રેસીસ, સ્માઇલ મેકઓવર સહિત દાંતની તમામ સારવાર એક જ જગ્યાએ ઉપલબ્ધ છે.',
     keywords: 'Dental Services Rajkot, Dental Treatments Rajkot, Dentist in Rajkot, Patel Dental Hospital Services'
   },
   {
@@ -95,22 +95,22 @@ const routes = [
   {
     path: '/services/invisible-aligners',
     pageId: 'services/invisible-aligners',
-    title: 'Clear Invisible Aligners Rajkot | Patel Dental Hospital',
-    description: 'Straighten your teeth invisibly with premium clear aligners at Patel Dental Hospital, Rajkot. USA-certified digital orthodontic templates for a perfect smile.',
+    title: 'ઇન્વિઝિબલ એલાઇનર્સ રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટમાં ડિજિટલ સ્કેનિંગ આધારિત ક્લિયર એલાઇનર્સ દ્વારા વાંકાચૂંકા દાંત સીધા કરવાની સારવાર. પ્લાનિંગ અને ફોલો-અપ નિષ્ણાત ડૉક્ટરો કરે છે.',
     keywords: 'Invisible Aligners Rajkot, Clear Aligners Rajkot, Orthodontist Rajkot, Teeth Straightening Rajkot'
   },
   {
     path: '/services/pediatric-dentistry',
     pageId: 'services/pediatric-dentistry',
-    title: 'Best Pediatric Dentist in Rajkot | Kids Dental Care',
-    description: 'Kid-friendly dental treatments in Rajkot at Patel Dental Hospital. Painless pediatric dentistry, preventive fluoride, and gentle cavity treatments.',
+    title: 'બાળકોના દાંતની સારવાર રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'રાજકોટમાં બાળકો માટે ફ્રેન્ડલી વાતાવરણમાં દાંતની તપાસ, ફ્લોરાઇડ, ફિશર સીલન્ટ, કેવિટી અને નિયમિત ડેન્ટલ સંભાળની સુવિધા ઉપલબ્ધ છે.',
     keywords: 'Pediatric Dentist Rajkot, Kids Dental Clinic Rajkot, Childrens Dentist Rajkot, Kids Tooth Cavity Treatment'
   },
   {
     path: '/services/braces-treatment',
     pageId: 'services/braces-treatment',
-    title: 'Best Braces Treatment in Rajkot | Ceramic & Metal Braces',
-    description: 'Advanced orthodontic braces treatment in Rajkot at Patel Dental Hospital. Metal, ceramic, and self-ligating braces for kids & adults by specialists.',
+    title: 'બ્રેસીસ સારવાર રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટમાં મેટલ, સિરામિક અને ક્લિયર બ્રેસીસ દ્વારા દાંતની ગોઠવણી અને બાઇટ સુધારવાની સારવાર. તમારા કેસ મુજબ યોગ્ય વિકલ્પની સલાહ મળે છે.',
     keywords: 'Braces Treatment Rajkot, Best Orthodontist Rajkot, Ceramic Braces Rajkot, Metal Braces Rajkot'
   },
   {
@@ -172,57 +172,57 @@ const routes = [
   {
     path: '/services/smile-makeover',
     pageId: 'services/smile-makeover',
-    title: 'Smile Makeover & Cosmetic Smile Designing in Rajkot | Patel Dental Hospital',
-    description: 'Get your dream smile designed by expert cosmetic dentists in Rajkot. Patel Dental Hospital offers professional smile correction, veneers, and aesthetic smile makeovers.',
+    title: 'સ્માઇલ મેકઓવર રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટમાં વેનિયર, વ્હાઇટનિંગ, ક્રાઉન અને દાંતના આકારમાં સુધારા દ્વારા સ્મિત સુંદર બનાવવાની સારવાર. સારવાર પહેલાં ડિજિટલ પ્રિવ્યૂ જોઈ શકાય.',
     keywords: 'Smile Makeover, Smile Designing, Cosmetic Dentistry, Smile Correction, Aesthetic Dentistry, Cosmetic Dentist Rajkot, Porcelain Veneers, Digital Smile Design, Patel Dental Hospital'
   },
   {
     path: '/services/full-mouth-rehabilitation',
     pageId: 'services/full-mouth-rehabilitation',
-    title: 'Full Mouth Rehabilitation & Restoration in Rajkot | Patel Dental Hospital',
-    description: 'Complete smile reconstruction and bite correction with full mouth rehabilitation in Rajkot. Painless restorative procedures by specialist clinicians at Patel Dental Hospital.',
+    title: 'ફુલ માઉથ રિહેબિલિટેશન રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'ચાવવામાં, બોલવામાં કે સ્મિતમાં તકલીફ હોય તો રાજકોટમાં આખા મોંના દાંત અને બાઇટ ફરી ગોઠવતી ફુલ માઉથ રિહેબિલિટેશન સારવાર ઉપલબ્ધ છે.',
     keywords: 'Full Mouth Rehabilitation, Full Mouth Restoration, Complete Dental Rehabilitation, Full Mouth Reconstruction, Restorative Dentistry, Advanced Dental Care in Rajkot, Dentist in Rajkot'
   },
   {
     path: '/services/oral-submucous-fibrosis-osmf-treatment-rajkot',
     pageId: 'services/oral-submucous-fibrosis-osmf-treatment-rajkot',
-    title: 'Oral Submucous Fibrosis (OSMF) Treatment & Surgery in Rajkot',
-    description: 'Get advanced Oral Submucous Fibrosis (OSMF) treatment & surgery in Rajkot at Patel Dental Hospital. Painless therapeutic procedures and comprehensive diagnosis.',
+    title: 'OSMF સારવાર રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'મોઢું ઓછું ખૂલતું હોય કે બળતરા રહેતી હોય તો રાજકોટમાં ઓરલ સબમ્યુકસ ફાઇબ્રોસિસ (OSMF) ની તપાસ, સારવાર અને ફિઝિયોથેરાપી માર્ગદર્શન મળે છે.',
     keywords: 'Oral Submucous Fibrosis Treatment Rajkot, OSMF Surgery Rajkot, OSMF Treatment Clinic Rajkot, Patel Dental Hospital'
   },
   {
     path: '/services/crowns-bridges',
     pageId: 'services/crowns-bridges',
-    title: 'Premium Dental Crowns & Bridges in Rajkot | Zirconia & Ceramic Caps',
-    description: 'Restore damaged or missing teeth with high-durability Zirconia and Ceramic dental crowns and bridges in Rajkot at Patel Dental Hospital. CAD/CAM custom restorations.',
+    title: 'ક્રોન અને બ્રિજ સારવાર રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'રાજકોટમાં તૂટેલા કે ખવાયેલા દાંત માટે અને ગુમ થયેલા દાંતની જગ્યા ભરવા માટે ક્રાઉન અને બ્રિજની સારવાર, કુદરતી દેખાવ સાથે.',
     keywords: 'Crowns and Bridges, Dental Crown, Zirconia Crown, Ceramic Crown, Dental Bridge, Tooth Cap, Best Dentist in Rajkot, Dental Clinic Rajkot, Restorative Dentistry, Patel Dental Hospital'
   },
   {
     path: '/services/root-canal-treatment',
     pageId: 'services/root-canal-treatment',
-    title: 'Painless Single Sitting Root Canal Treatment in Rajkot | RCT Specialist',
-    description: 'Experience comfortable, single-sitting Root Canal Treatment (RCT) in Rajkot at Patel Dental Hospital. Endodontic specialist care to resolve tooth pain & save natural teeth.',
+    title: 'રૂટ કેનાલ સારવાર રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'દાંતના દુખાવા કે ઇન્ફેક્શન માટે રાજકોટમાં આધુમિક સાધનો સાથે રૂટ કેનાલ સારવાર. તપાસ બાદ જરૂર મુજબ સારવારનું આયોજન કરવામાં આવે છે.',
     keywords: 'Root Canal Treatment, RCT, Single Sitting RCT, Root Canal Specialist, Tooth Pain Treatment, Endodontic Treatment, Best Dentist in Rajkot, Dental Clinic in Rajkot, Patel Dental Hospital'
   },
   {
     path: '/services/teeth-whitening',
     pageId: 'services/teeth-whitening',
-    title: 'Professional Laser Teeth Whitening in Rajkot | Instant Bright Smile',
-    description: 'Get a sparkling white smile in under 60 minutes with advanced laser teeth whitening in Rajkot at Patel Dental Hospital. Safe, painless, and highly effective shade brightening.',
+    title: 'ટીથ વ્હાઇટનિંગ રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટમાં ક્લિનિકમાં કરવામાં આવતી ટીથ વ્હાઇટનિંગ સારવાર દ્વારા દાંતના પીળાશ અને ડાઘ ઘટાડી દાંતને વધુ સફેદ બનાવી શકાય છે.',
     keywords: 'Teeth Whitening, Laser Teeth Whitening, Professional Teeth Whitening, Tooth Whitening, Cosmetic Dentist Rajkot, Best Dental Hospital in Rajkot, Instant Teeth Brightening, Patel Dental Hospital'
   },
   {
     path: '/services/wisdom-tooth-surgery',
     pageId: 'services/wisdom-tooth-surgery',
-    title: 'Painless Wisdom Tooth Surgery & Removal in Rajkot | Patel Dental Hospital',
-    description: 'Safe, comfortable, and pain-free wisdom tooth removal and impacted tooth surgery in Rajkot at Patel Dental Hospital. Advanced micromotor systems for fast post-op recovery.',
+    title: 'અક્કલ દાઢ કાઢવાની સારવાર રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'અક્કલ દાઢમાં દુખાવો કે સોજો હોય તો રાજકોટમાં એક્સ-રે તપાસ બાદ સુરક્ષિત સર્જરી દ્વારા દાઢ કાઢવાની સારવાર ઉપલબ્ધ છે.',
     keywords: 'Wisdom Tooth Removal, Wisdom Tooth Surgery, Impacted Tooth Surgery, Tooth Extraction, Best Dentist in Rajkot, Oral Surgeon Rajkot, Painless Extraction Rajkot, Patel Dental Hospital'
   },
   {
     path: '/services/tooth-coloured-filling',
     pageId: 'services/tooth-coloured-filling',
-    title: 'Biocompatible Tooth Coloured Fillings in Rajkot | Composite Restoration',
-    description: 'Restore cavities naturally with dental composite fillings in Rajkot. Patel Dental Hospital offers durable, aesthetic, and metal-free tooth-coloured tooth restorations.',
+    title: 'દાંતના રંગની ફિલિંગ રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'રાજકોટમાં કેવિટી માટે દાંતના રંગ સાથે મેળ ખાતી ફિલિંગ. સમયસર સારવારથી દાંત બચાવી શકાય અને રૂટ કેનાલની જરૂર ટાળી શકાય.',
     keywords: 'Tooth Filling, Composite Filling, Tooth Coloured Filling, Dental Filling, Cavity Restoration, Best Dentist in Rajkot, Dental Clinic Rajkot, Preventive Dentistry, Patel Dental Hospital'
   },
   {
