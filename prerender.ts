@@ -716,6 +716,7 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     slug: s.slug,
     title: s.title,
     is_active: s.is_active,
+    hero_image: s.hero_image,
   }));
 
   // Route-specific payloads:

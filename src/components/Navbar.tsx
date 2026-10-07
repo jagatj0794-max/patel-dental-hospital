@@ -99,7 +99,7 @@ const navHierarchy = [
   },
   {
     label: 'Dental Blog',
-    id: 'academy',
+    id: 'blogs',
   },
   {
     label: 'Contact Us',

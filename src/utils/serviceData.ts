@@ -1755,6 +1755,28 @@ export const isApprovedServiceSlug = (slug: string): boolean => {
   );
 };
 
+export function getUnifiedServiceHeroImage(slug: string, dbServices: any[] = []): string {
+  const dbRecord = (dbServices || []).find(s => s.slug === slug || s.id === slug);
+  if (dbRecord?.hero_image && dbRecord.hero_image.trim() !== '') {
+    return dbRecord.hero_image;
+  }
+  const fallbackImages: Record<string, string> = {
+    'dental-implants': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450851786_qnipnf0s.webp',
+    'full-mouth-rehabilitation': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp',
+    'wisdom-tooth-surgery': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp',
+    'oral-submucous-fibrosis-osmf-treatment-rajkot': '/Oral%20&%20Maxillofacial%20Surgery.png',
+    'root-canal-treatment': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450901463_tvoinbyq.jpg',
+    'invisible-aligners': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp',
+    'smile-makeover': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407738608_3vac10yu.webp',
+    'crowns-bridges': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786565722583_t57uxnk1.webp',
+    'pediatric-dentistry': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp',
+    'teeth-whitening': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407832495_qm0f2hs8.webp',
+    'braces-treatment': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407866067_1a700nk9.webp',
+    'tooth-coloured-filling': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407924645_khouwxx2.webp'
+  };
+  return fallbackImages[slug] || '';
+}
+
 const sanitizeServiceList = (services: Service[]): Service[] => {
   if (!Array.isArray(services)) return [];
   return services

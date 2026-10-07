@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, ServiceGalleryItem, ServiceFaq, ContactInfo, MarketingConfig } from '../types';
-import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_SERVICES } from '../utils/serviceData';
+import { serviceService, DEFAULT_GREEN_HIGHLIGHT_LINE, DEFAULT_SERVICES, getUnifiedServiceHeroImage } from '../utils/serviceData';
 import { TREATMENTS } from '../data/treatments';
 import { dentalImplantsFaqs, DENTAL_IMPLANTS_FAQS_GU, fullMouthFaqs, FULL_MOUTH_FAQS_GU, INVISIBLE_ALIGNERS_FAQS_GU, invisibleAlignersFaqs, rootCanalFaqs, ROOT_CANAL_FAQS_GU, smileMakeoverFaqs, SMILE_MAKEOVER_FAQS_GU, crownsBridgesFaqs, CROWNS_BRIDGES_FAQS_GU, pediatricDentistryFaqs, PEDIATRIC_DENTISTRY_FAQS_GU } from '../data/serviceFaqs';
 import { contactService, DEFAULT_CONTACT_INFO } from '../utils/contactData';
@@ -570,7 +570,7 @@ export default function ServiceDetail({
     isBracesTreatment, isWisdomToothSurgery, isToothColouredFilling, service
   ]);
 
-  const heroImage = service?.hero_image || fallback.hero_image;
+  const heroImage = getUnifiedServiceHeroImage(slug, allServicesList);
   const heroImageCaption = service?.hero_image_caption || fallback.hero_image_caption;
 
   const displayContentImages = React.useMemo(() => {

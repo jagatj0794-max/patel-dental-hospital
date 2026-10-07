@@ -17,7 +17,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import { PageId, Service } from '../types';
-import { DEFAULT_SERVICES } from '../utils/serviceData';
+import { DEFAULT_SERVICES, getUnifiedServiceHeroImage } from '../utils/serviceData';
 
 interface ServicesPageProps {
   setCurrentPage: (page: PageId) => void;
@@ -48,7 +48,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'ગુમ થયેલા દાંત માટે આધુનિક 3D કમ્પ્યુટર-ગાઇડેડ ટાઇટેનિયમ ડેન્ટલ ઇમ્પ્લાન્ટ્સ, જે કુદરતી દાંત જેવી મજબૂતી અને આજીવન સ્થિરતા આપે છે.',
     badgeEn: 'Specialized Care',
     badgeGu: 'સ્પેશિયાલિટી સારવાર',
-    image: '/Dental%20Implants.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450851786_qnipnf0s.webp',
     highlightsEn: ['16,000+ Successful Implants', 'Fixed Teeth in 1 Week', 'Permanent Lifetime Solution'],
     highlightsGu: ['16,000+ સફળ ઇમ્પ્લાન્ટ્સ', '૧ અઠવાડિયામાં ફિક્સ દાંત', 'આજીવન કાયમી સોલ્યુશન']
   },
@@ -60,7 +60,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'અદ્રશ્ય પારદર્શક એલાઇનર્સ દ્વારા મેટલ તાર વગર તમારા દાંતને સીધા અને સુંદર બનાવો. આરામદાયક અને દૂર કરી શકાય તેવા.',
     badgeEn: 'Digital Orthodontics',
     badgeGu: 'ડિજિટલ ઓર્થોડોન્ટિક્સ',
-    image: '/Aligners.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp',
     highlightsEn: ['100% Virtually Invisible', 'Removable & Comfortable', 'Digitally Planned Results'],
     highlightsGu: ['૧૦૦% અદ્રશ્ય અને પારદર્શક', 'સરળતાથી કાઢી શકાય તેવા', 'ડિજિટલ 3D પ્લાનિંગ']
   },
@@ -84,7 +84,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'વાંકાચૂંકા, આગળ પડતા કે છૂટા દાંત માટે મેટલ, સિરામિક અને સેલ્ફ-લિગેટિંગ બ્રેસીસ દ્વારા વ્યવસ્થિત ગોઠવણ.',
     badgeEn: 'Teeth Alignment',
     badgeGu: 'દાંતનું એલાઈનમેન્ટ',
-    image: '/IMG_3610.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407866067_1a700nk9.webp',
     highlightsEn: ['Metal & Ceramic Braces', 'Teens & Adults Solutions', 'Precision Alignment'],
     highlightsGu: ['મેટલ અને સિરામિક બ્રેસીસ', 'બાળકો અને પુખ્ત વયના લોકો માટે', 'ચોક્કસ એલાઇનમેન્ટ']
   },
@@ -96,9 +96,9 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'પોર્સેલેઈન વિનિયર્સ, ડિજિટલ સ્માઇલ ડિઝાઇન અને કસ્ટમ શેડ દ્વારા આકર્ષક અને આત્મવિશ્વાસપૂર્ણ સ્મિત મેળવો.',
     badgeEn: 'Aesthetic Dentistry',
     badgeGu: 'એસ્થેટિક ડેન્ટિસ્ટ્રી',
-    image: '/Smile%20Designing.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407738608_3vac10yu.webp',
     highlightsEn: ['Digital Smile Designing', 'Porcelain Veneers', 'Harmonious Aesthetics'],
-    highlightsGu: ['ડિજિટલ સ્માઇલ ડિઝાઇનિંગ', 'પોર્સેલેઈન વિનિયર્સ', 'પરફેક્ટ સ્માઇલ કરેક્શન']
+    highlightsGu: ['ડિજિટલ સ્માઇલ ડિઝાઇનિંગ', 'પોર્સેલેઈન વિનિયર્સ', 'પરફેક્ટ સ્માઇલ કરેક્ション']
   },
   {
     slug: 'full-mouth-rehabilitation',
@@ -108,7 +108,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'ઘસાઈ ગયેલા કે ગુમ થયેલા દાંત માટે આખા મોંની પુનઃરચના અને બાઇટ સુધારણા. ચાવવાની શક્તિ અને સ્મિતની પુનઃસ્થાપના.',
     badgeEn: 'Full Mouth Restoration',
     badgeGu: 'સંપૂર્ણ પુનઃનિર્માણ',
-    image: '/Full%20Mouth.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp',
     highlightsEn: ['350+ Full Mouth Cases', 'Bite & Jaw Alignment', 'Restores Complete Function'],
     highlightsGu: ['350+ ફુલ માઉથ કેસ', 'જડબા અને બાઇટ સુધારણા', 'સંપૂર્ણ ચાવવાની ક્ષમતા']
   },
@@ -120,7 +120,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'અત્યાધુનિક CAD/CAM ઝિર્કોનિયા અને સિરામિક કેપ દ્વારા ક્ષતિગ્રસ્ત કે તૂટેલા દાંતને કુદરતી મજબૂતી અને સુંદરતા આપો.',
     badgeEn: 'CAD/CAM Zirconia',
     badgeGu: 'CAD/CAM ઝિર્કોનિયા',
-    image: '/Digital%20Dental%20Experts.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786565722583_t57uxnk1.webp',
     highlightsEn: ['High-Strength Zirconia', 'Custom CAD/CAM Milled', 'Natural Tooth Translucency'],
     highlightsGu: ['ઉચ્ચ મજબૂતી ઝિર્કોનિયા', 'CAD/CAM કસ્ટમ ફિટિંગ', 'કુદરતી દાંત જેવો દેખાવ']
   },
@@ -132,7 +132,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'માત્ર ૧ જ મુલાકાતમાં દુખાવા વગરની આધુનિક સિંગલ-સિટિંગ રૂટ કેનાલ સારવાર. તમારા કુદરતી દાંતને બચાવવાનો શ્રેષ્ઠ ઉપાય.',
     badgeEn: 'Painless RCT',
     badgeGu: 'પીડારહિત રૂટ કેનાલ',
-    image: '/Root%20Canal.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450901463_tvoinbyq.jpg',
     highlightsEn: ['Single Sitting Completion', 'Made in Japan Endo Motor', 'Saves Natural Tooth'],
     highlightsGu: ['૧ જ મુલાકાતમાં પૂર્ણ', 'જાપાનીઝ એન્ડો મોટર ટેકનોલોજી', 'કુદરતી દાંતનું રક્ષણ']
   },
@@ -144,7 +144,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'માત્ર ૬૦ મિનિટમાં સુરક્ષિત લેસર ટીથ વ્હાઇટનિંગ. ચા-કોફી અને ડાઘ દૂર કરી દાંતને ચમકદાર સફેદ બનાવો.',
     badgeEn: 'Instant Brightening',
     badgeGu: 'ઇન્સ્ટન્ટ બ્રાઇતનીંગ',
-    image: '/white%20teeth%20in%20rajkot.jpg',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407832495_qm0f2hs8.webp',
     highlightsEn: ['Up to 8 Shades Whiter', 'Enamel-Safe Protocol', '60-Minute Session'],
     highlightsGu: ['૮ શેડ સુધી સફેદ દાંત', 'એનામલ-સુરક્ષિત પદ્ધતિ', 'માત્ર ૬૦ મિનિટમાં પરિણામ']
   },
@@ -168,7 +168,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'દાંતના રંગ સાથે મેળ ખાતી અમેરિકન કોમ્પોઝિટ રેઝિન ફિલિંગ દ્વારા સડો અટકાવો અને દાંતને કુદરતી સુરક્ષા આપો.',
     badgeEn: 'Biocompatible',
     badgeGu: 'બાયોકોમ્પેટિબલ',
-    image: '/MG_3249.webp',
+    image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407924645_khouwxx2.webp',
     highlightsEn: ['Natural Shade Matching', 'Mercury-Free Material', 'Reinforces Tooth Structure'],
     highlightsGu: ['દાંત સાથે મેળ ખાતો શેડ', 'મર્ક્યુરી-ફ્રી મટિરિયલ', 'દાંતને મજબૂતી']
   },
@@ -274,7 +274,7 @@ export default function Services({
             const desc = language === 'gu' ? item.guDesc : (dbRecord?.short_description || dbRecord?.homepage_short_description || item.enDesc);
             const badge = language === 'gu' ? item.badgeGu : item.badgeEn;
             const highlights = language === 'gu' ? item.highlightsGu : item.highlightsEn;
-            const image = dbRecord?.hero_image || dbRecord?.homepage_card_image || item.image;
+            const image = getUnifiedServiceHeroImage(item.slug, servicesList);
 
             return (
               <a
