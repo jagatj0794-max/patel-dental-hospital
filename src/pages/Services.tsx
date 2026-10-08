@@ -207,7 +207,7 @@ export default function Services({
         <ol className="flex items-center space-x-2 text-xs sm:text-sm text-slate-500 font-medium">
           <li>
             <a 
-              href="/"
+              href={language === 'en' ? '/en/' : '/'}
               onClick={(e) => {
                 e.preventDefault();
                 setCurrentPage('home');

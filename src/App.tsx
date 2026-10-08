@@ -142,6 +142,22 @@ const getLanguageFromUrl = (): 'en' | 'gu' => {
   return 'gu';
 };
 
+const getPathForPage = (pageId: string, targetLang: 'en' | 'gu'): string => {
+  const cleanId = (pageId || 'home').replace(/^\/+|\/+$/g, '') || 'home';
+  const prefix = targetLang === 'en' ? '/en' : '';
+
+  if (cleanId === 'home') return targetLang === 'en' ? '/en/' : '/';
+  if (cleanId === 'about') return `${prefix}/doctors/`;
+  if (cleanId === 'services' || cleanId === 'treatments') return `${prefix}/services/`;
+  if (cleanId === 'academy' || cleanId === 'blogs') return `${prefix}/blogs/`;
+  if (cleanId === 'implants') return `${prefix}/services/dental-implants/`;
+  if (cleanId === 'aligners' || cleanId === 'clear-aligners' || cleanId === 'invisible-aligners') return `${prefix}/services/invisible-aligners/`;
+  if (cleanId === 'kids' || cleanId === 'pediatric' || cleanId === 'pediatric-dentistry') return `${prefix}/services/pediatric-dentistry/`;
+  if (cleanId === 'braces' || cleanId === 'braces-treatment') return `${prefix}/services/braces-treatment/`;
+  if (cleanId.startsWith('services/') || cleanId.startsWith('blog/')) return `${prefix}/${cleanId}/`;
+  return `${prefix}/${cleanId}/`;
+};
+
 export default function App({ 
   initialPage, 
   preloadedData,
@@ -170,22 +186,21 @@ export default function App({
     return getLanguageFromUrl();
   });
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (path === '/en' || path.startsWith('/en/')) {
-        return;
-      }
-    }
-    const saved = safeStorage.getItem('app_language');
-    if (saved === 'en' || saved === 'gu') {
-      setLanguage(saved);
-    }
-  }, []);
-
   const handleSetLanguage = (lang: 'en' | 'gu') => {
     setLanguage(lang);
     safeStorage.setItem('app_language', lang);
+
+    if (typeof window !== 'undefined') {
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = lang;
+      }
+      if (currentPage !== 'admin' && !currentPage.startsWith('admin/')) {
+        const newPath = getPathForPage(currentPage, lang);
+        if (window.location.pathname !== newPath) {
+          window.history.pushState({}, '', newPath);
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -508,6 +523,16 @@ export default function App({
     const handleUrlChange = () => {
       const page = getPageFromUrl();
       setCurrentPage(page);
+      const urlLang = getLanguageFromUrl();
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = urlLang;
+      }
+      setLanguage((prevLang) => {
+        if (prevLang !== urlLang) {
+          return urlLang;
+        }
+        return prevLang;
+      });
     };
 
     window.addEventListener('hashchange', handleUrlChange);
