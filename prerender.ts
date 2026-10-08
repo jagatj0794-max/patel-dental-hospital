@@ -116,36 +116,36 @@ const routes = [
   {
     path: '/gallery',
     pageId: 'gallery',
-    title: 'Smile Gallery & Success Stories | Patel Dental Hospital',
-    description: 'View our before & after clinical cases, dental implant transformations, and happy patient moments at Patel Dental Hospital, Rajkot.',
+    title: 'હોસ્પિટલ ગેલેરી રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલની ગેલેરી: અમારું ક્લિનિક, સાધનો અને દર્દીઓના સ્મિત સારવાર પહેલાં અને પછીની તસવીરો જુઓ. પરિણામ દરેક દર્દીમાં અલગ હોઈ શકે.',
     keywords: 'Dental Before After Rajkot, Smile Makeover Cases Rajkot, Dental Hospital Success Stories, Clinical Gallery Rajkot'
   },
   {
     path: '/social-service',
     pageId: 'social-service',
-    title: 'Social Dental Service & Community Care | Patel Dental Hospital',
-    description: 'Patel Dental Hospital actively leads community dental wellness drives, free diagnostic camps, and educational seminars across Rajkot and rural Gujarat.',
+    title: 'સામાજિક સેવા રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'પટેલ ડેન્ટલ હોસ્પિટલ રાજકોટમાં દાંતની તપાસ કેમ્પ અને શાળા મુલાકાતો દ્વારા સમાજ માટે સેવા આપે છે. અમારી સામાજિક પહેલ વિશે વધુ જાણો.',
     keywords: 'Social Dental Service Rajkot, Free Dental Camps Gujarat, Community Dental Care, Patel Dental Hospital Outreach'
   },
   {
     path: '/technology',
     pageId: 'technology',
-    title: 'Advanced Diagnostic & Clinical Technology | Patel Dental Hospital',
-    description: 'Explore the advanced diagnostics at Patel Dental Hospital: In-house 3D CBCT, USA-standard sterilizers, and state-of-the-art computer guided systems.',
+    title: 'આધુનિક ડેન્ટલ ટેક્નોલોજી રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલમાં થ્રીડી સ્કેનિંગ અને ડિજિટલ પ્લાનિંગ જેવી આધુનિક ટેક્નોલોજીથી દાંતની સારવારનું સચોટ આયોજન કરવામાં આવે છે.',
     keywords: 'Dental Technology Rajkot, 3D CBCT Scan Rajkot, Dental Autoclave Sterilization, Guided Dental Surgery'
   },
   {
     path: '/why-choose-us',
     pageId: 'why-choose-us',
-    title: 'Why Choose Patel Dental Hospital | Advanced Dental Care Rajkot',
-    description: 'Discover why Patel Dental Hospital is the most trusted dental clinic in Rajkot. Advanced equipment, experienced doctors, painless treatments, and high success rates.',
+    title: 'પટેલ ડેન્ટલ હોસ્પિટલ શા માટે પસંદ કરવી? | રાજકોટ',
+    description: 'રાજકોટમાં પટેલ ડેન્ટલ હોસ્પિટલ પસંદ કરવાના કારણો: અનુભવી ડૉક્ટરો, આધુનિક સાધનો, સ્વચ્છતા અને દરેક દર્દીને સારવાર પહેલાં સ્પષ્ટ સમજૂતી.',
     keywords: 'Best Dentist in Rajkot, Why Patel Dental Hospital, Advanced Dental Clinic Gujarat, Painless Dentistry Rajkot'
   },
   {
     path: '/international',
     pageId: 'international',
-    title: 'Dental Tourism in India | Patel Dental Hospital Rajkot',
-    description: 'Combine your travel with world-class dental treatments in Rajkot, India. Premium implants & cosmetic dentistry at a fraction of Western costs for international patients.',
+    title: 'વિદેશી દર્દીઓ માટે ડેન્ટલ સારવાર ભારત | પટેલ ડેન્ટલ',
+    description: 'ભારત આવતા વિદેશી દર્દીઓ માટે રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલમાં સારવાર આયોજન, રહેવા-મુસાફરીની માહિતી અને ડેન્ટલ ટૂરિઝમ અંગે માર્ગદર્શન.',
     keywords: 'Dental Tourism India, Dental Tourism Rajkot, Cheap Implants India, International Dental Patient Gujarat'
   },
   {
@@ -158,15 +158,15 @@ const routes = [
   {
     path: '/doctors',
     pageId: 'doctors',
-    title: 'Best Dentists & Dental Surgeons in Rajkot | Patel Dental Hospital',
-    description: 'Meet our team of highly qualified dental specialists and surgeons in Rajkot, led by Dr. Vipul Patel. 18+ years of excellence in advanced oral healthcare.',
+    title: 'અમારા ડૉક્ટરો રાજકોટ | પટેલ ડેન્ટલ હોસ્પિટલ',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલના નિષ્ણાત ડૉક્ટરોને મળો. તેમની લાયકાત, અનુભવ અને સારવાર ક્ષેત્રો વિશે માહિતી મેળવો અને એપોઇન્ટમેન્ટ બુક કરો.',
     keywords: 'Best Dentists in Rajkot, Dental Surgeon Rajkot, Orthodontist Rajkot, Dr Vipul Patel Rajkot'
   },
   {
     path: '/contact',
     pageId: 'contact',
-    title: 'Contact Patel Dental Hospital Rajkot | Book Appointment',
-    description: 'Get in touch with Patel Dental Hospital, Rajkot. Phone numbers, maps, address and direct online consultation booking for Gayatrinagar & Amin Marg branches.',
+    title: 'સંપર્ક અને એપોઇન્ટમેન્ટ રાજકોટ | પટેલ ડેન્ટલ',
+    description: 'પટેલ ડેન્ટલ હોસ્પિટલ, રાજકોટનું સરનામું, ફોન નંબર અને સમય જુઓ. દાંતની તપાસ કે સારવાર માટે અમારો સંપર્ક કરો અને એપોઇન્ટમેન્ટ બુક કરો.',
     keywords: 'Contact Patel Dental Hospital, Patel Dental Hospital Address, Dentist Phone Number Rajkot, Book Dentist Appointment Rajkot'
   },
   {
@@ -228,22 +228,22 @@ const routes = [
   {
     path: '/blog/dental-implants-rajkot',
     pageId: 'blog/dental-implants-rajkot',
-    title: 'Dental Implants in Rajkot: Cost, Procedure & Best Clinic | Patel Dental Hospital',
-    description: 'Looking for the best dental clinic in Rajkot for tooth implants? Read our complete dental implants treatment guide: cost, process, and benefits at Patel Dental Hospital.',
+    title: 'રાજકોટમાં ડેન્ટલ ઇમ્પ્લાન્ટ: સારવાર, ફાયદા અને ખર્ચ',
+    description: 'રાજકોટમાં ડેન્ટલ ઇમ્પ્લાન્ટ શું છે, સારવારના તબક્કા, ફાયદા અને ખર્ચને અસર કરતી બાબતો વિશે પટેલ ડેન્ટલ હોસ્પિટલની સરળ માર્ગદર્શિકા વાંચો.',
     keywords: 'Dental Implants in Rajkot, best dental clinic in Rajkot, dental implant treatment, dental implant cost in Rajkot, implant specialist dentist Rajkot'
   },
   {
     path: '/blog/braces-vs-clear-aligners',
     pageId: 'blog/braces-vs-clear-aligners',
-    title: 'Braces vs Clear Aligners: Cost & Results in Rajkot | Patel Dental Hospital',
-    description: 'Wondering about braces vs clear aligners? Read our comprehensive comparison guide on orthodontic treatment cost, benefits, and invisible aligners in Rajkot.',
+    title: 'બ્રેસીસ કે ક્લિયર એલાઇનર્સ: કયું પસંદ કરવું? | રાજકોટ',
+    description: 'રાજકોટમાં બ્રેસીસ અને ક્લિયર એલાઇનર્સ વચ્ચેનો તફાવત, ફાયદા-ગેરફાયદા અને તમારા કેસ માટે યોગ્ય વિકલ્પ કેવી રીતે પસંદ કરવો તે જાણો.',
     keywords: 'Braces vs Clear Aligners, braces treatment in Rajkot, clear aligners Rajkot, invisible aligners Rajkot, best dentist in Rajkot'
   },
   {
     path: '/blog/maintain-white-teeth-after-whitening',
     pageId: 'blog/maintain-white-teeth-after-whitening',
-    title: 'How to Maintain White Teeth After Teeth Whitening in Rajkot | Patel Dental Hospital',
-    description: 'Discover 5 dentist-approved daily habits to maintain whiter, healthier teeth after professional teeth whitening treatment at Patel Dental Hospital Rajkot.',
+    title: 'વ્હાઇટનિંગ પછી દાંત ચમકતા રાખવાની આદતો | પટેલ ડેન્ટલ',
+    description: 'ટીથ વ્હાઇટનિંગ કરાવ્યા પછી દાંતનો રંગ લાંબો સમય જળવાઈ રહે તે માટે ખાવા-પીવાની ટેવો, બ્રશિંગ અને સંભાળની સરળ ટિપ્સ પટેલ ડેન્ટલ હોસ્પિટલ પાસેથી.',
     keywords: 'maintain white teeth after whitening, teeth whitening in Rajkot, teeth whitening aftercare, professional teeth whitening, dental treatment in Rajkot'
   }
 ];
