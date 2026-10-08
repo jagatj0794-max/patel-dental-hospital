@@ -116,16 +116,25 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
 
   // Map route IDs to canonical URL path destinations for search engines and AI crawlers
   const getHref = (id: string) => {
-    if (id === 'home') return '/';
-    if (id === 'about') return '/doctors/';
-    if (id === 'services' || id === 'treatments') return '/services/';
-    if (id === 'academy' || id === 'blogs') return '/blogs/';
-    if (id === 'implants') return '/services/dental-implants/';
-    if (id === 'aligners' || id === 'clear-aligners' || id === 'invisible-aligners') return '/services/invisible-aligners/';
-    if (id === 'kids' || id === 'pediatric' || id === 'pediatric-dentistry') return '/services/pediatric-dentistry/';
-    if (id === 'braces' || id === 'braces-treatment') return '/services/braces-treatment/';
-    if (id.startsWith('services/') || id.startsWith('blog/')) return `/${id}/`;
-    return `/${id}/`;
+    if (id.startsWith('http://') || id.startsWith('https://') || id.startsWith('tel:') || id.startsWith('mailto:') || id.startsWith('wa.me')) {
+      return id;
+    }
+    if (id === 'admin' || id.startsWith('admin/')) {
+      return `/${id}/`;
+    }
+
+    const prefix = language === 'en' ? '/en' : '';
+
+    if (id === 'home') return language === 'en' ? '/en/' : '/';
+    if (id === 'about') return `${prefix}/doctors/`;
+    if (id === 'services' || id === 'treatments') return `${prefix}/services/`;
+    if (id === 'academy' || id === 'blogs') return `${prefix}/blogs/`;
+    if (id === 'implants') return `${prefix}/services/dental-implants/`;
+    if (id === 'aligners' || id === 'clear-aligners' || id === 'invisible-aligners') return `${prefix}/services/invisible-aligners/`;
+    if (id === 'kids' || id === 'pediatric' || id === 'pediatric-dentistry') return `${prefix}/services/pediatric-dentistry/`;
+    if (id === 'braces' || id === 'braces-treatment') return `${prefix}/services/braces-treatment/`;
+    if (id.startsWith('services/') || id.startsWith('blog/')) return `${prefix}/${id}/`;
+    return `${prefix}/${id}/`;
   };
 
   // Fetch active services dynamically
@@ -265,7 +274,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             {/* Logo Brand */}
             <a
               id="navbar-brand"
-              href="/"
+              href={getHref('home')}
               onClick={(e) => {
                 e.preventDefault();
                 handleNavigate('home');

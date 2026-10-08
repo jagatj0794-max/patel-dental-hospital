@@ -279,7 +279,7 @@ export default function Services({
             return (
               <a
                 key={item.slug}
-                href={`/services/${item.slug}/`}
+                href={language === 'en' ? `/en/services/${item.slug}/` : `/services/${item.slug}/`}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavigate(item.slug);

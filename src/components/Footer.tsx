@@ -27,11 +27,25 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
   };
 
   const getHref = (target: string) => {
-    if (target === 'home') return '/';
-    if (target === 'services' || target === 'treatments') return '/services/';
-    if (target === 'academy' || target === 'blogs') return '/blogs/';
-    if (target.startsWith('services/') || target.startsWith('blog/')) return `/${target}/`;
-    return `/${target}/`;
+    if (target.startsWith('http://') || target.startsWith('https://') || target.startsWith('tel:') || target.startsWith('mailto:') || target.startsWith('wa.me')) {
+      return target;
+    }
+    if (target === 'admin' || target.startsWith('admin/')) {
+      return `/${target}/`;
+    }
+
+    const prefix = language === 'en' ? '/en' : '';
+
+    if (target === 'home') return language === 'en' ? '/en/' : '/';
+    if (target === 'about') return `${prefix}/doctors/`;
+    if (target === 'services' || target === 'treatments') return `${prefix}/services/`;
+    if (target === 'academy' || target === 'blogs') return `${prefix}/blogs/`;
+    if (target === 'implants') return `${prefix}/services/dental-implants/`;
+    if (target === 'aligners' || target === 'clear-aligners' || target === 'invisible-aligners') return `${prefix}/services/invisible-aligners/`;
+    if (target === 'kids' || target === 'pediatric' || target === 'pediatric-dentistry') return `${prefix}/services/pediatric-dentistry/`;
+    if (target === 'braces' || target === 'braces-treatment') return `${prefix}/services/braces-treatment/`;
+    if (target.startsWith('services/') || target.startsWith('blog/')) return `${prefix}/${target}/`;
+    return `${prefix}/${target}/`;
   };
 
   const currentYear = new Date().getFullYear();

@@ -3942,7 +3942,7 @@ export default function ServiceDetail({
                     return (
                       <a
                         key={card.slug}
-                        href={`/services/${card.slug}/`}
+                        href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                         onClick={(e) => {
                           e.preventDefault();
                           handleNavigateToService(card.slug);
@@ -4016,7 +4016,7 @@ export default function ServiceDetail({
                     return (
                       <a
                         key={card.slug}
-                        href={`/services/${card.slug}/`}
+                        href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                         onClick={(e) => {
                           e.preventDefault();
                           handleNavigateToService(card.slug);
@@ -4089,7 +4089,7 @@ export default function ServiceDetail({
                     return (
                       <a
                         key={card.slug}
-                        href={`/services/${card.slug}/`}
+                        href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                         onClick={(e) => {
                           e.preventDefault();
                           handleNavigateToService(card.slug);
@@ -4162,7 +4162,7 @@ export default function ServiceDetail({
                     return (
                       <a
                         key={card.slug}
-                        href={`/services/${card.slug}/`}
+                        href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                         onClick={(e) => {
                           e.preventDefault();
                           handleNavigateToService(card.slug);
@@ -4217,7 +4217,7 @@ export default function ServiceDetail({
                   {smileMakeoverRelatedCards.map((card) => (
                     <a
                       key={card.slug}
-                      href={`/services/${card.slug}/`}
+                      href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                       onClick={(e) => {
                         e.preventDefault();
                         handleNavigateToService(card.slug);
@@ -4271,7 +4271,7 @@ export default function ServiceDetail({
                   {crownsBridgesRelatedCards.map((card) => (
                     <a
                       key={card.slug}
-                      href={`/services/${card.slug}/`}
+                      href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                       onClick={(e) => {
                         e.preventDefault();
                         handleNavigateToService(card.slug);
@@ -4325,7 +4325,7 @@ export default function ServiceDetail({
                   {pediatricRelatedCards.map((card) => (
                     <a
                       key={card.slug}
-                      href={`/services/${card.slug}/`}
+                      href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                       onClick={(e) => {
                         e.preventDefault();
                         handleNavigateToService(card.slug);
@@ -4379,7 +4379,7 @@ export default function ServiceDetail({
                   {osmfRelatedCards.map((card) => (
                     <a
                       key={card.slug}
-                      href={`/services/${card.slug}/`}
+                      href={language === 'en' ? `/en/services/${card.slug}/` : `/services/${card.slug}/`}
                       onClick={(e) => {
                         e.preventDefault();
                         handleNavigateToService(card.slug);
@@ -4454,7 +4454,7 @@ export default function ServiceDetail({
 
                       <div className="p-5 pt-0">
                         <a
-                          href={`/services/${item.slug}/`}
+                          href={language === 'en' ? `/en/services/${item.slug}/` : `/services/${item.slug}/`}
                           onClick={(e) => {
                             e.preventDefault();
                             handleNavigateToService(item.slug);

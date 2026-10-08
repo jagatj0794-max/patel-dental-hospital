@@ -1133,7 +1133,7 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
           {/* 1. Invisible Aligners */}
           <a 
-            href="/services/invisible-aligners/"
+            href={language === 'en' ? "/en/services/invisible-aligners/" : "/services/invisible-aligners/"}
             onClick={(e) => {
               e.preventDefault();
               handleNavigateToService('invisible-aligners');
@@ -1169,7 +1169,7 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
 
           {/* 2. Smile Makeover */}
           <a 
-            href="/services/smile-makeover/"
+            href={language === 'en' ? "/en/services/smile-makeover/" : "/services/smile-makeover/"}
             onClick={(e) => {
               e.preventDefault();
               handleNavigateToService('smile-makeover');
@@ -1205,7 +1205,7 @@ export const BracesTreatmentView: React.FC<BracesTreatmentViewProps> = ({
 
           {/* 3. Pediatric Dentistry */}
           <a 
-            href="/services/pediatric-dentistry/"
+            href={language === 'en' ? "/en/services/pediatric-dentistry/" : "/services/pediatric-dentistry/"}
             onClick={(e) => {
               e.preventDefault();
               handleNavigateToService('pediatric-dentistry');

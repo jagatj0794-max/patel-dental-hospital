@@ -1111,7 +1111,7 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto items-stretch">
               {/* Card 1: Dental Implants */}
               <a
-                href="/services/dental-implants/"
+                href={language === 'en' ? "/en/services/dental-implants/" : "/services/dental-implants/"}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavigateToService('dental-implants');
@@ -1147,7 +1147,7 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
 
               {/* Card 2: Full Mouth Rehabilitation */}
               <a
-                href="/services/full-mouth-rehabilitation/"
+                href={language === 'en' ? "/en/services/full-mouth-rehabilitation/" : "/services/full-mouth-rehabilitation/"}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavigateToService('full-mouth-rehabilitation');
@@ -1183,7 +1183,7 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
 
               {/* Card 3: Wisdom Tooth Surgery */}
               <a
-                href="/services/wisdom-tooth-surgery/"
+                href={language === 'en' ? "/en/services/wisdom-tooth-surgery/" : "/services/wisdom-tooth-surgery/"}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavigateToService('wisdom-tooth-surgery');

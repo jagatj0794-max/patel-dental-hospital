@@ -1012,7 +1012,7 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                   : "Complete dynamic smile transformation blending veneers, alignment, and bleaching to create a symmetrical artistic masterpiece."}
               </p>
               <a
-                href="/services/smile-makeover"
+                href={language === 'en' ? "/en/services/smile-makeover/" : "/services/smile-makeover"}
                 className="inline-flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#E8EEF5] hover:border-[#14B8A6] hover:bg-teal-50/35 text-xs sm:text-sm font-bold text-[#0D9488] transition-all duration-200 mt-auto"
               >
                 <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
@@ -1041,7 +1041,7 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                   : "Invisible, removable custom clear aligner series that subtly straighten your smile with maximum daily lifestyle freedom."}
               </p>
               <a
-                href="/services/invisible-aligners"
+                href={language === 'en' ? "/en/services/invisible-aligners/" : "/services/invisible-aligners"}
                 className="inline-flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#E8EEF5] hover:border-[#14B8A6] hover:bg-teal-50/35 text-xs sm:text-sm font-bold text-[#0D9488] transition-all duration-200 mt-auto"
               >
                 <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
@@ -1070,7 +1070,7 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                   : "Composite resin filling, also known as a tooth-coloured filling, is a cavity filling intended to be durable and natural-looking."}
               </p>
               <a
-                href="/services/tooth-coloured-filling"
+                href={language === 'en' ? "/en/services/tooth-coloured-filling/" : "/services/tooth-coloured-filling"}
                 className="inline-flex items-center justify-between py-2.5 px-4 rounded-xl border border-[#E8EEF5] hover:border-[#14B8A6] hover:bg-teal-50/35 text-xs sm:text-sm font-bold text-[#0D9488] transition-all duration-200 mt-auto"
               >
                 <span>{language === 'gu' ? "વિગતો જાણો" : "Learn Details"}</span>
