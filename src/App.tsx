@@ -86,9 +86,20 @@ const getPageFromUrl = (): PageId => {
     page = page.substring(1);
   }
   
+  // Remove "en" prefix if it is a complete segment in the hash
+  if (page === 'en' || page.startsWith('en/')) {
+    page = page.substring(2);
+    if (page.startsWith('/')) {
+      page = page.substring(1);
+    }
+  }
+  
   // If no hash, check pathname
   if (!page) {
     let path = window.location.pathname;
+    if (path === '/en' || path.startsWith('/en/')) {
+      path = path.substring(3);
+    }
     if (path.startsWith('/')) {
       path = path.substring(1);
     }
@@ -120,7 +131,26 @@ const getPageFromUrl = (): PageId => {
   return 'home';
 };
 
-export default function App({ initialPage, preloadedData }: { initialPage?: PageId; preloadedData?: any } = {}) {
+const getLanguageFromUrl = (): 'en' | 'gu' => {
+  if (typeof window === 'undefined') {
+    return 'gu';
+  }
+  const path = window.location.pathname;
+  if (path === '/en' || path.startsWith('/en/')) {
+    return 'en';
+  }
+  return 'gu';
+};
+
+export default function App({ 
+  initialPage, 
+  preloadedData,
+  initialLanguage
+}: { 
+  initialPage?: PageId; 
+  preloadedData?: any;
+  initialLanguage?: 'en' | 'gu';
+} = {}) {
   const [currentPage, setCurrentPage] = useState<PageId>(() => {
     return initialPage || getPageFromUrl();
   });
@@ -133,9 +163,20 @@ export default function App({ initialPage, preloadedData }: { initialPage?: Page
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   // English ↔ Gujarati language switch foundation state (Default is Gujarati for SSG)
-  const [language, setLanguage] = useState<'en' | 'gu'>('gu');
+  const [language, setLanguage] = useState<'en' | 'gu'>(() => {
+    if (initialLanguage) {
+      return initialLanguage;
+    }
+    return getLanguageFromUrl();
+  });
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path === '/en' || path.startsWith('/en/')) {
+        return;
+      }
+    }
     const saved = safeStorage.getItem('app_language');
     if (saved === 'en' || saved === 'gu') {
       setLanguage(saved);

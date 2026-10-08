@@ -50,6 +50,6 @@ if (typeof globalThis.window === 'undefined') {
 
 export function render(pageId: string, preloadedData?: any) {
   return ReactDOMServer.renderToString(
-    <App initialPage={pageId as any} preloadedData={preloadedData} />
+    <App initialPage={pageId as any} preloadedData={preloadedData} initialLanguage="gu" />
   );
 }
