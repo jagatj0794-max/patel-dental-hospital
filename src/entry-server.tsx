@@ -48,8 +48,8 @@ if (typeof globalThis.window === 'undefined') {
   (globalThis as any).sessionStorage = dummyStorage;
 }
 
-export function render(pageId: string, preloadedData?: any) {
+export function render(pageId: string, preloadedData?: any, language: 'gu' | 'en' = 'gu') {
   return ReactDOMServer.renderToString(
-    <App initialPage={pageId as any} preloadedData={preloadedData} initialLanguage="gu" />
+    <App initialPage={pageId as any} preloadedData={preloadedData} initialLanguage={language} />
   );
 }

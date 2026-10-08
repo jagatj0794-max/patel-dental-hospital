@@ -153,7 +153,7 @@ export const RootCanalView: React.FC<RootCanalViewProps> = ({
 
 
                   {/* Surgical Team Section */}
-                  <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+                  <SurgicalTeamSection setCurrentPage={setCurrentPage} language={language as 'en' | 'gu'} />
 
                 {/* Section 3: Option Comparison for Root Canal */}
                 

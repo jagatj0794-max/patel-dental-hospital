@@ -281,7 +281,7 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
       </section>
 
       {/* Surgical Team Section */}
-      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} language={language as 'en' | 'gu'} />
 
       {/* Option Comparison Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6" id="option-comparison-section">

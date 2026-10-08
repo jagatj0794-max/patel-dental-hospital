@@ -180,7 +180,7 @@ export const SmileMakeoverView: React.FC<SmileMakeoverViewProps> = ({
                   </div>
 
                   {/* Surgical Team Section */}
-                  <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+                  <SurgicalTeamSection setCurrentPage={setCurrentPage} language={language as 'en' | 'gu'} />
 
                   {/* Section 3: The Route Comparison */}
                   <div className="space-y-6 sm:space-y-10 pt-6 sm:pt-14 border-t border-slate-200/60" id="route-comparison-section">

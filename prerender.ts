@@ -70,7 +70,16 @@ import { supabase } from './src/utils/supabase';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Routes to pre-render
-const routes = [
+interface RouteDef {
+  path: string;
+  pageId: string;
+  title: string;
+  description: string;
+  keywords: string;
+  language: 'gu' | 'en';
+}
+
+const baseRoutes = [
   {
     path: '/',
     pageId: 'home',
@@ -131,7 +140,7 @@ const routes = [
     path: '/technology',
     pageId: 'technology',
     title: 'આધુનિક ડેન્ટલ ટેક્નોલોજી રાજકોટ | પટેલ ડેન્ટલ',
-    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલમાં થ્રીડી સ્કેનિંગ અને ડિજિટલ પ્લાનિંગ જેવી આધુનિક ટેક્નોલોજીથી દાંતની સારવારનું સચોટ આયોજન કરવામાં આવે છે.',
+    description: 'રાજકોટની પટેલ ડેન્ટલ હોસ્પિટલમાં થ્રીડી સ્કેનિંગ અને ડિજிட்டલ પ્લાનિંગ જેવી આધુનિક ટેક્નોલોજીથી દાંતની સારવારનું સચોટ આયોજન કરવામાં આવે છે.',
     keywords: 'Dental Technology Rajkot, 3D CBCT Scan Rajkot, Dental Autoclave Sterilization, Guided Dental Surgery'
   },
   {
@@ -248,15 +257,96 @@ const routes = [
   }
 ];
 
+const englishTitles: Record<string, string> = {
+  'home': 'Patel Dental Hospital | Dental Care in Rajkot',
+  'services': 'Dental Treatments in Rajkot | Patel Dental Hospital',
+  'services/dental-implants': 'Dental Implants in Rajkot | Patel Dental Hospital',
+  'services/invisible-aligners': 'Invisible Aligners in Rajkot | Patel Dental Hospital',
+  'services/pediatric-dentistry': 'Pediatric Dentist in Rajkot | Patel Dental Hospital',
+  'services/braces-treatment': 'Braces Treatment in Rajkot | Patel Dental Hospital',
+  'services/smile-makeover': 'Smile Makeover in Rajkot | Patel Dental Hospital',
+  'services/full-mouth-rehabilitation': 'Full Mouth Rehabilitation in Rajkot | Patel Dental',
+  'services/oral-submucous-fibrosis-osmf-treatment-rajkot': 'OSMF Treatment in Rajkot | Patel Dental Hospital',
+  'services/crowns-bridges': 'Dental Crowns and Bridges in Rajkot | Patel Dental',
+  'services/root-canal-treatment': 'Root Canal Treatment in Rajkot | Patel Dental Hospital',
+  'services/teeth-whitening': 'Teeth Whitening in Rajkot | Patel Dental Hospital',
+  'services/wisdom-tooth-surgery': 'Wisdom Tooth Removal in Rajkot | Patel Dental Hospital',
+  'services/tooth-coloured-filling': 'Tooth-Coloured Fillings in Rajkot | Patel Dental',
+  'gallery': 'Hospital Gallery Rajkot | Patel Dental Hospital',
+  'social-service': 'Social Service | Patel Dental Hospital, Rajkot',
+  'technology': 'Advanced Dental Technology | Patel Dental Hospital',
+  'why-choose-us': 'Why Choose Patel Dental Hospital | Rajkot',
+  'international': 'Dental Tourism India | Patel Dental Hospital, Rajkot',
+  'blogs': 'Dental Health Blog & Articles | Patel Dental Hospital',
+  'doctors': 'Our Doctors in Rajkot | Patel Dental Hospital',
+  'contact': 'Contact & Appointments | Patel Dental Hospital Rajkot',
+  'blog/dental-implants-rajkot': 'Dental Implants in Rajkot: Treatment, Benefits & Cost',
+  'blog/braces-vs-clear-aligners': 'Braces vs Clear Aligners: Which Should You Choose?',
+  'blog/maintain-white-teeth-after-whitening': 'Keep Teeth White After Whitening | Patel Dental'
+};
+
+const englishDescriptions: Record<string, string> = {
+  'home': 'Patel Dental Hospital in Rajkot offers dental implants, root canal treatment, smile makeovers, braces, aligners and other dental care. Book a consultation today.',
+  'services': 'Explore dental services at Patel Dental Hospital, Rajkot: implants, root canal, braces, aligners, smile makeover, whitening, wisdom tooth surgery and more.',
+  'services/dental-implants': 'Dental implant treatment in Rajkot for single teeth or full-mouth replacement, planned with 3D scanning. Get advice on the right option for your case.',
+  'services/invisible-aligners': 'Straighten crooked teeth with clear aligners in Rajkot. Digital scan-based planning and regular follow-ups by experienced dentists at Patel Dental Hospital.',
+  'services/pediatric-dentistry': 'Child-friendly dental care in Rajkot: check-ups, fluoride, fissure sealants, cavity treatment and regular dental care for kids at Patel Dental Hospital.',
+  'services/braces-treatment': 'Metal, ceramic and clear braces in Rajkot to align teeth and correct your bite. Get advice on the right option for your case at Patel Dental Hospital.',
+  'services/smile-makeover': 'Improve your smile in Rajkot with veneers, whitening, crowns and tooth reshaping. See a digital preview of your planned smile before treatment begins.',
+  'services/full-mouth-rehabilitation': 'Trouble chewing, speaking or smiling? Full mouth rehabilitation in Rajkot restores your teeth and bite with a complete treatment plan.',
+  'services/oral-submucous-fibrosis-osmf-treatment-rajkot': 'Difficulty opening your mouth or a burning sensation? Get OSMF (oral submucous fibrosis) evaluation, treatment and physiotherapy guidance in Rajkot.',
+  'services/crowns-bridges': 'Crowns for broken or decayed teeth and bridges to replace missing teeth in Rajkot, designed to look natural. Visit Patel Dental Hospital for advice.',
+  'services/root-canal-treatment': 'Tooth pain or infection? Root canal treatment in Rajkot with modern equipment. Treatment is planned after examination at Patel Dental Hospital.',
+  'services/teeth-whitening': 'Professional in-clinic teeth whitening in Rajkot to reduce yellowing and stains and brighten your teeth. Book a consultation at Patel Dental Hospital.',
+  'services/wisdom-tooth-surgery': 'Pain or swelling from a wisdom tooth? Safe wisdom tooth surgery in Rajkot after X-ray evaluation at Patel Dental Hospital.',
+  'services/tooth-coloured-filling': 'Tooth-coloured fillings for cavities in Rajkot that blend with your natural teeth. Timely treatment can save the tooth and help avoid a root canal.',
+  'gallery': 'See our clinic, equipment and patient smiles before and after treatment at Patel Dental Hospital, Rajkot. Results vary from patient to patient.',
+  'social-service': 'Patel Dental Hospital serves the community in Rajkot through dental check-up camps and school visits. Learn more about our social initiatives.',
+  'technology': 'Patel Dental Hospital in Rajkot uses 3D scanning and digital planning to plan dental treatments with precision. Learn about our technology.',
+  'why-choose-us': 'Reasons to choose Patel Dental Hospital in Rajkot: experienced doctors, modern equipment, strict hygiene and a clear explanation before every treatment.',
+  'international': 'Planning dental treatment in India? Patel Dental Hospital in Rajkot offers treatment planning, stay and travel information, and guidance for international patients.',
+  'blogs': 'Read dental care tips and articles on implants, braces, aligners, whitening and oral hygiene from Patel Dental Hospital, Rajkot.',
+  'doctors': 'Meet the dentists at Patel Dental Hospital, Rajkot. Learn about their qualifications, experience and areas of treatment, and book an appointment.',
+  'contact': 'Find the address, phone number and timings of Patel Dental Hospital, Rajkot. Contact us for a check-up or treatment and book an appointment.',
+  'blog/dental-implants-rajkot': 'Learn what dental implants are, the treatment stages, benefits and factors that affect cost in Rajkot, in a simple guide from Patel Dental Hospital.',
+  'blog/braces-vs-clear-aligners': 'Compare braces and clear aligners in Rajkot: differences, pros and cons, and how to choose the right option for your case.',
+  'blog/maintain-white-teeth-after-whitening': 'Simple tips on food habits, brushing and care to help your teeth stay bright for longer after teeth whitening, from Patel Dental Hospital.'
+};
+
+const guRoutes: RouteDef[] = baseRoutes.map(r => ({ ...r, language: 'gu' as const }));
+const enRoutes: RouteDef[] = baseRoutes.map(r => {
+  const pageId = r.pageId;
+  const path = r.path === '/' ? '/en' : `/en${r.path}`;
+  const title = englishTitles[pageId];
+  if (!title) {
+    throw new Error(`Missing English title for pageId: "${pageId}"`);
+  }
+  const description = englishDescriptions[pageId];
+  if (!description) {
+    throw new Error(`Missing English description for pageId: "${pageId}"`);
+  }
+  return {
+    path,
+    pageId,
+    title,
+    description,
+    keywords: '',
+    language: 'en' as const
+  };
+});
+
+const routes: RouteDef[] = [...guRoutes, ...enRoutes];
+
 function generateSchemasForRoute(route: typeof routes[number]) {
-  const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path + '/'}`;
+  const prefix = route.language === 'en' ? '/en' : '';
+  const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path === '/en' ? '/en/' : route.path.endsWith('/') ? route.path : route.path + '/'}`;
   const dentistSchema = {
     "@context": "https://schema.org",
     "@type": "Dentist",
     "name": "Patel Dental Hospital",
     "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
-    "@id": "https://pdhrajkot.com/#dentist",
-    "url": "https://pdhrajkot.com/",
+    "@id": `https://pdhrajkot.com${prefix}/#dentist`,
+    "url": `https://pdhrajkot.com${prefix}/`,
     "telephone": "+919510397046",
     "priceRange": "$$",
     "address": {
@@ -291,28 +381,28 @@ function generateSchemasForRoute(route: typeof routes[number]) {
   const schemas: any[] = [];
 
   // Home Page
-  if (route.path === '/') {
+  if (route.path === '/' || route.path === '/en') {
     schemas.push({
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Patel Dental Hospital",
-      "url": "https://pdhrajkot.com/"
+      "url": `https://pdhrajkot.com${prefix}/`
     });
     schemas.push(dentistSchema);
   } else {
     // Breadcrumb schema
-    const pathParts = route.path.split('/').filter(Boolean);
+    const pathParts = route.path.split('/').filter(p => p && p !== 'en');
     const breadcrumbListElement = [
       {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://pdhrajkot.com/"
+        "item": `https://pdhrajkot.com${prefix}/`
       }
     ];
 
     if (pathParts.length === 1) {
-      const crumbName = route.path === '/services' ? 'Services' : route.title.split('|')[0].trim();
+      const crumbName = pathParts[0] === 'services' ? 'Services' : route.title.split('|')[0].trim();
       breadcrumbListElement.push({
         "@type": "ListItem",
         "position": 2,
@@ -321,7 +411,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
       });
     } else if (pathParts.length === 2) {
       const parentName = pathParts[0] === 'services' ? 'Services' : pathParts[0] === 'blog' ? 'Blog' : pathParts[0];
-      const parentUrl = `https://pdhrajkot.com/${pathParts[0] === 'blog' ? 'blogs' : pathParts[0]}/`;
+      const parentUrl = `https://pdhrajkot.com${prefix}/${pathParts[0] === 'blog' ? 'blogs' : pathParts[0]}/`;
       breadcrumbListElement.push({
         "@type": "ListItem",
         "position": 2,
@@ -343,13 +433,13 @@ function generateSchemasForRoute(route: typeof routes[number]) {
     });
 
     // Page Specific Schema
-    if (route.path === '/services') {
+    if (route.path === '/services' || route.path === '/en/services') {
       schemas.push({
         "@context": "https://schema.org",
         "@type": "MedicalBusiness",
         "name": "Patel Dental Hospital Services",
-        "url": "https://pdhrajkot.com/services/",
-        "@id": "https://pdhrajkot.com/#dentist",
+        "url": `https://pdhrajkot.com${prefix}/services/`,
+        "@id": `https://pdhrajkot.com${prefix}/#dentist`,
         "telephone": "+919510397046",
         "priceRange": "$$",
         "address": {
@@ -364,28 +454,28 @@ function generateSchemasForRoute(route: typeof routes[number]) {
           "@type": "OfferCatalog",
           "name": "All Dental Services & Treatments",
           "itemListElement": [
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Dental Implants", "url": "https://pdhrajkot.com/services/dental-implants/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Invisible Aligners", "url": "https://pdhrajkot.com/services/invisible-aligners/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Full Mouth Rehabilitation", "url": "https://pdhrajkot.com/services/full-mouth-rehabilitation/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Single Sitting Root Canal Treatment", "url": "https://pdhrajkot.com/services/root-canal-treatment/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Smile Makeover", "url": "https://pdhrajkot.com/services/smile-makeover/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Dental Crowns & Bridges", "url": "https://pdhrajkot.com/services/crowns-bridges/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Orthodontic Braces Treatment", "url": "https://pdhrajkot.com/services/braces-treatment/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Pediatric Dentistry", "url": "https://pdhrajkot.com/services/pediatric-dentistry/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Professional Teeth Whitening", "url": "https://pdhrajkot.com/services/teeth-whitening/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Painless Wisdom Tooth Surgery", "url": "https://pdhrajkot.com/services/wisdom-tooth-surgery/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Tooth Coloured Filling", "url": "https://pdhrajkot.com/services/tooth-coloured-filling/" } },
-            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Oral Submucous Fibrosis (OSMF) Treatment", "url": "https://pdhrajkot.com/services/oral-submucous-fibrosis-osmf-treatment-rajkot/" } }
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Dental Implants", "url": `https://pdhrajkot.com${prefix}/services/dental-implants/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Invisible Aligners", "url": `https://pdhrajkot.com${prefix}/services/invisible-aligners/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Full Mouth Rehabilitation", "url": `https://pdhrajkot.com${prefix}/services/full-mouth-rehabilitation/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Single Sitting Root Canal Treatment", "url": `https://pdhrajkot.com${prefix}/services/root-canal-treatment/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Smile Makeover", "url": `https://pdhrajkot.com${prefix}/services/smile-makeover/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Dental Crowns & Bridges", "url": `https://pdhrajkot.com${prefix}/services/crowns-bridges/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Orthodontic Braces Treatment", "url": `https://pdhrajkot.com${prefix}/services/braces-treatment/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Pediatric Dentistry", "url": `https://pdhrajkot.com${prefix}/services/pediatric-dentistry/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Professional Teeth Whitening", "url": `https://pdhrajkot.com${prefix}/services/teeth-whitening/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Painless Wisdom Tooth Surgery", "url": `https://pdhrajkot.com${prefix}/services/wisdom-tooth-surgery/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Tooth Coloured Filling", "url": `https://pdhrajkot.com${prefix}/services/tooth-coloured-filling/` } },
+            { "@type": "Offer", "itemOffered": { "@type": "MedicalSpecialty", "name": "Oral Submucous Fibrosis (OSMF) Treatment", "url": `https://pdhrajkot.com${prefix}/services/oral-submucous-fibrosis-osmf-treatment-rajkot/` } }
           ]
         }
       });
       schemas.push(dentistSchema);
-    } else if (route.path.startsWith('/services/')) {
+    } else if (route.path.startsWith('/services/') || route.path.startsWith('/en/services/')) {
       // Dentist with clinical service catalog offer
       schemas.push({
         "@context": "https://schema.org",
         "@type": "Dentist",
-        "@id": "https://pdhrajkot.com/#dentist",
+        "@id": `https://pdhrajkot.com${prefix}/#dentist`,
         "hasOfferCatalog": {
           "@type": "OfferCatalog",
           "name": "Dental Services",
@@ -434,7 +524,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
           }))
         });
       }
-    } else if (route.path.startsWith('/blog/')) {
+    } else if (route.path.startsWith('/blog/') || route.path.startsWith('/en/blog/')) {
       // Blog Article Schema
       schemas.push({
         "@context": "https://schema.org",
@@ -464,7 +554,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
           "@id": canonicalUrl
         }
       });
-    } else if (route.path === '/doctors') {
+    } else if (route.path === '/doctors' || route.path === '/en/doctors') {
       schemas.push({
         "@context": "https://schema.org",
         "@type": "Person",
@@ -487,7 +577,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         },
         "description": "Dr. Kinjal Patel specializes in pediatric dentistry, child preventive care, and aesthetic smile correction procedures."
       });
-    } else if (route.path === '/contact') {
+    } else if (route.path === '/contact' || route.path === '/en/contact') {
       schemas.push({
         "@context": "https://schema.org",
         "@type": "ContactPage",
@@ -712,8 +802,16 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     hero_image: s.hero_image,
   }));
 
-  // Route-specific payloads:
-  if (route.path === '/') {
+  // Route-specific payloads, normalized by removing starting '/en' (if present) for matching:
+  let cleanPath = route.path;
+  if (cleanPath.startsWith('/en')) {
+    cleanPath = cleanPath.substring(3);
+    if (cleanPath === '') {
+      cleanPath = '/';
+    }
+  }
+
+  if (cleanPath === '/') {
     return {
       contactInfo: sharedContact,
       services: navServicesList,
@@ -748,7 +846,7 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     };
   }
 
-  if (route.path === '/doctors') {
+  if (cleanPath === '/doctors') {
     return {
       contactInfo: sharedContact,
       services: navServicesList,
@@ -756,7 +854,7 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     };
   }
 
-  if (route.path === '/gallery') {
+  if (cleanPath === '/gallery') {
     return {
       contactInfo: sharedContact,
       services: navServicesList,
@@ -765,12 +863,12 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     };
   }
 
-  if (route.path.startsWith('/services/')) {
-    const slug = route.path.replace('/services/', '');
+  if (cleanPath.startsWith('/services/')) {
+    const slug = cleanPath.replace('/services/', '');
     const currentService = allData.services.find(s => s.slug === slug || s.id === slug);
 
     if (!currentService) {
-      console.error(`❌ FATAL BUILD ERROR: Service data for "${route.path}" is missing from Supabase! Aborting build.`);
+      console.error(`❌ FATAL BUILD ERROR: Service data for "${route.path}" (clean: "${cleanPath}") is missing from Supabase! Aborting build.`);
       process.exit(1);
     }
 
@@ -795,15 +893,15 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     return payload;
   }
 
-  if (route.path === '/services') {
+  if (cleanPath === '/services') {
     return {
       contactInfo: sharedContact,
       services: navServicesList,
     };
   }
 
-  if (route.path.startsWith('/blog/')) {
-    const slug = route.path.replace('/blog/', '');
+  if (cleanPath.startsWith('/blog/')) {
+    const slug = cleanPath.replace('/blog/', '');
     const blog = allData.blogs.find(b => b.slug === slug);
     return {
       contactInfo: sharedContact,
@@ -812,7 +910,7 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     };
   }
 
-  if (route.path === '/blogs') {
+  if (cleanPath === '/blogs') {
     return {
       contactInfo: sharedContact,
       services: navServicesList,
@@ -820,7 +918,7 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
     };
   }
 
-  if (route.path === '/why-choose-us') {
+  if (cleanPath === '/why-choose-us') {
     return {
       contactInfo: sharedContact,
       services: navServicesList,
@@ -873,13 +971,14 @@ async function prerender() {
     if (s.is_active && s.slug) {
       const sPath = `/services/${s.slug}`;
       if (!routes.some(r => r.path === sPath)) {
-        console.log(`  ✨ Discovered new active service from CMS: ${sPath}`);
+        console.log(`  ✨ Discovered new active service from CMS (gu): ${sPath}`);
         routes.push({
           path: sPath,
           pageId: `services/${s.slug}`,
           title: `${s.title} in Rajkot | Patel Dental Hospital`,
           description: s.short_description || `Advanced ${s.title} treatment in Rajkot at Patel Dental Hospital.`,
-          keywords: `${s.title} Rajkot, Patel Dental Hospital`
+          keywords: `${s.title} Rajkot, Patel Dental Hospital`,
+          language: 'gu'
         });
       }
     }
@@ -889,13 +988,14 @@ async function prerender() {
     if (b.slug) {
       const bPath = `/blog/${b.slug}`;
       if (!routes.some(r => r.path === bPath)) {
-        console.log(`  ✨ Discovered new published blog from CMS: ${bPath}`);
+        console.log(`  ✨ Discovered new published blog from CMS (gu): ${bPath}`);
         routes.push({
           path: bPath,
           pageId: `blog/${b.slug}`,
           title: `${b.title} | Patel Dental Hospital Rajkot`,
           description: b.excerpt || b.meta_description || 'Dental health article by Patel Dental Hospital specialists.',
-          keywords: b.keywords || 'Dental Blog Rajkot'
+          keywords: b.keywords || 'Dental Blog Rajkot',
+          language: 'gu'
         });
       }
     }
@@ -903,7 +1003,7 @@ async function prerender() {
 
   // 3. Render each route with route-tailored preloadedData
   for (const route of routes) {
-    console.log(`Rendering route: ${route.path} (pageId: ${route.pageId})`);
+    console.log(`Rendering route: ${route.path} (pageId: ${route.pageId}, language: ${route.language})`);
 
     const routePreloadedData = getRouteSpecificPreloadedData(route, allData);
 
@@ -916,7 +1016,7 @@ async function prerender() {
 
     try {
       // Render component to string with tailored data
-      const appHtml = render(route.pageId, routePreloadedData);
+      const appHtml = render(route.pageId, routePreloadedData, route.language);
 
       if (!appHtml || appHtml.trim() === '') {
         console.error(`❌ FATAL BUILD ERROR: Rendered HTML for route ${route.path} was completely empty!`);
@@ -929,8 +1029,8 @@ async function prerender() {
         `<div id="root">${appHtml}</div>`
       );
 
-      // Replace html lang attribute from en to gu
-      html = html.replace('<html lang="en">', '<html lang="gu">');
+      // Replace html lang attribute
+      html = html.replace('<html lang="en">', `<html lang="${route.language}">`);
 
       // Inject route-specific meta tags and title
       html = html.replace(
@@ -981,8 +1081,9 @@ async function prerender() {
       );
 
       // Canonical Tag, Locale Tag and Schema JSON-LD blocks
-      const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path + '/'}`;
-      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <meta property="og:locale" content="gu_IN" />\n`;
+      const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path === '/en' ? '/en/' : route.path.endsWith('/') ? route.path : route.path + '/'}`;
+      const localeVal = route.language === 'en' ? 'en_US' : 'gu_IN';
+      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <meta property="og:locale" content="${localeVal}" />\n`;
 
       const schemas = generateSchemasForRoute(route);
       for (const s of schemas) {
@@ -1026,7 +1127,7 @@ async function prerender() {
       }
 
       // STRICT VALIDATION 3: For blog articles, ensure full body text is >= 1000 characters and date/meta are present
-      if (route.path.startsWith('/blog/')) {
+      if (route.path.startsWith('/blog/') || route.path.startsWith('/en/blog/')) {
         const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
         const articleHtml = articleMatch ? articleMatch[1] : '';
         const articleText = articleHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1051,9 +1152,9 @@ async function prerender() {
       }
 
       // STRICT VALIDATION 4: Ensure dental-implants contains "16000" text
-      if (route.path === '/services/dental-implants') {
+      if (route.path === '/services/dental-implants' || route.path === '/en/services/dental-implants') {
         if (!html.includes('16000') && !html.includes('16,000')) {
-          console.error('❌ FATAL BUILD ERROR: Route "/services/dental-implants" does not contain "16000" text! Build aborted.');
+          console.error(`❌ FATAL BUILD ERROR: Route "${route.path}" does not contain "16000" text! Build aborted.`);
           process.exit(1);
         }
       }

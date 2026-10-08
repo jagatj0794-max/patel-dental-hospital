@@ -342,7 +342,7 @@ export const WisdomToothSurgeryView: React.FC<WisdomToothSurgeryViewProps> = ({
       </section>
 
       {/* Surgical Team Section */}
-      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} language={language as 'en' | 'gu'} />
 
       {/* SECTION 3: Comparison */}
       <section id="wisdom-option-comparison-section" className="max-w-7xl mx-auto px-4 sm:px-6 scroll-mt-20">

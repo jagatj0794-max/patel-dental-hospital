@@ -280,7 +280,7 @@ export const PediatricDentistryView: React.FC<PediatricDentistryViewProps> = ({
       </section>
 
       {/* Surgical Team Section */}
-      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} language={language as 'en' | 'gu'} />
 
       {/* SECTION 5: BEFORE & AFTER GALLERY */}
       {mConfig.show_before_after !== false && beforeAfterPairs.length > 0 && (

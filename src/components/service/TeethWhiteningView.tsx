@@ -171,7 +171,7 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
       </section>
 
       {/* Surgical Team Section */}
-      <SurgicalTeamSection setCurrentPage={setCurrentPage} />
+      <SurgicalTeamSection setCurrentPage={setCurrentPage} language={language as 'en' | 'gu'} />
 
       {/* SECTION 3: Treatment / Option Comparison */}
       <section id="teeth-whitening-comparison-section" className="max-w-7xl mx-auto px-4 sm:px-6">
