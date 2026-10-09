@@ -337,6 +337,100 @@ const enRoutes: RouteDef[] = baseRoutes.map(r => {
 
 const routes: RouteDef[] = [...guRoutes, ...enRoutes];
 
+const ROUTE_LASTMOD: Record<string, string> = {
+  'home': '2026-10-09',
+  'services': '2026-10-09',
+  'services/dental-implants': '2026-10-09',
+  'services/invisible-aligners': '2026-10-09',
+  'services/pediatric-dentistry': '2026-10-09',
+  'services/braces-treatment': '2026-10-09',
+  'gallery': '2026-10-09',
+  'social-service': '2026-10-09',
+  'technology': '2026-10-09',
+  'why-choose-us': '2026-10-09',
+  'international': '2026-10-09',
+  'blogs': '2026-10-09',
+  'doctors': '2026-10-09',
+  'contact': '2026-10-09',
+  'services/smile-makeover': '2026-10-09',
+  'services/full-mouth-rehabilitation': '2026-10-09',
+  'services/oral-submucous-fibrosis-osmf-treatment-rajkot': '2026-10-09',
+  'services/crowns-bridges': '2026-10-09',
+  'services/root-canal-treatment': '2026-10-09',
+  'services/teeth-whitening': '2026-10-09',
+  'services/wisdom-tooth-surgery': '2026-10-09',
+  'services/tooth-coloured-filling': '2026-10-09',
+  'blog/dental-implants-rajkot': '2026-08-08',
+  'blog/braces-vs-clear-aligners': '2026-08-01',
+  'blog/maintain-white-teeth-after-whitening': '2026-07-25'
+};
+
+const ROUTE_METADATA: Record<string, { changefreq: string; priority: number }> = {
+  'home': { changefreq: 'weekly', priority: 1.0 },
+  'services': { changefreq: 'weekly', priority: 0.9 },
+  'services/dental-implants': { changefreq: 'monthly', priority: 0.9 },
+  'services/invisible-aligners': { changefreq: 'monthly', priority: 0.8 },
+  'services/pediatric-dentistry': { changefreq: 'monthly', priority: 0.8 },
+  'services/braces-treatment': { changefreq: 'monthly', priority: 0.8 },
+  'gallery': { changefreq: 'monthly', priority: 0.8 },
+  'social-service': { changefreq: 'monthly', priority: 0.7 },
+  'technology': { changefreq: 'monthly', priority: 0.8 },
+  'why-choose-us': { changefreq: 'monthly', priority: 0.8 },
+  'international': { changefreq: 'monthly', priority: 0.8 },
+  'blogs': { changefreq: 'weekly', priority: 0.8 },
+  'doctors': { changefreq: 'monthly', priority: 0.9 },
+  'contact': { changefreq: 'monthly', priority: 0.9 },
+  'services/smile-makeover': { changefreq: 'monthly', priority: 0.8 },
+  'services/full-mouth-rehabilitation': { changefreq: 'monthly', priority: 0.8 },
+  'services/oral-submucous-fibrosis-osmf-treatment-rajkot': { changefreq: 'monthly', priority: 0.8 },
+  'services/crowns-bridges': { changefreq: 'monthly', priority: 0.8 },
+  'services/root-canal-treatment': { changefreq: 'monthly', priority: 0.8 },
+  'services/teeth-whitening': { changefreq: 'monthly', priority: 0.8 },
+  'services/wisdom-tooth-surgery': { changefreq: 'monthly', priority: 0.8 },
+  'services/tooth-coloured-filling': { changefreq: 'monthly', priority: 0.8 },
+  'blog/dental-implants-rajkot': { changefreq: 'monthly', priority: 0.9 },
+  'blog/braces-vs-clear-aligners': { changefreq: 'monthly', priority: 0.9 },
+  'blog/maintain-white-teeth-after-whitening': { changefreq: 'monthly', priority: 0.9 }
+};
+
+function generateSitemapXml(allRoutes: RouteDef[]): string {
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`;
+
+  for (const r of allRoutes) {
+    const lastmod = ROUTE_LASTMOD[r.pageId];
+    if (!lastmod) {
+      throw new Error(`Missing ROUTE_LASTMOD for pageId: "${r.pageId}"`);
+    }
+
+    const meta = ROUTE_METADATA[r.pageId] || { changefreq: 'monthly', priority: 0.7 };
+    const priorityVal = r.language === 'en'
+      ? Math.max(0.1, Math.round((meta.priority - 0.1) * 10) / 10)
+      : meta.priority;
+    const priority = priorityVal.toFixed(1);
+    const changefreq = meta.changefreq;
+
+    const basePath = r.language === 'en'
+      ? (r.path.replace(/^\/en/, '') || '/')
+      : r.path;
+    const guUrl = `https://pdhrajkot.com${basePath === '/' ? '/' : basePath.endsWith('/') ? basePath : basePath + '/'}`;
+    const enUrl = `https://pdhrajkot.com/en${basePath === '/' ? '/' : basePath.endsWith('/') ? basePath : basePath + '/'}`;
+    const locUrl = r.language === 'en' ? enUrl : guUrl;
+
+    xml += `  <url>\n`;
+    xml += `    <loc>${locUrl}</loc>\n`;
+    xml += `    <lastmod>${lastmod}</lastmod>\n`;
+    xml += `    <changefreq>${changefreq}</changefreq>\n`;
+    xml += `    <priority>${priority}</priority>\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="gu" href="${guUrl}" />\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${guUrl}" />\n`;
+    xml += `  </url>\n`;
+  }
+
+  xml += `</urlset>\n`;
+  return xml;
+}
+
 function generateSchemasForRoute(route: typeof routes[number]) {
   const prefix = route.language === 'en' ? '/en' : '';
   const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path === '/en' ? '/en/' : route.path.endsWith('/') ? route.path : route.path + '/'}`;
@@ -1080,10 +1174,17 @@ async function prerender() {
         `<meta property="og:description" content="${escapeHtml(route.description)}" />`
       );
 
-      // Canonical Tag, Locale Tag and Schema JSON-LD blocks
+      // Canonical Tag, Hreflang Tags, Locale Tag and Schema JSON-LD blocks
       const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path === '/en' ? '/en/' : route.path.endsWith('/') ? route.path : route.path + '/'}`;
       const localeVal = route.language === 'en' ? 'en_US' : 'gu_IN';
-      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <meta property="og:locale" content="${localeVal}" />\n`;
+
+      const basePath = route.language === 'en'
+        ? (route.path.replace(/^\/en/, '') || '/')
+        : route.path;
+      const guUrl = `https://pdhrajkot.com${basePath === '/' ? '/' : basePath.endsWith('/') ? basePath : basePath + '/'}`;
+      const enUrl = `https://pdhrajkot.com/en${basePath === '/' ? '/' : basePath.endsWith('/') ? basePath : basePath + '/'}`;
+
+      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <link rel="alternate" hreflang="gu" href="${guUrl}" />\n  <link rel="alternate" hreflang="en" href="${enUrl}" />\n  <link rel="alternate" hreflang="x-default" href="${guUrl}" />\n  <meta property="og:locale" content="${localeVal}" />\n`;
 
       const schemas = generateSchemasForRoute(route);
       for (const s of schemas) {
@@ -1194,6 +1295,12 @@ async function prerender() {
       process.exit(1);
     }
   }
+
+  // Generate and write complete sitemap.xml with 50 URLs and hreflang pairs
+  const sitemapXml = generateSitemapXml(routes);
+  const sitemapDistPath = path.resolve(__dirname, './dist/sitemap.xml');
+  fs.writeFileSync(sitemapDistPath, sitemapXml, 'utf-8');
+  console.log(`✅ Generated sitemap: ${sitemapDistPath} (${routes.length} URLs with hreflang pairs)`);
 
   console.log('🎉 Static pre-rendering completed successfully!');
   process.exit(0);
