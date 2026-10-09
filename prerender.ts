@@ -1296,11 +1296,163 @@ async function prerender() {
     }
   }
 
+function generate404Html(): string {
+  return `<!doctype html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>404 - પેજ મળ્યું નથી | Page Not Found | Patel Dental Hospital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Gujarati:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: #F8FAFC;
+      color: #0F172A;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .card {
+      background: #FFFFFF;
+      max-width: 580px;
+      width: 100%;
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    }
+    .badge {
+      display: inline-block;
+      background: #EFF6FF;
+      color: #0284C7;
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.05em;
+    }
+    .code {
+      font-size: 4rem;
+      line-height: 1;
+      font-weight: 800;
+      color: #0284C7;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.03em;
+    }
+    h1 {
+      font-family: 'Noto Sans Gujarati', 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 1.25rem;
+    }
+    p {
+      color: #64748B;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+    }
+    p.gujarati {
+      font-family: 'Noto Sans Gujarati', sans-serif;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin: 2rem 0 1.75rem 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #0284C7;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+    }
+    .btn-primary:hover {
+      background: #0369A1;
+    }
+    .btn-secondary {
+      background: #F1F5F9;
+      color: #334155;
+    }
+    .btn-secondary:hover {
+      background: #E2E8F0;
+    }
+    .contact-box {
+      border-top: 1px solid #E2E8F0;
+      padding-top: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: #64748B;
+    }
+    .contact-link {
+      color: #0284C7;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .contact-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">PATEL DENTAL HOSPITAL</div>
+    <div class="code">404</div>
+    <h1>પેજ મળ્યું નથી</h1>
+    <h2>Page Not Found</h2>
+    <p class="gujarati">તમે જે પેજ શોધી રહ્યા છો તે અસ્તિત્વમાં નથી અથવા તેનું સરનામું બદલાઈ ગયું છે.</p>
+    <p>The page you are looking for doesn't exist, has been removed, or is temporarily unavailable.</p>
+    <div class="buttons">
+      <a href="/" class="btn btn-primary">મુખ્ય પૃષ્ઠ (Gujarati Home)</a>
+      <a href="/en/" class="btn btn-secondary">Home (English)</a>
+    </div>
+    <div class="contact-box">
+      કોઈ સહાયતા માટે ફોન કરો / For assistance call:<br />
+      <a href="tel:+919510397046" class="contact-link">+91 95103 97046</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
   // Generate and write complete sitemap.xml with 50 URLs and hreflang pairs
   const sitemapXml = generateSitemapXml(routes);
   const sitemapDistPath = path.resolve(__dirname, './dist/sitemap.xml');
   fs.writeFileSync(sitemapDistPath, sitemapXml, 'utf-8');
   console.log(`✅ Generated sitemap: ${sitemapDistPath} (${routes.length} URLs with hreflang pairs)`);
+
+  // Generate and write standalone dist/404.html (without JS bundle, with noindex)
+  const notFoundHtml = generate404Html();
+  const notFoundDistPath = path.resolve(__dirname, './dist/404.html');
+  fs.writeFileSync(notFoundDistPath, notFoundHtml, 'utf-8');
+  console.log(`✅ Generated standalone 404 page: ${notFoundDistPath} (${Math.round(notFoundHtml.length / 1024)} KB)`);
 
   console.log('🎉 Static pre-rendering completed successfully!');
   process.exit(0);

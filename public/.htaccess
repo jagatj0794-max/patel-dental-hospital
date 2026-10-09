@@ -1,13 +1,37 @@
+ErrorDocument 404 /404.html
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
+  # Original Legacy 301 Redirects
   RewriteRule ^services/single-sitting-root-canal-treatment/?$ /services/root-canal-treatment/ [R=301,L]
   RewriteRule ^services/crowns-and-bridges/?$ /services/crowns-bridges/ [R=301,L]
   RewriteRule ^blog/?$ /blogs/ [R=301,L]
   RewriteRule ^sameday/?$ /services/dental-implants/ [R=301,L]
 
+  # New 301 Redirects (Gujarati)
+  RewriteRule ^implants/?$ /services/dental-implants/ [R=301,L]
+  RewriteRule ^(kids|pediatric|pediatric-dentistry)/?$ /services/pediatric-dentistry/ [R=301,L]
+  RewriteRule ^braces/?$ /services/braces-treatment/ [R=301,L]
+  RewriteRule ^academy/?$ /blogs/ [R=301,L]
+  RewriteRule ^about/?$ /doctors/ [R=301,L]
+
+  # New 301 Redirects (English /en/)
+  RewriteRule ^en/implants/?$ /en/services/dental-implants/ [R=301,L]
+  RewriteRule ^en/(kids|pediatric|pediatric-dentistry)/?$ /en/services/pediatric-dentistry/ [R=301,L]
+  RewriteRule ^en/braces/?$ /en/services/braces-treatment/ [R=301,L]
+  RewriteRule ^en/academy/?$ /en/blogs/ [R=301,L]
+  RewriteRule ^en/about/?$ /en/doctors/ [R=301,L]
+
+  # Optional Safety Net for Dynamic Client-Side SPA Routes (Admin & DB Tests)
+  RewriteRule ^admin(/.*)?$ /index.html [L]
+  RewriteRule ^admin-login/?$ /index.html [L]
+  RewriteRule ^supabase-test/?$ /index.html [L]
+
+  # Real 404 for any other missing file or directory
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  RewriteRule . - [R=404,L]
 </IfModule>
+

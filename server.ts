@@ -169,10 +169,25 @@ async function startServer() {
         
       const fullPath = path.join(distPath, htmlFile);
       if (fs.existsSync(fullPath)) {
-        res.sendFile(fullPath);
-      } else {
-        res.sendFile(path.join(distPath, 'index.html'));
+        return res.sendFile(fullPath);
       }
+
+      // Dynamic Client-Side SPA Routes (Admin Panel & DB Testing)
+      if (
+        cleanPath === '/admin' || 
+        cleanPath.startsWith('/admin/') || 
+        cleanPath === '/admin-login' || 
+        cleanPath === '/supabase-test'
+      ) {
+        return res.sendFile(path.join(distPath, 'index.html'));
+      }
+
+      // Return genuine 404 status code with standalone 404.html
+      const notFoundPath = path.join(distPath, '404.html');
+      if (fs.existsSync(notFoundPath)) {
+        return res.status(404).sendFile(notFoundPath);
+      }
+      return res.status(404).send('404 Not Found');
     });
     console.log('[Server] Serving production assets from dist/');
   }
