@@ -453,8 +453,151 @@ function generateSchemasForRoute(route: typeof routes[number]) {
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": "22.2856",
-      "longitude": "70.7912"
+      "latitude": "22.2849732",
+      "longitude": "70.7811127"
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "09:00",
+        "closes": "13:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "16:00",
+        "closes": "20:00"
+      }
+    ]
+  };
+
+  const parentDentistSchema = {
+    "@context": "https://schema.org",
+    "@type": "Dentist",
+    "@id": `https://pdhrajkot.com${prefix}/#dentist`,
+    "name": "Patel Dental Hospital",
+    "url": `https://pdhrajkot.com${prefix}/`,
+    "logo": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "description": route.description,
+    "telephone": "+919510397046",
+    "email": "Pateldentalhospital1@gmail.com",
+    "priceRange": "$$",
+    "areaServed": "Rajkot, Gujarat",
+    "sameAs": [
+      "https://www.instagram.com/pateldentalhospital_rj/",
+      "https://www.youtube.com/@pateldentalhospital",
+      "https://www.facebook.com/vipul.gothi.73"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Business Centrum Complex, 1st Floor, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, From Rajnagar Chowk towards Amin Marg",
+      "addressLocality": "Rajkot",
+      "addressRegion": "Gujarat",
+      "postalCode": "360001",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 22.2849732,
+      "longitude": 70.7811127
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "09:00",
+        "closes": "13:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "16:00",
+        "closes": "20:00"
+      }
+    ],
+    "subOrganization": [
+      {
+        "@id": `https://pdhrajkot.com${prefix}/#branch-amin-marg`
+      },
+      {
+        "@id": `https://pdhrajkot.com${prefix}/#branch-gayatrinagar`
+      }
+    ]
+  };
+
+  const aminMargBranchSchema = {
+    "@context": "https://schema.org",
+    "@type": "Dentist",
+    "@id": `https://pdhrajkot.com${prefix}/#branch-amin-marg`,
+    "name": "Patel Dental Hospital - Amin Marg Branch",
+    "url": `https://pdhrajkot.com${prefix}/`,
+    "hasMap": "https://maps.app.goo.gl/dV9Ny6o6ZqQFoS9CA",
+    "logo": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "telephone": "+919510397046",
+    "email": "Pateldentalhospital1@gmail.com",
+    "priceRange": "$$",
+    "parentOrganization": {
+      "@id": `https://pdhrajkot.com${prefix}/#dentist`
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Business Centrum Complex, 1st Floor, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, From Rajnagar Chowk towards Amin Marg",
+      "addressLocality": "Rajkot",
+      "addressRegion": "Gujarat",
+      "postalCode": "360001",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 22.2849732,
+      "longitude": 70.7811127
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "09:00",
+        "closes": "13:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "16:00",
+        "closes": "20:00"
+      }
+    ]
+  };
+
+  const gayatrinagarBranchSchema = {
+    "@context": "https://schema.org",
+    "@type": "Dentist",
+    "@id": `https://pdhrajkot.com${prefix}/#branch-gayatrinagar`,
+    "name": "Patel Dental Hospital - Gayatrinagar Branch",
+    "url": `https://pdhrajkot.com${prefix}/`,
+    "hasMap": "https://maps.app.goo.gl/y9khHSZARNxcgYsx7",
+    "logo": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "telephone": "+919510397046",
+    "email": "Pateldentalhospital1@gmail.com",
+    "priceRange": "$$",
+    "parentOrganization": {
+      "@id": `https://pdhrajkot.com${prefix}/#dentist`
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "1st Floor, Rameshwar Complex, Opp. SBI Bank, Gayatrinagar Road, Jalaram Chowk, Bhaktinagar Circle",
+      "addressLocality": "Rajkot",
+      "addressRegion": "Gujarat",
+      "postalCode": "360002",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 22.2760712,
+      "longitude": 70.8043623
     },
     "openingHoursSpecification": [
       {
@@ -482,7 +625,9 @@ function generateSchemasForRoute(route: typeof routes[number]) {
       "name": "Patel Dental Hospital",
       "url": `https://pdhrajkot.com${prefix}/`
     });
-    schemas.push(dentistSchema);
+    schemas.push(parentDentistSchema);
+    schemas.push(aminMargBranchSchema);
+    schemas.push(gayatrinagarBranchSchema);
   } else {
     // Breadcrumb schema
     const pathParts = route.path.split('/').filter(p => p && p !== 'en');
@@ -678,7 +823,9 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         "name": "Contact Patel Dental Hospital",
         "description": "Contact information, maps, phone numbers, and appointment details for Patel Dental Hospital Rajkot."
       });
-      schemas.push(dentistSchema);
+      schemas.push(parentDentistSchema);
+      schemas.push(aminMargBranchSchema);
+      schemas.push(gayatrinagarBranchSchema);
     }
   }
 
@@ -1188,7 +1335,14 @@ async function prerender() {
 
       const schemas = generateSchemasForRoute(route);
       for (const s of schemas) {
-        headInjections += `  <script type="application/ld+json">\n${JSON.stringify(s, null, 2)}\n  </script>\n`;
+        const jsonText = JSON.stringify(s, null, 2);
+        try {
+          JSON.parse(jsonText);
+        } catch (err) {
+          console.error(`❌ FATAL BUILD ERROR: Invalid JSON-LD schema on route ${route.path}:`, err);
+          process.exit(1);
+        }
+        headInjections += `  <script type="application/ld+json">\n${jsonText}\n  </script>\n`;
       }
 
       html = html.replace('</head>', `${headInjections}</head>`);

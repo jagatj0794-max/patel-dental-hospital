@@ -61,8 +61,8 @@ export const getServiceSEO = (slug: string, title: string, fallbackDesc: string,
         },
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": "22.2856",
-          "longitude": "70.7912"
+          "latitude": "22.2849732",
+          "longitude": "70.7811127"
         },
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
