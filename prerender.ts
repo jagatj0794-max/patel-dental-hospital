@@ -1267,27 +1267,27 @@ async function prerender() {
       // Inject server-rendered HTML into the root div
       let html = template.replace(
         /<div id="root">[\s\S]*?<\/div>/,
-        `<div id="root">${appHtml}</div>`
+        () => `<div id="root">${appHtml}</div>`
       );
 
       // Replace html lang attribute
-      html = html.replace('<html lang="en">', `<html lang="${route.language}">`);
+      html = html.replace('<html lang="en">', () => `<html lang="${route.language}">`);
 
       // Inject route-specific meta tags and title
       html = html.replace(
         /<title>[\s\S]*?<\/title>/,
-        `<title>${route.title}</title>`
+        () => `<title>${escapeHtml(route.title)}</title>`
       );
 
       if (html.includes('name="description"')) {
         html = html.replace(
           /<meta name="description" content="[\s\S]*?"\s*\/?>/,
-          `<meta name="description" content="${escapeHtml(route.description)}" />`
+          () => `<meta name="description" content="${escapeHtml(route.description)}" />`
         );
       } else {
         html = html.replace(
           '</head>',
-          `  <meta name="description" content="${escapeHtml(route.description)}" />\n</head>`
+          () => `  <meta name="description" content="${escapeHtml(route.description)}" />\n</head>`
         );
       }
 
@@ -1295,12 +1295,12 @@ async function prerender() {
         if (html.includes('name="keywords"')) {
           html = html.replace(
             /<meta name="keywords" content="[\s\S]*?"\s*\/?>/,
-            `<meta name="keywords" content="${escapeHtml(route.keywords)}" />`
+            () => `<meta name="keywords" content="${escapeHtml(route.keywords)}" />`
           );
         } else {
           html = html.replace(
             '</head>',
-            `  <meta name="keywords" content="${escapeHtml(route.keywords)}" />\n</head>`
+            () => `  <meta name="keywords" content="${escapeHtml(route.keywords)}" />\n</head>`
           );
         }
       } else {
@@ -1314,12 +1314,49 @@ async function prerender() {
 
       html = html.replace(
         /<meta property="og:title" content="[\s\S]*?"\s*\/?>/,
-        `<meta property="og:title" content="${escapeHtml(route.title)}" />`
+        () => `<meta property="og:title" content="${escapeHtml(route.title)}" />`
       );
       html = html.replace(
         /<meta property="og:description" content="[\s\S]*?"\s*\/?>/,
-        `<meta property="og:description" content="${escapeHtml(route.description)}" />`
+        () => `<meta property="og:description" content="${escapeHtml(route.description)}" />`
       );
+
+      // Twitter card meta tag overrides / injections
+      if (html.includes('name="twitter:card"')) {
+        html = html.replace(
+          /<meta name="twitter:card" content="[\s\S]*?"\s*\/?>/,
+          () => `<meta name="twitter:card" content="summary" />`
+        );
+      } else {
+        html = html.replace(
+          '</head>',
+          () => `  <meta name="twitter:card" content="summary" />\n</head>`
+        );
+      }
+
+      if (html.includes('name="twitter:title"')) {
+        html = html.replace(
+          /<meta name="twitter:title" content="[\s\S]*?"\s*\/?>/,
+          () => `<meta name="twitter:title" content="${escapeHtml(route.title)}" />`
+        );
+      } else {
+        html = html.replace(
+          '</head>',
+          () => `  <meta name="twitter:title" content="${escapeHtml(route.title)}" />\n</head>`
+        );
+      }
+
+      if (html.includes('name="twitter:description"')) {
+        html = html.replace(
+          /<meta name="twitter:description" content="[\s\S]*?"\s*\/?>/,
+          () => `<meta name="twitter:description" content="${escapeHtml(route.description)}" />`
+        );
+      } else {
+        html = html.replace(
+          '</head>',
+          () => `  <meta name="twitter:description" content="${escapeHtml(route.description)}" />\n</head>`
+        );
+      }
 
       // Canonical Tag, Hreflang Tags, Locale Tag and Schema JSON-LD blocks
       const canonicalUrl = `https://pdhrajkot.com${route.path === '/' ? '/' : route.path === '/en' ? '/en/' : route.path.endsWith('/') ? route.path : route.path + '/'}`;
@@ -1331,7 +1368,7 @@ async function prerender() {
       const guUrl = `https://pdhrajkot.com${basePath === '/' ? '/' : basePath.endsWith('/') ? basePath : basePath + '/'}`;
       const enUrl = `https://pdhrajkot.com/en${basePath === '/' ? '/' : basePath.endsWith('/') ? basePath : basePath + '/'}`;
 
-      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <link rel="alternate" hreflang="gu" href="${guUrl}" />\n  <link rel="alternate" hreflang="en" href="${enUrl}" />\n  <link rel="alternate" hreflang="x-default" href="${guUrl}" />\n  <meta property="og:locale" content="${localeVal}" />\n`;
+      let headInjections = `\n  <link rel="canonical" href="${canonicalUrl}" />\n  <link rel="alternate" hreflang="gu" href="${guUrl}" />\n  <link rel="alternate" hreflang="en" href="${enUrl}" />\n  <link rel="alternate" hreflang="x-default" href="${guUrl}" />\n  <meta property="og:url" content="${canonicalUrl}" />\n  <meta property="og:locale" content="${localeVal}" />\n`;
 
       const schemas = generateSchemasForRoute(route);
       for (const s of schemas) {
@@ -1345,11 +1382,11 @@ async function prerender() {
         headInjections += `  <script type="application/ld+json">\n${jsonText}\n  </script>\n`;
       }
 
-      html = html.replace('</head>', `${headInjections}</head>`);
+      html = html.replace('</head>', () => `${headInjections}</head>`);
 
       // Inject minimal, route-specific __PRELOADED_DATA__ JSON script before </body>
       const preloadedScriptTag = `<script id="__PRELOADED_DATA__" type="application/json">${jsonStr.replace(/</g, '\\u003c')}</script>`;
-      html = html.replace('</body>', `  ${preloadedScriptTag}\n</body>`);
+      html = html.replace('</body>', () => `  ${preloadedScriptTag}\n</body>`);
 
       // STRICT VALIDATION 1: Ensure exactly ONE <h1> tag exists and has text content
       const allH1Matches = [...html.matchAll(/<h1[^>]*>([\s\S]*?)<\/h1>/gi)].map(m =>
