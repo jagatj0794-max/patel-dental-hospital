@@ -282,7 +282,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
                 Missing teeth can impact more than just the appearance of your smile; they can affect your chewing ability, speech, and long-term oral health structure. While traditional tooth replacement solutions like dentures or conventional bridges have been common for decades, modern dental medicine offers a highly durable, permanent option: <strong>dental implants</strong>.
               </p>
               <p>
-                Dental implants have revolutionized restorative dentistry. They look, function, and feel like your natural teeth, restoring both oral health and patient confidence. If you are considering replacing a missing tooth or multiple teeth, our advanced <a href="#services/dental-implants" className="text-[#0D9488] font-bold hover:underline">dental implants treatment</a> is the first step toward reclaiming a complete, healthy smile.
+                Dental implants have revolutionized restorative dentistry. They look, function, and feel like your natural teeth, restoring both oral health and patient confidence. If you are considering replacing a missing tooth or multiple teeth, our advanced <a href="/en/services/dental-implants/" className="text-[#0D9488] font-bold hover:underline">dental implants treatment</a> is the first step toward reclaiming a complete, healthy smile.
               </p>
             </section>
 
@@ -412,7 +412,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
                 <div className="space-y-1.5">
                   <h3 className="font-bold text-[#081C3A] text-sm sm:text-base">Personalized Pricing After Consultation</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Treatment cost varies depending on the implant system, number of implants, crown type, bone condition, and individual treatment requirements. A personalized estimate is provided after a detailed clinical <a href="#contact" className="text-[#0D9488] font-bold hover:underline">appointment and consultation</a>.
+                    Treatment cost varies depending on the implant system, number of implants, crown type, bone condition, and individual treatment requirements. A personalized estimate is provided after a detailed clinical <a href="/en/contact/" className="text-[#0D9488] font-bold hover:underline">appointment and consultation</a>.
                   </p>
                 </div>
               </div>
@@ -455,7 +455,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
               </p>
               <ul className="space-y-2.5 pl-4 list-disc text-slate-600 text-xs sm:text-sm">
                 <li>
-                  <strong className="text-[#081C3A]">18+ Years of Clinical Expertise:</strong> Led by <a href="#doctors" className="text-[#0D9488] font-bold hover:underline">Dr. Vipul Patel</a>, our experienced surgical team has safely placed thousands of implants, adhering to international guidelines.
+                  <strong className="text-[#081C3A]">18+ Years of Clinical Expertise:</strong> Led by <a href="/en/doctors/" className="text-[#0D9488] font-bold hover:underline">Dr. Vipul Patel</a>, our experienced surgical team has safely placed thousands of implants, adhering to international guidelines.
                 </li>
                 <li>
                   <strong className="text-[#081C3A]">In-House 3D CBCT Imaging:</strong> We utilize advanced, low-radiation Cone Beam Computed Tomography inside our facility, allowing us to perform precise bone mapping and treatment planning without third-party lab delays.
@@ -634,7 +634,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
                 A straight, healthy smile does wonders for your confidence and oral health. Orthodontic treatment has advanced significantly over the years, giving patients more treatment choices than ever before. If you are looking to correct misaligned, crowded, or spaced teeth, the decision typically comes down to two major modern solutions: <strong>Traditional Braces</strong> and <strong>Clear Aligners</strong>.
               </p>
               <p>
-                Both systems are designed to safely and gradually move your teeth into optimal cosmetic and functional alignment. If you are seeking professional <a href="#services/braces-treatment" className="text-[#0D9488] font-bold hover:underline">orthodontic braces treatment in Rajkot</a> or modern <a href="#services/invisible-aligners" className="text-[#0D9488] font-bold hover:underline">clear aligners in Rajkot</a>, choosing the right one requires a solid understanding of how each works and how they align with your smile goals.
+                Both systems are designed to safely and gradually move your teeth into optimal cosmetic and functional alignment. If you are seeking professional <a href="/en/services/braces-treatment/" className="text-[#0D9488] font-bold hover:underline">orthodontic braces treatment in Rajkot</a> or modern <a href="/en/services/invisible-aligners/" className="text-[#0D9488] font-bold hover:underline">clear aligners in Rajkot</a>, choosing the right one requires a solid understanding of how each works and how they align with your smile goals.
               </p>
             </section>
 
@@ -718,7 +718,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
                 6. Orthodontic Care at Patel Dental Hospital
               </h2>
               <p>
-                At Patel Dental Hospital, Rajkot, we provide advanced, fully digitalized orthodontic assessments. We offer both standard <a href="#services/braces-treatment" className="text-[#0D9488] font-bold hover:underline">Braces Treatment</a> and premium, custom-designed <a href="#services/invisible-aligners" className="text-[#0D9488] font-bold hover:underline">Invisible Aligners</a> to deliver the highest clinical precision and maximum patient comfort.
+                At Patel Dental Hospital, Rajkot, we provide advanced, fully digitalized orthodontic assessments. We offer both standard <a href="/en/services/braces-treatment/" className="text-[#0D9488] font-bold hover:underline">Braces Treatment</a> and premium, custom-designed <a href="/en/services/invisible-aligners/" className="text-[#0D9488] font-bold hover:underline">Invisible Aligners</a> to deliver the highest clinical precision and maximum patient comfort.
               </p>
               <p>
                 Our specialized team utilizes cutting-edge intraoral digital scanners and advanced computerized planning software to simulate your beautiful, straight smile even before starting treatment, helping you proceed with absolute confidence.
@@ -883,7 +883,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
                 A professional teeth whitening treatment can instantly remove years of yellowing and deeply embedded stains, leaving you with an incredibly bright, dazzling smile. However, teeth whitening is not a permanent shield against staining; your teeth remain naturally porous and susceptible to new stains over time.
               </p>
               <p>
-                To safeguard your beautiful whitening investment and prolong that sparkling brilliance, establishing consistent daily care and dietary habits is essential. The experienced aesthetic dentists at <a href="#doctors" className="text-[#0D9488] font-bold hover:underline">Patel Dental Hospital Rajkot</a> recommend these 5 vital, dentist-approved habits to keep your pearly whites looking brighter for much longer.
+                To safeguard your beautiful whitening investment and prolong that sparkling brilliance, establishing consistent daily care and dietary habits is essential. The experienced aesthetic dentists at <a href="/en/doctors/" className="text-[#0D9488] font-bold hover:underline">Patel Dental Hospital Rajkot</a> recommend these 5 vital, dentist-approved habits to keep your pearly whites looking brighter for much longer.
               </p>
             </section>
 
@@ -952,7 +952,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
                 No matter how diligent you are at home, tough mineralized tartar and deep extrinsic stains will eventually build up over several months.
               </p>
               <p>
-                Visiting your dentist twice a year for routine scaling and polishing is key. Your hygienist can comfortably polish away stubborn outer coffee or tea stains, keeping your underlying white smile intact. If you want to brighten your teeth again, our professional <a href="#services/teeth-whitening" className="text-[#0D9488] font-bold hover:underline">Teeth Whitening</a> treatment is highly safe, reliable, and comfortable.
+                Visiting your dentist twice a year for routine scaling and polishing is key. Your hygienist can comfortably polish away stubborn outer coffee or tea stains, keeping your underlying white smile intact. If you want to brighten your teeth again, our professional <a href="/en/services/teeth-whitening/" className="text-[#0D9488] font-bold hover:underline">Teeth Whitening</a> treatment is highly safe, reliable, and comfortable.
               </p>
             </section>
 
