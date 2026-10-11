@@ -23,7 +23,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
   const handleLinkClick = (page: PageId) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.location.hash = page;
+    if (page === 'admin' || page.startsWith('admin/')) { window.location.hash = page; } else { const p = getHref(page); if (typeof window !== 'undefined' && window.location.pathname !== p) { window.history.pushState({}, '', p); } }
   };
 
   const getHref = (target: string) => {

@@ -182,7 +182,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
     setIsOpen(false);
     setActiveDropdown(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.location.hash = id;
+    if (id === 'admin' || id.startsWith('admin/')) { window.location.hash = id; } else { const p = getHref(id); if (typeof window !== 'undefined' && window.location.pathname !== p) { window.history.pushState({}, '', p); } }
   };
 
   const toggleMobileDropdown = (id: string) => {
