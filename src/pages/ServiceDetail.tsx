@@ -1535,7 +1535,7 @@ export default function ServiceDetail({
                             </span>
                             
                             <h1 className="font-sans font-black text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] text-[#081C3A] tracking-tight leading-[1.15]">
-                              દાંત ખૂટે છે? ડેન્ટલ ઇમ્પ્લાન્ટ દ્વારા મેળવો ફિક્સ દાંત.
+                              શું દાંત નથી? ડેન્ટલ ઇમ્પ્લાન્ટ દ્વારા મેળવો ફિક્સ દાંત.
                             </h1>
                           </div>
 

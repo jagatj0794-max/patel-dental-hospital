@@ -859,7 +859,7 @@ export default function HomeGujarati({
               {/* Main Heading & Description above the award badge */}
               <h2 className="font-display text-[26px] xl:text-[32px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-3">
                 <span className="lg:block lg:whitespace-nowrap">આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.</span>
-                <span className="lg:block lg:whitespace-nowrap">ફરીથી તમારા જેવા અનુભવો.</span>
+                <span className="lg:block lg:whitespace-nowrap">તમારા સાચા સ્વરૂપને ફરી અનુભવો.</span>
               </h2>
               <p className="text-[14px] xl:text-[15px] font-semibold text-black leading-relaxed mb-6">
                 અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
@@ -977,7 +977,7 @@ export default function HomeGujarati({
             {/* Main Heading & Description above the award badge */}
             <h2 className="font-display text-[17px] sm:text-[19px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight max-w-[95%]">
               આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.<br className="hidden sm:inline" />
-              ફરીથી તમારા જેવા અનુભવો.
+              તમારા સાચા સ્વરૂપને ફરી અનુભવો.
             </h2>
             <p className="text-[11px] sm:text-[12px] font-semibold text-black leading-relaxed max-w-[95%] mb-1">
               અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
@@ -1085,7 +1085,7 @@ export default function HomeGujarati({
               {/* Main Heading & Description above the award badge */}
               <h2 className="font-display text-[19px] md:text-[21px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-2">
                 <span className="md:block md:whitespace-nowrap">આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.</span>
-                <span className="md:block md:whitespace-nowrap">ફરીથી તમારા જેવા અનુભવો.</span>
+                <span className="md:block md:whitespace-nowrap">તમારા સાચા સ્વરૂપને ફરી અનુભવો.</span>
               </h2>
               <p className="text-[12px] md:text-[12.5px] font-semibold text-black leading-relaxed mb-3.5">
                 અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
