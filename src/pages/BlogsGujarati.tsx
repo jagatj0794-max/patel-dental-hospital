@@ -183,7 +183,7 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
     };
 
     window.addEventListener('hashchange', handleHash);
-    handleHash();
+    if (window.location.hash.replace('#', '').startsWith('blog/')) { handleHash(); }
 
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);

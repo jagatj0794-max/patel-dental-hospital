@@ -183,7 +183,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
     };
 
     window.addEventListener('hashchange', handleHash);
-    handleHash();
+    if (window.location.hash.replace('#', '').startsWith('blog/')) { handleHash(); }
 
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
