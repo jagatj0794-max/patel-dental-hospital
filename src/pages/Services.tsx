@@ -196,7 +196,11 @@ export default function Services({
   const handleNavigate = (slug: string) => {
     const targetPage = `services/${slug}` as PageId;
     setCurrentPage(targetPage);
-    window.location.hash = targetPage;
+    const prefix = language === 'en' ? '/en' : '';
+    const path = `${prefix}/services/${slug}/`;
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -211,7 +215,10 @@ export default function Services({
               onClick={(e) => {
                 e.preventDefault();
                 setCurrentPage('home');
-                window.location.hash = 'home';
+                const homePath = language === 'en' ? '/en/' : '/';
+                if (typeof window !== 'undefined' && window.location.pathname !== homePath) {
+                  window.history.pushState({}, '', homePath);
+                }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="hover:text-[#0D9488] transition-colors"

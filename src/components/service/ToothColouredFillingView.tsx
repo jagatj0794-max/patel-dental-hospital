@@ -69,7 +69,14 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const handleNavigateToService = (targetSlug: string) => {
-    window.location.hash = `#services/${targetSlug}`;
+    const prefix = language === 'en' ? '/en' : '';
+    const path = `${prefix}/services/${targetSlug}/`;
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+    if (setCurrentPage) {
+      setCurrentPage(`services/${targetSlug}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const whatsappNum = '919510397046';

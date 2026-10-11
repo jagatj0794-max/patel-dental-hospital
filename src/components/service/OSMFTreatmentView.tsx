@@ -73,7 +73,14 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
   const isGujarati = language === 'gu';
 
   const handleNavigateToService = (targetSlug: string) => {
-    window.location.hash = `#services/${targetSlug}`;
+    const prefix = language === 'en' ? '/en' : '';
+    const path = `${prefix}/services/${targetSlug}/`;
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+    if (setCurrentPage) {
+      setCurrentPage(`services/${targetSlug}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

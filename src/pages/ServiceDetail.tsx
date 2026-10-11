@@ -1201,7 +1201,10 @@ export default function ServiceDetail({
 
   // Handle navigating to back / treatment page
   const handleBackToServices = () => {
-    window.location.hash = '#home';
+    const homePath = language === 'en' ? '/en/' : '/';
+    if (typeof window !== 'undefined' && window.location.pathname !== homePath) {
+      window.history.pushState({}, '', homePath);
+    }
     if (setCurrentPage) {
       setCurrentPage('home');
     }
@@ -1209,7 +1212,11 @@ export default function ServiceDetail({
 
   // Navigating to other services
   const handleNavigateToService = (targetSlug: string) => {
-    window.location.hash = `#services/${targetSlug}`;
+    const prefix = language === 'en' ? '/en' : '';
+    const path = `${prefix}/services/${targetSlug}/`;
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
     if (setCurrentPage) {
       setCurrentPage(`services/${targetSlug}`);
     }
