@@ -127,7 +127,10 @@ export const SurgicalTeamSection: React.FC<SurgicalTeamSectionProps> = ({
                   if (setCurrentPage) {
                     setCurrentPage('doctors');
                   }
-                  window.location.hash = 'doctors';
+                  const targetPath = (language === 'en' || activeLanguage === 'en' || (typeof window !== 'undefined' && window.location.pathname.startsWith('/en'))) ? '/en/doctors/' : '/doctors/';
+                  if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
+                    window.history.pushState({}, '', targetPath);
+                  }
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className={`px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-[11px] ${isGujarati ? 'font-black' : 'font-bold'} uppercase tracking-wider rounded-lg shadow-sm hover:shadow transition-all duration-300 cursor-pointer text-center`}
@@ -216,7 +219,10 @@ export const SurgicalTeamSection: React.FC<SurgicalTeamSectionProps> = ({
                   if (setCurrentPage) {
                     setCurrentPage('doctors');
                   }
-                  window.location.hash = 'doctors';
+                  const targetPath = (language === 'en' || activeLanguage === 'en' || (typeof window !== 'undefined' && window.location.pathname.startsWith('/en'))) ? '/en/doctors/' : '/doctors/';
+                  if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
+                    window.history.pushState({}, '', targetPath);
+                  }
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className={`px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-[11px] ${isGujarati ? 'font-black' : 'font-bold'} uppercase tracking-wider rounded-lg shadow-sm hover:shadow transition-all duration-300 cursor-pointer text-center`}

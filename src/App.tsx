@@ -203,6 +203,21 @@ export default function App({
     }
   };
 
+  const handleNavigate = (page: PageId | string) => {
+    if (page === 'admin' || page.startsWith('admin/') || page === 'supabase-test') {
+      window.location.hash = page;
+      setCurrentPage(page as PageId);
+      return;
+    }
+    setCurrentPage(page as PageId);
+    if (typeof window !== 'undefined') {
+      const targetPath = getPathForPage(page, language);
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({}, '', targetPath);
+      }
+    }
+  };
+
   useEffect(() => {
     initAnalytics();
   }, []);
@@ -886,7 +901,7 @@ export default function App({
       case 'home':
         return language === 'gu' ? (
           <HomeGujarati 
-            setCurrentPage={setCurrentPage} 
+            setCurrentPage={handleNavigate} 
             openAppointmentModal={openAppointmentModal} 
             heroHeading={heroHeading}
             heroDescription={heroDescription}
@@ -899,7 +914,7 @@ export default function App({
           />
         ) : (
           <Home 
-            setCurrentPage={setCurrentPage} 
+            setCurrentPage={handleNavigate} 
             openAppointmentModal={openAppointmentModal} 
             heroHeading={heroHeading}
             heroDescription={heroDescription}
@@ -1009,9 +1024,9 @@ export default function App({
         );
       case 'international':
         return language === 'gu' ? (
-          <DentalTourismGujarati openAppointmentModal={openAppointmentModal} setCurrentPage={setCurrentPage} />
+          <DentalTourismGujarati openAppointmentModal={openAppointmentModal} setCurrentPage={handleNavigate} />
         ) : (
-          <DentalTourism openAppointmentModal={openAppointmentModal} setCurrentPage={setCurrentPage} />
+          <DentalTourism openAppointmentModal={openAppointmentModal} setCurrentPage={handleNavigate} />
         );
       case 'academy':
       case 'blogs':

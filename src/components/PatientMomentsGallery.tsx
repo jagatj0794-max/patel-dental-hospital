@@ -203,7 +203,11 @@ export default function PatientMomentsGallery({
       if (onNavigate) {
         onNavigate('gallery');
       }
-      window.location.hash = 'gallery';
+      const isEn = typeof window !== 'undefined' && window.location.pathname.startsWith('/en');
+      const targetPath = isEn ? '/en/gallery/' : '/gallery/';
+      if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
+        window.history.pushState({}, '', targetPath);
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setVisibleCount(momentsToRender.length);
