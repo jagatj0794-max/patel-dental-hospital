@@ -1476,8 +1476,8 @@ async function prerender() {
           process.exit(1);
         }
 
-        // Verify date exists in HTML (any year starting with 20xx)
-        if (!/\b20\d{2}\b/.test(html)) {
+        // Verify date exists in article text (any year starting with 20xx)
+        if (!/\b20\d{2}\b/.test(articleText)) {
           console.error(`❌ FATAL BUILD ERROR: Blog post "${route.path}" is missing publication date in HTML! Build aborted.`);
           process.exit(1);
         }
