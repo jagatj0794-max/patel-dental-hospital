@@ -134,8 +134,8 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
       ? `${selectedPost.primaryKeyword}, ${selectedPost.secondaryKeywords.join(', ')}`
       : 'Dental Implants Rajkot, Dental Blog Rajkot, Patel Dental Hospital Blog, Best Implant Dentist Rajkot, Dentist Blog Gujarat',
     canonicalUrl: selectedPost
-      ? `${origin}/#blog/${selectedPost.id}`
-      : `${origin}/#blogs`,
+      ? `https://pdhrajkot.com/en/blog/${selectedPost.id}/`
+      : `https://pdhrajkot.com/en/blogs/`,
     ogTitle: selectedPost ? selectedPost.seoTitle : undefined,
     ogDescription: selectedPost ? selectedPost.metaDescription : undefined,
     ogImage: selectedPost ? selectedPost.image : undefined,
@@ -145,7 +145,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
       "@type": "BlogPosting",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": `${origin}/#blog/${selectedPost.id}`
+        "@id": `https://pdhrajkot.com/en/blog/${selectedPost.id}/`
       },
       "headline": selectedPost.title,
       "description": selectedPost.metaDescription,
