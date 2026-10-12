@@ -685,7 +685,10 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         "@type": "MedicalBusiness",
         "name": "Patel Dental Hospital Services",
         "url": `https://pdhrajkot.com${prefix}/services/`,
-        "@id": `https://pdhrajkot.com${prefix}/#dentist`,
+        "@id": `https://pdhrajkot.com${prefix}/services/#services`,
+        "parentOrganization": {
+          "@id": `https://pdhrajkot.com${prefix}/#dentist`
+        },
         "telephone": "+919510397046",
         "priceRange": "$$",
         "address": {
