@@ -893,45 +893,12 @@ export const ToothColouredFillingView: React.FC<ToothColouredFillingViewProps> =
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "q": "How long does a tooth-coloured filling last?",
-                "a": "The lifespan of a composite filling typically ranges from several years to a decade. This depends on factors such as cavity size and location, individual bite forces, dietary habits, and daily oral hygiene care."
-              },
-              {
-                "q": "Will the filling match my natural tooth colour?",
-                "a": "Yes, composite resins are available in a wide spectrum of natural tooth shades. We carefully shade-match the material to your natural enamel to ensure a virtually invisible, seamless restoration."
-              },
-              {
-                "q": "Is a tooth-coloured filling completed in one visit?",
-                "a": "Yes, in most clinically suitable cases, a standard composite filling is completed entirely in a single comfortable visit."
-              },
-              {
-                "q": "Does getting a composite filling hurt?",
-                "a": "The procedure is highly comfortable. We use appropriate local anaesthesia where needed to keep you relaxed and ensure a completely pain-free treatment experience."
-              },
-              {
-                "q": "Can a tooth-coloured filling be used for a chipped tooth?",
-                "a": "Yes, composite bonding is an excellent, conservative option to restore chipped or minor fractures on anterior or posterior teeth, when clinically suitable."
-              },
-              {
-                "q": "Can composite treatment close a small gap between teeth?",
-                "a": "Yes, when clinically appropriate, composite resin can be layered directly to close minor gaps (diastemas) and improve aesthetics without any tooth reduction."
-              },
-              {
-                "q": "What happens if I delay treatment for a cavity?",
-                "a": "Delaying treatment allows active decay to progress deeper into the inner tooth layers (dentin and pulp), potentially requiring more extensive and costly treatments like root canals or crowns."
-              },
-              {
-                "q": "How much does a tooth-coloured filling cost?",
-                "a": "The cost depends on the tooth involved, the size of the cavity, and the number of surfaces requiring restoration. We provide clear, itemized pricing after a detailed clinical assessment."
-              }
-            ].map((item) => ({
+            "mainEntity": faqs.map((faq) => ({
               "@type": "Question",
-              "name": item.q,
+              "name": faq.q,
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": item.a
+                "text": faq.a
               }
             }))
           })}

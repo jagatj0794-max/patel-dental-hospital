@@ -831,7 +831,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
             "@type": "FAQPage",
             "mainEntity": [
               {
-                "question": language === 'gu' ? "પ્રોફેશનલ ટીથ વ્હાઇટનિંગ (દાંત સફેદ કરવા) શું છે?" : "What is professional teeth whitening?",
+                "@type": "Question",
+                "name": language === 'gu' ? "પ્રોફેશનલ ટીથ વ્હાઇટનિંગ (દાંત સફેદ કરવા) શું છે?" : "What is professional teeth whitening?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -840,7 +841,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "દાંત સફેદ કરવાની પ્રક્રિયામાં કેટલો સમય લાગે છે?" : "How long does Teeth Whitening take?",
+                "@type": "Question",
+                "name": language === 'gu' ? "દાંત સફેદ કરવાની પ્રક્રિયામાં કેટલો સમય લાગે છે?" : "How long does Teeth Whitening take?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -849,7 +851,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "શું ટીથ વ્હાઇટનિંગ માત્ર એક જ મુલાકાતમાં થઈ જાય છે?" : "Is professional Teeth Whitening done in one appointment?",
+                "@type": "Question",
+                "name": language === 'gu' ? "શું ટીથ વ્હાઇટનિંગ માત્ર એક જ મુલાકાતમાં થઈ જાય છે?" : "Is professional Teeth Whitening done in one appointment?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -858,7 +861,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "મને ક્યારે પરિણામ જોવા મળશે?" : "When will I see the result?",
+                "@type": "Question",
+                "name": language === 'gu' ? "મને ક્યારે પરિણામ જોવા મળશે?" : "When will I see the result?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -867,7 +871,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "શું ટીથ વ્હાઇટનિંગ દંતવલ્ક (એનામેલ) માટે સુરક્ષિત છે?" : "Is Teeth Whitening enamel-safe?",
+                "@type": "Question",
+                "name": language === 'gu' ? "શું ટીથ વ્હાઇટનિંગ દંતવલ્ક (એનામેલ) માટે સુરક્ષિત છે?" : "Is Teeth Whitening enamel-safe?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -876,7 +881,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "શું મને દાંતમાં ઝણઝણાટી (સંવેદનશીલતા) થશે?" : "Will I experience sensitivity?",
+                "@type": "Question",
+                "name": language === 'gu' ? "શું મને દાંતમાં ઝણઝણાટી (સંવેદનશીલતા) થશે?" : "Will I experience sensitivity?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -885,7 +891,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "શું તમે ઘરે ઉપયોગ કરવા માટે વ્હાઇટનિંગ કિટ્સ આપો છો?" : "Do you offer take-home whitening kits?",
+                "@type": "Question",
+                "name": language === 'gu' ? "શું તમે ઘરે ઉપયોગ કરવા માટે વ્હાઇટનિંગ કિટ્સ આપો છો?" : "Do you offer take-home whitening kits?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -894,7 +901,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "શું ટીથ વ્હાઇટનિંગ દરેક વ્યક્તિ માટે યોગ્ય છે?" : "Is Teeth Whitening suitable for everyone?",
+                "@type": "Question",
+                "name": language === 'gu' ? "શું ટીથ વ્હાઇટનિંગ દરેક વ્યક્તિ માટે યોગ્ય છે?" : "Is Teeth Whitening suitable for everyone?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -903,7 +911,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "દાંત સફેદ કરવાની સારવારનો ખર્ચ કેટલો થાય છે?" : "How much does Teeth Whitening cost?",
+                "@type": "Question",
+                "name": language === 'gu' ? "દાંત સફેદ કરવાની સારવારનો ખર્ચ કેટલો થાય છે?" : "How much does Teeth Whitening cost?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'
@@ -912,7 +921,8 @@ export const TeethWhiteningView: React.FC<TeethWhiteningViewProps> = ({
                 }
               },
               {
-                "question": language === 'gu' ? "શું હું કોઈ મહત્વના પ્રસંગ પહેલા આ સારવાર બુક કરાવી સ્કું?" : "Can I book whitening before an important event?",
+                "@type": "Question",
+                "name": language === 'gu' ? "શું હું કોઈ મહત્વના પ્રસંગ પહેલા આ સારવાર બુક કરાવી શકું?" : "Can I book whitening before an important event?",
                 "acceptedAnswer": {
                   "@type": "Answer",
                   "text": language === 'gu'

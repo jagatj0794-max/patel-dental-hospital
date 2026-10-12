@@ -54,7 +54,14 @@ import {
   rootCanalFaqs,
   smileMakeoverFaqs,
   crownsBridgesFaqs,
-  pediatricDentistryFaqs
+  pediatricDentistryFaqs,
+  DENTAL_IMPLANTS_FAQS_GU,
+  FULL_MOUTH_FAQS_GU,
+  INVISIBLE_ALIGNERS_FAQS_GU,
+  ROOT_CANAL_FAQS_GU,
+  SMILE_MAKEOVER_FAQS_GU,
+  CROWNS_BRIDGES_FAQS_GU,
+  PEDIATRIC_DENTISTRY_FAQS_GU
 } from './src/data/serviceFaqs';
 
 import { DEFAULT_SERVICES, serviceService } from './src/utils/serviceData';
@@ -733,35 +740,72 @@ function generateSchemasForRoute(route: typeof routes[number]) {
 
       // FAQ Page Schema
       let faqs: any[] = [];
+      let guDict: Record<string, { question: string; answer: string }> | null = null;
       if (route.path.endsWith('/dental-implants')) {
         faqs = dentalImplantsFaqs;
+        guDict = DENTAL_IMPLANTS_FAQS_GU;
       } else if (route.path.endsWith('/full-mouth-rehabilitation')) {
         faqs = fullMouthFaqs;
+        guDict = FULL_MOUTH_FAQS_GU;
       } else if (route.path.endsWith('/invisible-aligners')) {
         faqs = invisibleAlignersFaqs;
+        guDict = INVISIBLE_ALIGNERS_FAQS_GU;
       } else if (route.path.endsWith('/root-canal-treatment')) {
         faqs = rootCanalFaqs;
+        guDict = ROOT_CANAL_FAQS_GU;
       } else if (route.path.endsWith('/smile-makeover')) {
         faqs = smileMakeoverFaqs;
+        guDict = SMILE_MAKEOVER_FAQS_GU;
       } else if (route.path.endsWith('/crowns-bridges')) {
         faqs = crownsBridgesFaqs;
+        guDict = CROWNS_BRIDGES_FAQS_GU;
       } else if (route.path.endsWith('/pediatric-dentistry')) {
         faqs = pediatricDentistryFaqs;
+        guDict = PEDIATRIC_DENTISTRY_FAQS_GU;
       }
 
       if (faqs.length > 0) {
-        schemas.push({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": faqs.map(faq => ({
-            "@type": "Question",
-            "name": faq.question,
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": faq.answer
+        if (route.language === 'gu') {
+          let hasMissing = false;
+          const mainEntity: any[] = [];
+          for (const faq of faqs) {
+            const translation = guDict ? guDict[faq.question] : null;
+            if (!translation || !translation.question || !translation.answer) {
+              hasMissing = true;
+              break;
             }
-          }))
-        });
+            mainEntity.push({
+              "@type": "Question",
+              "name": translation.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": translation.answer
+              }
+            });
+          }
+          if (hasMissing) {
+            console.warn(`[FAQ Schema Warning] Missing Gujarati FAQ translation for route: ${route.path}. Omitting FAQPage schema.`);
+          } else {
+            schemas.push({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": mainEntity
+            });
+          }
+        } else {
+          schemas.push({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqs.map(faq => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+              }
+            }))
+          });
+        }
       }
     } else if (route.path.startsWith('/blog/') || route.path.startsWith('/en/blog/')) {
       // Blog Article Schema
