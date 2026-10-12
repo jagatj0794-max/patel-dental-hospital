@@ -23,6 +23,7 @@ ErrorDocument 404 /404.html
   RewriteRule ^en/braces/?$ /en/services/braces-treatment/ [R=301,L]
   RewriteRule ^en/academy/?$ /en/blogs/ [R=301,L]
   RewriteRule ^en/about/?$ /en/doctors/ [R=301,L]
+  RewriteRule ^en/blog/?$ /en/blogs/ [R=301,L]
 
   # Optional Safety Net for Dynamic Client-Side SPA Routes (Admin & DB Tests)
   RewriteRule ^admin(/.*)?$ /index.html [L]
