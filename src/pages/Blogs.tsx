@@ -189,15 +189,40 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
+  // Sync selectedPostId from currentPage prop on popstate/navigation
+  useEffect(() => {
+    if (currentPage && currentPage.startsWith('blog/')) {
+      const postId = currentPage.substring('blog/'.length);
+      if (BLOG_POSTS.some(p => p.id === postId)) {
+        setSelectedPostId(postId);
+        return;
+      }
+    } else if (currentPage === 'blogs' || currentPage === 'academy') {
+      setSelectedPostId(null);
+    }
+  }, [currentPage]);
+
   const handlePostClick = (postId: string) => {
     setSelectedPostId(postId);
-    window.location.hash = `blog/${postId}`;
+    const path = `/en/blog/${postId}/`;
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+    if (setCurrentPage) {
+      setCurrentPage(`blog/${postId}`);
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleBackToList = () => {
     setSelectedPostId(null);
-    window.location.hash = 'blogs';
+    const path = '/en/blogs/';
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+    if (setCurrentPage) {
+      setCurrentPage('blogs');
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
