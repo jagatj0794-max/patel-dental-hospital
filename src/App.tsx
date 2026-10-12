@@ -80,6 +80,9 @@ const getPageFromUrl = (): PageId => {
   if (typeof window === 'undefined') {
     return 'home';
   }
+
+  const validPages: PageId[] = ['home', 'services', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
+
   // First check hash
   let page = window.location.hash.replace('#', '');
   if (page.startsWith('/')) {
@@ -91,6 +94,14 @@ const getPageFromUrl = (): PageId => {
     page = page.substring(2);
     if (page.startsWith('/')) {
       page = page.substring(1);
+    }
+  }
+
+  // Treat the hash as a route ONLY if it is a real route; otherwise (same-page anchor like benefits, faq) ignore it and fall back to pathname
+  if (page) {
+    const isRoute = page === 'admin' || page.startsWith('admin') || page === 'admin-login' || page === 'supabase-test' || validPages.includes(page as PageId) || page.startsWith('services/') || page.startsWith('blog/');
+    if (!isRoute) {
+      page = '';
     }
   }
   
@@ -123,7 +134,6 @@ const getPageFromUrl = (): PageId => {
     return 'admin';
   }
 
-  const validPages: PageId[] = ['home', 'services', 'implants', 'gallery', 'doctors', 'contact', 'admin', 'admin/login', 'supabase-test', 'kids', 'pediatric', 'pediatric-dentistry', 'braces', 'braces-treatment', 'social-service', 'technology', 'international', 'academy', 'blogs', 'why-choose-us'];
   if (page && (validPages.includes(page as PageId) || page.startsWith('services/') || page.startsWith('blog/'))) {
     return page as PageId;
   }

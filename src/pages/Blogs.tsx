@@ -178,8 +178,9 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
           setSelectedPostId(postId);
           return;
         }
+      } else if (hash === 'blogs') {
+        setSelectedPostId(null);
       }
-      setSelectedPostId(null);
     };
 
     window.addEventListener('hashchange', handleHash);

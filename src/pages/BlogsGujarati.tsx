@@ -178,8 +178,9 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
           setSelectedPostId(postId);
           return;
         }
+      } else if (hash === 'blogs') {
+        setSelectedPostId(null);
       }
-      setSelectedPostId(null);
     };
 
     window.addEventListener('hashchange', handleHash);
