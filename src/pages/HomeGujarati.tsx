@@ -2931,7 +2931,7 @@ export default function HomeGujarati({
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
                 <a
-                  href="https://maps.app.goo.gl/D35eZxR6xgAk93vi7"
+                  href="https://www.google.com/maps/place/Patel+Dental+Hospital/@22.2849732,70.7785378,17z/data=!3m2!4b1!5s0x3959ca3b9480c44f:0xc7ac34d54efdea75!4m6!3m5!1s0x3959cb46342cee0b:0x795278e6d37bfdd7!8m2!3d22.2849732!4d70.7811127!16s%2Fg%2F11vwp9gn3s"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"
@@ -2988,7 +2988,7 @@ export default function HomeGujarati({
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
                 <a
-                  href="https://maps.app.goo.gl/ZjBsNmdHpTR17iZ66"
+                  href="https://www.google.com/maps/place/Patel+Dental+Hospital/@22.2760712,70.8017874,17z/data=!3m1!4b1!4m6!3m5!1s0x3959ca73a223071b:0x7aa4eb7bffb8998c!8m2!3d22.2760712!4d70.8043623!16s%2Fg%2F11cnc7qn1n"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"

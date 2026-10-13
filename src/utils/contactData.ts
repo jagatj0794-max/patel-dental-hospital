@@ -13,7 +13,7 @@ export const DEFAULT_CONTACT_INFO: ContactInfo = {
   whatsappRaw: '919510397046',
   email: 'Pateldentalhospital1@gmail.com',
   address: 'Patel Dental Hospital, Business Centrum Complex, 1st Floor, Opp. Kings Heights, Beside Golden Super Market, Pandit Deendayal Upadhyay Road, From Rajnagar Chowk towards Amin Marg, Rajkot – 360001, Gujarat, India.',
-  mapsLink: 'https://maps.app.goo.gl/D35eZxR6xgAk93vi7'
+  mapsLink: 'https://www.google.com/maps/place/Patel+Dental+Hospital/@22.2849732,70.7785378,17z/data=!3m2!4b1!5s0x3959ca3b9480c44f:0xc7ac34d54efdea75!4m6!3m5!1s0x3959cb46342cee0b:0x795278e6d37bfdd7!8m2!3d22.2849732!4d70.7811127!16s%2Fg%2F11vwp9gn3s'
 };
 
 export const contactService = {
