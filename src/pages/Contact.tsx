@@ -500,7 +500,7 @@ Rajkot – 360001, Gujarat, India.`}
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <a
-                  href={contactInfo?.mapsLink || "https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic"}
+                  href={contactInfo?.mapsLink || "https://maps.app.goo.gl/D35eZxR6xgAk93vi7"}
                   target="_blank"
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-brand-navy hover:bg-brand-cyan text-white text-xs font-bold rounded-xl transition shadow"
@@ -508,7 +508,7 @@ Rajkot – 360001, Gujarat, India.`}
                   Amin Marg Branch Map
                 </a>
                 <a
-                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic"
+                  href="https://maps.app.goo.gl/ZjBsNmdHpTR17iZ66"
                   target="_blank"
                   rel="noreferrer"
                   className="px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow"

@@ -2931,7 +2931,7 @@ export default function HomeGujarati({
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
                 <a
-                  href="https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic"
+                  href="https://maps.app.goo.gl/D35eZxR6xgAk93vi7"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"
@@ -2988,7 +2988,7 @@ export default function HomeGujarati({
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-5 mt-auto">
                 <a
-                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic"
+                  href="https://maps.app.goo.gl/ZjBsNmdHpTR17iZ66"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center text-xs sm:text-sm font-bold text-white bg-[#00897B] hover:bg-[#1E3A5F] px-4 py-3.5 rounded-xl transition-all duration-300 text-center shadow-sm cursor-pointer gujarati-text"

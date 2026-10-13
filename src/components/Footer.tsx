@@ -294,7 +294,7 @@ Rajkot – 360001, Gujarat, India.`)}
                   <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
-                  href={contactInfo?.mapsLink || 'https://maps.app.goo.gl/AmSRutz2HjsBh6CX9?g_st=ic'} 
+                  href={contactInfo?.mapsLink || 'https://maps.app.goo.gl/D35eZxR6xgAk93vi7'} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1.5 text-xs text-brand-teal hover:text-white font-bold transition-colors group-hover:underline gujarati-text"
@@ -341,7 +341,7 @@ Rajkot, Gujarat, India.`}
                   <span>{contactInfo?.phone || '+91 9510397046'}</span>
                 </a>
                 <a 
-                  href="https://maps.app.goo.gl/5L8euDj9U4AiedgCA?g_st=ic" 
+                  href="https://maps.app.goo.gl/ZjBsNmdHpTR17iZ66" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-1.5 text-xs text-brand-teal hover:text-white font-bold transition-colors group-hover:underline gujarati-text"
