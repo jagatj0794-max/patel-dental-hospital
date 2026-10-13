@@ -1337,7 +1337,7 @@ export default function ServiceDetail({
         onClick: () => {
           const phone = dest === 'custom' 
             ? value.replace(/\s+/g, '') 
-            : (mConfig.contact_call_number ? mConfig.contact_call_number.replace(/\s+/g, '') : contactInfo.callRaw || '9924225500');
+            : (mConfig.contact_call_number ? mConfig.contact_call_number.replace(/\s+/g, '') : contactInfo.phoneRaw || '+919510397046');
           window.location.href = `tel:${phone}`;
         },
         isWhatsappSecondary: false
@@ -4606,7 +4606,7 @@ export default function ServiceDetail({
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 relative z-10 pt-2">
                   <button
                     onClick={() => {
-                      const phone = (mConfig.contact_call_number || mConfig.phone_number || contactInfo.callRaw || '+919924225500').replace(/\s+/g, '');
+                      const phone = (mConfig.contact_call_number || mConfig.phone_number || contactInfo.phoneRaw || '+919510397046').replace(/\s+/g, '');
                       window.location.href = `tel:${phone}`;
                     }}
                     className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"

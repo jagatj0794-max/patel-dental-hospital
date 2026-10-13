@@ -488,10 +488,10 @@ export default function ContactGujarati({
                   <div className="flex items-start">
                     <MapPin className="h-5 w-5 text-brand-teal mr-2 shrink-0 mt-0.5" />
                     <p className="leading-relaxed whitespace-pre-line text-slate-700 font-semibold font-sans">
-                      {`ડૉ. વિપુલ પટેલ, પટેલ ડેન્ટલ હોસ્પિટલ,
+                      {`પટેલ ડેન્ટલ હોસ્પિટલ,
 1st ફ્લોર, રામેશ્વર કોમ્પ્લેક્સ, SBI બેંકની સામે,
 ગાયત્રીનગર રોડ, જલારામ ચોક, ભક્તિનગર સર્કલ,
-રાજકોટ, ગુજરાત, ભારત.`}
+રાજકોટ – 360002, ગુજરાત, ભારત.`}
                     </p>
                   </div>
                   <div className="flex items-center">

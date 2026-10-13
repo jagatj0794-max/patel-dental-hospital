@@ -457,14 +457,13 @@ Rajkot – 360001, Gujarat, India.`}
                   <div className="flex items-start">
                     <MapPin className="h-5 w-5 text-brand-teal mr-2 shrink-0 mt-0.5" />
                     <p className="leading-relaxed whitespace-pre-line">
-                      Dr. Vipul Patel
                       Patel Dental Hospital,
                       1st Floor, Rameshwar Complex,
                       Opp. SBI Bank,
                       Gayatrinagar Road,
                       Jalaram Chowk,
                       Bhaktinagar Circle,
-                      Rajkot, Gujarat, India.
+                      Rajkot – 360002, Gujarat, India.
                     </p>
                   </div>
                   <div className="flex items-center">

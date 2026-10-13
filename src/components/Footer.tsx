@@ -319,15 +319,14 @@ Rajkot – 360001, Gujarat, India.`)}
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans whitespace-pre-line gujarati-text">
                   {language === 'gu'
-                    ? `ડૉ. વિપુલ પટેલ પટેલ ડેન્ટલ હોસ્પિટલ, 1st ફ્લોર, રામેશ્વર કોમ્પ્લેક્સ, SBI બેંકની સામે, ગાયત્રીનગર રોડ, જલારામ ચોક, ભક્તિનગર સર્કલ, રાજકોટ, ગુજરાત, ભારત.`
-                    : `Dr. Vipul Patel
-Patel Dental Hospital,
+                    ? `પટેલ ડેન્ટલ હોસ્પિટલ, 1st ફ્લોર, રામેશ્વર કોમ્પ્લેક્સ, SBI બેંકની સામે, ગાયત્રીનગર રોડ, જલારામ ચોક, ભક્તિનગર સર્કલ, રાજકોટ – 360002, ગુજરાત, ભારત.`
+                    : `Patel Dental Hospital,
 1st Floor, Rameshwar Complex,
 Opp. SBI Bank,
 Gayatrinagar Road,
 Jalaram Chowk,
 Bhaktinagar Circle,
-Rajkot, Gujarat, India.`}
+Rajkot – 360002, Gujarat, India.`}
                 </p>
               </div>
 
