@@ -4,6 +4,10 @@ ErrorDocument 404 /404.html
   RewriteEngine On
   RewriteBase /
 
+  # Redirect www to the non-www canonical host
+  RewriteCond %{HTTP_HOST} ^www\.pdhrajkot\.com$ [NC]
+  RewriteRule ^(.*)$ https://pdhrajkot.com/$1 [R=301,L]
+
   # Original Legacy 301 Redirects
   RewriteRule ^services/single-sitting-root-canal-treatment/?$ /services/root-canal-treatment/ [R=301,L]
   RewriteRule ^services/crowns-and-bridges/?$ /services/crowns-bridges/ [R=301,L]
