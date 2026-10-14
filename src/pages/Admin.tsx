@@ -9527,9 +9527,14 @@ export default function Admin({
                               value={svc.display_order ?? 0}
                               onChange={async (e) => {
                                 const newOrder = parseInt(e.target.value) || 0;
+                                const oldList = [...servicesList];
                                 const updatedSvc = { ...svc, display_order: newOrder };
                                 setServicesList(prev => prev.map(s => s.id === svc.id ? updatedSvc : s));
-                                await serviceService.saveService(updatedSvc);
+                                const result = await serviceService.saveService(updatedSvc);
+                                if (!result.success) {
+                                  setServicesList(oldList);
+                                  window.alert('Failed to save: ' + (result.error || 'Unknown error'));
+                                }
                               }}
                               className="w-16 px-2.5 py-1.5 text-xs text-center border border-slate-200 rounded-lg focus:outline-none focus:border-[#0D9488] font-bold bg-white text-slate-800 shadow-3xs transition duration-150"
                               title="Modify Display Order"
@@ -9583,9 +9588,14 @@ export default function Admin({
                               <button
                                 type="button"
                                 onClick={async () => {
+                                  const oldList = [...servicesList];
                                   const updatedSvc = { ...svc, is_active: !svc.is_active };
                                   setServicesList(prev => prev.map(s => s.id === svc.id ? updatedSvc : s));
-                                  await serviceService.saveService(updatedSvc);
+                                  const result = await serviceService.saveService(updatedSvc);
+                                  if (!result.success) {
+                                    setServicesList(oldList);
+                                    window.alert('Failed to save: ' + (result.error || 'Unknown error'));
+                                  }
                                 }}
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
                                   svc.is_active 

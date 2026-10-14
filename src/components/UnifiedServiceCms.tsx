@@ -204,9 +204,11 @@ export default function UnifiedServiceCms({ serviceSlug, onSaveSuccess }: Unifie
         onSaveSuccess?.();
       } else {
         setErrorMsg(result.error || 'Failed to save service configuration changes.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'An unexpected exception occurred during save operations.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSaving(false);
     }

@@ -1793,25 +1793,27 @@ const sanitizeServiceList = (services: Service[]): Service[] => {
 /**
  * Direct helper to update localStorage and Supabase without calling getServices() or triggering recursion
  */
-export async function saveServiceDirectly(service: Service): Promise<void> {
-  try {
-    const rawLocal = localStorage.getItem('hospital_services');
-    let services: Service[] = rawLocal ? JSON.parse(rawLocal) : [];
-    if (!Array.isArray(services)) services = [];
-    const existingIndex = services.findIndex(s => s.id === service.id);
-    if (existingIndex >= 0) {
-      services[existingIndex] = { ...services[existingIndex], ...service };
-    } else {
-      services.push(service);
+export async function saveServiceDirectly(service: Service): Promise<{ success: boolean; error?: string }> {
+  const updateLocalStorage = () => {
+    try {
+      const rawLocal = localStorage.getItem('hospital_services');
+      let services: Service[] = rawLocal ? JSON.parse(rawLocal) : [];
+      if (!Array.isArray(services)) services = [];
+      const existingIndex = services.findIndex(s => s.id === service.id);
+      if (existingIndex >= 0) {
+        services[existingIndex] = { ...services[existingIndex], ...service };
+      } else {
+        services.push(service);
+      }
+      localStorage.setItem('hospital_services', JSON.stringify(services));
+    } catch (e) {
+      console.warn('Failed to update localStorage in saveServiceDirectly:', e);
     }
-    localStorage.setItem('hospital_services', JSON.stringify(services));
-  } catch (e) {
-    console.warn('Failed to update localStorage in saveServiceDirectly:', e);
-  }
+  };
 
   if (isSupabaseConfigured()) {
     try {
-      let { error } = await supabase.client
+      const { data, error } = await supabase.client
         .from('services')
         .upsert({
           id: service.id,
@@ -1846,35 +1848,29 @@ export async function saveServiceDirectly(service: Service): Promise<void> {
           hero_image_alt_text: service.hero_image_alt_text || null,
           homepage_card_image_alt_text: service.homepage_card_image_alt_text || null,
           updated_at: new Date().toISOString()
-        });
+        })
+        .select('id');
 
-      if (error && (error.message?.includes('hero_title') || error.message?.includes('column'))) {
-        const { error: retryError1 } = await supabase.client
-          .from('services')
-          .upsert({
-            id: service.id,
-            slug: service.slug,
-            title: service.title,
-            short_description: service.short_description,
-            description: service.description,
-            hero_image: service.hero_image,
-            icon: service.icon || null,
-            display_order: service.display_order,
-            is_active: service.is_active,
-            seo_title: service.seo_title || null,
-            seo_description: service.seo_description || null,
-            homepage_card_image: service.homepage_card_image || null,
-            homepage_short_description: service.homepage_short_description || null,
-            features: service.features || null,
-            marketing_config: service.marketing_config || null,
-            updated_at: new Date().toISOString()
-          });
-        error = retryError1;
+      if (error) {
+        console.error('Direct Supabase upsert error in saveServiceDirectly:', error);
+        return { success: false, error: error.message };
       }
-    } catch (e) {
-      console.warn('Direct Supabase upsert error in saveServiceDirectly:', e);
+
+      if (!data || data.length === 0) {
+        return { success: false, error: 'Database did not confirm the save (no rows written). Please check permissions and try again.' };
+      }
+
+      updateLocalStorage();
+
+      return { success: true };
+    } catch (e: any) {
+      console.error('Direct Supabase upsert error in saveServiceDirectly:', e);
+      return { success: false, error: e?.message || String(e) };
     }
   }
+
+  updateLocalStorage();
+  return { success: true };
 }
 
 export const serviceService = {
@@ -3082,8 +3078,7 @@ export const serviceService = {
    * Save (Insert/Update) a service record.
    */
   saveService: async (service: Service): Promise<{ success: boolean; error?: string }> => {
-    await saveServiceDirectly(service);
-    return { success: true };
+    return await saveServiceDirectly(service);
   },
 
   /**
