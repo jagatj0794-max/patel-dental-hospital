@@ -844,7 +844,7 @@ export default function HomeGujarati({
             */}
             <img
               src={heroBgImage || "/patel-doctors-transparent.webp"}
-              alt="Dr. Jaimin Patel and Dr. Kinjal Patel at Patel Dental Hospital reception"
+              alt="Dr. Vipul Patel and Dr. Kinjal Patel at Patel Dental Hospital reception"
               className="w-full h-full object-cover object-top lg:object-[right_top]"
               referrerPolicy="no-referrer"
               loading="eager"
