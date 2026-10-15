@@ -61,8 +61,11 @@ export const awardsService = {
         .order('display_order', { ascending: true });
 
       if (error) {
-        console.error('[Awards] Fetch Error', error);
-        console.warn('Error fetching awards from public.awards table:', error);
+        if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+          console.warn('[Awards] Fetch aborted:', error.message);
+        } else {
+          console.warn('Error fetching awards from public.awards table:', error);
+        }
         awardsService.lastError = error.message;
         return [];
       }
@@ -105,8 +108,11 @@ export const awardsService = {
 
       return mapped;
     } catch (e: any) {
-      console.error('[Awards] Fetch Error', e);
-      console.warn('Exception in getAwards:', e);
+      if (e?.name === 'AbortError' || e?.message?.includes('aborted')) {
+        console.warn('[Awards] Fetch aborted:', e?.message || e);
+      } else {
+        console.warn('Exception in getAwards:', e);
+      }
       awardsService.lastError = e?.message || String(e);
       return [];
     }

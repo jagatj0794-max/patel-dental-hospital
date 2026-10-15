@@ -180,7 +180,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     guDesc: 'સોપારી-ગુટખાના કારણે મોં ઓછું ખુલવું, બળતરા થવી કે ફાઇબ્રોસિસની સમસ્યા માટે અત્યાધુનિક સારવાર અને સર્જરી.',
     badgeEn: 'Specialized Care',
     badgeGu: 'સ્પેશિયલ સારવાર',
-    image: '/Oral%20&%20Maxillofacial%20Surgery.png',
+    image: '/oral-and-maxillofacial-surgery.png',
     highlightsEn: ['Mouth Opening Restoration', 'Tissue Elasticity Therapy', 'Specialist Surgical Protocols'],
     highlightsGu: ['મોં ખોલવાની ક્ષમતા苏ધારણા', 'બળતરામાં તાત્કાલિક રાહત', 'નિષ્ણાત સર્જિકલ કેર']
   }

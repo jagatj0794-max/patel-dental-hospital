@@ -283,7 +283,7 @@ export default function Navbar({ currentPage, setCurrentPage, openAppointmentMod
             >
               <img 
                 id="navbar-brand-logo-img"
-                src="/Best Dntal Hospital Rajkot.PNG" 
+                src="/best-dental-hospital-rajkot.png" 
                 alt="Patel Dental Hospital Logo"
                 className="w-auto h-[40px] sm:h-[60px] lg:h-[72px] object-contain transition-all duration-300 group-hover:scale-[1.02] origin-left bg-transparent rounded-lg max-w-[65vw] sm:max-w-[340px] lg:max-w-[380px] xl:max-w-[500px]"
               />

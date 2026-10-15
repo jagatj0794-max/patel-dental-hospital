@@ -51,7 +51,7 @@ const BLOG_POSTS: BlogPost[] = [
     date: '8 ઓગસ્ટ 2026',
     readingTime: '6 મિનિટનો સમય',
     category: 'ડેન્ટલ ઈમ્પ્લાન્ટ',
-    image: '/dental implant in rajkot.jpg',
+    image: '/dental-implant-in-rajkot.jpg',
     imageAlt: 'પટેલ ડેન્ટલ હોસ્પિટલ, રાજકોટ ખાતે ડેન્ટલ ઈમ્પ્લાન્ટ ટ્રીટમેન્ટ પહેલા અને પછી',
     seoTitle: 'રાજકોટમાં ડેન્ટલ ઈમ્પ્લાન્ટ: ખર્ચ, પ્રક્રિયા અને શ્રેષ્ઠ ક્લિનિક',
     metaDescription: 'શું તમે દાંતના ઈમ્પ્લાન્ટ માટે રાજકોટમાં શ્રેષ્ઠ ડેન્ટલ ક્લિનિક શોધી રહ્યા છો? પટેલ ડેન્ટલ હોસ્પિટલ ખાતે ડેન્ટલ ઈમ્પ્લાન્ટ ટ્રીટમેન્ટની સંપૂર્ણ માર્ગદર્શિકા વાંચો.',
@@ -65,7 +65,7 @@ const BLOG_POSTS: BlogPost[] = [
     date: '1 ઓગસ્ટ 2026',
     readingTime: '5 મિનિટનો સમય',
     category: 'ઓર્થોડોન્ટિક્સ',
-    image: '/cline aliner in rajkot.jpg',
+    image: '/clear-aligner-in-rajkot.jpg',
     imageAlt: 'પટેલ ડેન્ટલ હોસ્પિટલ, રાજકોટ ખાતે અદ્રશ્ય ક્લિયર એલાઈનર્સ વિરુદ્ધ પરંપરાગત મેટલ બ્રેસીસ ટ્રીટમેન્ટ',
     seoTitle: 'બ્રેસીસ વિરુદ્ધ ક્લિયર એલાઈનર્સ: રાજકોટમાં ખર્ચ અને પરિણામો',
     metaDescription: 'બ્રેસીસ કે ક્લિયર એલાઈનર્સ? ઓર્થોડોન્ટિક ટ્રીટમેન્ટ ખર્ચ, ફાયદા અને રાજકોટમાં અદ્રશ્ય એલાઈનર્સ વિશેની અમારી સંપૂર્ણ સરખામણી માર્ગદર્શિકા વાંચો.',
@@ -79,7 +79,7 @@ const BLOG_POSTS: BlogPost[] = [
     date: '25 જુલાઈ 2026',
     readingTime: '4 મિનિટનો સમય',
     category: 'કોસ્મેટિક ડેન્ટિસ્ટ્રી',
-    image: '/white teeth in rajkot.jpg',
+    image: '/white-teeth-in-rajkot.jpg',
     imageAlt: 'પટેલ ડેન્ટલ હોસ્પિટલ, કોસ્મેટિક ડેન્ટિસ્ટ રાજકોટ દ્વારા ટીથ સ્કેલિંગ અને વ્હાઇટનિંગ પછીની સંભાળ માર્ગદર્શિકા',
     seoTitle: 'રાજકોટમાં ટીથ વ્હાઇટનિંગ પછી સફેદ દાંત કેવી રીતે જાળવી રાખવા',
     metaDescription: 'પટેલ ડેન્ટલ હોસ્પિટલ રાજકોટ ખાતે પ્રોફેશનલ ટીથ વ્હાઇટનિંગ ટ્રીટમેન્ટ પછી વધુ સફેદ અને સ્વસ્થ દાંત જાળવી રાખવા માટે ડેન્ટિસ્ટ દ્વારા મંજૂર કરાયેલી ૫ દૈનિક આદતો જાણો.',
@@ -162,7 +162,7 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
         "name": "Patel Dental Hospital",
         "logo": {
           "@type": "ImageObject",
-          "url": `${origin}/LOGO 3D FULL NAME WHITE (3)-1.png`
+          "url": `${origin}/logo-3d-full-name-white-3-1.png`
         }
       }
     } : undefined
@@ -270,7 +270,7 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
           {/* Featured Image */}
           <div className="aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden mb-10 border border-slate-100 shadow-2xs">
             <img 
-              src="/dental implant in rajkot.jpg" 
+              src="/dental-implant-in-rajkot.jpg" 
               alt="Before after dental implants treatment at Patel Dental Hospital, the best dental clinic in Rajkot" 
               className="w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
@@ -625,7 +625,7 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
           {/* Featured Image */}
           <div className="aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden mb-10 border border-slate-100 shadow-2xs">
             <img 
-              src="/cline aliner in rajkot.jpg" 
+              src="/clear-aligner-in-rajkot.jpg" 
               alt="Invisible clear aligners vs traditional metal braces treatment at Patel Dental Hospital, the best dental hospital in Rajkot" 
               className="w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
@@ -870,7 +870,7 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
           {/* Featured Image */}
           <div className="aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden mb-10 border border-slate-100 shadow-2xs">
             <img 
-              src="/white teeth in rajkot.jpg" 
+              src="/white-teeth-in-rajkot.jpg" 
               alt="White teeth scaling and teeth whitening aftercare guide by cosmetic dentist in Rajkot, Patel Dental Hospital" 
               className="w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"

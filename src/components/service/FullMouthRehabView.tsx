@@ -64,7 +64,7 @@ export const FullMouthRehabView: React.FC<FullMouthRehabViewProps> = ({
   displayGallery,
   seoHeadings,
   openAppointmentModal,
-  drVipulImg = '/dr. patel.png',
+  drVipulImg = '/dr-patel.png',
   setCurrentPage,
   language = 'en'
 }) => {

@@ -57,19 +57,19 @@ const gujaratDestinations = [
   {
     name: "સ્ટેચ્યુ ઓફ યુનિટી",
     description: "વિશ્વની સૌથી ઊંચી પ્રતિમા અને ભારતનું પ્રસિદ્ધ ઐતિહાસિક સ્થળ.",
-    image: "/1730717115_Statue_of_Unity.jpg",
+    image: "/1730717115-statue-of-unity.jpg",
     location: "કેવડિયા"
   },
   {
     name: "કચ્છનું રણ",
     description: "ગુજરાતના પ્રસિદ્ધ સફેદ રણનો અનુભવ કરો.",
-    image: "/Great Rann Of Kutch (14).jpg",
+    image: "/great-rann-of-kutch-14.jpg",
     location: "કચ્છ"
   },
   {
     name: "ગીર નેશનલ પાર્ક",
     description: "દુર્લભ એશિયાટિક સિંહોનું ઘર.",
-    image: "/Gir-National-Park-and-Santuary.jpg",
+    image: "/gir-national-park-and-sanctuary.jpg",
     location: "ગીર ફોરેસ્ટ"
   },
   {
@@ -81,7 +81,7 @@ const gujaratDestinations = [
   {
     name: "દ્વારકાધીશ મંદિર",
     description: "અરબી સમુદ્રના કિનારે આવેલું પ્રાચીન કૃષ્ણ મંદિર.",
-    image: "/Gujarat-Dwarkadhish-Temple.jpg",
+    image: "/gujarat-dwarkadhish-temple.jpg",
     location: "દ્વારકા"
   },
   {
@@ -161,7 +161,7 @@ const internationalTreatments = [
     slug: "dental-implants",
     title: "ડેન્ટલ ઇમ્પ્લાન્ટ",
     description: "ખોવાયેલા દાંતને કુદરતી દેખાવ અને કાર્યક્ષમતા ધરાવતા દાંતથી બદલો.",
-    image: "/Dental%20Implants.webp",
+    image: "/dental-implants.webp",
     route: "services/dental-implants"
   },
   {
@@ -169,7 +169,7 @@ const internationalTreatments = [
     slug: "smile-makeover",
     title: "સ્માઇલ મેકઓવર",
     description: "વ્યક્તિગત કોસ્મેટિક ડેન્ટિસ્ટ્રી દ્વારા તમારા સ્માઇલના દેખાવમાં પરિવર્તન લાવો.",
-    image: "/Smile%20Designing.webp",
+    image: "/smile-designing.webp",
     route: "services/smile-makeover"
   },
   {
@@ -177,7 +177,7 @@ const internationalTreatments = [
     slug: "full-mouth-rehabilitation",
     title: "ફુલ માઉથ રિહેબિલિટેશન",
     description: "ગંભીર રીતે નુકસાન પામેલા, ઘસાઈ ગયેલા અથવા ખોવાયેલા દાંત માટે સંપૂર્ણ પુનઃનિર્માણ સારવાર.",
-    image: "/Full%20Mouth.webp",
+    image: "/full-mouth.webp",
     route: "services/full-mouth-rehabilitation"
   },
   {
@@ -185,7 +185,7 @@ const internationalTreatments = [
     slug: "crowns-and-bridges",
     title: "ક્રાઉન્સ અને બ્રિજિસ",
     description: "મેટલ-ફ્રી, પ્રીમિયમ ઝિર્કોનિયા રિસ્ટોરેશન દ્વારા નુકસાન પામેલા અથવા ખોવાયેલા દાંતને પુનઃસ્થાપિત કરો.",
-    image: "/Digital%20Dental%20Experts.webp",
+    image: "/digital-dental-experts.webp",
     route: "services/crowns-and-bridges"
   },
   {
@@ -193,7 +193,7 @@ const internationalTreatments = [
     slug: "root-canal-treatment",
     title: "સિંગલ સિટિંગ રૂટ કેનાલ સારવાર",
     description: "આરામદાયક અને એક જ મુલાકાતમાં થતી રૂટ કેનાલ સારવાર દ્વારા ચેપગ્રસ્ત દાંતને બચાવો અને દુખાવો દૂર કરો.",
-    image: "/Root%20Canal.webp",
+    image: "/root-canal.webp",
     route: "services/root-canal-treatment"
   },
   {
@@ -201,7 +201,7 @@ const internationalTreatments = [
     slug: "invisible-aligners",
     title: "ઇનવિઝિબલ એલાઇનર્સ",
     description: "કસ્ટમ, લગભગ અદૃશ્ય એલાઇનર્સ દ્વારા આરામદાયક અને સરળતાથી દૃશ્યમાન ન થાય તે રીતે તમારા દાંતને સીધા કરો.",
-    image: "/Aligners.webp",
+    image: "/aligners.webp",
     route: "services/invisible-aligners"
   },
   {
@@ -217,7 +217,7 @@ const internationalTreatments = [
     slug: "teeth-whitening",
     title: "દાંત સફેદ કરવાની સારવાર",
     description: "અમારી સલામત, ઝડપી અને અત્યંત અસરકારક દાંત સફેદ કરવાની પ્રક્રિયાઓ દ્વારા તમારા સ્માઇલને વધુ ચમકદાર બનાવો.",
-    image: "/white%20teeth%20in%20rajkot.jpg",
+    image: "/white-teeth-in-rajkot.jpg",
     route: "services/teeth-whitening"
   },
   {
@@ -225,7 +225,7 @@ const internationalTreatments = [
     slug: "braces-treatment",
     title: "બ્રેસિસ સારવાર",
     description: "ટકાઉ સિરામિક, મેટલ અથવા સેલ્ફ-લિગેટિંગ બ્રેકેટ સિસ્ટમનો ઉપયોગ કરીને પરંપરાગત ઓર્થોડોન્ટિક સારવાર.",
-    image: "/IMG_3610.webp",
+    image: "/img-3610.webp",
     route: "services/braces-treatment"
   },
   {
@@ -233,7 +233,7 @@ const internationalTreatments = [
     slug: "wisdom-tooth-surgery",
     title: "અક્કલ દાંતની સર્જરી",
     description: "અટવાયેલા અથવા દુખાવાવાળા અક્કલ દાંતને સુરક્ષિત અને દુખાવા વગર સર્જરી દ્વારા દૂર કરવાની સારવાર.",
-    image: "/Oral%20&%20Maxillofacial%20Surgery.png",
+    image: "/oral-and-maxillofacial-surgery.png",
     route: "services/wisdom-tooth-surgery"
   },
   {
@@ -241,7 +241,7 @@ const internationalTreatments = [
     slug: "tooth-coloured-filling",
     title: "દાંતના રંગનું ફિલિંગ (કમ્પોઝિટ ફિલિંગ)",
     description: "Seamlessly restore decayed or damaged teeth with natural-looking, metal-free composite fillings.",
-    image: "/MG_3249.webp",
+    image: "/mg-3249.webp",
     route: "services/tooth-coloured-filling"
   }
 ];
@@ -626,7 +626,7 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
                 {/* Main Hero Image */}
                 <div className="aspect-[4/3] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 relative">
                   <img
-                    src="/NRI.webp"
+                    src="/nri.webp"
                     alt="Patel Dental Hospital International Care"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
@@ -735,7 +735,7 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
             <div className="col-span-5 relative">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 relative">
                 <img
-                  src="/NRI.webp"
+                  src="/nri.webp"
                   alt="Patel Dental Hospital International Care"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -768,7 +768,7 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
             <div className="mx-auto max-w-sm px-2">
               <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-md border-4 border-white bg-slate-50 relative">
                 <img
-                  src="/NRI.webp"
+                  src="/nri.webp"
                   alt="Patel Dental Hospital International Care"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -1502,7 +1502,7 @@ export default function DentalTourismGujarati({ openAppointmentModal, setCurrent
               {/* Clean, sized image wrapper directly on the mint background */}
               <div className="relative w-full max-w-[310px] sm:max-w-[360px] lg:max-w-[380px] aspect-[4/5] rounded-[24px] overflow-hidden transition-transform duration-500 hover:-translate-y-1">
                 <img
-                  src="/dr. vipul patel.webp"
+                  src="/dr-vipul-patel.webp"
                   alt="Dr. Vipul Patel - Best Dentist in Rajkot"
                   className="w-full h-full object-cover object-top hover:scale-[1.03] transition-transform duration-700 ease-out"
                   referrerPolicy="no-referrer"

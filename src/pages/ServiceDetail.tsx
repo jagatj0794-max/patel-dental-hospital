@@ -241,7 +241,7 @@ export const FeaturedTreatmentVideo: React.FC<FeaturedTreatmentVideoProps> = ({
   );
 };
 
-function getFallbackMedia(slug: string, title: string) {
+function getFallbackMedia(slug: string, title: string): any {
   let heroImg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
   let heroCap = 'State-of-the-art dental clinical care at Patel Dental Hospital.';
   
@@ -368,7 +368,7 @@ export default function ServiceDetail({
   const [relatedServices, setRelatedServices] = useState<Service[]>(() => previewRelatedServices || []);
   const [allServicesList, setAllServicesList] = useState<Service[]>(() => preloadedData?.services || DEFAULT_SERVICES);
   const [contactInfo, setContactInfo] = useState<ContactInfo>(() => preloadedData?.contactInfo || DEFAULT_CONTACT_INFO);
-  const [drVipulImg, setDrVipulImg] = useState('/dr. patel.png');
+  const [drVipulImg, setDrVipulImg] = useState('/dr-patel.png');
   
   const [isLoading, setIsLoading] = useState(!fallbackInitialService);
 
@@ -3675,7 +3675,7 @@ export default function ServiceDetail({
             'dental-implants': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450851786_qnipnf0s.webp',
             'full-mouth-rehabilitation': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp',
             'wisdom-tooth-surgery': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp',
-            'oral-submucous-fibrosis-osmf-treatment-rajkot': '/Oral%20&%20Maxillofacial%20Surgery.png',
+            'oral-submucous-fibrosis-osmf-treatment-rajkot': '/oral-and-maxillofacial-surgery.png',
             'root-canal-treatment': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1786450901463_tvoinbyq.jpg',
             'invisible-aligners': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407659917_xj46d3vp.webp',
             'smile-makeover': 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407738608_3vac10yu.webp',

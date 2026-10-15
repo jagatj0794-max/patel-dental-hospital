@@ -431,20 +431,20 @@ const clinicInterior = 'https://images.unsplash.com/photo-1629909613654-28e377c3
 const heroBannerBg = 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=1200';
 const doctorsImg = 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800';
 import AnimatedCounter from '../components/AnimatedCounter';
-const sameDayTeethImg = '/Dental%20Implants.webp';
-const dentalImplantsImg = '/Dental%20Implants.webp';
-const fullMouthRehabImg = '/Full%20Mouth.webp';
-const clearAlignersImg = '/Aligners.webp';
-const rootCanalImg = '/Root%20Canal.webp';
-const smileMakeoverImg = '/Smile%20Designing.webp';
-const crownsBridgesImg = '/Digital%20Dental%20Experts.webp';
-const teethCleaningImg = '/white%20teeth%20in%20rajkot.jpg';
+const sameDayTeethImg = '/dental-implants.webp';
+const dentalImplantsImg = '/dental-implants.webp';
+const fullMouthRehabImg = '/full-mouth.webp';
+const clearAlignersImg = '/aligners.webp';
+const rootCanalImg = '/root-canal.webp';
+const smileMakeoverImg = '/smile-designing.webp';
+const crownsBridgesImg = '/digital-dental-experts.webp';
+const teethCleaningImg = '/white-teeth-in-rajkot.jpg';
 const kidsDentistryImg = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407803817_fd94jnkr.webp';
-const bracesImg = '/IMG_3610.webp';
+const bracesImg = '/img-3610.webp';
 const wisdomToothImg = 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407897064_5jan06j9.webp';
-const osmfHeroImg = '/Oral%20&%20Maxillofacial%20Surgery.png';
-const compositeFillingImg = '/MG_3249.webp';
-const fdaApprovedImplantImg = '/Dental%20Implants.webp';
+const osmfHeroImg = '/oral-and-maxillofacial-surgery.png';
+const compositeFillingImg = '/mg-3249.webp';
+const fdaApprovedImplantImg = '/dental-implants.webp';
 
 const patelDentistPatient1 = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800';
 const patelReceptionLounge = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=800';
@@ -1085,7 +1085,7 @@ export default function Home({
           {/* LAYER 3: INDEPENDENT DOCTOR IMAGE LAYER (Foreground Transparent Doctor Asset Only) */}
           <div className="absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 flex items-end justify-end pointer-events-none pr-1 md:pr-4">
             <img
-              src="/Teblate hero image-1.webp"
+              src="/tablet-hero-image-1.webp"
               alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
               className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
               referrerPolicy="no-referrer"
@@ -1507,7 +1507,7 @@ export default function Home({
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/1,-1.webp" 
+                      src="/1-1.webp" 
                       alt="Digital Dental Experts" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
@@ -1525,7 +1525,7 @@ export default function Home({
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/2,-1.webp" 
+                      src="/2-1.webp" 
                       alt="Dental Implant Specialists" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
@@ -1543,7 +1543,7 @@ export default function Home({
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/3,-1.webp" 
+                      src="/3-1.webp" 
                       alt="Braces & Invisible Aligner Experts" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
@@ -1561,7 +1561,7 @@ export default function Home({
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-b lg:border-b-0 border-slate-100 sm:border-r-0 lg:border-r transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/4,-1.webp" 
+                      src="/4-1.webp" 
                       alt="FMR & Root Canal Specialists" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
@@ -1579,7 +1579,7 @@ export default function Home({
                 <div className="flex flex-col items-center text-center p-6 sm:p-8 border-slate-100 col-span-1 sm:col-span-2 lg:col-span-1 transition-all duration-300 hover:bg-[#F8FAFC]/50 group">
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
-                      src="/5,-1.webp" 
+                      src="/5-1.webp" 
                       alt="Oral & Maxillofacial Surgery" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
@@ -1643,7 +1643,7 @@ export default function Home({
                 suffix: "+",
                 title: "Dental Implants",
                 subtitle: "Fixed Teeth Solutions",
-                icon: "/Dental Implant svg.svg",
+                icon: "/dental-implant-svg.svg",
                 color: "text-rose-500",
                 bgColor: "bg-rose-50/50",
                 borderColor: "border-rose-100/40",
@@ -1653,7 +1653,7 @@ export default function Home({
                 suffix: "+",
                 title: "Full Mouth Rehabilitation",
                 subtitle: "Comprehensive Rehabilitation",
-                icon: "/Full Mouth.webp",
+                icon: "/full-mouth.webp",
                 color: "text-amber-500",
                 bgColor: "bg-amber-50/50",
                 borderColor: "border-amber-100/40",
@@ -1663,7 +1663,7 @@ export default function Home({
                 suffix: "+",
                 title: "Root Canal Treatments",
                 subtitle: "Single Sitting Specialization",
-                icon: "/Root Canal Treatments.svg.svg",
+                icon: "/root-canal-treatments.svg",
                 color: "text-[#10B981]",
                 bgColor: "bg-emerald-50/50",
                 borderColor: "border-emerald-100/40",
@@ -1683,7 +1683,7 @@ export default function Home({
                 suffix: "+",
                 title: "Aligners",
                 subtitle: "Clear Smile Alignment",
-                icon: "/Aligners svg.svg",
+                icon: "/aligners-svg.svg",
                 color: "text-[#0ea5e9]",
                 bgColor: "bg-blue-50/70",
                 borderColor: "border-blue-100/50",
@@ -1693,7 +1693,7 @@ export default function Home({
                 suffix: "+",
                 title: "Smile Designing",
                 subtitle: "Aesthetic Smile Customization",
-                icon: "/Smile Designing.webp",
+                icon: "/smile-designing.webp",
                 color: "text-teal-500",
                 bgColor: "bg-teal-50/50",
                 borderColor: "border-teal-100/40",
@@ -1703,7 +1703,7 @@ export default function Home({
                 suffix: "+",
                 title: "Oral & Maxillofacial Surgeries",
                 subtitle: "Expert Surgical Solutions",
-                icon: "/Oral & Maxillofacial Surgeries svg.svg",
+                icon: "/oral-and-maxillofacial-surgeries-svg.svg",
                 color: "text-indigo-500",
                 bgColor: "bg-indigo-50/50",
                 borderColor: "border-indigo-100/40",
@@ -2479,7 +2479,7 @@ export default function Home({
                 >
                   <img
                     className="w-full h-full object-cover absolute inset-0"
-                    src="/IMG_20190521_190345.jpg"
+                    src="/img-20190521-190345.jpg"
                     alt="Patel Dental Hospital Premium Modern Treatment Center"
                     referrerPolicy="no-referrer"
                   />
@@ -2547,7 +2547,7 @@ export default function Home({
               <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
                 <img
                    className="w-full h-full object-cover absolute inset-0 z-10"
-                   src="/MG_3249.webp"
+                   src="/mg-3249.webp"
                    alt="Patel Dental Hospital Advanced Clinical Care"
                    referrerPolicy="no-referrer"
                    loading="lazy"
@@ -2726,7 +2726,7 @@ export default function Home({
             >
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
-                  src="/IMG_3610.webp"
+                  src="/img-3610.webp"
                   alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"

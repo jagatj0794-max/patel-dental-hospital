@@ -3109,7 +3109,7 @@ export default function Admin({
         .then(() => console.log('[Audio] Wav Chime played successfully.'))
         .catch(e => {
           console.warn('[Audio] Wav playback prevented or failed, trying mp3 fallback:', e);
-          const audioFallback = new Audio('/sounds/notification.wav.mp3');
+          const audioFallback = new Audio('/sounds/notification.mp3');
           audioFallback.volume = 0.55;
           audioFallback.play()
             .then(() => console.log('[Audio] Fallback MP3 chime played successfully.'))
@@ -9641,7 +9641,7 @@ export default function Admin({
       <div className="lg:hidden w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between relative z-30 shrink-0">
         <div className="flex items-center space-x-2">
           <img 
-            src="/Best Dntal Hospital Rajkot.PNG" 
+            src="/best-dental-hospital-rajkot.png" 
             alt="Patel Logo" 
             className="h-9 w-auto object-contain rounded-md"
             referrerPolicy="no-referrer"
@@ -9673,7 +9673,7 @@ export default function Admin({
           {/* Logo Brand Header (Desktop only) */}
           <div className="hidden lg:flex flex-col items-center pb-4 border-b border-slate-100">
             <img 
-              src="/Best Dntal Hospital Rajkot.PNG" 
+              src="/best-dental-hospital-rajkot.png" 
               alt="Patel Dental Hospital Logo" 
               className="h-[52px] w-auto object-contain mb-3 rounded-lg"
               referrerPolicy="no-referrer"

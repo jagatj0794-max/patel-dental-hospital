@@ -855,9 +855,9 @@ export default function WhyChooseUsGujarati({
             const isKinjal = (doctor.id === 'kinjal' || doctor.name.toLowerCase().includes('kinjal'));
             const isVipul = (doctor.id === 'vipul' || doctor.name.toLowerCase().includes('vipul'));
             const imageSrc = isKinjal 
-              ? '/Dr. Kinjal Patel.JPG' 
+              ? '/dr-kinjal-patel.jpg' 
               : isVipul 
-                ? '/Dr. Vipul Patel.jpg' 
+                ? '/dr-vipul-patel.jpg' 
                 : doctor.img;
 
             return (

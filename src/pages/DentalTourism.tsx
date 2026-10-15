@@ -57,19 +57,19 @@ const gujaratDestinations = [
   {
     name: "Statue of Unity",
     description: "World's tallest statue and India's iconic landmark.",
-    image: "/1730717115_Statue_of_Unity.jpg",
+    image: "/1730717115-statue-of-unity.jpg",
     location: "Kevadia"
   },
   {
     name: "Rann of Kutch",
     description: "Experience the famous White Desert of Gujarat.",
-    image: "/Great Rann Of Kutch (14).jpg",
+    image: "/great-rann-of-kutch-14.jpg",
     location: "Kutch"
   },
   {
     name: "Gir National Park",
     description: "Home of the rare Asiatic Lions.",
-    image: "/Gir-National-Park-and-Santuary.jpg",
+    image: "/gir-national-park-and-sanctuary.jpg",
     location: "Gir Forest"
   },
   {
@@ -81,7 +81,7 @@ const gujaratDestinations = [
   {
     name: "Dwarkadhish Temple",
     description: "Ancient Krishna temple on the Arabian Sea.",
-    image: "/Gujarat-Dwarkadhish-Temple.jpg",
+    image: "/gujarat-dwarkadhish-temple.jpg",
     location: "Dwarka"
   },
   {
@@ -161,7 +161,7 @@ const internationalTreatments = [
     slug: "dental-implants",
     title: "Dental Implants",
     description: "Replace missing teeth with natural-looking, functional teeth.",
-    image: "/Dental%20Implants.webp",
+    image: "/dental-implants.webp",
     route: "services/dental-implants"
   },
   {
@@ -169,7 +169,7 @@ const internationalTreatments = [
     slug: "smile-makeover",
     title: "Smile Makeover",
     description: "Transform the appearance of your smile with personalised cosmetic dentistry.",
-    image: "/Smile%20Designing.webp",
+    image: "/smile-designing.webp",
     route: "services/smile-makeover"
   },
   {
@@ -177,7 +177,7 @@ const internationalTreatments = [
     slug: "full-mouth-rehabilitation",
     title: "Full-Mouth Rehabilitation",
     description: "Comprehensive reconstruction for severely damaged, worn or missing teeth.",
-    image: "/Full%20Mouth.webp",
+    image: "/full-mouth.webp",
     route: "services/full-mouth-rehabilitation"
   },
   {
@@ -185,7 +185,7 @@ const internationalTreatments = [
     slug: "crowns-and-bridges",
     title: "Zirconia Crowns & Bridges",
     description: "Restore damaged or missing teeth with metal-free, premium Zirconia restorations.",
-    image: "/Digital%20Dental%20Experts.webp",
+    image: "/digital-dental-experts.webp",
     route: "services/crowns-and-bridges"
   },
   {
@@ -193,7 +193,7 @@ const internationalTreatments = [
     slug: "root-canal-treatment",
     title: "Single Sitting Root Canal Treatment",
     description: "Save infected teeth and eliminate pain with comfortable, single-visit root canal therapy.",
-    image: "/Root%20Canal.webp",
+    image: "/root-canal.webp",
     route: "services/root-canal-treatment"
   },
   {
@@ -201,7 +201,7 @@ const internationalTreatments = [
     slug: "invisible-aligners",
     title: "Invisible Aligners",
     description: "Straighten your teeth comfortably and discreetly with custom, virtually invisible aligners.",
-    image: "/Aligners.webp",
+    image: "/aligners.webp",
     route: "services/invisible-aligners"
   },
   {
@@ -217,7 +217,7 @@ const internationalTreatments = [
     slug: "teeth-whitening",
     title: "Teeth Whitening",
     description: "Brighten your smile dramatically with our safe, fast, and highly effective teeth whitening procedures.",
-    image: "/white%20teeth%20in%20rajkot.jpg",
+    image: "/white-teeth-in-rajkot.jpg",
     route: "services/teeth-whitening"
   },
   {
@@ -225,7 +225,7 @@ const internationalTreatments = [
     slug: "braces-treatment",
     title: "Braces Treatment",
     description: "Classic orthodontic corrections using durable ceramic, metal, or self-ligating bracket systems.",
-    image: "/IMG_3610.webp",
+    image: "/img-3610.webp",
     route: "services/braces-treatment"
   },
   {
@@ -233,7 +233,7 @@ const internationalTreatments = [
     slug: "wisdom-tooth-surgery",
     title: "Wisdom Tooth Surgery",
     description: "Safe, pain-free, surgical extraction of impacted or painful wisdom teeth.",
-    image: "/Oral%20&%20Maxillofacial%20Surgery.png",
+    image: "/oral-and-maxillofacial-surgery.png",
     route: "services/wisdom-tooth-surgery"
   },
   {
@@ -241,7 +241,7 @@ const internationalTreatments = [
     slug: "tooth-coloured-filling",
     title: "Tooth Coloured Filling (Composite Filling)",
     description: "Seamlessly restore decayed or damaged teeth with natural-looking, metal-free composite fillings.",
-    image: "/MG_3249.webp",
+    image: "/mg-3249.webp",
     route: "services/tooth-coloured-filling"
   }
 ];
@@ -624,7 +624,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 {/* Main Hero Image */}
                 <div className="aspect-[4/3] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 relative">
                   <img
-                    src="/NRI.webp"
+                    src="/nri.webp"
                     alt="Patel Dental Hospital International Care"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
@@ -733,7 +733,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             <div className="col-span-5 relative">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 relative">
                 <img
-                  src="/NRI.webp"
+                  src="/nri.webp"
                   alt="Patel Dental Hospital International Care"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -766,7 +766,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             <div className="mx-auto max-w-sm px-2">
               <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-md border-4 border-white bg-slate-50 relative">
                 <img
-                  src="/NRI.webp"
+                  src="/nri.webp"
                   alt="Patel Dental Hospital International Care"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -1502,7 +1502,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
               {/* Clean, sized image wrapper directly on the mint background */}
               <div className="relative w-full max-w-[310px] sm:max-w-[360px] lg:max-w-[380px] aspect-[4/5] rounded-[24px] overflow-hidden transition-transform duration-500 hover:-translate-y-1">
                 <img
-                  src="/dr. vipul patel.webp"
+                  src="/dr-vipul-patel.webp"
                   alt="Dr. Vipul Patel - Best Dentist in Rajkot"
                   className="w-full h-full object-cover object-top hover:scale-[1.03] transition-transform duration-700 ease-out"
                   referrerPolicy="no-referrer"

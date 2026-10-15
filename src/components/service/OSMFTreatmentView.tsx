@@ -324,7 +324,7 @@ export const OSMFTreatmentView: React.FC<OSMFTreatmentViewProps> = ({
           <div className="w-full md:w-2/5 shrink-0">
             <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 relative shadow-sm">
               <img 
-                src="/Dr. Vipul Patel.jpg" 
+                src="/dr-vipul-patel.jpg" 
                 alt="Dr. Vipul Patel"
                 className="w-full h-full object-cover object-top"
                 referrerPolicy="no-referrer"

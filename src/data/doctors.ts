@@ -102,7 +102,7 @@ AWARDS & RECOGNITION
     name: 'Dr. Vipul Patel',
     titles: 'MDS in Oral & Maxillofacial Surgery, MDS in Oral Medicine & Radiology, Mastership in Implant Prosthodontics (USA)',
     designation: 'Maxillofacial Surgeon & Implantologist',
-    img: '/dr. patel.png',
+    img: '/dr-patel.png',
     briefIntro: `PROFESSIONAL PROFILE
 
 Dr. Vipul Patel has been practicing as a Dental Implant Surgeon in Rajkot since 2012.

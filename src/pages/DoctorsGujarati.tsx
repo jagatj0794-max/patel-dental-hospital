@@ -13,7 +13,7 @@ import { useSEO } from '../utils/seo';
 
 // Unified images with clear paths
 const drKinjalPatelImg = '/Dr kinjal patel 2.png';
-const drVipulPatelImg = '/dr. patel.png';
+const drVipulPatelImg = '/dr-patel.png';
 
 import { Doctor } from '../types';
 import { DoctorBioRenderer as OriginalDoctorBioRenderer } from '../components/DoctorBioRenderer';

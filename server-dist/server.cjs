@@ -36,9 +36,20 @@ var sanitizeEnvValue = (val) => {
   }
   return trimmed;
 };
+process.on("uncaughtException", (err) => {
+  console.error("[Server UncaughtException]", err);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("[Server UnhandledRejection]", reason);
+});
 async function startServer() {
   const app = (0, import_express.default)();
-  const PORT = 3e3;
+  const portArgIndex = process.argv.indexOf("--port");
+  const portFromArgs = portArgIndex !== -1 ? Number(process.argv[portArgIndex + 1]) : null;
+  const PORT = Number(process.env.PORT) || portFromArgs || 3e3;
+  const hostArgIndex = process.argv.indexOf("--host");
+  const hostFromArgs = hostArgIndex !== -1 ? process.argv[hostArgIndex + 1] : null;
+  const HOST = process.env.HOST || hostFromArgs || "0.0.0.0";
   app.use("/api/supabase", import_express.default.raw({ type: "*/*", limit: "50mb" }));
   app.all("/api/supabase/*", async (req, res) => {
     if (req.method === "OPTIONS") {
@@ -87,10 +98,16 @@ async function startServer() {
       }
       console.log(`[Supabase Proxy] Forwarding ${req.method} request to: ${targetUrl}`);
       const response = await fetch(targetUrl, fetchOptions);
+      if (res.headersSent || res.writableEnded) {
+        return;
+      }
       response.headers.forEach((value, name) => {
         const lowerName = name.toLowerCase();
         if (!["content-encoding", "transfer-encoding", "content-length"].includes(lowerName) && !lowerName.startsWith("access-control-")) {
-          res.setHeader(name, value);
+          try {
+            res.setHeader(name, value);
+          } catch (_) {
+          }
         }
       });
       const origin = req.headers.origin || "*";
@@ -100,13 +117,17 @@ async function startServer() {
       res.setHeader("Access-Control-Allow-Headers", req.headers["access-control-request-headers"] || "authorization, apikey, content-type, x-client-info, x-supabase-auth");
       res.status(response.status);
       const buffer = await response.arrayBuffer();
-      res.send(Buffer.from(buffer));
+      if (!res.writableEnded) {
+        res.send(Buffer.from(buffer));
+      }
     } catch (err) {
       console.error("[Supabase Proxy Error] Failed to proxy request:", err);
-      res.status(500).json({
-        error: "Failed to proxy request to Supabase",
-        message: err.message
-      });
+      if (!res.headersSent && !res.writableEnded) {
+        res.status(500).json({
+          error: "Failed to proxy request to Supabase",
+          message: err?.message || String(err)
+        });
+      }
     }
   });
   app.get("/api/health", (req, res) => {
@@ -115,9 +136,59 @@ async function startServer() {
   app.get(["/about", "/about/"], (req, res) => {
     res.redirect(301, "/doctors/");
   });
+  const assetRedirectMap = {
+    "/1,-1.webp": "/1-1.webp",
+    "/1730717115_Statue_of_Unity.jpg": "/1730717115-statue-of-unity.jpg",
+    "/2,-1.webp": "/2-1.webp",
+    "/3,-1.webp": "/3-1.webp",
+    "/4,-1.webp": "/4-1.webp",
+    "/5,-1.webp": "/5-1.webp",
+    "/Aligners svg.svg": "/aligners-svg.svg",
+    "/Aligners.webp": "/aligners.webp",
+    "/Best Dntal Hospital Rajkot.PNG": "/best-dental-hospital-rajkot.png",
+    "/Dental Implant svg.svg": "/dental-implant-svg.svg",
+    "/Dental Implants.webp": "/dental-implants.webp",
+    "/Digital Dental Experts.webp": "/digital-dental-experts.webp",
+    "/Dr. Kinjal Patel.JPG": "/dr-kinjal-patel.jpg",
+    "/Dr. Vipul Patel.jpg": "/dr-vipul-patel.jpg",
+    "/Full Mouth.webp": "/full-mouth.webp",
+    "/Gir-National-Park-and-Santuary.jpg": "/gir-national-park-and-sanctuary.jpg",
+    "/Great Rann Of Kutch (14).jpg": "/great-rann-of-kutch-14.jpg",
+    "/Gujarat-Dwarkadhish-Temple.jpg": "/gujarat-dwarkadhish-temple.jpg",
+    "/IMG_20190521_190345.jpg": "/img-20190521-190345.jpg",
+    "/IMG_20200313_130221.jpg": "/img-20200313-130221.jpg",
+    "/IMG_3610.webp": "/img-3610.webp",
+    "/LOGO 3D FULL NAME WHITE (3)-1.png": "/logo-3d-full-name-white-3-1.png",
+    "/MG_3249.webp": "/mg-3249.webp",
+    "/NRI.webp": "/nri.webp",
+    "/Oral & Maxillofacial Surgeries svg.svg": "/oral-and-maxillofacial-surgeries-svg.svg",
+    "/Oral & Maxillofacial Surgery.png": "/oral-and-maxillofacial-surgery.png",
+    "/Root Canal Treatments.svg.svg": "/root-canal-treatments.svg",
+    "/Root Canal.webp": "/root-canal.webp",
+    "/Smile Designing.webp": "/smile-designing.webp",
+    "/Teblate hero image-1.webp": "/tablet-hero-image-1.webp",
+    "/cline aliner in rajkot.jpg": "/clear-aligner-in-rajkot.jpg",
+    "/dental implant in rajkot.jpg": "/dental-implant-in-rajkot.jpg",
+    "/dr. patel.png": "/dr-patel.png",
+    "/dr. vipul patel.webp": "/dr-vipul-patel.webp",
+    "/sounds/notification.wav.mp3": "/sounds/notification.mp3",
+    "/white teeth in rajkot.jpg": "/white-teeth-in-rajkot.jpg"
+  };
+  app.use((req, res, next) => {
+    let decodedPath = req.path;
+    try {
+      decodedPath = decodeURIComponent(req.path);
+    } catch (_) {
+    }
+    const destination = assetRedirectMap[decodedPath] || assetRedirectMap[req.path];
+    if (destination) {
+      return res.redirect(301, destination);
+    }
+    next();
+  });
   if (process.env.NODE_ENV !== "production") {
     const vite = await (0, import_vite.createServer)({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: "spa"
     });
     app.use(vite.middlewares);
@@ -131,15 +202,24 @@ async function startServer() {
       const htmlFile = cleanPath === "/" ? "index.html" : import_path.default.join(cleanPath, "index.html");
       const fullPath = import_path.default.join(distPath, htmlFile);
       if (import_fs.default.existsSync(fullPath)) {
-        res.sendFile(fullPath);
-      } else {
-        res.sendFile(import_path.default.join(distPath, "index.html"));
+        return res.sendFile(fullPath);
       }
+      if (cleanPath === "/admin" || cleanPath.startsWith("/admin/") || cleanPath === "/admin-login" || cleanPath === "/supabase-test") {
+        return res.sendFile(import_path.default.join(distPath, "index.html"));
+      }
+      const notFoundPath = import_path.default.join(distPath, "404.html");
+      if (import_fs.default.existsSync(notFoundPath)) {
+        return res.status(404).sendFile(notFoundPath);
+      }
+      return res.status(404).send("404 Not Found");
     });
     console.log("[Server] Serving production assets from dist/");
   }
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[Server] Listening on http://localhost:${PORT}`);
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`[Server] Listening on http://${HOST}:${PORT}`);
+  });
+  server.on("error", (err) => {
+    console.error("[Server Error]", err);
   });
 }
 startServer().catch((err) => {

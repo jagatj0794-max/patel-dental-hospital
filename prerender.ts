@@ -445,7 +445,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
     "@context": "https://schema.org",
     "@type": "Dentist",
     "name": "Patel Dental Hospital",
-    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "image": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
     "@id": `https://pdhrajkot.com${prefix}/#dentist`,
     "url": `https://pdhrajkot.com${prefix}/`,
     "telephone": "+919510397046",
@@ -485,8 +485,8 @@ function generateSchemasForRoute(route: typeof routes[number]) {
     "@id": `https://pdhrajkot.com${prefix}/#dentist`,
     "name": "Patel Dental Hospital",
     "url": `https://pdhrajkot.com${prefix}/`,
-    "logo": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
-    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "logo": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
+    "image": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
     "description": route.description,
     "telephone": "+919510397046",
     "email": "Pateldentalhospital1@gmail.com",
@@ -541,8 +541,8 @@ function generateSchemasForRoute(route: typeof routes[number]) {
     "name": "Patel Dental Hospital - Amin Marg Branch",
     "url": `https://pdhrajkot.com${prefix}/`,
     "hasMap": "https://www.google.com/maps/place/Patel+Dental+Hospital/@22.2849732,70.7785378,17z/data=!3m2!4b1!5s0x3959ca3b9480c44f:0xc7ac34d54efdea75!4m6!3m5!1s0x3959cb46342cee0b:0x795278e6d37bfdd7!8m2!3d22.2849732!4d70.7811127!16s%2Fg%2F11vwp9gn3s",
-    "logo": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
-    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "logo": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
+    "image": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
     "telephone": "+919510397046",
     "email": "Pateldentalhospital1@gmail.com",
     "priceRange": "$$",
@@ -585,8 +585,8 @@ function generateSchemasForRoute(route: typeof routes[number]) {
     "name": "Patel Dental Hospital - Gayatrinagar Branch",
     "url": `https://pdhrajkot.com${prefix}/`,
     "hasMap": "https://www.google.com/maps/place/Patel+Dental+Hospital/@22.2760712,70.8017874,17z/data=!3m1!4b1!4m6!3m5!1s0x3959ca73a223071b:0x7aa4eb7bffb8998c!8m2!3d22.2760712!4d70.8043623!16s%2Fg%2F11cnc7qn1n",
-    "logo": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
-    "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+    "logo": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
+    "image": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
     "telephone": "+919510397046",
     "email": "Pateldentalhospital1@gmail.com",
     "priceRange": "$$",
@@ -817,7 +817,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
         "@type": "BlogPosting",
         "headline": route.title,
         "description": route.description,
-        "image": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG",
+        "image": "https://pdhrajkot.com/best-dental-hospital-rajkot.png",
         "author": {
           "@type": "Person",
           "name": "Dr. Vipul Patel",
@@ -832,7 +832,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
           "name": "Patel Dental Hospital",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://pdhrajkot.com/Best%20Dntal%20Hospital%20Rajkot.PNG"
+            "url": "https://pdhrajkot.com/best-dental-hospital-rajkot.png"
           }
         },
         "mainEntityOfPage": {
@@ -961,7 +961,7 @@ async function fetchAllData(): Promise<AllFetchedData> {
     // Strictly sanitize doctor images to static paths (eliminate base64)
     doctors = doctors.map(d => ({
       ...d,
-      img: d.id === 'vipul' ? '/Dr. Vipul Patel.jpg' : '/Dr. Kinjal Patel.JPG'
+      img: d.id === 'vipul' ? '/dr-vipul-patel.jpg' : '/dr-kinjal-patel.jpg'
     }));
     console.log(`  ✓ Loaded ${doctors.length} doctors from Supabase (clean static images)`);
   } catch (err) {

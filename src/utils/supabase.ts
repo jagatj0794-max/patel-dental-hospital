@@ -153,7 +153,31 @@ export function getSupabase(): SupabaseClient {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // Safer 30s timeout for cold starts
+    const timeoutId = setTimeout(() => {
+      try {
+        controller.abort(new DOMException('Request timeout after 30s', 'TimeoutError'));
+      } catch {
+        controller.abort();
+      }
+    }, 30000);
+
+    if (options.signal) {
+      if (options.signal.aborted) {
+        try {
+          controller.abort(options.signal.reason);
+        } catch {
+          controller.abort();
+        }
+      } else {
+        options.signal.addEventListener('abort', () => {
+          try {
+            controller.abort(options.signal.reason);
+          } catch {
+            controller.abort();
+          }
+        });
+      }
+    }
 
     return fetch(targetUrl, { ...options, signal: controller.signal })
       .then(res => {

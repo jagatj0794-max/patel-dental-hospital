@@ -82,7 +82,7 @@ export default function Footer({ setCurrentPage, openAppointmentModal, contactIn
             <div className="flex items-center">
               <img 
                 id="footer-brand-logo-img"
-                src="/Best Dntal Hospital Rajkot.PNG" 
+                src="/best-dental-hospital-rajkot.png" 
                 alt="Patel Dental Hospital Logo"
                 className="h-[55px] w-auto object-contain rounded-lg"
                 referrerPolicy="no-referrer"

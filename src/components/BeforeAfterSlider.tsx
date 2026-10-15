@@ -2,10 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronsLeftRight } from 'lucide-react';
 
 interface BeforeAfterSliderProps {
-  beforeImage: string;
-  afterImage: string;
+  beforeImage?: string;
+  beforeImg?: string;
+  afterImage?: string;
+  afterImg?: string;
   caption?: string;
   aspectRatio?: string;
+  aspectRatioClassName?: string;
   beforeLabel?: string;
   afterLabel?: string;
   beforeAltText?: string;
@@ -14,14 +17,20 @@ interface BeforeAfterSliderProps {
 
 export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   beforeImage,
+  beforeImg,
   afterImage,
+  afterImg,
   caption,
   aspectRatio = 'aspect-[4/3]',
+  aspectRatioClassName,
   beforeLabel = 'Before',
   afterLabel = 'After',
   beforeAltText = 'Before Treatment Condition',
   afterAltText = 'After Treatment Result'
 }) => {
+  const actualBeforeImage = beforeImage || beforeImg || '';
+  const actualAfterImage = afterImage || afterImg || '';
+  const actualAspectRatio = aspectRatioClassName || aspectRatio || 'aspect-[4/3]';
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(600);
   const [sliderPosition, setSliderPosition] = useState(50); // Percentage 0 - 100
@@ -111,11 +120,11 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={`Before and after treatment slider${caption ? `: ${caption}` : ''}`}
-        className={`relative ${aspectRatio} w-full ${aspectRatio === 'aspect-[4/3]' ? 'max-h-[340px]' : ''} overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/60 focus:ring-offset-2 transition-shadow`}
+        className={`relative ${actualAspectRatio} w-full ${actualAspectRatio === 'aspect-[4/3]' ? 'max-h-[340px]' : ''} overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs select-none cursor-ew-resize group focus:outline-none focus:ring-2 focus:ring-[#0D9488]/60 focus:ring-offset-2 transition-shadow`}
       >
         {/* After Image (Background) */}
         <img
-          src={afterImage || null}
+          src={actualAfterImage || undefined}
           alt={afterAltText || 'After Treatment Result'}
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
           loading="lazy"
@@ -128,7 +137,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           style={{ width: `${sliderPosition}%` }}
         >
           <img
-            src={beforeImage || null}
+            src={actualBeforeImage || undefined}
             alt={beforeAltText || 'Before Treatment Condition'}
             style={{
               width: containerWidth,

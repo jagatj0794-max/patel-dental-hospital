@@ -43,7 +43,7 @@ const DEFAULT_FALLBACK_SOCIAL_SERVICES: SocialServiceItem[] = [
   {
     id: '62b9a1f2-1d52-4a5d-b0a5-f12bc85d1e21',
     title: 'Free Dental Awareness & Diagnostics Camp',
-    image_url: '/IMG_20190521_190345.jpg',
+    image_url: '/img-20190521-190345.jpg',
     display_order: 1,
     is_active: true,
     alt_text: 'Free dental awareness and diagnostics camp conducted by Patel Dental Hospital for the community in Rajkot.'
@@ -51,7 +51,7 @@ const DEFAULT_FALLBACK_SOCIAL_SERVICES: SocialServiceItem[] = [
   {
     id: 'f2c83d10-31e2-45e5-9d33-41bb3396aa77',
     title: 'Community Oral Health Campaign',
-    image_url: '/IMG_20200313_130221.jpg',
+    image_url: '/img-20200313-130221.jpg',
     display_order: 2,
     is_active: true,
     alt_text: 'Community oral health screening and hygiene promotion campaign conducted by dentists.'
