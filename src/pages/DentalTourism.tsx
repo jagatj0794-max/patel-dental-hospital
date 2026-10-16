@@ -624,7 +624,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
                 {/* Main Hero Image */}
                 <div className="aspect-[4/3] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 relative">
                   <img
-                    src="/nri.webp"
+                    src="/NRI.webp"
                     alt="Patel Dental Hospital International Care"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
@@ -733,7 +733,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             <div className="col-span-5 relative">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 relative">
                 <img
-                  src="/nri.webp"
+                  src="/NRI.webp"
                   alt="Patel Dental Hospital International Care"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -766,7 +766,7 @@ export default function DentalTourism({ openAppointmentModal, setCurrentPage }: 
             <div className="mx-auto max-w-sm px-2">
               <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-md border-4 border-white bg-slate-50 relative">
                 <img
-                  src="/nri.webp"
+                  src="/NRI.webp"
                   alt="Patel Dental Hospital International Care"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"

@@ -1139,7 +1139,7 @@ export default function HomeGujarati({
           {/* LAYER 3: INDEPENDENT DOCTOR IMAGE LAYER (Foreground Transparent Doctor Asset Only) */}
           <div className="absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 flex items-end justify-end pointer-events-none pr-1 md:pr-4">
             <img
-              src="/tablet-hero-image-1.webp"
+              src="/Teblate hero image-1.webp"
               alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
               className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
               referrerPolicy="no-referrer"
@@ -1723,7 +1723,7 @@ export default function HomeGujarati({
                 title: "Root Canal Treatments",
                 titleGuj: "રૂટ કેનાલ ટ્રીટમેન્ટ્સ",
                 subtitle: "Single Sitting Specialization",
-                icon: "/root-canal-treatments.svg",
+                icon: "/Root Canal Treatments.svg.svg",
                 color: "text-[#10B981]",
                 bgColor: "bg-emerald-50/50",
                 borderColor: "border-emerald-100/40",
@@ -1756,7 +1756,7 @@ export default function HomeGujarati({
                 title: "Smile Designing",
                 titleGuj: "સ્માઇલ ડિઝાઇનિંગ",
                 subtitle: "Aesthetic Smile Customization",
-                icon: "/smile-designing.webp",
+                icon: "/Smile Designing.webp",
                 color: "text-teal-500",
                 bgColor: "bg-teal-50/50",
                 borderColor: "border-teal-100/40",
@@ -1767,7 +1767,7 @@ export default function HomeGujarati({
                 title: "Oral & Maxillofacial Surgeries",
                 titleGuj: "ઓરલ અને મેક્સિલોફેશિયલ સર્જરી",
                 subtitle: "Expert Surgical Solutions",
-                icon: "/oral-and-maxillofacial-surgeries-svg.svg",
+                icon: "/Oral & Maxillofacial Surgeries svg.svg",
                 color: "text-indigo-500",
                 bgColor: "bg-indigo-50/50",
                 borderColor: "border-indigo-100/40",
@@ -2550,7 +2550,7 @@ export default function HomeGujarati({
                 >
                   <img
                     className="w-full h-full object-cover absolute inset-0"
-                    src="/img-20190521-190345.jpg"
+                    src="/IMG_20190521_190345.jpg"
                     alt="Patel Dental Hospital Premium Modern Treatment Center"
                     referrerPolicy="no-referrer"
                   />
@@ -2618,7 +2618,7 @@ export default function HomeGujarati({
               <div className="rounded-[20px] overflow-hidden aspect-video bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.1)] border border-slate-100 group">
                 <img
                    className="w-full h-full object-cover absolute inset-0 z-10"
-                   src="/mg-3249.webp"
+                   src="/dental-treatment.webp"
                    alt="Patel Dental Hospital Advanced Clinical Care"
                    referrerPolicy="no-referrer"
                    loading="lazy"
@@ -2797,7 +2797,7 @@ export default function HomeGujarati({
             >
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
-                  src="/img-3610.webp"
+                  src="/dental-treatment-near-me.jpg"
                   alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"
