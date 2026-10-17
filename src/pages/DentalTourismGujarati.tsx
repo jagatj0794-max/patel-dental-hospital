@@ -81,7 +81,7 @@ const gujaratDestinations = [
   {
     name: "દ્વારકાધીશ મંદિર",
     description: "અરબી સમુદ્રના કિનારે આવેલું પ્રાચીન કૃષ્ણ મંદિર.",
-    image: "/gujarat-Dwarkadhish-Temple.jpg",
+    image: "/gujarat-dwarkadhish-temple.jpg",
     location: "દ્વારકા"
   },
   {

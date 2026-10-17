@@ -81,7 +81,7 @@ const gujaratDestinations = [
   {
     name: "Dwarkadhish Temple",
     description: "Ancient Krishna temple on the Arabian Sea.",
-    image: "/gujarat-Dwarkadhish-Temple.jpg",
+    image: "/gujarat-dwarkadhish-temple.jpg",
     location: "Dwarka"
   },
   {
