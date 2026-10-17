@@ -63,7 +63,7 @@ const gujaratDestinations = [
   {
     name: "Rann of Kutch",
     description: "Experience the famous White Desert of Gujarat.",
-    image: "/great-rann-of-kutch-14.jpg",
+    image: "/great-rann-of-kutch.jpg",
     location: "Kutch"
   },
   {
@@ -81,7 +81,7 @@ const gujaratDestinations = [
   {
     name: "Dwarkadhish Temple",
     description: "Ancient Krishna temple on the Arabian Sea.",
-    image: "/gujarat-dwarkadhish-temple.jpg",
+    image: "/gujarat-Dwarkadhish-Temple.jpg",
     location: "Dwarka"
   },
   {

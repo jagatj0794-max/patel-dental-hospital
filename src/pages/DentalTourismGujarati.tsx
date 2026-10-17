@@ -63,7 +63,7 @@ const gujaratDestinations = [
   {
     name: "કચ્છનું રણ",
     description: "ગુજરાતના પ્રસિદ્ધ સફેદ રણનો અનુભવ કરો.",
-    image: "/great-rann-of-kutch-14.jpg",
+    image: "/great-rann-of-kutch.jpg",
     location: "કચ્છ"
   },
   {
@@ -81,7 +81,7 @@ const gujaratDestinations = [
   {
     name: "દ્વારકાધીશ મંદિર",
     description: "અરબી સમુદ્રના કિનારે આવેલું પ્રાચીન કૃષ્ણ મંદિર.",
-    image: "/gujarat-dwarkadhish-temple.jpg",
+    image: "/gujarat-Dwarkadhish-Temple.jpg",
     location: "દ્વારકા"
   },
   {
