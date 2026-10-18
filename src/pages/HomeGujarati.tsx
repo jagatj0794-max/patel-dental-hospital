@@ -834,10 +834,10 @@ export default function HomeGujarati({
       {/* 1 & 2. Hero Section & BOTTOM TRUST BAR */}
       <section className="relative z-30 w-full bg-[#FAFAFC] pb-0 lg:pb-0" id="immersive-clinical-hero">
         
-        {/* DESKTOP HERO VIEW (ONLY visible on desktop/large tablet screens) */}
-        <div className="hidden lg:flex relative w-full h-[900px] min-h-[810px] flex-col justify-between pt-[140px] pb-0">
-          {/* Background Image & Wide Gradient Overlay */}
-          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+        {/* UNIFIED RESPONSIVE HERO BANNER */}
+        <div className="relative w-full h-[640px] sm:h-[720px] md:h-[540px] lg:h-[900px] lg:min-h-[810px] overflow-hidden bg-white md:bg-[#EEF5F3] lg:bg-transparent pt-[88px] sm:pt-[100px] md:pt-[88px] lg:pt-[140px] pb-0 border-b border-[#00897B]/20 lg:border-b-0 flex flex-col justify-start md:justify-center lg:justify-between">
+          {/* DESKTOP BACKGROUND IMAGE (Visible on lg: >= 1024px) */}
+          <div className="hidden lg:block absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             {/* 
               TODO:
               Replace hero collage with doctor's original photo / hospital photo / staff photo once assets are provided.
@@ -852,117 +852,26 @@ export default function HomeGujarati({
             />
           </div>
 
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 w-full relative z-20 flex flex-col justify-between flex-grow h-full">
-            {/* Left Content Area - 35% - 38% width, shifted 90px to the right, sitting near the top */}
-            <div className="w-full lg:w-[38%] xl:w-[35%] flex flex-col justify-start pt-8 xl:pt-12 pb-12 pr-4 z-20 lg:ml-[90px] relative">
-              
-              {/* Main Heading & Description above the award badge */}
-              <h2 className="font-display text-[26px] xl:text-[32px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-3">
-                <span className="lg:block lg:whitespace-nowrap">આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.</span>
-                <span className="lg:block lg:whitespace-nowrap">તમારા સાચા સ્વરૂપને ફરી અનુભવો.</span>
-              </h2>
-              <p className="text-[14px] xl:text-[15px] font-semibold text-black leading-relaxed mb-6">
-                અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
-              </p>
-
-              {/* 1. Small trust badge */}
-              <span className="inline-flex items-center px-[18px] py-[10px] rounded-2xl bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[10.5px] md:text-[11.5px] leading-tight uppercase tracking-widest shadow-md mb-4 lg:mb-6 animate-fade-in w-fit">
-                <span className="text-[22px] leading-none shrink-0 mr-3 select-none">🏆</span>
-                <span className="flex flex-col text-left">
-                  <span className="gujarati-text">ભારતમાં શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત</span>
-                  <span className="text-[#00897B] gujarati-text mt-0.5">FAMDENT દ્વારા</span>
-                </span>
-              </span>
-
-              {/* 2. Headline */}
-              <div className="flex flex-col text-left space-y-2 lg:space-y-3 max-w-[550px]">
-                {/* Main Heading */}
-                <h1 className="font-display text-[17px] sm:text-[21px] md:text-[24px] lg:text-[26px] xl:text-[29px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
-                  વર્લ્ડ-ક્લાસ{" "}
-                  <span className="relative inline-block text-[#00897B]">
-                    ડેન્ટલ કેર
-                    {/* Subtle underline accent */}
-                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[3px] md:h-[4px] bg-[#C9A96E] rounded-full" />
-                  </span>
-                </h1>
-              </div>
-
-              {/* Quick Information Cards removed from inside the hero on desktop per layout update */}
-
-              {/* Two CTA buttons positioned exactly below description/trust statement */}
-              <div className="mt-6 lg:mt-8 flex flex-col sm:flex-row items-center justify-start gap-4 w-full max-w-[450px]">
-                <button
-                  id="hero-primary-cta"
-                  onClick={openAppointmentModal}
-                  className="h-[56px] px-8 w-full sm:flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[16.5px] font-extrabold rounded-[16px] shadow-[0_12px_30px_rgba(0,137,123,0.22)] hover:shadow-[0_15px_35px_rgba(0,137,123,0.32)] cursor-pointer transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300 flex items-center justify-center space-x-2.5 border border-white/10 relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
-                >
-                  <Calendar className="h-5 w-5 shrink-0" />
-                  <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
-                </button>
-
-                <a
-                  href={getWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-[56px] w-full sm:flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[16.5px] font-extrabold rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-2.5 transform hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
-                >
-                  <MessageCircle className="h-5 w-5 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
-                  <span className="whitespace-nowrap">WhatsApp કરો</span>
-                </a>
-              </div>
-
-              {/* Side-by-Side Doctor Profiles on Desktop */}
-              <div className="mt-6 grid grid-cols-2 gap-4 w-full max-w-[550px] animate-fade-in text-left">
-                {/* Dr. Vipul Patel Card */}
-                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
-                  <h3 className="font-display text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-2 border-b border-[#C9A96E]/20 pb-1.5">ડૉ. વિપુલ પટેલ</h3>
-                  <ul className="text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-relaxed space-y-1">
-                    <li className="flex items-start">
-                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
-                      <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
-                      <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
-                      <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Dr. Kinjal Patel Card */}
-                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
-                  <h3 className="font-display text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-2 border-b border-[#C9A96E]/20 pb-1.5">ડૉ. કિંજલ પટેલ</h3>
-                  <ul className="text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-relaxed space-y-1">
-                    <li className="flex items-start">
-                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
-                      <span>BDS</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
-                      <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-[#C9A96E] mr-1.5 font-bold select-none">•</span>
-                      <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* 5. Shrunk vertical spacing after CTA/doctors before the floating trust bar */}
-              <div className="h-4 lg:h-[25px] pointer-events-none" />
-
-            </div>
+          {/* TABLET BACKGROUND & DOCTOR CUTOUT (Visible on md: 768px - 1023px) */}
+          <div className="hidden md:block lg:hidden absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
+            <img
+              src="/patel-tablet-bg.webp"
+              alt="Background"
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
           </div>
-        </div>
+          <div className="hidden md:flex lg:hidden absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 items-end justify-end pointer-events-none pr-1 md:pr-4">
+            <img
+              src="/tablet-hero-image-1.webp"
+              alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
+              className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
+              referrerPolicy="no-referrer"
+            />
+          </div>
 
-        {/* MOBILE HERO VIEW (ONLY visible on mobile screens < 768px) */}
-        <div className="block md:hidden relative w-full h-[640px] sm:h-[720px] overflow-hidden bg-white pt-[88px] sm:pt-[100px]">
-          {/* Mobile Background Image */}
-          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+          {/* MOBILE BACKGROUND IMAGE (Visible on < 768px) */}
+          <div className="block md:hidden absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             <img 
               src={heroBgImageMobile || heroBgImage || "/patel-tablet-bg.webp"} 
               alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
@@ -973,151 +882,50 @@ export default function HomeGujarati({
             />
           </div>
 
-          <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-3 px-4 sm:px-6 relative z-20 pt-6 sm:pt-4 pb-4">
-            {/* Main Heading & Description above the award badge */}
-            <h2 className="font-display text-[17px] sm:text-[19px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight max-w-[95%]">
-              આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.<br className="hidden sm:inline" />
-              તમારા સાચા સ્વરૂપને ફરી અનુભવો.
-            </h2>
-            <p className="text-[11px] sm:text-[12px] font-semibold text-black leading-relaxed max-w-[95%] mb-1">
-              અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
-            </p>
-
-            {/* 1. Small trust badge */}
-            <span className="inline-flex items-center px-[14px] py-2 rounded-xl bg-white border border-[#C9A96E] text-[#1E3A5F] font-extrabold text-[8px] sm:text-[9.5px] leading-tight uppercase tracking-widest shadow-md mb-2 animate-fade-in w-fit max-w-[95%]">
-              <span className="text-[14px] sm:text-[18px] leading-none shrink-0 mr-2 select-none">🏆</span>
-              <span className="flex flex-col text-left">
-                <span className="gujarati-text">ભારતમાં શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત</span>
-                <span className="text-[#00897B] gujarati-text mt-0.5">FAMDENT દ્વારા</span>
-              </span>
-            </span>
-
-            {/* Headline */}
-            <div className="flex flex-col text-center space-y-2 max-w-[450px]">
-              {/* Main Heading */}
-              <h2 className="font-display text-[20px] sm:text-[21px] leading-[1.2] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
-                વર્લ્ડ-ક્લાસ <span className="text-[#00897B]">ડેન્ટલ કેર</span>
-              </h2>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="w-full flex flex-row items-center justify-center gap-2 max-w-[280px] sm:max-w-[380px] mx-auto pt-4 sm:pt-3">
-              <button
-                onClick={() => openAppointmentModal()}
-                className="h-[38px] sm:h-[46px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] hover:shadow-[0_10px_20px_rgba(0,137,123,0.25)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
-              >
-                <Calendar className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] shrink-0" />
-                <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
-              </button>
-
-              <a
-                href={getWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-[38px] sm:h-[46px] flex-1 bg-white text-[#00897B] text-[10px] sm:text-[12px] font-extrabold rounded-[10px] sm:rounded-[14px] border-2 border-[#00897B] hover:border-[#00796B] hover:bg-[#00897B]/5 shadow-[0_5px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
-              >
-                <MessageCircle className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] shrink-0 fill-[#00897B]/10 text-[#00897B]" strokeWidth={2.5} />
-                <span className="whitespace-nowrap">WhatsApp કરો</span>
-              </a>
-            </div>
-
-            {/* Removed vertically stacked cards from here to place them below hero */}
-          </div>
-        </div>
-
-        {/* Mobile View Doctor Cards: Vertically Stacked BELOW the Hero Area */}
-        <div className="block md:hidden px-4 mt-6 mb-2 space-y-3.5 max-w-[280px] sm:max-w-[380px] mx-auto text-left">
-          {/* Dr. Vipul Patel Card */}
-          <div className="bg-white/85 border border-slate-200/80 rounded-xl p-3 sm:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)]">
-            <h3 className="font-display text-[12px] sm:text-[13px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. વિપુલ પટેલ</h3>
-            <ul className="text-[10px] sm:text-[10.5px] font-semibold text-[#4A5568] leading-tight space-y-1">
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Dr. Kinjal Patel Card */}
-          <div className="bg-white/85 border border-slate-200/80 rounded-xl p-3 sm:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)]">
-            <h3 className="font-display text-[12px] sm:text-[13px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. કિંજલ પટેલ</h3>
-            <ul className="text-[10px] sm:text-[10.5px] font-semibold text-[#4A5568] leading-tight space-y-1">
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>BDS</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* TABLET HERO VIEW (ONLY visible on tablet screens: 768px <= width < 1024px) */}
-        <div className="hidden md:block lg:hidden relative w-full h-[520px] md:h-[540px] overflow-hidden bg-[#EEF5F3] pt-[88px] pb-0 border-b border-[#00897B]/20">
-          
-          {/* LAYER 1: INDEPENDENT BACKGROUND LAYER (Background Asset Only - Zero Doctors) */}
-          <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
-            <img
-              src="/patel-tablet-bg.webp"
-              alt="Background"
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-
-          {/* LAYER 2: CONTENT LAYER (Left Side: Award Badge + Headline + Subtitle + CTA Buttons) */}
-          <div className="relative z-20 max-w-[1200px] mx-auto px-6 sm:px-8 w-full h-full flex flex-row items-center justify-start pointer-events-auto">
-            <div className="w-[42%] flex flex-col justify-center py-4 pr-2">
-              {/* Main Heading & Description above the award badge */}
-              <h2 className="font-display text-[19px] md:text-[21px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight mb-2">
+          {/* HERO CONTENT AREA (Single responsive heading tree, subtitle, trust badge & CTA buttons) */}
+          <div className="relative z-20 w-full max-w-xl md:max-w-[1200px] lg:max-w-[1600px] mx-auto px-4 sm:px-6 md:px-6 sm:md:px-8 lg:px-12 flex flex-col justify-start md:justify-center lg:justify-between flex-grow h-full pointer-events-auto">
+            <div className="w-full md:w-[42%] lg:w-[38%] xl:w-[35%] flex flex-col items-center md:items-start text-center md:text-left pt-4 sm:pt-3 md:pt-4 md:py-4 lg:pt-8 xl:pt-12 lg:pb-12 md:pr-2 lg:pr-4 lg:ml-[90px] -translate-y-1 md:translate-y-0 relative">
+              
+              {/* Single H2: Main Sub-headline */}
+              <h2 className="font-display text-[17px] sm:text-[19px] md:text-[21px] lg:text-[26px] xl:text-[32px] leading-[1.25] font-black text-[#1E3A5F] tracking-tight max-w-[95%] md:max-w-none mb-1 md:mb-2 lg:mb-3">
                 <span className="md:block md:whitespace-nowrap">આરામથી ખાઓ. આત્મવિશ્વાસથી સ્મિત કરો.</span>
+                <span className="hidden sm:inline md:hidden"> </span>
                 <span className="md:block md:whitespace-nowrap">તમારા સાચા સ્વરૂપને ફરી અનુભવો.</span>
               </h2>
-              <p className="text-[12px] md:text-[12.5px] font-semibold text-black leading-relaxed mb-3.5">
+
+              {/* Sub-paragraph */}
+              <p className="text-[11px] sm:text-[12px] md:text-[12.5px] lg:text-[14px] xl:text-[15px] font-semibold text-black leading-relaxed max-w-[95%] md:max-w-none mb-2 md:mb-3.5 lg:mb-6">
                 અદ્યતન ડેન્ટલ ઇમ્પ્લાન્ટ્સ, ફુલ-માઉથ રિહેબિલિટેશન અને રાજકોટમાં માત્ર એક અઠવાડિયામાં સંપૂર્ણ ડેન્ટલ સારવાર
               </p>
 
-              {/* Trust Badge */}
-              <div className="inline-flex items-center self-start px-3 py-2 rounded-xl bg-white/95 border border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[8.5px] md:text-[9.5px] leading-tight uppercase tracking-wider shadow-sm mb-3.5 w-fit">
-                <span className="text-[12px] md:text-[14px] leading-none shrink-0 mr-2 select-none">🏆</span>
+              {/* Small Trust Badge */}
+              <span className="inline-flex items-center self-center md:self-start px-[14px] md:px-3 lg:px-[18px] py-2 lg:py-[10px] rounded-xl lg:rounded-2xl bg-white md:bg-white/95 border border-[#C9A96E] md:border-[#C9A96E]/70 text-[#1E3A5F] font-extrabold text-[8px] sm:text-[9.5px] md:text-[9.5px] lg:text-[10.5px] md:lg:text-[11.5px] leading-tight uppercase tracking-widest md:tracking-wider lg:tracking-widest shadow-md md:shadow-sm lg:shadow-md mb-2 md:mb-3.5 lg:mb-6 animate-fade-in w-fit max-w-[95%] md:max-w-none">
+                <span className="text-[14px] sm:text-[18px] md:text-[14px] lg:text-[22px] leading-none shrink-0 mr-2 lg:mr-3 select-none">🏆</span>
                 <span className="flex flex-col text-left">
                   <span className="gujarati-text">ભારતમાં શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલ તરીકે પુરસ્કૃત</span>
                   <span className="text-[#00897B] gujarati-text mt-0.5">FAMDENT દ્વારા</span>
                 </span>
-              </div>
+              </span>
 
-              {/* Main Headline */}
-              <div className="flex flex-col text-left space-y-2">
-                <h2 className="font-display text-[20px] md:text-[22px] leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase">
+              {/* Single H1: World Class Dental Care */}
+              <div className="flex flex-col text-center md:text-left space-y-2 lg:space-y-3 max-w-[450px] lg:max-w-[550px]">
+                <h1 className="font-display text-[20px] sm:text-[21px] md:text-[22px] lg:text-[26px] xl:text-[29px] leading-[1.2] md:leading-[1.15] font-black text-[#1E3A5F] tracking-tight uppercase whitespace-nowrap">
                   વર્લ્ડ-ક્લાસ{" "}
                   <span className="relative inline-block text-[#00897B]">
                     ડેન્ટલ કેર
-                    <div className="absolute -bottom-1 left-0 w-full h-[3px] bg-[#C9A96E] rounded-full" />
+                    <div className="absolute -bottom-1 lg:-bottom-1.5 left-0 w-full h-[3px] md:h-[4px] bg-[#C9A96E] rounded-full" />
                   </span>
-                </h2>
+                </h1>
               </div>
 
-              {/* Action Buttons */}
-              <div className="mt-5 flex flex-row items-center justify-start gap-3 w-full max-w-[340px]">
+              {/* Two CTA Buttons */}
+              <div className="w-full flex flex-row items-center justify-center md:justify-start gap-2 md:gap-3 lg:gap-4 max-w-[280px] sm:max-w-[380px] md:max-w-[340px] lg:max-w-[450px] pt-4 sm:pt-3 md:pt-0 md:mt-5 lg:mt-8 -translate-y-3 sm:-translate-y-3 md:translate-y-0">
                 <button
+                  id="hero-primary-cta"
                   onClick={openAppointmentModal}
-                  className="h-[42px] flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[11px] font-extrabold rounded-[12px] shadow-[0_8px_20px_rgba(0,137,123,0.15)] hover:shadow-[0_12px_24px_rgba(0,137,123,0.28)] cursor-pointer flex items-center justify-center space-x-1.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                  className="h-[38px] sm:h-[46px] md:h-[42px] lg:h-[56px] px-3 sm:px-4 lg:px-8 flex-1 bg-[#00897B] hover:bg-[#00796B] text-white text-[10px] sm:text-[12px] md:text-[11px] lg:text-[16.5px] font-extrabold rounded-[10px] sm:rounded-[14px] md:rounded-[12px] lg:rounded-[16px] shadow-[0_6px_15px_rgba(0,137,123,0.15)] md:shadow-[0_8px_20px_rgba(0,137,123,0.15)] lg:shadow-[0_12px_30px_rgba(0,137,123,0.22)] hover:shadow-[0_15px_35px_rgba(0,137,123,0.32)] cursor-pointer flex items-center justify-center space-x-1.5 md:space-x-1.5 lg:space-x-2.5 border border-white/10 relative overflow-hidden transform hover:-translate-y-[2px] lg:hover:-translate-y-[3px] active:scale-98 transition-all duration-300 before:absolute before:inset-x-0 before:top-0 before:h-[50%] before:bg-gradient-to-b before:from-white/15 before:to-transparent before:pointer-events-none"
                 >
-                  <Calendar className="h-4 w-4 shrink-0" />
+                  <Calendar className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] md:h-4 md:w-4 lg:h-5 lg:w-5 shrink-0" />
                   <span className="whitespace-nowrap">ફ્રી પુછપરછ</span>
                 </button>
 
@@ -1125,67 +933,61 @@ export default function HomeGujarati({
                   href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-[42px] flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[11px] font-extrabold rounded-[12px] border-2 border-[#00897B] hover:border-[#00796B] shadow-sm cursor-pointer flex items-center justify-center space-x-1.5 transform hover:-translate-y-[2px] active:scale-98 transition-all duration-300"
+                  className="h-[38px] sm:h-[46px] md:h-[42px] lg:h-[56px] px-3 sm:px-4 lg:px-8 flex-1 bg-white hover:bg-[#00897B]/5 text-[#00897B] text-[10px] sm:text-[12px] md:text-[11px] lg:text-[16.5px] font-extrabold rounded-[10px] sm:rounded-[14px] md:rounded-[12px] lg:rounded-[16px] border-2 border-[#00897B] hover:border-[#00796B] shadow-[0_5px_12px_rgba(0,0,0,0.04)] md:shadow-sm lg:shadow-[0_10px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)] cursor-pointer flex items-center justify-center space-x-1.5 md:space-x-1.5 lg:space-x-2.5 transform hover:-translate-y-[2px] lg:hover:-translate-y-[3px] active:scale-98 transition-all duration-300"
                 >
-                  <MessageCircle className="h-4 w-4 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
+                  <MessageCircle className="h-[12px] w-[12px] sm:h-[14px] sm:w-[14px] md:h-4 md:w-4 lg:h-5 lg:w-5 fill-[#00897B]/10 shrink-0 text-[#00897B]" strokeWidth={2.5} />
                   <span className="whitespace-nowrap">WhatsApp કરો</span>
                 </a>
               </div>
 
-              {/* Removed vertically stacked cards from here to place them below hero */}
             </div>
           </div>
-
-          {/* LAYER 3: INDEPENDENT DOCTOR IMAGE LAYER (Foreground Transparent Doctor Asset Only) */}
-          <div className="absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 flex items-end justify-end pointer-events-none pr-1 md:pr-4">
-            <img
-              src="/Teblate hero image-1.webp"
-              alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
-              className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-
         </div>
 
-        {/* Tablet View Doctor Cards: Side-by-Side BELOW the Hero Area */}
-        <div className="hidden md:flex lg:hidden px-6 sm:px-8 mt-6 gap-4 max-w-3xl mx-auto relative z-20">
-          {/* Dr. Vipul Patel Card */}
-          <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-[0_3px_12px_rgba(0,0,0,0.02)] flex-1 text-left">
-            <h3 className="font-display text-[11px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. વિપુલ પટેલ</h3>
-            <ul className="text-[9.5px] font-semibold text-[#4A5568] leading-tight space-y-0.5">
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
-              </li>
-            </ul>
-          </div>
+        {/* SINGLE RESPONSIVE DOCTOR CARDS (Below hero on mobile & tablet; inside hero left column on desktop) */}
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-0 mt-6 md:mt-6 lg:mt-0 mb-2 md:mb-0 lg:absolute lg:top-[530px] xl:top-[560px] lg:left-0 lg:right-0 lg:pointer-events-none z-20">
+          <div className="max-w-[280px] sm:max-w-[380px] md:max-w-3xl lg:max-w-[1600px] mx-auto lg:px-12 w-full">
+            <div className="w-full lg:w-[38%] xl:w-[35%] lg:ml-[90px] lg:pointer-events-auto">
+              <div className="flex flex-col md:flex-row lg:grid lg:grid-cols-2 gap-3.5 md:gap-4 w-full lg:max-w-[550px] animate-fade-in text-left">
+                {/* Dr. Vipul Patel Card */}
+                <div className="bg-white/85 md:bg-white lg:bg-white/80 lg:backdrop-blur-sm border border-slate-200/80 rounded-xl p-3 sm:p-4 md:p-3.5 lg:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)] lg:shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)] flex-1 text-left">
+                  <h3 className="font-display text-[12px] sm:text-[13px] md:text-[11px] lg:text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-1.5 lg:mb-2 border-b border-[#C9A96E]/20 pb-1 lg:pb-1.5">ડૉ. વિપુલ પટેલ</h3>
+                  <ul className="text-[10px] sm:text-[10.5px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-tight lg:leading-relaxed space-y-1 md:space-y-0.5 lg:space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1 lg:mr-1.5 font-bold select-none">•</span>
+                      <span>ઓરલ અને મેક્સિલોફેશિયલ સર્જરીમાં MDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1 lg:mr-1.5 font-bold select-none">•</span>
+                      <span>ઓરલ મેડિસિન અને રેડિયોલોજીમાં MDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1 lg:mr-1.5 font-bold select-none">•</span>
+                      <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં માસ્ટરશિપ (USA)</span>
+                    </li>
+                  </ul>
+                </div>
 
-          {/* Dr. Kinjal Patel Card */}
-          <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-[0_3px_12px_rgba(0,0,0,0.02)] flex-1 text-left">
-            <h3 className="font-display text-[11px] font-black text-[#1E3A5F] mb-1.5 border-b border-[#C9A96E]/20 pb-1">ડૉ. કિંજલ પટેલ</h3>
-            <ul className="text-[9.5px] font-semibold text-[#4A5568] leading-tight space-y-0.5">
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>BDS</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#C9A96E] mr-1 font-bold select-none">•</span>
-                <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
-              </li>
-            </ul>
+                {/* Dr. Kinjal Patel Card */}
+                <div className="bg-white/85 md:bg-white lg:bg-white/80 lg:backdrop-blur-sm border border-slate-200/80 rounded-xl p-3 sm:p-4 md:p-3.5 lg:p-4 shadow-[0_3px_12px_rgba(0,0,0,0.02)] lg:shadow-[0_4px_16px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)] flex-1 text-left">
+                  <h3 className="font-display text-[12px] sm:text-[13px] md:text-[11px] lg:text-[14.5px] xl:text-[15.5px] font-black text-[#1E3A5F] mb-1.5 lg:mb-2 border-b border-[#C9A96E]/20 pb-1 lg:pb-1.5">ડૉ. કિંજલ પટેલ</h3>
+                  <ul className="text-[10px] sm:text-[10.5px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-semibold text-[#4A5568] leading-tight lg:leading-relaxed space-y-1 md:space-y-0.5 lg:space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1 lg:mr-1.5 font-bold select-none">•</span>
+                      <span>BDS</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1 lg:mr-1.5 font-bold select-none">•</span>
+                      <span>ઇમ્પ્લાન્ટ પ્રોસ્ટોડોન્ટિક્સમાં ફેલોશિપ (USA)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#C9A96E] mr-1 lg:mr-1.5 font-bold select-none">•</span>
+                      <span>રૂટ કેનાલ ટ્રીટમેન્ટ અને ક્લિયર એલાઇનર્સમાં નિષ્ણાત</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
