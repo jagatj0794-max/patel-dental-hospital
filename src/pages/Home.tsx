@@ -2331,7 +2331,7 @@ export default function Home({
                   Whether you need a dental implant specialist in Rajkot, a root canal specialist in Rajkot, or a complete smile makeover in Rajkot, our focus is on restoring confidence, comfort, and long-term oral health through patient-centered care.
                 </p>
                 <p>
-                  With over 45,000 satisfied patients and 11+ years of clinical excellence, Patel Dental Hospital is trusted as a top dental implant hospital in Rajkot and one of the best dental hospitals in India.
+                  With over 45,000 satisfied patients and 14+ years of clinical excellence, Patel Dental Hospital is trusted as a top dental implant hospital in Rajkot and one of the best dental hospitals in India.
                 </p>
               </div>
 

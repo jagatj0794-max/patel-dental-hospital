@@ -13,7 +13,7 @@ Dr. Kinjal Patel is an Aesthetic Dentist and Dental Implant Surgeon practicing i
 
 She completed her Bachelor of Dental Surgery (BDS) from Government Dental College, Jamnagar.
 
-She has more than 11 years of clinical experience with extensive expertise in oral surgery and aesthetic dentistry.
+She has more than 14 years of clinical experience with extensive expertise in oral surgery and aesthetic dentistry.
 
 PROFESSIONAL MEMBERSHIPS
 
@@ -94,7 +94,7 @@ AWARDS & RECOGNITION
       }
     ],
     branch: 'Gayatrinagar Branch',
-    experience: '12+',
+    experience: '14+',
     alt_text: 'Dr. Kinjal Patel, cosmetic and aesthetic dentist, posing at Patel Dental Hospital, Rajkot.'
   },
   {
@@ -167,7 +167,7 @@ AWARDS & RECOGNITION
 CLINICAL EXPERIENCE
 
 • Dental Implant Surgeon practicing in Rajkot since 2012
-• Successfully placed more than 7000+ Dental Implants
+• Successfully placed more than 16,000+ Dental Implants
 • Extensive experience in Advanced Implant Dentistry
 • Extensive experience in Oral Surgery`,
     quote: 'Dr. Vipul Patel is committed to delivering advanced dental care with personalized treatment planning and modern technology.',
@@ -197,7 +197,7 @@ CLINICAL EXPERIENCE
       }
     ],
     branch: 'Amin Marg Branch',
-    experience: '18+',
+    experience: '14+',
     alt_text: 'Dr. Vipul Patel, senior maxillofacial surgeon and implantologist, at Patel Dental Hospital, Rajkot.'
   }
 ];

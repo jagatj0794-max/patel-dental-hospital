@@ -106,13 +106,13 @@ export default function Implants({ setCurrentPage, openAppointmentModal }: Impla
     },
     {
       num: '07',
-      title: '7,000+ Placements',
-      body: 'More than 7000 implant placements.'
+      title: '16,000+ Placements',
+      body: 'More than 16,000 implant placements.'
     },
     {
       num: '08',
-      title: '350+ FMR Cases',
-      body: 'More than 350 Full Mouth Rehabilitation cases completed by Dr. Vipul Patel.'
+      title: '800+ FMR Cases',
+      body: 'More than 800 Full Mouth Rehabilitation cases completed by Dr. Vipul Patel.'
     },
     {
       num: '09',

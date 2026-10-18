@@ -850,7 +850,7 @@ function generateSchemasForRoute(route: typeof routes[number]) {
           "@type": "Dentist",
           "name": "Patel Dental Hospital"
         },
-        "description": "Dr. Vipul Patel is the Director of Patel Dental Hospital, with 18+ years of clinical experience in advanced dental implants, computer guided surgeries, and full mouth rehabilitation."
+        "description": "Dr. Vipul Patel is the Director of Patel Dental Hospital, with 14+ years of clinical experience in advanced dental implants, computer guided surgeries, and full mouth rehabilitation."
       });
       schemas.push({
         "@context": "https://schema.org",

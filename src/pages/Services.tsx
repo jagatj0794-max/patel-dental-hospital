@@ -109,8 +109,8 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     badgeEn: 'Full Mouth Restoration',
     badgeGu: 'સંપૂર્ણ પુનઃનિર્માણ',
     image: 'https://wmgzhqtqmnddfjykaykm.supabase.co/storage/v1/object/public/media/f1b95c7d-29d3-403a-9f81-bd443a86e362/1784407618701_pcftuvyu.webp',
-    highlightsEn: ['350+ Full Mouth Cases', 'Bite & Jaw Alignment', 'Restores Complete Function'],
-    highlightsGu: ['350+ ફુલ માઉથ કેસ', 'જડબા અને બાઇટ સુધારણા', 'સંપૂર્ણ ચાવવાની ક્ષમતા']
+    highlightsEn: ['800+ Full Mouth Cases', 'Bite & Jaw Alignment', 'Restores Complete Function'],
+    highlightsGu: ['800+ ફુલ માઉથ કેસ', 'જડબા અને બાઇટ સુધારણા', 'સંપૂર્ણ ચાવવાની ક્ષમતા']
   },
   {
     slug: 'crowns-bridges',
@@ -258,7 +258,7 @@ export default function Services({
         <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 pt-4 text-xs sm:text-sm font-semibold text-[#081C3A]">
           <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-xs">
             <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
-            <span>{language === 'gu' ? '18+ વર્ષનો અનુભવ' : '18+ Years Experience'}</span>
+            <span>{language === 'gu' ? '14+ વર્ષનો અનુભવ' : '14+ Years Experience'}</span>
           </div>
           <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-xs">
             <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />

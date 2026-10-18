@@ -481,7 +481,7 @@ export default function Blogs({ openAppointmentModal, setCurrentPage, currentPag
               </p>
               <ul className="space-y-2.5 pl-4 list-disc text-slate-600 text-xs sm:text-sm">
                 <li>
-                  <strong className="text-[#081C3A]">18+ Years of Clinical Expertise:</strong> Led by <a href="/en/doctors/" className="text-[#0D9488] font-bold hover:underline">Dr. Vipul Patel</a>, our experienced surgical team has safely placed thousands of implants, adhering to international guidelines.
+                  <strong className="text-[#081C3A]">14+ Years of Clinical Expertise:</strong> Led by <a href="/en/doctors/" className="text-[#0D9488] font-bold hover:underline">Dr. Vipul Patel</a>, our experienced surgical team has safely placed thousands of implants, adhering to international guidelines.
                 </li>
                 <li>
                   <strong className="text-[#081C3A]">In-House 3D CBCT Imaging:</strong> We utilize advanced, low-radiation Cone Beam Computed Tomography inside our facility, allowing us to perform precise bone mapping and treatment planning without third-party lab delays.

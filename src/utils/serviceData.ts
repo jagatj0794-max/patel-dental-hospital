@@ -271,7 +271,7 @@ export const DEFAULT_SERVICES: Service[] = [
       {
         id: 'sup-6',
         title: '',
-        description: 'More than 7000 implant placements and more than 350 full mouth rehabilitation cases done by Dr. Vipul Patel.',
+        description: 'More than 16,000 implant placements and more than 800 full mouth rehabilitation cases done by Dr. Vipul Patel.',
         display_order: 60
       },
       {

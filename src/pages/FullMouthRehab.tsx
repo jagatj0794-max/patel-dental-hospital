@@ -781,7 +781,7 @@ export default function FullMouthRehab({ setCurrentPage, openAppointmentModal }:
               </p>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="bg-[#FAFAFC] p-4 rounded-2xl border border-slate-100 text-center">
-                  <span className="block text-xl font-black text-[#0D9488] font-mono">350+</span>
+                  <span className="block text-xl font-black text-[#0D9488] font-mono">800+</span>
                   <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider font-sans">FMR CASES SUCCESSFULLY SOLVED</span>
                 </div>
                 <div className="bg-[#FAFAFC] p-4 rounded-2xl border border-slate-100 text-center">
