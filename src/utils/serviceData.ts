@@ -2222,16 +2222,6 @@ export const serviceService = {
     }
 
     try {
-      // Proactively clean up any deleted/unapproved service entries in Supabase
-      try {
-        await supabase.client
-          .from('services')
-          .delete()
-          .or('slug.eq.bone-grafting-sinus-lift,slug.eq.bone-grafting,id.eq.bone-graft-srv,title.ilike.%Bone Graft%');
-      } catch (cleanupErr) {
-        // Non-blocking cleanup
-      }
-
       const { data, error } = await supabase.client
         .from('services')
         .select('*')
