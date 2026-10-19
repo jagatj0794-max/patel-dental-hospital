@@ -349,7 +349,7 @@ export default function BlogsGujarati({ openAppointmentModal, setCurrentPage, cu
                   </p>
                 </div>
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-1.5">
-                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">सामान्य શારીરિક સ્વાસ્થ્ય</h3>
+                  <h3 className="font-sans font-bold text-[#081C3A] text-sm">સામાન્ય શારીરિક સ્વાસ્થ્ય</h3>
                   <p className="text-xs text-slate-500 leading-normal">
                     ડાયાબિટીસ જેવી લાંબી બીમારીઓ નિયંત્રણમાં હોવી જોઈએ. પટેલ ડેન્ટલ હોસ્પિટલ ખાતે વ્યાવસાયિક ક્લિનિકલ મૂલ્યાંકન રાજકોટમાં આ અદ્યતન ડેન્ટલ ટ્રીટમેન્ટ માટે તમારી પાત્રતા નક્કી કરે છે.
                   </p>

@@ -182,7 +182,7 @@ const SERVICES_HUB_DATA: ServiceCardMeta[] = [
     badgeGu: 'સ્પેશિયલ સારવાર',
     image: '/oral-and-maxillofacial-surgery.png',
     highlightsEn: ['Mouth Opening Restoration', 'Tissue Elasticity Therapy', 'Specialist Surgical Protocols'],
-    highlightsGu: ['મોં ખોલવાની ક્ષમતા苏ધારણા', 'બળતરામાં તાત્કાલિક રાહત', 'નિષ્ણાત સર્જિકલ કેર']
+    highlightsGu: ['મોં ખોલવાની ક્ષમતા સુધારણા', 'બળતરામાં તાત્કાલિક રાહત', 'નિષ્ણાત સર્જિકલ કેર']
   }
 ];
 

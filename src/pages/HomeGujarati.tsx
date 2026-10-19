@@ -772,7 +772,7 @@ export default function HomeGujarati({
       greenHighlightLineVal = "ઉપરના અને નીચેના બંને જડબામાં તમામ દાંત, પેઢાં અને ટેમ્પોરોમેન્ડિબ્યુલર જોઈન્ટને ફરીથી બનાવવાની અથવા સુધારવાની પ્રક્રિયાને ફુલ માઉથ રિહેબિલિટેશન, રિકન્સ્ટ્રક્શન અથવા રિસ્ટોરેશન કહેવામાં આવે છે.";
     } else if (defaultSlug === 'invisible-aligners') {
       titleVal = "ઇનવિઝિબલ અલાઈનર્સ";
-      shortDescVal = `નિષ્ણાતો અને અદ્યતન સોફ્ષવેરની મદદથી તમારા માટે ખાસ બનાવવામાં આવેલા કસ્ટમ અલાઈનર્સની શ્રેણી દ્વારા દાંતને સીધા અને યોગ્ય ગોઠવણીમાં લાવવાની આધુનિક પદ્ધતિ. અમારા અલાઈનર ટ્રે સ્મૂથ, આરામદાયક અને લગભગ અદૃશ્ય પ્લાસ્ટિકમાંથી બનાવવામાં આવે છે, જેને તમે સરળતાથી દાંત પર પહેરી શકો છો. અમારા ઇનવિઝિબલ અલાઈનર્સ વાયર અથવા બ્રેકેટ્સના ઉપયોગ વિના તમારા દાંતને ધીમે ધીમે અને હળવેથી યોગ્ય સ્થિતિમાં લાવે છે.`;
+      shortDescVal = `નિષ્ણાતો અને અદ્યતન સોફ્ટવેરની મદદથી તમારા માટે ખાસ બનાવવામાં આવેલા કસ્ટમ અલાઈનર્સની શ્રેણી દ્વારા દાંતને સીધા અને યોગ્ય ગોઠવણીમાં લાવવાની આધુનિક પદ્ધતિ. અમારા અલાઈનર ટ્રે સ્મૂથ, આરામદાયક અને લગભગ અદૃશ્ય પ્લાસ્ટિકમાંથી બનાવવામાં આવે છે, જેને તમે સરળતાથી દાંત પર પહેરી શકો છો. અમારા ઇનવિઝિબલ અલાઈનર્સ વાયર અથવા બ્રેકેટ્સના ઉપયોગ વિના તમારા દાંતને ધીમે ધીમે અને હળવેથી યોગ્ય સ્થિતિમાં લાવે છે.`;
       greenHighlightLineVal = "નિષ્ણાતો અને અદ્યતન સોફ્ટવેરની મદદથી તમારા માટે ખાસ બનાવવામાં આવેલા કસ્ટમ અલાઈનર્સની શ્રેણી દ્વારા દાંતને સીધા અને યોગ્ય ગોઠવણીમાં લાવવાની આધુનિક પદ્ધતિ.";
     } else if (defaultSlug === 'smile-makeover') {
       titleVal = "સ્માઇલ મેકઓવર";
@@ -780,7 +780,7 @@ export default function HomeGujarati({
       greenHighlightLineVal = "વ્યક્તિગત સ્માઇલ મેકઓવર સારવાર દ્વારા તમારા આત્મવિશ્વાસ અને દાંતના સૌંદર્યમાં વધારો કરો.";
     } else if (defaultSlug === 'crowns-and-bridges') {
       titleVal = "ક્રાઉન્સ અને બ્રિજ";
-      shortDescVal = `ડેન્ટલ ક્રાઉન એ ખાસ બનાવવામાં આવતી કેપ છે, જે ક્ષતિગ્રસ્ત, સડેલા અથવા રૂટ કેનલની સારવાર કરાયેલા દાંતને ઢાંકે છે અને તેના મૂળ આકાર, મજબૂતી અને દેખાવને પુનઃસ્થાપિત કરવામાં મદદ કરે છે. ડેન્ટલ બ્રિજ કુદરતી નજીકના દાંત અથવા ઇમ્પ્લાન્ટ વચ્ચે કૃત્રિમ દાંત (પોન્ટિક્સ)ને આધાર આપીને એક અથવા વધુ ગુમ થયેલા દાંતને બદલે છે. જ્યારે ગુમ થયેલા દાંતને સમયસર બદલવામાં આવતા નથી, ત્યારે નજીકના દાંત ખાલી જગ્યામાં ખસી શકે છે, જેના કારણે બાઇટ કોલેપ્સ, ચાવવામાં ફેરહાર અને ટેમ્પોરોમેન્ડિબ્યુલર (TM) જોઈન્ટ પર તાણ આવી શકે છે.`;
+      shortDescVal = `ડેન્ટલ ક્રાઉન એ ખાસ બનાવવામાં આવતી કેપ છે, જે ક્ષતિગ્રસ્ત, સડેલા અથવા રૂટ કેનલની સારવાર કરાયેલા દાંતને ઢાંકે છે અને તેના મૂળ આકાર, મજબૂતી અને દેખાવને પુનઃસ્થાપિત કરવામાં મદદ કરે છે. ડેન્ટલ બ્રિજ કુદરતી નજીકના દાંત અથવા ઇમ્પ્લાન્ટ વચ્ચે કૃત્રિમ દાંત (પોન્ટિક્સ)ને આધાર આપીને એક અથવા વધુ ગુમ થયેલા દાંતને બદલે છે. જ્યારે ગુમ થયેલા દાંતને સમયસર બદલવામાં આવતા નથી, ત્યારે નજીકના દાંત ખાલી જગ્યામાં ખસી શકે છે, જેના કારણે બાઇટ કોલેપ્સ, ચાવવામાં ફેરફાર અને ટેમ્પોરોમેન્ડિબ્યુલર (TM) જોઈન્ટ પર તાણ આવી શકે છે.`;
       greenHighlightLineVal = "ક્રાઉન્સ અને બ્રિજ દ્વારા ગુમ થયેલા દાંતને બદલવાથી ચાવવાની કાર્યક્ષમતા પુનઃસ્થાપિત થાય છે, બાઇટ કોલેપ્સ અટકાવવામાં મદદ મળે છે અને TM જોઈન્ટની યોગ્ય ગોઠવણી જાળવવામાં મદદ મળે છે.";
     } else if (defaultSlug === 'teeth-whitening') {
       titleVal = "દાંત સફેદ કરવાની સારવાર";
@@ -1223,7 +1223,7 @@ export default function HomeGujarati({
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: "any" }}
+              viewport={{ once: true, amount: "some" }}
               transition={{ duration: 0.6 }}
               className="text-center max-w-3xl mx-auto mb-12"
             >
@@ -1280,13 +1280,13 @@ export default function HomeGujarati({
                 }
               ].map((item, index) => {
                 const isStringIcon = typeof item.icon === 'string';
-                const IconComponent = item.icon as React.ComponentType<{ className?: string }>;
+                const IconComponent = !isStringIcon ? (item.icon as unknown as React.ComponentType<{ className?: string }>) : null;
                 return (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: "any" }}
+                    viewport={{ once: true, amount: "some" }}
                     transition={{ duration: 0.4, delay: index * 0.04 }}
                     onClick={() => openAppointmentModal()}
                     className="group bg-white rounded-[20px] p-6 border border-slate-200/60 shadow-[0_4px_20px_rgba(8,28,58,0.02)] hover:shadow-[0_12px_32px_rgba(8,28,58,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center text-center justify-center min-h-[160px] cursor-pointer"
@@ -1300,9 +1300,9 @@ export default function HomeGujarati({
                           className={`w-full h-full object-contain ${item.scaleClass || 'scale-100'}`} 
                           referrerPolicy="no-referrer"
                         />
-                      ) : (
+                      ) : IconComponent ? (
                         <IconComponent className="w-full h-full object-contain" />
-                      )}
+                      ) : null}
                     </div>
 
                     {/* Centered Content Wording */}
@@ -1353,7 +1353,7 @@ export default function HomeGujarati({
           <motion.div 
             initial={{ opacity: 0.1, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: "any" }}
+            viewport={{ once: true, amount: "some" }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="block lg:mt-[55px] mb-16"
           >
@@ -2402,7 +2402,7 @@ export default function HomeGujarati({
                   તમને રાજકોટમાં ડેન્ટલ ઇમ્પ્લાન્ટ સ્પેશિયાલિસ્ટ, રાજકોટમાં રૂટ કેનાલ સ્પેશિયાલિસ્ટ અથવા રાજકોટમાં સંપૂર્ણ સ્માઇલ મેકઓવર સારવારની જરૂર હોય, અમારું ધ્યાન દર્દી-કેન્દ્રિત કાળજી દ્વારા તમારો આત્મવિશ્વાસ, આરામ અને લાંબા ગાળાનું ઓરલ હેલ્થ પુનઃસ્થાપિત કરવા પર છે.
                 </p>
                 <p>
-                  45,000થી વધુ સંતુષ્ટ દર્દીઓ અને 14+ વર્ષના ક્લિનિકલ અનુભવ સાથે, પટેલ ડેન્ટલ હોસ્પિટલ રાજકોટની અગ્રણી ડેન્ટલ ઇમ્પ્લાન્ટ હોસ્પิตલ તરીકે અને ભારતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલોમાંની એક તરીકે વિશ્વસનીય છે.
+                  45,000થી વધુ સંતુષ્ટ દર્દીઓ અને 14+ વર્ષના ક્લિનિકલ અનુભવ સાથે, પટેલ ડેન્ટલ હોસ્પિટલ રાજકોટની અગ્રણી ડેન્ટલ ઇમ્પ્લાન્ટ હોસ્પિટલ તરીકે અને ભારતની શ્રેષ્ઠ ડેન્ટલ હોસ્પિટલોમાંની એક તરીકે વિશ્વસનીય છે.
                 </p>
               </div>
 
