@@ -20,7 +20,6 @@ import { getAwardCaption, cleanAwardImageUrl } from '../utils/awardCaptions';
 import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { InstagramEmbed } from '../components/InstagramEmbed';
 import { Mp4ReelPlayer } from '../components/Mp4ReelPlayer';
-import { isPublicCategory, getCategoryLabel } from '../utils/galleryLabels';
 
 // Custom SVG Premium Dental-Specific Representation Icons
 const DentalImplantIcon = ({ className }: { className?: string }) => (
@@ -1947,14 +1946,6 @@ export default function Home({
                       referrerPolicy="no-referrer"
                       loading="lazy"
                     />
-                    
-                    {/* Category Badge */}
-                    {isPublicCategory(img.category) && (
-                      <span className="absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
-                        {getCategoryLabel(img.category, false)}
-                      </span>
-                    )}
-
                     {/* Hover Overlay */}
                     <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <div className="bg-white/95 backdrop-blur-xs p-3 rounded-full shadow-lg transform translate-y-3 group-hover:translate-y-0 transition-all duration-300">
