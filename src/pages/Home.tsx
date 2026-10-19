@@ -500,6 +500,7 @@ interface HomeProps {
   patientMoments?: PatientMoment[];
   videosList?: DentalVideo[];
   contactInfo?: ContactInfo;
+  initialAwards?: AwardItem[];
 }
 
 export default function Home({ 
@@ -512,7 +513,8 @@ export default function Home({
   mediaImages = [],
   patientMoments,
   videosList = [],
-  contactInfo
+  contactInfo,
+  initialAwards = []
 }: HomeProps) {
 
   const momentsToRender = patientMoments !== undefined ? patientMoments : PATIENT_MOMENTS;
@@ -564,7 +566,7 @@ export default function Home({
   };
 
   const [dbServices, setDbServices] = useState<Service[]>([]);
-  const [awardsList, setAwardsList] = useState<AwardItem[]>([]);
+  const [awardsList, setAwardsList] = useState<AwardItem[]>(() => initialAwards || []);
   const [detectedOrientations, setDetectedOrientations] = useState<Record<string, 'horizontal' | 'vertical'>>({});
 
   useEffect(() => {
@@ -1764,7 +1766,7 @@ export default function Home({
                                       src={cleanAwardImageUrl(item.image_url) || null}
                                       alt={item.alt_text || "Award & Recognition Horizontal"}
                                       className="h-full w-auto object-contain object-center rounded-lg"
-                                      loading="eager"
+                                      loading={idx < 9 ? "eager" : "lazy"}
                                       referrerPolicy="no-referrer"
                                     />
                                   </div>
@@ -1811,7 +1813,7 @@ export default function Home({
                                       src={cleanAwardImageUrl(item.image_url) || null}
                                       alt={item.alt_text || "Award & Recognition Horizontal"}
                                       className="h-full w-auto object-contain object-center rounded-lg"
-                                      loading="eager"
+                                      loading="lazy"
                                       referrerPolicy="no-referrer"
                                     />
                                   </div>

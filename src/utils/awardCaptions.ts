@@ -232,6 +232,9 @@ export function cleanAwardImageUrl(imageUrl: string): string {
 }
 
 export function getAwardSavedText(id: string, _imageUrl?: string): { title?: string; subtitle?: string; person_name?: string; date?: string; alt_text?: string } | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
   try {
     const stored = safeStorage.getItem('award_text_' + id);
     if (stored) {

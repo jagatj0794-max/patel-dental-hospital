@@ -11,6 +11,14 @@ import { getAwardCaption, cleanAwardImageUrl, parseAwardMetaFromUrl, getAwardSav
 
 export { cleanAwardImageUrl, parseAwardMetaFromUrl, getAwardSavedText };
 
+const VERTICAL_AWARD_IDS = new Set([
+  '3a7cc3e0-bfe6-4300-99fb-b5a153c5fc69',
+  '472f0848-85d5-4d86-b167-5d0d722f9494',
+  'ba137ef1-c883-4b39-8333-f54518070ac4',
+  '1422a2d5-7feb-4b7e-8107-5607398d6032',
+  '2232f4c8-26dd-4ef9-8f6f-9e1c019608e6'
+]);
+
 export function generateUUID(): string {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
     return window.crypto.randomUUID();
@@ -94,7 +102,9 @@ export const awardsService = {
           id: row.id,
           image_url: rawUrl,
           display_order: Number(row.display_order) || 0,
-          orientation: hasCol ? (row.orientation || 'horizontal') : 'horizontal',
+          orientation: (row.orientation && (row.orientation === 'vertical' || row.orientation === 'horizontal'))
+            ? row.orientation
+            : (VERTICAL_AWARD_IDS.has(row.id) ? 'vertical' : 'horizontal'),
           is_active: row.is_active !== false,
           title,
           subtitle,

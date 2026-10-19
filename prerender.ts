@@ -72,6 +72,7 @@ import { heroService } from './src/utils/heroData';
 import { DEFAULT_MEDIA_IMAGES, galleryService } from './src/utils/galleryData';
 import { PATIENT_MOMENTS } from './src/data/patientMoments';
 import { DEFAULT_VIDEOS, videoService } from './src/utils/videoData';
+import { awardsService } from './src/utils/awardsData';
 import { supabase } from './src/utils/supabase';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -890,6 +891,7 @@ interface AllFetchedData {
   patientMoments: any[];
   videos: any[];
   blogs: any[];
+  awards: any[];
 }
 
 /**
@@ -1052,6 +1054,18 @@ async function fetchAllData(): Promise<AllFetchedData> {
     // blogs table optional
   }
 
+  let awards: any[] = [];
+  try {
+    const fetchedAwards = await awardsService.getAwards();
+    if (fetchedAwards && Array.isArray(fetchedAwards) && fetchedAwards.length > 0) {
+      awards = sanitizeNoBase64(fetchedAwards.filter((a: any) => a.is_active !== false));
+      console.log(`  ✓ Loaded ${awards.length} active awards from Supabase`);
+    }
+  } catch (err) {
+    console.warn('  ⚠️ Awards fetch warning, falling back to empty:', err);
+    awards = [];
+  }
+
   return {
     services,
     faqs,
@@ -1062,7 +1076,8 @@ async function fetchAllData(): Promise<AllFetchedData> {
     mediaImages,
     patientMoments,
     videos,
-    blogs
+    blogs,
+    awards
   };
 }
 
@@ -1130,6 +1145,26 @@ function getRouteSpecificPreloadedData(route: typeof routes[number], allData: Al
         title: v.title,
         video_url: v.video_url,
         thumbnail_url: v.thumbnail_url,
+      })),
+      awards: (allData.awards || []).map(a => ({
+        id: a.id,
+        image_url: a.image_url,
+        orientation: a.orientation || 'horizontal',
+        is_active: a.is_active,
+        display_order: a.display_order,
+        title: a.title,
+        subtitle: a.subtitle,
+        person_name: a.person_name,
+        date: a.date,
+        alt_text: a.alt_text,
+      })),
+      mediaImages: (allData.mediaImages || []).map(img => ({
+        id: img.id,
+        url: img.url,
+        title: img.title,
+        category: img.category,
+        branch: img.branch,
+        altText: img.altText,
       }))
     };
   }

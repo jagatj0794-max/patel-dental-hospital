@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, PhoneCall, Plus, Table, Trash2, X, Sparkles, Check, CheckSquare } from 'lucide-react';
 
-import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo } from './types';
+import { PageId, GalleryItem, Appointment, Doctor, PatientMoment, ContactInfo, DentalVideo, AwardItem } from './types';
 import { DEFAULT_DOCTORS } from './data/doctors';
 import { safeStorage } from './utils/storage';
 import { supabase } from './utils/supabase';
@@ -420,6 +420,10 @@ export default function App({
 
   // Video management state initialized with preloaded/default values; updated from Supabase on mount
   const [videosList, setVideosList] = useState<DentalVideo[]>(() => preloadedData?.videos || DEFAULT_VIDEOS);
+
+  // Awards state initialized with preloaded values; updated from Supabase on mount
+  const [awardsList, setAwardsList] = useState<AwardItem[]>(() => preloadedData?.awards || []);
+
 
   // Load Contact Info from Supabase on mount
   useEffect(() => {
@@ -921,6 +925,7 @@ export default function App({
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
+            initialAwards={awardsList}
           />
         ) : (
           <Home 
@@ -934,6 +939,7 @@ export default function App({
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
+            initialAwards={awardsList}
           />
         );
       case 'services':
@@ -1146,6 +1152,7 @@ export default function App({
             patientMoments={patientMoments}
             videosList={videosList}
             contactInfo={contactInfo}
+            initialAwards={awardsList}
           />
         );
     }
