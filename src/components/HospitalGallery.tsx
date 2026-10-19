@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Maximize2, X, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
 import { MediaImage } from '../pages/SmileGallery';
+import { isPublicCategory, getCategoryLabel, getBranchLabel } from '../utils/galleryLabels';
 
 interface HospitalGalleryProps {
   mediaImages: MediaImage[];
@@ -28,8 +29,8 @@ export default function HospitalGallery({
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Extract unique categories from mediaImages
-  const rawCategories = Array.from(new Set((mediaImages || []).map(img => img.category).filter(Boolean)));
+  // Extract unique public categories from mediaImages
+  const rawCategories = Array.from(new Set((mediaImages || []).map(img => img.category).filter(isPublicCategory)));
   const categories = ['All', ...rawCategories];
 
   // Filtered images based on active category selection
@@ -92,13 +93,7 @@ export default function HospitalGallery({
                       : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600'
                   }`}
                 >
-                  {isGujarati
-                    ? category === 'All'
-                      ? 'બધા'
-                      : category === 'Homepage Gallery'
-                      ? 'હોમપેજ ગેલેરી'
-                      : category
-                    : category}
+                  {getCategoryLabel(category, isGujarati)}
                 </button>
               ))}
             </div>
@@ -141,9 +136,9 @@ export default function HospitalGallery({
                     />
                     
                     {/* Category Badge */}
-                    {img.category && img.category !== 'Homepage Gallery' && (
-                      <span className="absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
-                        {img.category}
+                    {isPublicCategory(img.category) && (
+                      <span className={`absolute top-3 left-3 bg-[#081C3A]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 shadow-sm ${isGujarati ? 'gujarati-text' : ''}`}>
+                        {getCategoryLabel(img.category, isGujarati)}
                       </span>
                     )}
 
@@ -221,11 +216,15 @@ export default function HospitalGallery({
                     <h3 className="font-display font-bold text-sm sm:text-base text-white">
                       {currentLightboxImg.title}
                     </h3>
-                    {currentLightboxImg.category && (
-                      <span className="text-[10px] font-bold text-[#11B5D8] tracking-wider uppercase">
-                        {currentLightboxImg.category} {currentLightboxImg.branch ? `• ${currentLightboxImg.branch}` : ''}
-                      </span>
-                    )}
+                    {isPublicCategory(currentLightboxImg.category) && (() => {
+                      const categoryLabel = getCategoryLabel(currentLightboxImg.category, isGujarati);
+                      const branchLabel = getBranchLabel(currentLightboxImg.branch, isGujarati);
+                      return (
+                        <span className={`text-[10px] font-bold text-[#11B5D8] tracking-wider uppercase ${isGujarati ? 'gujarati-text' : ''}`}>
+                          {categoryLabel}{branchLabel ? ` • ${branchLabel}` : ''}
+                        </span>
+                      );
+                    })()}
                   </div>
                   {lightboxIndex !== null && (
                     <span className="text-xs font-bold text-white/50">
