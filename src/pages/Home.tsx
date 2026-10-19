@@ -802,7 +802,7 @@ export default function Home({
           <div className="hidden md:block lg:hidden absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
             <img
               src="/patel-tablet-bg.webp"
-              alt="Background"
+              alt="Modern clinic interior at Patel Dental Hospital, Rajkot"
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
@@ -1169,7 +1169,7 @@ export default function Home({
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: "any" }}
+              viewport={{ once: true, amount: "some" }}
               transition={{ duration: 0.6 }}
               className="text-center max-w-3xl mx-auto mb-12"
             >
@@ -1226,13 +1226,13 @@ export default function Home({
                 }
               ].map((item, index) => {
                 const isStringIcon = typeof item.icon === 'string';
-                const IconComponent = item.icon as React.ComponentType<{ className?: string }>;
+                const IconComponent = !isStringIcon ? (item.icon as unknown as React.ComponentType<{ className?: string }>) : null;
                 return (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: "any" }}
+                    viewport={{ once: true, amount: "some" }}
                     transition={{ duration: 0.4, delay: index * 0.04 }}
                     onClick={() => openAppointmentModal()}
                     className="group bg-white rounded-[20px] p-6 border border-slate-200/60 shadow-[0_4px_20px_rgba(8,28,58,0.02)] hover:shadow-[0_12px_32px_rgba(8,28,58,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center text-center justify-center min-h-[160px] cursor-pointer"
@@ -1246,9 +1246,9 @@ export default function Home({
                           className={`w-full h-full object-contain ${item.scaleClass || 'scale-100'}`} 
                           referrerPolicy="no-referrer"
                         />
-                      ) : (
+                      ) : IconComponent ? (
                         <IconComponent className="w-full h-full object-contain" />
-                      )}
+                      ) : null}
                     </div>
 
                     {/* Centered Content Wording */}
@@ -1299,7 +1299,7 @@ export default function Home({
           <motion.div 
             initial={{ opacity: 0.1, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: "any" }}
+            viewport={{ once: true, amount: "some" }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="block lg:mt-[55px] mb-16"
           >

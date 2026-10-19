@@ -802,6 +802,8 @@ export default function HomeGujarati({
       titleVal = "ટૂથ કલર્ડ ફિલિંગ (કમ્પોઝિટ ફિલિંગ)";
       shortDescVal = `કમ્પોઝિટ ફિલિંગ અદ્યતન સિરામિક અને રેઝિન સામગ્રીમાંથી બનાવવામાં આવે છે, જે કુદરતી દાંત સાથે રાસાયણિક રીતે જોડાય છે અને દાંતની કાર્યક્ષમતા તથા દેખાવ બંનેને પુનઃસ્થાપિત કરવામાં મદદ કરે છે.`;
       greenHighlightLineVal = "સુંદર સ્મિત માટે કુદરતી દાંતના રંગની ફિલિંગ";
+    } else if (defaultSlug === 'oral-submucous-fibrosis-osmf-treatment-rajkot' || id === 'osmf-srv') {
+      titleVal = "ઓરલ સબમ્યુકસ ફાઇબ્રોસિસ (OSMF) ની સારવાર અને સર્જરી - રાજકોટ";
     }
 
     const isValidImage = (url: any): boolean => {
@@ -844,7 +846,7 @@ export default function HomeGujarati({
             */}
             <img
               src={heroBgImage || "/patel-doctors-transparent.webp"}
-              alt="Dr. Vipul Patel and Dr. Kinjal Patel at Patel Dental Hospital reception"
+              alt="પટેલ ડેન્ટલ હોસ્પિટલ રાજકોટના રિસેપ્શન ખાતે ડૉ. વિપુલ પટેલ અને ડૉ. કિંજલ પટેલ"
               className="w-full h-full object-cover object-top lg:object-[right_top]"
               referrerPolicy="no-referrer"
               loading="eager"
@@ -856,7 +858,7 @@ export default function HomeGujarati({
           <div className="hidden md:block lg:hidden absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
             <img
               src="/patel-tablet-bg.webp"
-              alt="Background"
+              alt="પટેલ ડેન્ટલ હોસ્પિટલનું આધુનિક ક્લિનિક"
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
@@ -864,7 +866,7 @@ export default function HomeGujarati({
           <div className="hidden md:flex lg:hidden absolute right-0 bottom-0 top-0 h-full w-[56%] md:w-[58%] z-10 items-end justify-end pointer-events-none pr-1 md:pr-4">
             <img
               src="/tablet-hero-image-1.webp"
-              alt="Dr. Vipul Patel and Dr. Kinjal Patel - Patel Dental Hospital"
+              alt="ડૉ. વિપુલ પટેલ અને ડૉ. કિંજલ પટેલ - પટેલ ડેન્ટલ હોસ્પિટલ"
               className="h-full w-full object-contain object-bottom drop-shadow-xl select-none"
               referrerPolicy="no-referrer"
             />
@@ -874,7 +876,7 @@ export default function HomeGujarati({
           <div className="block md:hidden absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             <img 
               src={heroBgImageMobile || heroBgImage || "/patel-tablet-bg.webp"} 
-              alt="Dr. Vipul Patel and Dr. Kinjal Patel" 
+              alt="ડૉ. વિપુલ પટેલ અને ડૉ. કિંજલ પટેલ, રાજકોટના ડેન્ટલ નિષ્ણાતો" 
               className="w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
               loading="eager"
@@ -1364,7 +1366,7 @@ export default function HomeGujarati({
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/1-1.webp" 
-                      alt="Digital Dental Experts" 
+                      alt="ડિજિટલ ડેન્ટલ નિષ્ણાતો" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
@@ -1382,7 +1384,7 @@ export default function HomeGujarati({
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/2-1.webp" 
-                      alt="Dental Implant Specialists" 
+                      alt="ડેન્ટલ ઇમ્પ્લાન્ટ નિષ્ણાતો" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
@@ -1400,7 +1402,7 @@ export default function HomeGujarati({
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/3-1.webp" 
-                      alt="Braces & Invisible Aligner Experts" 
+                      alt="બ્રેસિસ અને ઇનવિઝિબલ અલાઈનર નિષ્ણાતો" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
@@ -1418,7 +1420,7 @@ export default function HomeGujarati({
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/4-1.webp" 
-                      alt="FMR & Root Canal Specialists" 
+                      alt="FMR અને રૂટ કેનાલ નિષ્ણાતો" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
@@ -1436,7 +1438,7 @@ export default function HomeGujarati({
                   <div className="h-24 w-24 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110">
                     <img 
                       src="/5-1.webp" 
-                      alt="Oral & Maxillofacial Surgery" 
+                      alt="ઓરલ અને મેક્સિલોફેશિયલ સર્જરી" 
                       className="h-20 w-20 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
@@ -1617,7 +1619,7 @@ export default function HomeGujarati({
                       {isStringIcon ? (
                         <img 
                           src={item.icon || null} 
-                          alt={item.title} 
+                          alt={item.titleGuj || item.title} 
                           className={item.title === "Root Canal Treatments" || item.title === "Dental Implants"
                             ? "h-[50px] w-[34px] md:h-[66px] md:w-[44px] object-contain mx-auto"
                             : item.title === "Aligners"
@@ -1739,7 +1741,7 @@ export default function HomeGujarati({
                           >
                             <img
                               src={cleanAwardImageUrl(item.image_url) || null}
-                              alt={item.alt_text || "Award & Recognition Vertical"}
+                              alt={item.alt_text || "એવોર્ડ અને સન્માન"}
                               className="h-full w-auto object-contain object-center rounded-lg shadow-sm"
                               loading="lazy"
                               referrerPolicy="no-referrer"
@@ -1828,7 +1830,7 @@ export default function HomeGujarati({
                                   >
                                     <img
                                       src={cleanAwardImageUrl(item.image_url) || null}
-                                      alt={item.alt_text || "Award & Recognition Horizontal"}
+                                      alt={item.alt_text || "એવોર્ડ અને સન્માન"}
                                       className="h-full w-auto object-contain object-center rounded-lg"
                                       loading="eager"
                                       referrerPolicy="no-referrer"
@@ -1875,7 +1877,7 @@ export default function HomeGujarati({
                                   >
                                     <img
                                       src={cleanAwardImageUrl(item.image_url) || null}
-                                      alt={item.alt_text || "Award & Recognition Horizontal"}
+                                      alt={item.alt_text || "એવોર્ડ અને સન્માન"}
                                       className="h-full w-auto object-contain object-center rounded-lg"
                                       loading="eager"
                                       referrerPolicy="no-referrer"
@@ -1948,7 +1950,7 @@ export default function HomeGujarati({
               <div className="flex-1 min-h-0 w-full flex items-center justify-center">
                 <img
                   src={cleanAwardImageUrl(selectedAward.image_url) || null}
-                  alt={selectedAward.alt_text || "Award Full View"}
+                  alt={selectedAward.alt_text || "એવોર્ડ સંપૂર્ણ દૃશ્ય"}
                   className="max-w-full max-h-[65vh] sm:max-h-[70vh] object-contain rounded-lg shadow-2xl"
                   referrerPolicy="no-referrer"
                 />
@@ -1993,7 +1995,7 @@ export default function HomeGujarati({
           {filteredHospitalImages.length === 0 ? (
             <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-3xs max-w-lg mx-auto">
               <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-700 font-bold text-sm">No gallery photos available.</p>
+              <p className="text-slate-700 font-bold text-sm">ગેલેરીમાં હાલમાં કોઈ ફોટા ઉપલબ્ધ નથી.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -2010,7 +2012,7 @@ export default function HomeGujarati({
                   <div className="relative w-full overflow-hidden bg-slate-50">
                     <img
                       src={img.url}
-                      alt={img.altText || img.title || 'Patel Dental Hospital Gallery'}
+                      alt={img.altText || img.title || 'પટેલ ડેન્ટલ હોસ્પિટલ ગેલેરી'}
                       className="w-full h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-105 block"
                       referrerPolicy="no-referrer"
                       loading="lazy"
@@ -2077,7 +2079,7 @@ export default function HomeGujarati({
 
               <img
                 src={currentHospitalLightboxImg.url}
-                alt={currentHospitalLightboxImg.altText || currentHospitalLightboxImg.title || 'Gallery View'}
+                alt={currentHospitalLightboxImg.altText || currentHospitalLightboxImg.title || 'ગેલેરી દૃશ્ય'}
                 className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
                 referrerPolicy="no-referrer"
               />
@@ -2111,7 +2113,7 @@ export default function HomeGujarati({
           className="w-full sm:w-auto px-8 py-4 bg-transparent hover:bg-slate-50 border border-slate-300 text-[#081C3A] text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 cursor-pointer text-center flex items-center justify-center space-x-2 shadow-sm hover:shadow-md transform hover:-translate-y-[2px] active:scale-98"
         >
           <ImageIcon className="h-4 w-4 shrink-0 text-[#081C3A]" />
-          <span>View More Photos</span>
+          <span>વધુ ફોટા જુઓ</span>
         </button>
 
         <button
@@ -2119,7 +2121,7 @@ export default function HomeGujarati({
           className="w-full sm:w-auto px-8 py-4 bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition duration-200 shadow-md hover:shadow-lg cursor-pointer text-center flex items-center justify-center space-x-2 transform hover:-translate-y-[2px] active:scale-98"
         >
           <Calendar className="h-4 w-4 shrink-0 text-white" />
-          <span>Book Free Consultation</span>
+          <span>ફ્રી પુછપરછ માટે બુક કરો</span>
         </button>
       </div>
 
@@ -2353,7 +2355,7 @@ export default function HomeGujarati({
                   <img
                     className="w-full h-full object-cover absolute inset-0"
                     src="/IMG_20190521_190345.jpg"
-                    alt="Patel Dental Hospital Premium Modern Treatment Center"
+                    alt="પટેલ ડેન્ટલ હોસ્પિટલનું આધુનિક ટ્રીટમેન્ટ સેન્ટર"
                     referrerPolicy="no-referrer"
                   />
                 </motion.div>
@@ -2421,7 +2423,7 @@ export default function HomeGujarati({
                 <img
                    className="w-full h-full object-cover absolute inset-0 z-10"
                    src="/dental-treatment.webp"
-                   alt="Patel Dental Hospital Advanced Clinical Care"
+                   alt="પટેલ ડેન્ટલ હોસ્પિટલમાં અદ્યતન ક્લિનિકલ સંભાળ"
                    referrerPolicy="no-referrer"
                    loading="lazy"
                 />
@@ -2600,7 +2602,7 @@ export default function HomeGujarati({
               <div className="rounded-[20px] overflow-hidden aspect-[16/10] bg-slate-100 relative shadow-[0_15px_45px_rgba(8,28,58,0.06)] border border-slate-150 group">
                 <img
                   src="/dental-treatment-near-me.jpg"
-                  alt="Patel Dental Hospital and Clinic Reception Lounge in Rajkot"
+                  alt="રાજકોટમાં પટેલ ડેન્ટલ હોસ્પિટલનું રિસેપ્શન લાઉન્જ"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                   referrerPolicy="no-referrer"
                 />
