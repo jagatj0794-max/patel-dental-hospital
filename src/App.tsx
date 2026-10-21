@@ -17,7 +17,7 @@ import { galleryService, DEFAULT_MEDIA_IMAGES } from './utils/galleryData';
 import { videoService, DEFAULT_VIDEOS } from './utils/videoData';
 import { contactService, DEFAULT_CONTACT_INFO } from './utils/contactData';
 import { PATIENT_MOMENTS } from './data/patientMoments';
-import { appointmentService, AdminAppointment } from './utils/appointmentData';
+import { appointmentService, AdminAppointment, generateAppointmentId } from './utils/appointmentData';
 import { whatsappNotificationService } from './utils/notificationService';
 import { realtimeService } from './utils/realtimeService';
 import Navbar from './components/Navbar';
@@ -238,10 +238,9 @@ export default function App({
         const bookedIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
         if (bookedIds.length === 0) return;
 
-        const { data, error } = await supabase.client
-          .from('appointments')
-          .select('*')
-          .in('id', bookedIds);
+        const { data, error } = await supabase.client.rpc('get_my_appointments', {
+          p_ids: bookedIds
+        });
 
         if (error) {
           console.warn('Error fetching my appointments:', error);
@@ -675,7 +674,7 @@ export default function App({
       return false;
     }
 
-    const newId = `apt-${Date.now()}`;
+    const newId = generateAppointmentId();
     const newAdminApt: AdminAppointment = {
       id: newId,
       patientName: data.name,
@@ -770,18 +769,19 @@ export default function App({
 
   const handleCancelAppointment = async (id: string) => {
     try {
-      const { error } = await supabase.client
-        .from('appointments')
-        .update({ status: 'Cancelled' })
-        .eq('id', id);
+      const { data, error } = await supabase.client.rpc('cancel_my_appointment', {
+        p_id: id
+      });
 
       if (error) {
         console.error('Error cancelling appointment on Supabase:', error);
-      } else {
+      } else if (data === true) {
         setAppointments(prev => prev.filter((apt) => apt.id !== id));
         const bookedIds = JSON.parse(safeStorage.getSessionItem('my_booked_ids') || '[]');
         const updatedIds = bookedIds.filter((bid: string) => bid !== id);
         safeStorage.setSessionItem('my_booked_ids', JSON.stringify(updatedIds));
+      } else {
+        console.warn('Cancel not applied for appointment', id);
       }
     } catch (e) {
       console.error('Exception cancelling appointment:', e);

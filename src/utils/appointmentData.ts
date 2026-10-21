@@ -4,8 +4,27 @@
  */
 
 import { supabase } from './supabase';
-import { realtimeService } from './realtimeService';
 import { dbNotificationService } from './dbNotificationService';
+
+export function generateAppointmentId(): string {
+  if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+  if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+    // RFC 4122 v4: set version (0100) and variant (10xx)
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export interface AdminAppointment {
   id: string;
@@ -168,16 +187,6 @@ export const appointmentService = {
             appointment_time: appointment.appointmentTime,
             doctor: appointment.doctor || 'To Be Assigned'
           }).catch(err => console.error('[DB Notification] Failed to create from saveAppointment:', err));
-
-          // Trigger Real-time Notification Event
-          realtimeService.triggerNewAppointment({
-            id: appointment.id,
-            patientName: appointment.patientName,
-            mobileNumber: appointment.mobileNumber,
-            appointmentDate: appointment.appointmentDate,
-            appointmentTime: appointment.appointmentTime,
-            doctor: appointment.doctor || 'To Be Assigned'
-          }).catch(err => console.error('[Real-time Notification] Failed to trigger from saveAppointment:', err));
         }
       }
     } catch (e) {
@@ -226,18 +235,16 @@ export const appointmentService = {
   getBookedSlots: async (date: string, branch: string, _doctor?: string): Promise<string[]> => {
     try {
       if (!date || !branch) return [];
-      const { data, error } = await supabase.client
-        .from('appointments')
-        .select('appointment_time')
-        .eq('appointment_date', date)
-        .eq('branch', branch)
-        .neq('status', 'Cancelled');
+      const { data, error } = await supabase.client.rpc('get_booked_slots', {
+        p_date: date,
+        p_branch: branch
+      });
 
       if (error) {
         console.error('Error fetching booked slots:', error);
         return [];
       }
-      return (data || []).map(row => row.appointment_time);
+      return (Array.isArray(data) ? data : []) as string[];
     } catch (e) {
       console.error('Exception in getBookedSlots:', e);
       return [];
@@ -250,20 +257,17 @@ export const appointmentService = {
   isSlotAvailable: async (date: string, timeSlot: string, branch: string, _doctor?: string): Promise<boolean> => {
     try {
       if (!date || !timeSlot || !branch) return false;
-      const { data, error } = await supabase.client
-        .from('appointments')
-        .select('id')
-        .eq('appointment_date', date)
-        .eq('appointment_time', timeSlot)
-        .eq('branch', branch)
-        .neq('status', 'Cancelled')
-        .limit(1);
+      const { data, error } = await supabase.client.rpc('is_slot_available', {
+        p_date: date,
+        p_time: timeSlot,
+        p_branch: branch
+      });
 
       if (error) {
         console.error('Error checking slot availability:', error);
         return false;
       }
-      return (data || []).length === 0;
+      return data === true;
     } catch (e) {
       console.error('Exception in isSlotAvailable:', e);
       return false;
