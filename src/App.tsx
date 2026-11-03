@@ -23,6 +23,7 @@ import { realtimeService } from './utils/realtimeService';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingActionPanel from './components/FloatingActionPanel';
+import AIChatbot from './components/AIChatbot';
 import Lightbox from './components/Lightbox';
 
 // Pages
@@ -1245,11 +1246,14 @@ export default function App({
 
       {/* Floating active emergency action and booking widget */}
       {currentPage !== 'admin' && currentPage !== 'admin/login' && currentPage !== 'supabase-test' && (
-        <FloatingActionPanel 
-          openAppointmentModal={openAppointmentModal} 
-          contactInfo={contactInfo}
-          currentPage={currentPage}
-        />
+        <>
+          <FloatingActionPanel 
+            openAppointmentModal={openAppointmentModal} 
+            contactInfo={contactInfo}
+            currentPage={currentPage}
+          />
+          <AIChatbot language={language} />
+        </>
       )}
 
       {/* Custom Comparison Lightbox */}
